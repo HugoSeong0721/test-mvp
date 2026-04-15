@@ -4,6 +4,8 @@
 *.pyc
 *.swp
 .DS_Store
+Thumbs.db
+Desktop.ini
 .atom/
 .build/
 .buildlog/
@@ -22,6 +24,7 @@ migrate_working_dir/
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 #.vscode/
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -33,6 +36,8 @@ migrate_working_dir/
 /build/
 /web_build/
 /coverage/
+.env
+.env.*
 
 # Symbolication related
 app.*.symbols
