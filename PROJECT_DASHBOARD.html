@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Dashboard</title>
+  <style>
+    body { font-family: "Segoe UI", "Noto Sans KR", sans-serif; margin: 24px; background: #f5f7fb; color: #111827; }
+    h1 { margin: 0 0 10px; }
+    .sub { color: #4b5563; margin-bottom: 16px; }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; }
+    .done { color: #047857; font-weight: 700; }
+    .prog { color: #b45309; font-weight: 700; }
+    .block { color: #b91c1c; font-weight: 700; }
+    ul { padding-left: 18px; margin: 8px 0 0; }
+    li { margin: 6px 0; }
+    .links a { display: inline-block; margin: 4px 8px 0 0; }
+  </style>
+</head>
+<body>
+  <h1>APP Build Dashboard</h1>
+  <div class="sub">업데이트 날짜: 2026-04-14 | 이 파일은 진행 상황을 눈으로 확인하는 용도입니다.</div>
+
+  <div class="grid">
+    <section class="card">
+      <h3>현재 상태</h3>
+      <p><span class="prog">In Progress</span> Foundation 안정화</p>
+      <p><span class="block">Blocked</span> `puro` 경로 이슈로 `flutter run` 불안정</p>
+      <p><span class="done">Done</span> Scope/Wireframe/Spec/Flutter 설치/웹 빌드 1회 성공</p>
+    </section>
+
+    <section class="card">
+      <h3>이번 주 액션</h3>
+      <ul>
+        <li><input type="checkbox" checked /> MVP 범위 고정</li>
+        <li><input type="checkbox" checked /> 와이어프레임 작성</li>
+        <li><input type="checkbox" checked /> Flutter 설치</li>
+        <li><input type="checkbox" /> 로컬 실행 명령 1개로 고정</li>
+        <li><input type="checkbox" /> 3개 화면을 active root 프로젝트로 정리</li>
+        <li><input type="checkbox" /> GitHub 프로젝트 보드 연결</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h3>다음 단계</h3>
+      <ul>
+        <li>웹 우선 침술사 대시보드 UI 정리</li>
+        <li>Firebase 프로젝트 생성 및 Firestore 컬렉션 구성</li>
+        <li>환자 입력 -> 요약 -> 대시보드 흐름 연결</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="card links" style="margin-top:12px;">
+    <h3>트래킹 파일</h3>
+    <a href="EXECUTION_TRACKER.csv">EXECUTION_TRACKER.csv (Excel용)</a>
+    <a href="PROJECT_STATUS_BOARD.md">PROJECT_STATUS_BOARD.md</a>
+  </section>
+</body>
+</html>
