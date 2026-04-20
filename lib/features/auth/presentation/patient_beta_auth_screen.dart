@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/services/patient_profile_service.dart';
@@ -120,95 +120,124 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       appBar: AppBar(title: const Text('지인 베타 회원가입/로그인')),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 460),
-          child: Card(
-            margin: const EdgeInsets.all(20),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    _isRegisterMode ? '베타 회원가입' : '베타 로그인',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _isRegisterMode
-                        ? '지인 테스트용 계정을 만들고 바로 환자 화면으로 들어갑니다.'
-                        : '가입한 이메일과 비밀번호로 다시 들어갑니다.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade700),
-                  ),
-                  const SizedBox(height: 18),
-                  if (_isRegisterMode) ...[
-                    TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: '이름',
-                        border: OutlineInputBorder(),
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(20),
+            children: [
+              Card(
+                color: const Color(0xFFF7FBFA),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        '처음 오신 분 가이드',
+                        style: TextStyle(fontWeight: FontWeight.w700),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: '이메일',
-                      border: OutlineInputBorder(),
-                    ),
+                      SizedBox(height: 8),
+                      Text('1. 이름, 이메일, 비밀번호로 회원가입'),
+                      SizedBox(height: 4),
+                      Text('2. 로그인 후 프로필에서 전화번호와 이메일 확인'),
+                      SizedBox(height: 4),
+                      Text('3. 문진 질문에 답하고 제출하기'),
+                      SizedBox(height: 4),
+                      Text('4. 민감한 실제 건강정보 대신 테스트용 문구로 먼저 확인해도 됩니다.'),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: !_showPassword,
-                    decoration: InputDecoration(
-                      labelText: '비밀번호',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        onPressed: () =>
-                            setState(() => _showPassword = !_showPassword),
-                        icon: Icon(
-                          _showPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        _isRegisterMode ? '베타 회원가입' : '베타 로그인',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _loading ? null : _submit,
-                    child: Text(
-                      _loading
-                          ? '처리 중...'
-                          : _isRegisterMode
-                              ? '회원가입 후 시작'
-                              : '로그인',
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: _loading
-                        ? null
-                        : () => setState(
-                              () => _isRegisterMode = !_isRegisterMode,
+                      const SizedBox(height: 10),
+                      Text(
+                        _isRegisterMode
+                            ? '지인 테스트용 계정을 만들고 바로 환자 화면으로 들어갑니다.'
+                            : '가입한 이메일과 비밀번호로 다시 들어갑니다.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      const SizedBox(height: 18),
+                      if (_isRegisterMode) ...[
+                        TextField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            labelText: '이름',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      TextField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: '이메일',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: !_showPassword,
+                        decoration: InputDecoration(
+                          labelText: '비밀번호',
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            onPressed: () =>
+                                setState(() => _showPassword = !_showPassword),
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                             ),
-                    child: Text(
-                      _isRegisterMode
-                          ? '이미 계정이 있으면 로그인'
-                          : '처음이면 회원가입',
-                    ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      FilledButton(
+                        onPressed: _loading ? null : _submit,
+                        child: Text(
+                          _loading
+                              ? '처리 중...'
+                              : _isRegisterMode
+                                  ? '회원가입 후 시작'
+                                  : '로그인',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: _loading
+                            ? null
+                            : () => setState(
+                                  () => _isRegisterMode = !_isRegisterMode,
+                                ),
+                        child: Text(
+                          _isRegisterMode
+                              ? '이미 계정이 있으면 로그인'
+                              : '처음이면 회원가입',
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
