@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!isPractitionerLogin && !isPatientDefaultLogin && !isPatientHugoLogin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ID 또는 비밀번호가 올바르지 않습니다.')),
+        const SnackBar(content: Text('The ID or password is incorrect.')),
       );
       return;
     }
@@ -88,15 +88,15 @@ class _LoginScreenState extends State<LoginScreen> {
       role = routeArgs;
     }
 
-    final roleLabel = role == 'practitioner' ? '침술사' : '환자';
+    final roleLabel = role == 'practitioner' ? 'Practitioner' : 'Patient';
     final helperText = role == 'practitioner'
-        ? '테스트 계정: 123 / 123'
+        ? 'Test account: 123 / 123'
         : loginMode == 'hugo'
-            ? '내 계정 테스트: hugo / hugo'
-            : '환자 테스트 계정: 123 / 123';
+            ? 'My account test: hugo / hugo'
+            : 'Patient test account: 123 / 123';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('로그인')),
+      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '$roleLabel 로그인',
+                  '$roleLabel Login',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
                 ),
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () => _submit(role, loginMode),
-                  child: const Text('로그인'),
+                  child: const Text('Login'),
                 ),
               ],
             ),

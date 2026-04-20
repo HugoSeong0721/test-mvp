@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class PractitionerInsightsScreen extends StatelessWidget {
   const PractitionerInsightsScreen({super.key});
@@ -9,11 +9,11 @@ class PractitionerInsightsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('침술사 인사이트 대시보드'),
+        title: const Text('Practitioner Insights Dashboard'),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text('침술사 화면'))),
+            child: Center(child: Chip(label: Text('Practitioner View'))),
           ),
         ],
       ),
@@ -21,7 +21,7 @@ class PractitionerInsightsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const Text(
-            '최근 12주 집계 (데모)',
+            'Last 12 Weeks Summary (Demo)',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
@@ -29,75 +29,75 @@ class PractitionerInsightsScreen extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: const [
-              _KpiCard(title: '총 내원', value: '148명'),
-              _KpiCard(title: '재내원율', value: '63%'),
-              _KpiCard(title: '사전문진 응답률', value: '71%'),
-              _KpiCard(title: '노쇼율', value: '9%'),
+              _KpiCard(title: 'Total Visits', value: '148'),
+              _KpiCard(title: 'Return Rate', value: '63%'),
+              _KpiCard(title: 'Pre-Visit Intake Response Rate', value: '71%'),
+              _KpiCard(title: 'No-Show Rate', value: '9%'),
             ],
           ),
           const SizedBox(height: 12),
-          const _SectionTitle('환자 구성'),
+          const _SectionTitle('Patient Mix'),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text('성별: 여성 58% · 남성 39% · 기타/무응답 3%'),
+                  Text('Gender: Female 58% · Male 39% · Other/No Response 3%'),
                   SizedBox(height: 4),
-                  Text('연령대: 20대 18% · 30대 33% · 40대 27% · 50대+ 22%'),
+                  Text('Age Range: 20s 18% · 30s 33% · 40s 27% · 50+ 22%'),
                   SizedBox(height: 4),
-                  Text('인종/문화권: East Asian 41% · White 29% · Hispanic 15% · Black 9% · 기타 6%'),
+                  Text('Race/Cultural Background: East Asian 41% · White 29% · Hispanic 15% · Black 9% · Other 6%'),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 12),
-          const _SectionTitle('자주 오는 증상 추세'),
+          const _SectionTitle('Most Common Symptom Trends'),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: const [
-                  _TrendRow('수면 질 저하/새벽 각성', 42),
-                  _TrendRow('목/어깨 통증', 38),
-                  _TrendRow('소화 불편(더부룩/역류)', 31),
-                  _TrendRow('두통/눈피로(HEENT)', 27),
-                  _TrendRow('피로/에너지 저하', 25),
+                  _TrendRow('Poor Sleep / Early Morning Waking', 42),
+                  _TrendRow('Neck / Shoulder Pain', 38),
+                  _TrendRow('Digestive Discomfort / Reflux', 31),
+                  _TrendRow('Headache / Eye Fatigue (HEENT)', 27),
+                  _TrendRow('Low Energy / Fatigue', 25),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 12),
-          const _SectionTitle('자주 제공한 조언'),
+          const _SectionTitle('Most Common Advice Given'),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: const [
-                  _AdviceRow('취침 전 스트레칭/호흡 루틴', 36, 63),
-                  _AdviceRow('카페인 시간 조절', 30, 57),
-                  _AdviceRow('식후 10분 걷기', 26, 52),
-                  _AdviceRow('수분 섭취 패턴 조정', 19, 48),
+                  _AdviceRow('Bedtime Stretching / Breathing Routine', 36, 63),
+                  _AdviceRow('Adjust Caffeine Timing', 30, 57),
+                  _AdviceRow('10-Minute Walk After Meals', 26, 52),
+                  _AdviceRow('Hydration Pattern Adjustment', 19, 48),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 12),
-          const _SectionTitle('아이템 기획 인사이트 (침술사용)'),
+          const _SectionTitle('Product Opportunity Insights (For Practitioner)'),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text('1) 수면/통증 동시 추적 카드: 반복 내원군 비중이 높아 우선순위 높음'),
+                  Text('1) Sleep + pain tracking card: high priority because repeat visits often cluster here'),
                   SizedBox(height: 6),
-                  Text('2) 맞춤 리마인드 템플릿: 사전문진 응답률 개선 여지 큼'),
+                  Text('2) Personalized reminder templates: clear room to improve pre-visit intake response rate'),
                   SizedBox(height: 6),
-                  Text('3) 조언 이행 체크(체크리스트형): 재내원율과 연결된 행동 데이터 확보 가능'),
+                  Text('3) Advice adherence checklist: useful for capturing behavior data tied to return visits'),
                   SizedBox(height: 6),
-                  Text('4) 카테고리 누락 경고(10문진 기준): 진단 일관성 향상에 도움'),
+                  Text('4) Missing-category warning (based on the 10-question system): helps improve diagnostic consistency'),
                 ],
               ),
             ),
@@ -192,7 +192,7 @@ class _AdviceRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(label)),
-          Text('권고 $count회 · 이행 $followupRate%'),
+          Text('Recommended $count times · Follow-through $followupRate%'),
         ],
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class SymptomTrendScreen extends StatelessWidget {
   const SymptomTrendScreen({super.key});
@@ -12,11 +12,11 @@ class SymptomTrendScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('유사증상 주별 추세'),
+        title: const Text('Weekly Similar Symptom Trends'),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text('침술사 화면'))),
+            child: Center(child: Chip(label: Text('Practitioner View'))),
           ),
         ],
       ),
@@ -65,7 +65,7 @@ class SymptomTrendScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      'W-3   W-2   W-1   이번주',
+                      'W-3   W-2   W-1   This Week',
                       style: TextStyle(fontSize: 12, color: Colors.black54),
                     ),
                   ],
@@ -86,11 +86,11 @@ class SymptomTrendPageArgs {
   });
 
   const SymptomTrendPageArgs.empty()
-      : periodLabel = '데이터 없음',
+      : periodLabel = 'No data',
         weekly = const {
-          '수면/각성': [0, 0, 0, 0],
-          '목/어깨 통증': [0, 0, 0, 0],
-          '소화 불편': [0, 0, 0, 0],
+          'Sleep / Wakefulness': [0, 0, 0, 0],
+          'Neck / Shoulder Pain': [0, 0, 0, 0],
+          'Digestive Discomfort': [0, 0, 0, 0],
         };
 
   final String periodLabel;

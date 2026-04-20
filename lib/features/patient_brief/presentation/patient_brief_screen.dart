@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 
@@ -48,12 +48,18 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
       return;
     }
     _initialized = true;
-    _adviceGivenController.text = '수면 전 카페인 줄이고, 어깨 스트레칭 5분.';
-    _adherenceFollowupController.text = '다음 방문 시 스트레칭 실천 횟수 확인.';
-    _patientAlertController.text = '이번 주는 수면/피로 변화가 핵심 관찰 포인트입니다.';
-    _weeklyMustDoController.text = '주중 최소 4일, 취침 1시간 전 스트레칭.';
-    _currentStatusController.text = '현재는 수면 질 저하와 어깨 긴장이 함께 보입니다.';
-    _actionGuideController.text = '무리한 운동보다 강도 낮은 이완 루틴을 우선하세요.';
+    _adviceGivenController.text =
+        'Reduce caffeine before bed and do 5 minutes of shoulder stretching.';
+    _adherenceFollowupController.text =
+        'At the next visit, review how often the stretching routine was followed.';
+    _patientAlertController.text =
+        'This week, sleep and fatigue changes are the main things to watch.';
+    _weeklyMustDoController.text =
+        'Stretch at least 4 days this week, 1 hour before bed.';
+    _currentStatusController.text =
+        'Right now, decreased sleep quality and shoulder tension appear together.';
+    _actionGuideController.text =
+        'Prioritize a low-intensity relaxation routine over intense exercise.';
   }
 
   @override
@@ -72,7 +78,11 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
 
   void _saveMemos() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('저장 완료 (임시): 다음 단계에서 DB 연결 예정')),
+      const SnackBar(
+        content: Text(
+          'Saved (temporary): database connection will be added in the next step.',
+        ),
+      ),
     );
   }
 
@@ -83,7 +93,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
 
     if (historyArgs == null) {
       return const Scaffold(
-        body: Center(child: Text('환자 기록을 불러오지 못했습니다.')),
+        body: Center(child: Text('Unable to load the patient record.')),
       );
     }
 
@@ -98,11 +108,11 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('환자 상세 브리핑'),
+        title: const Text('Patient Detail Brief'),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text('침술사 화면'))),
+            child: Center(child: Chip(label: Text('Practitioner View'))),
           ),
         ],
       ),
@@ -115,12 +125,12 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            '지난 방문: ${visit.lastVisitDate} (${visit.daysAgo}일 전)',
+            'Last visit: ${visit.lastVisitDate} (${visit.daysAgo} days ago)',
             style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
           const SizedBox(height: 4),
           Text(
-            '환자 정보: ${patient.sex}, ${patient.ageRange}, ${patient.ethnicity}',
+            'Patient info: ${patient.sex}, ${patient.ageRange}, ${patient.ethnicity}',
             style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
           const SizedBox(height: 10),
@@ -131,13 +141,13 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '전체 방문 기록 (${history.length}회)',
+                    'Full Visit History (${history.length} visits)',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   ...history.map((item) {
                     final preview = item.visit.qaList.isEmpty
-                        ? '문진 기록 없음'
+                        ? 'No intake record'
                         : '${item.visit.qaList.first.question} / ${item.visit.qaList.first.answer}';
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -155,9 +165,9 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                               style: const TextStyle(fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 4),
-                            Text('치료 부위: ${item.visit.previousTreatmentArea}'),
-                            Text('기록: ${item.visit.previousSessionNote}'),
-                            Text('요약: $preview'),
+                            Text('Treatment area: ${item.visit.previousTreatmentArea}'),
+                            Text('Notes: ${item.visit.previousSessionNote}'),
+                            Text('Summary: $preview'),
                           ],
                         ),
                       ),
@@ -175,15 +185,15 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '카테고리 커버리지: $coveredCount / ${_categoryOrder.length}',
+                    'Category coverage: $coveredCount / ${_categoryOrder.length}',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),
-                  Text('총 질문 수: ${visit.qaList.length}개'),
+                  Text('Total questions: ${visit.qaList.length}'),
                   if (unasked.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
-                      '아직 안 물어본 카테고리: ${unasked.join(', ')}',
+                      'Categories not asked yet: ${unasked.join(', ')}',
                       style: const TextStyle(color: Colors.redAccent),
                     ),
                   ],
@@ -193,7 +203,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           ),
           const SizedBox(height: 12),
           const Text(
-            '10 카테고리 문진',
+            '10-Category Intake',
             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
@@ -206,13 +216,13 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '$category (${list.length}개 질문)',
+                      '$category (${list.length} questions)',
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     if (list.isEmpty)
                       const Text(
-                        '아직 질문 없음',
+                        'No questions yet',
                         style: TextStyle(color: Colors.black54),
                       ),
                     ...list.map(
@@ -234,26 +244,26 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           }),
           const SizedBox(height: 12),
           _buildMemoCard(
-            title: '지난 방문 기록 (비공유)',
+            title: 'Previous Visit Record (Private)',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('지난 치료 부위: ${visit.previousTreatmentArea}'),
+                Text('Previous treatment area: ${visit.previousTreatmentArea}'),
                 const SizedBox(height: 6),
-                Text('지난 노트: ${visit.previousSessionNote}'),
+                Text('Previous notes: ${visit.previousSessionNote}'),
               ],
             ),
           ),
           const SizedBox(height: 10),
           _buildMemoCard(
-            title: '이번 방문 메모',
+            title: 'This Visit Notes',
             child: Column(
               children: [
                 TextField(
                   controller: _thisSessionTreatmentAreaController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '이번 치료 부위',
+                    labelText: 'Treatment area for this visit',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -262,7 +272,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 3,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '이번 세션 메모',
+                    labelText: 'Session notes for this visit',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -271,7 +281,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '다음 방문 때 관찰할 것',
+                    labelText: 'What to observe at the next visit',
                   ),
                 ),
               ],
@@ -279,7 +289,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           ),
           const SizedBox(height: 10),
           _buildMemoCard(
-            title: '조언 / 팔로업',
+            title: 'Advice / Follow-Up',
             child: Column(
               children: [
                 TextField(
@@ -287,7 +297,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 3,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '이번에 준 조언',
+                    labelText: 'Advice given this time',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -296,7 +306,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '다음 방문에서 확인할 이행 사항',
+                    labelText: 'What to review for adherence next visit',
                   ),
                 ),
               ],
@@ -304,7 +314,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           ),
           const SizedBox(height: 10),
           _buildMemoCard(
-            title: '공유 메모 (환자에게 보임)',
+            title: 'Shared Notes (Visible to Patient)',
             child: Column(
               children: [
                 TextField(
@@ -312,7 +322,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '환자 알림',
+                    labelText: 'Patient alert',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -321,7 +331,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '이번 주 꼭 지켜줬으면 하는 것',
+                    labelText: 'What to follow carefully this week',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -330,7 +340,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '지금 상태 안내',
+                    labelText: 'Current status note',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -339,7 +349,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: '어떻게 해야 하는지 안내',
+                    labelText: 'What to do next',
                   ),
                 ),
               ],
@@ -349,7 +359,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           FilledButton.icon(
             onPressed: _saveMemos,
             icon: const Icon(Icons.save_outlined),
-            label: const Text('메모 저장'),
+            label: const Text('Save Notes'),
           ),
         ],
       ),

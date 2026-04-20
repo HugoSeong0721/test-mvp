@@ -36,11 +36,11 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     final name = _nameController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showMessage('이메일과 비밀번호를 입력해 주세요.');
+      _showMessage('Please enter your email and password.');
       return;
     }
     if (_isRegisterMode && name.isEmpty) {
-      _showMessage('회원가입에는 이름이 필요합니다.');
+      _showMessage('A name is required to sign up.');
       return;
     }
 
@@ -78,7 +78,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     } on FirebaseAuthException catch (error) {
       _showMessage(_friendlyAuthMessage(error));
     } catch (error) {
-      _showMessage('회원가입/로그인 처리 중 오류가 발생했습니다: $error');
+      _showMessage('An error occurred during sign up / login: $error');
     } finally {
       if (mounted) {
         setState(() => _loading = false);
@@ -98,26 +98,26 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   String _friendlyAuthMessage(FirebaseAuthException error) {
     switch (error.code) {
       case 'email-already-in-use':
-        return '이미 가입된 이메일입니다. 로그인으로 들어가 주세요.';
+        return 'This email is already registered. Please log in instead.';
       case 'invalid-email':
-        return '이메일 형식이 올바르지 않습니다.';
+        return 'Please enter a valid email address.';
       case 'weak-password':
-        return '비밀번호를 6자 이상으로 입력해 주세요.';
+        return 'Please use a password with at least 6 characters.';
       case 'user-not-found':
       case 'wrong-password':
       case 'invalid-credential':
-        return '이메일 또는 비밀번호가 올바르지 않습니다.';
+        return 'The email or password is incorrect.';
       case 'operation-not-allowed':
-        return 'Firebase 콘솔에서 이메일/비밀번호 로그인을 먼저 활성화해야 합니다.';
+        return 'You need to enable Email/Password sign-in in the Firebase console first.';
       default:
-        return error.message ?? '인증 처리 중 오류가 발생했습니다.';
+        return error.message ?? 'An authentication error occurred.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('지인 베타 회원가입/로그인')),
+      appBar: AppBar(title: const Text('Friend Beta Sign Up / Login')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -133,17 +133,17 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text(
-                        '처음 오신 분 가이드',
+                        'Quick Guide for First-Time Testers',
                         style: TextStyle(fontWeight: FontWeight.w700),
                       ),
                       SizedBox(height: 8),
-                      Text('1. 이름, 이메일, 비밀번호로 회원가입'),
+                      Text('1. Sign up with your name, email, and password'),
                       SizedBox(height: 4),
-                      Text('2. 로그인 후 프로필에서 전화번호와 이메일 확인'),
+                      Text('2. After logging in, confirm your phone number and email in your profile'),
                       SizedBox(height: 4),
-                      Text('3. 문진 질문에 답하고 제출하기'),
+                      Text('3. Answer the intake questions and submit'),
                       SizedBox(height: 4),
-                      Text('4. 민감한 실제 건강정보 대신 테스트용 문구로 먼저 확인해도 됩니다.'),
+                      Text('4. You can start with sample wording instead of sensitive real health details'),
                     ],
                   ),
                 ),
@@ -157,7 +157,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        _isRegisterMode ? '베타 회원가입' : '베타 로그인',
+                        _isRegisterMode ? 'Beta Sign Up' : 'Beta Login',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 24,
@@ -167,8 +167,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                       const SizedBox(height: 10),
                       Text(
                         _isRegisterMode
-                            ? '지인 테스트용 계정을 만들고 바로 환자 화면으로 들어갑니다.'
-                            : '가입한 이메일과 비밀번호로 다시 들어갑니다.',
+                            ? 'Create a tester account and go straight into the patient flow.'
+                            : 'Log back in with the email and password you already created.',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
@@ -177,7 +177,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                         TextField(
                           controller: _nameController,
                           decoration: const InputDecoration(
-                            labelText: '이름',
+                            labelText: 'Name',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -187,7 +187,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
-                          labelText: '이메일',
+                          labelText: 'Email',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -196,7 +196,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                         controller: _passwordController,
                         obscureText: !_showPassword,
                         decoration: InputDecoration(
-                          labelText: '비밀번호',
+                          labelText: 'Password',
                           border: const OutlineInputBorder(),
                           suffixIcon: IconButton(
                             onPressed: () =>
@@ -214,10 +214,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                         onPressed: _loading ? null : _submit,
                         child: Text(
                           _loading
-                              ? '처리 중...'
+                              ? 'Working...'
                               : _isRegisterMode
-                                  ? '회원가입 후 시작'
-                                  : '로그인',
+                                  ? 'Sign Up and Start'
+                                  : 'Login',
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -229,8 +229,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                                 ),
                         child: Text(
                           _isRegisterMode
-                              ? '이미 계정이 있으면 로그인'
-                              : '처음이면 회원가입',
+                              ? 'Already have an account? Log in'
+                              : 'New here? Sign up',
                         ),
                       ),
                     ],

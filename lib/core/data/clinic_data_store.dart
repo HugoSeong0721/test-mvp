@@ -6,11 +6,11 @@ extension IntakeStatusLabel on IntakeStatus {
   String get label {
     switch (this) {
       case IntakeStatus.notStarted:
-        return '사전문진 응답률 0%';
+        return 'Pre-Visit Intake Response 0%';
       case IntakeStatus.inProgress:
-        return '사전문진 응답률 50%';
+        return 'Pre-Visit Intake Response 50%';
       case IntakeStatus.completed:
-        return '사전문진 응답률 100%';
+        return 'Pre-Visit Intake Response 100%';
     }
   }
 }
@@ -54,11 +54,11 @@ class PatientProfile {
 
   String get ageRange {
     final age = DateTime.now().year - birthYear;
-    if (age < 30) return '20대';
-    if (age < 40) return '30대';
-    if (age < 50) return '40대';
-    if (age < 60) return '50대';
-    return '60대+';
+    if (age < 30) return '20s';
+    if (age < 40) return '30s';
+    if (age < 50) return '40s';
+    if (age < 60) return '50s';
+    return '60s+';
   }
 
   PatientProfile copyWith({
@@ -147,9 +147,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '201-555-0199',
       email: 'hugo.demo@example.com',
       birthYear: 1991,
-      sex: '남성',
+      sex: 'Male',
       ethnicity: 'Korean',
-      memo: '실사용 테스트용 본인 프로필',
+      memo: 'My real-use test profile',
     ),
     const PatientProfile(
       id: 'jane_kim',
@@ -157,9 +157,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '201-555-0101',
       email: 'jane.demo@example.com',
       birthYear: 1990,
-      sex: '여성',
+      sex: 'Female',
       ethnicity: 'Korean',
-      memo: '수면/어깨 통증 추적 필요',
+      memo: 'Track sleep and shoulder pain',
     ),
     const PatientProfile(
       id: 'min_park',
@@ -167,9 +167,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '',
       email: '',
       birthYear: 1988,
-      sex: '남성',
+      sex: 'Male',
       ethnicity: 'Korean',
-      memo: '연락처 미입력 예시',
+      memo: 'Example with missing contact info',
     ),
     const PatientProfile(
       id: 'eunji_lee',
@@ -177,9 +177,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '646-555-0130',
       email: 'eunji.demo@example.com',
       birthYear: 1993,
-      sex: '여성',
+      sex: 'Female',
       ethnicity: 'Korean',
-      memo: '소화/갈증 패턴 추적',
+      memo: 'Track digestion and thirst patterns',
     ),
     const PatientProfile(
       id: 'daniel_cho',
@@ -187,9 +187,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '917-555-0142',
       email: '',
       birthYear: 1985,
-      sex: '남성',
+      sex: 'Male',
       ethnicity: 'Korean',
-      memo: '긴장성 두통 추적',
+      memo: 'Track tension headache pattern',
     ),
     const PatientProfile(
       id: 'hana_yoo',
@@ -197,9 +197,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '718-555-0155',
       email: 'hana.demo@example.com',
       birthYear: 1997,
-      sex: '여성',
+      sex: 'Female',
       ethnicity: 'Korean',
-      memo: '야간 식은땀/두통 관찰',
+      memo: 'Watch for night sweating and headaches',
     ),
     const PatientProfile(
       id: 'chris_jung',
@@ -207,9 +207,9 @@ class ClinicDataStore extends ChangeNotifier {
       phone: '212-555-0170',
       email: '',
       birthYear: 1982,
-      sex: '남성',
+      sex: 'Male',
       ethnicity: 'Korean',
-      memo: '허리 통증/노쇼 이력 확인',
+      memo: 'Review low back pain and no-show history',
     ),
   ];
 
@@ -224,11 +224,11 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 1,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: '경추 + 우측 견갑 주변',
-      previousSessionNote: '수면과 어깨 긴장도 변화 추적 필요.',
+      previousTreatmentArea: 'Cervical area + right scapular region',
+      previousSessionNote: 'Track changes in sleep and shoulder tension.',
       qaList: const [
-        QaItem(category: 'Sleep', question: '최근 수면은 어떠셨나요?', answer: '중간에 한두 번 깨는 날이 있었어요.'),
-        QaItem(category: 'Energy', question: '하루 중 피로는 어떤가요?', answer: '오후 늦게 집중력이 떨어져요.'),
+        QaItem(category: 'Sleep', question: 'How has your sleep been recently?', answer: 'There were days when I woke up once or twice during the night.'),
+        QaItem(category: 'Energy', question: 'How is your fatigue during the day?', answer: 'My focus drops later in the afternoon.'),
       ],
     ),
     PatientVisit(
@@ -241,11 +241,11 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 1,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: '승모근 상부 + 측두부',
-      previousSessionNote: '긴장성 두통 패턴.',
+      previousTreatmentArea: 'Upper trapezius + temple area',
+      previousSessionNote: 'Tension headache pattern.',
       qaList: const [
-        QaItem(category: 'HEENT', question: '두통/눈피로는?', answer: '오후에 눈이 뻑뻑하고 두통이 와요.'),
-        QaItem(category: 'Emotion', question: '감정 기복은?', answer: '예민해지고 짜증이 늘었어요.'),
+        QaItem(category: 'HEENT', question: 'How are your headaches and eye fatigue?', answer: 'My eyes feel strained in the afternoon and I get headaches.'),
+        QaItem(category: 'Emotion', question: 'How have your mood swings been?', answer: 'I have been more sensitive and irritable.'),
       ],
     ),
     PatientVisit(
@@ -258,8 +258,8 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 2,
       noShowSinceLast: 1,
       intakeStatus: IntakeStatus.notStarted,
-      previousTreatmentArea: '요추 주변 + 둔부 트리거포인트',
-      previousSessionNote: '장시간 앉을 때 통증 악화.',
+      previousTreatmentArea: 'Lumbar area + glute trigger points',
+      previousSessionNote: 'Pain gets worse when sitting for a long time.',
       qaList: const [],
     ),
     PatientVisit(
@@ -272,11 +272,11 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 1,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: '우측 견갑 주변 + 경추 C5-C7 주변',
-      previousSessionNote: '견갑 내측 압통 강함, 새벽 각성 빈도 높음.',
+      previousTreatmentArea: 'Right scapular region + cervical C5-C7 area',
+      previousSessionNote: 'Strong tenderness along the medial scapula, frequent early waking.',
       qaList: const [
-        QaItem(category: 'Sleep', question: '최근 수면은 어떠셨나요?', answer: '새벽 3시에 자주 깨고 다시 잠들기 어려워요.'),
-        QaItem(category: 'Energy', question: '오후 피로감은 어떤가요?', answer: '오후 2시 이후 급격히 피곤해져요.'),
+        QaItem(category: 'Sleep', question: 'How has your sleep been recently?', answer: 'I often wake up around 3 AM and have trouble falling back asleep.'),
+        QaItem(category: 'Energy', question: 'How is your afternoon fatigue?', answer: 'I get much more tired after 2 PM.'),
       ],
     ),
     PatientVisit(
@@ -289,10 +289,10 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 0,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: '측두부 + 흉쇄유돌근',
-      previousSessionNote: '두통 빈도 추적 중.',
+      previousTreatmentArea: 'Temple area + sternocleidomastoid',
+      previousSessionNote: 'Tracking headache frequency.',
       qaList: const [
-        QaItem(category: 'Temperature/Sweat', question: '땀/체온 변화는?', answer: '밤에 식은땀이 가끔 나요.'),
+        QaItem(category: 'Temperature/Sweat', question: 'How have sweating and temperature changes been?', answer: 'I sometimes get cold sweats at night.'),
       ],
     ),
     PatientVisit(
@@ -305,12 +305,12 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 1,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: '우측 견갑 주변 + 경추 C5-C7 주변',
-      previousSessionNote: '견갑 내측 압통 강함, 새벽 각성 빈도 높음.',
+      previousTreatmentArea: 'Right scapular region + cervical C5-C7 area',
+      previousSessionNote: 'Strong tenderness along the medial scapula, frequent early waking.',
       qaList: const [
-        QaItem(category: 'Sleep', question: '최근 수면은 어떠셨나요?', answer: '새벽 3시에 자주 깨고 다시 잠들기 어려워요.'),
-        QaItem(category: 'Energy', question: '오후 피로감은 어떤가요?', answer: '오후 2시 이후 급격히 피곤해져요.'),
-        QaItem(category: 'Emotion', question: '최근 스트레스 정도는?', answer: '업무 스트레스가 높은 편이에요.'),
+        QaItem(category: 'Sleep', question: 'How has your sleep been recently?', answer: 'I often wake up around 3 AM and have trouble falling back asleep.'),
+        QaItem(category: 'Energy', question: 'How is your afternoon fatigue?', answer: 'I get much more tired after 2 PM.'),
+        QaItem(category: 'Emotion', question: 'How high has your stress been recently?', answer: 'My work stress has been pretty high.'),
       ],
     ),
     PatientVisit(
@@ -323,8 +323,8 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 2,
       noShowSinceLast: 1,
       intakeStatus: IntakeStatus.notStarted,
-      previousTreatmentArea: '요추 주변 + 둔부 트리거포인트',
-      previousSessionNote: '장시간 앉을 때 통증 악화.',
+      previousTreatmentArea: 'Lumbar area + glute trigger points',
+      previousSessionNote: 'Pain gets worse when sitting for a long time.',
       qaList: const [],
     ),
     PatientVisit(
@@ -337,10 +337,10 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 0,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: '복부 + 비위 관련 포인트',
-      previousSessionNote: '식후 복부팽만 호소.',
+      previousTreatmentArea: 'Abdominal area + digestive points',
+      previousSessionNote: 'Reports abdominal bloating after meals.',
       qaList: const [
-        QaItem(category: 'Appetite/Thirst', question: '식욕/갈증은 어떠셨나요?', answer: '입이 자주 마르고 찬물 찾게 돼요.'),
+        QaItem(category: 'Appetite/Thirst', question: 'How have your appetite and thirst been?', answer: 'My mouth gets dry often and I keep reaching for cold water.'),
       ],
     ),
     PatientVisit(
@@ -353,11 +353,11 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 3,
       noShowSinceLast: 1,
       intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: '승모근 상부 + 측두부',
-      previousSessionNote: '긴장성 두통 패턴.',
+      previousTreatmentArea: 'Upper trapezius + temple area',
+      previousSessionNote: 'Tension headache pattern.',
       qaList: const [
-        QaItem(category: 'HEENT', question: '두통/눈피로는?', answer: '오후에 눈이 뻑뻑하고 두통이 와요.'),
-        QaItem(category: 'Emotion', question: '감정 기복은?', answer: '예민해지고 짜증이 늘었어요.'),
+        QaItem(category: 'HEENT', question: 'How are your headaches and eye fatigue?', answer: 'My eyes feel strained in the afternoon and I get headaches.'),
+        QaItem(category: 'Emotion', question: 'How have your mood swings been?', answer: 'I have been more sensitive and irritable.'),
       ],
     ),
     PatientVisit(
@@ -370,10 +370,10 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 0,
       noShowSinceLast: 0,
       intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: '측두부 + 흉쇄유돌근',
-      previousSessionNote: '두통 빈도 추적 중.',
+      previousTreatmentArea: 'Temple area + sternocleidomastoid',
+      previousSessionNote: 'Tracking headache frequency.',
       qaList: const [
-        QaItem(category: 'Temperature/Sweat', question: '땀/체온 변화는?', answer: '밤에 식은땀이 가끔 나요.'),
+        QaItem(category: 'Temperature/Sweat', question: 'How have sweating and temperature changes been?', answer: 'I sometimes get cold sweats at night.'),
       ],
     ),
     PatientVisit(
@@ -386,8 +386,8 @@ class ClinicDataStore extends ChangeNotifier {
       scheduledSinceLast: 2,
       noShowSinceLast: 2,
       intakeStatus: IntakeStatus.notStarted,
-      previousTreatmentArea: '요추 기립근 + 햄스트링',
-      previousSessionNote: '장시간 운전 후 악화.',
+      previousTreatmentArea: 'Lumbar erectors + hamstrings',
+      previousSessionNote: 'Worse after long periods of driving.',
       qaList: const [],
     ),
   ];
@@ -507,3 +507,4 @@ class ClinicDataStore extends ChangeNotifier {
     notifyListeners();
   }
 }
+
