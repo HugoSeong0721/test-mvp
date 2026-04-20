@@ -37,19 +37,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final isPractitionerLogin =
         role == 'practitioner' &&
-        loginMode == 'default' &&
         id == _sharedTestId &&
         password == _sharedTestPassword;
 
     final isPatientDefaultLogin =
         role == 'patient' &&
-        loginMode == 'default' &&
         id == _sharedTestId &&
         password == _sharedTestPassword;
 
     final isPatientHugoLogin =
         role == 'patient' &&
-        loginMode == 'hugo' &&
         id == _hugoId &&
         password == _hugoPassword;
 
@@ -79,11 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final routeArgs = ModalRoute.of(context)?.settings.arguments;
 
     String role = 'patient';
-    String loginMode = 'default';
-
     if (routeArgs is Map) {
       role = (routeArgs['role'] as String?) ?? 'patient';
-      loginMode = (routeArgs['loginMode'] as String?) ?? 'default';
     } else if (routeArgs is String) {
       role = routeArgs;
     }
@@ -91,9 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final roleLabel = role == 'practitioner' ? 'Practitioner' : 'Patient';
     final helperText = role == 'practitioner'
         ? 'Test account: 123 / 123'
-        : loginMode == 'hugo'
-            ? 'My account test: hugo / hugo'
-            : 'Patient test account: 123 / 123';
+        : 'Test accounts: 123 / 123 or hugo / hugo';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
@@ -120,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: _idController,
                   textInputAction: TextInputAction.next,
-                  onSubmitted: (_) => _submit(role, loginMode),
+                  onSubmitted: (_) => _submit(role, 'default'),
                   decoration: const InputDecoration(
                     labelText: 'ID',
                     border: OutlineInputBorder(),
@@ -131,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: !_showPassword,
                   textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _submit(role, loginMode),
+                  onSubmitted: (_) => _submit(role, 'default'),
                   decoration: InputDecoration(
                     labelText: 'Password',
                     border: const OutlineInputBorder(),
@@ -145,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () => _submit(role, loginMode),
+                  onPressed: () => _submit(role, 'default'),
                   child: const Text('Login'),
                 ),
               ],
