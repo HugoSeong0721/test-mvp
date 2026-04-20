@@ -166,6 +166,8 @@ class _PractitionerDashboardScreenState
                 _buildUpcomingBoard(upcoming),
               ],
               const SizedBox(height: 12),
+              const _BetaRegistrantBoard(),
+              const SizedBox(height: 12),
               const _BetaSubmissionBoard(),
               const SizedBox(height: 16),
               Row(
@@ -1172,6 +1174,320 @@ class _BetaSubmissionBoard extends StatelessWidget {
     final hh = value.hour.toString().padLeft(2, '0');
     final mm = value.minute.toString().padLeft(2, '0');
     return '$y-$m-$d $hh:$mm';
+  }
+}
+
+class _BetaRegistrantBoard extends StatelessWidget {
+  const _BetaRegistrantBoard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '지인 베타 가입자',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '회원가입만 한 사람, 연락처가 빠진 사람, 이미 제출까지 한 사람을 여기서 바로 확인합니다.',
+              style: TextStyle(color: Colors.grey.shade700),
+            ),
+            const SizedBox(height: 12),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('patients')
+                  .snapshots(),
+              builder: (context, patientSnapshot) {
+                if (patientSnapshot.hasError) {
+                  return const Text(
+                    '베타 가입자 목록을 불러오지 못했습니다.',
+                    style: TextStyle(color: Colors.redAccent),
+                  );
+                }
+                if (!patientSnapshot.hasData) {
+                  return const LinearProgressIndicator(minHeight: 4);
+                }
+
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('intake_submissions')
+                      .snapshots(),
+                  builder: (context, submissionSnapshot) {
+                    if (submissionSnapshot.hasError) {
+                      return const Text(
+                        '베타 제출 데이터를 불러오지 못했습니다.',
+                        style: TextStyle(color: Colors.redAccent),
+                      );
+                    }
+                    if (!submissionSnapshot.hasData) {
+                      return const LinearProgressIndicator(minHeight: 4);
+                    }
+
+                    final patientDocs = [...patientSnapshot.data!.docs]
+                      ..sort((a, b) {
+                        final aDate =
+                            (a.data()['updatedAt'] as Timestamp?)?.toDate();
+                        final bDate =
+                            (b.data()['updatedAt'] as Timestamp?)?.toDate();
+                        return (bDate ?? DateTime(2000))
+                            .compareTo(aDate ?? DateTime(2000));
+                      });
+
+                    final submissionsByPatient = <String, List<Map<String, dynamic>>>{};
+                    for (final doc in submissionSnapshot.data!.docs) {
+                      final data = doc.data();
+                      final patientId = (data['patientId'] as String?) ?? '';
+                      if (patientId.isEmpty) {
+                        continue;
+                      }
+                      submissionsByPatient.putIfAbsent(patientId, () => []).add(data);
+                    }
+
+                    if (patientDocs.isEmpty) {
+                      return const Text('아직 가입한 베타 사용자가 없습니다.');
+                    }
+
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _BetaOverviewChip(
+                                label: '가입자',
+                                value: '${patientDocs.length}명',
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _BetaOverviewChip(
+                                label: '연락처 완성',
+                                value:
+                                    '${patientDocs.where((doc) => _hasRequiredInfo(doc.data())).length}명',
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _BetaOverviewChip(
+                                label: '제출 완료',
+                                value:
+                                    '${patientDocs.where((doc) => (submissionsByPatient[doc.id] ?? const []).isNotEmpty).length}명',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ...patientDocs.take(8).map((doc) {
+                          final data = doc.data();
+                          final name = ((data['name'] as String?) ?? '').trim();
+                          final displayName =
+                              name.isEmpty ? 'New Patient' : name;
+                          final phone = ((data['phone'] as String?) ?? '').trim();
+                          final email = ((data['email'] as String?) ?? '').trim();
+                          final sex = ((data['sex'] as String?) ?? '').trim();
+                          final ethnicity =
+                              ((data['ethnicity'] as String?) ?? '').trim();
+                          final birthYear =
+                              (data['birthYear'] as num?)?.toInt();
+                          final updatedAt =
+                              (data['updatedAt'] as Timestamp?)?.toDate();
+                          final createdAt =
+                              (data['createdAt'] as Timestamp?)?.toDate();
+                          final hasRequired = phone.isNotEmpty && email.isNotEmpty;
+                          final submissions =
+                              submissionsByPatient[doc.id] ?? const [];
+                          submissions.sort((a, b) {
+                            final aDate =
+                                (a['submittedAt'] as Timestamp?)?.toDate();
+                            final bDate =
+                                (b['submittedAt'] as Timestamp?)?.toDate();
+                            return (bDate ?? DateTime(2000))
+                                .compareTo(aDate ?? DateTime(2000));
+                          });
+                          final latestSubmission =
+                              submissions.isNotEmpty ? submissions.first : null;
+                          final latestSubmissionAt =
+                              (latestSubmission?['submittedAt'] as Timestamp?)
+                                  ?.toDate();
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: hasRequired
+                                  ? const Color(0xFFF8FBFA)
+                                  : const Color(0xFFFFF6F6),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: hasRequired
+                                    ? const Color(0xFFD8E9E5)
+                                    : const Color(0xFFF2C8C8),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        displayName,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    Chip(
+                                      label: Text(
+                                        hasRequired
+                                            ? '연락처 준비됨'
+                                            : '필수 정보 부족',
+                                      ),
+                                      backgroundColor: hasRequired
+                                          ? const Color(0xFFE3F3EF)
+                                          : const Color(0xFFFFE2E2),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  phone.isEmpty && email.isEmpty
+                                      ? '연락처 없음'
+                                      : '${phone.isEmpty ? '전화번호 없음' : phone} · ${email.isEmpty ? '이메일 없음' : email}',
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${birthYear?.toString() ?? '출생연도 미입력'} · ${sex.isEmpty ? '성별 미입력' : sex} · ${ethnicity.isEmpty ? '인종/민족 미입력' : ethnicity}',
+                                  style: const TextStyle(color: Colors.black54),
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    _StatusTag(
+                                      label: submissions.isEmpty
+                                          ? '아직 제출 없음'
+                                          : '제출 ${submissions.length}회',
+                                      color: submissions.isEmpty
+                                          ? const Color(0xFFF6E9C9)
+                                          : const Color(0xFFDDF0E8),
+                                    ),
+                                    _StatusTag(
+                                      label:
+                                          '가입: ${_formatDateTime(createdAt)}',
+                                      color: const Color(0xFFEAECEF),
+                                    ),
+                                    _StatusTag(
+                                      label:
+                                          '프로필 수정: ${_formatDateTime(updatedAt)}',
+                                      color: const Color(0xFFEAECEF),
+                                    ),
+                                    if (latestSubmissionAt != null)
+                                      _StatusTag(
+                                        label:
+                                            '최근 제출: ${_formatDateTime(latestSubmissionAt)}',
+                                        color: const Color(0xFFDDF0E8),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static bool _hasRequiredInfo(Map<String, dynamic> data) {
+    final phone = ((data['phone'] as String?) ?? '').trim();
+    final email = ((data['email'] as String?) ?? '').trim();
+    return phone.isNotEmpty && email.isNotEmpty;
+  }
+
+  static String _formatDateTime(DateTime? value) {
+    if (value == null) {
+      return '기록 없음';
+    }
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    final hh = value.hour.toString().padLeft(2, '0');
+    final mm = value.minute.toString().padLeft(2, '0');
+    return '$y-$m-$d $hh:$mm';
+  }
+}
+
+class _BetaOverviewChip extends StatelessWidget {
+  const _BetaOverviewChip({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F7F7),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusTag extends StatelessWidget {
+  const _StatusTag({
+    required this.label,
+    required this.color,
+  });
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
+    );
   }
 }
 

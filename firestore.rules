@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    // Stage 1 beta safety:
+    // Friends who sign up can only read/write their own patient profile document.
+    match /patients/{userId} {
+      allow create: if isSelf(userId);
+      allow read, update: if isSelf(userId);
+      allow delete: if false;
+    }
+
+    // Transitional collections:
+    // These stay open a bit longer because practitioner flow is not yet moved to Firebase Auth.
+    // Once practitioner auth is added, these should be tightened.
+    match /intake_submissions/{documentId} {
+      allow read, write: if true;
+    }
+
+    match /answer_requests/{documentId} {
+      allow read, write: if true;
+    }
+  }
+}
