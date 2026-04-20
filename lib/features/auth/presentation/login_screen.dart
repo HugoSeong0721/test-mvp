@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/settings/app_language_controller.dart';
+import '../../../core/widgets/language_menu_button.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
 import '../../practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
 
@@ -31,34 +33,42 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _submit(String role, String loginMode) {
+  void _submit(String role) {
+    final lang = AppLanguageController.instance;
     final id = _idController.text.trim();
     final password = _passwordController.text.trim();
 
-    final isPractitionerLogin =
-        role == 'practitioner' &&
+    final isPractitionerLogin = role == 'practitioner' &&
         id == _sharedTestId &&
         password == _sharedTestPassword;
 
-    final isPatientDefaultLogin =
-        role == 'patient' &&
+    final isPatientDefaultLogin = role == 'patient' &&
         id == _sharedTestId &&
         password == _sharedTestPassword;
 
-    final isPatientHugoLogin =
-        role == 'patient' &&
+    final isPatientHugoLogin = role == 'patient' &&
         id == _hugoId &&
         password == _hugoPassword;
 
     if (!isPractitionerLogin && !isPatientDefaultLogin && !isPatientHugoLogin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The ID or password is incorrect.')),
+        SnackBar(
+          content: Text(
+            lang.tr(
+              'The ID or password is incorrect.',
+              '아이디 또는 비밀번호가 올바르지 않습니다.',
+            ),
+          ),
+        ),
       );
       return;
     }
 
     if (isPractitionerLogin) {
-      Navigator.pushReplacementNamed(context, PractitionerDashboardScreen.routeName);
+      Navigator.pushReplacementNamed(
+        context,
+        PractitionerDashboardScreen.routeName,
+      );
       return;
     }
 
@@ -73,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
     final routeArgs = ModalRoute.of(context)?.settings.arguments;
 
     String role = 'patient';
@@ -82,13 +93,22 @@ class _LoginScreenState extends State<LoginScreen> {
       role = routeArgs;
     }
 
-    final roleLabel = role == 'practitioner' ? 'Practitioner' : 'Patient';
+    final roleLabel = role == 'practitioner'
+        ? lang.tr('Practitioner', '침술사')
+        : lang.tr('Patient', '환자');
+
     final helperText = role == 'practitioner'
-        ? 'Test account: 123 / 123'
-        : 'Test accounts: 123 / 123 or hugo / hugo';
+        ? lang.tr('Test account: 123 / 123', '테스트 계정: 123 / 123')
+        : lang.tr(
+            'Test accounts: 123 / 123 or hugo / hugo',
+            '테스트 계정: 123 / 123 또는 hugo / hugo',
+          );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(
+        title: Text(lang.tr('Login', '로그인')),
+        actions: const [LanguageMenuButton()],
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -99,23 +119,20 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '$roleLabel Login',
+                  lang.tr('$roleLabel Login', '$roleLabel 로그인'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  helperText,
-                  textAlign: TextAlign.center,
-                ),
+                Text(helperText, textAlign: TextAlign.center),
                 const SizedBox(height: 20),
                 TextField(
                   controller: _idController,
                   textInputAction: TextInputAction.next,
-                  onSubmitted: (_) => _submit(role, 'default'),
-                  decoration: const InputDecoration(
-                    labelText: 'ID',
-                    border: OutlineInputBorder(),
+                  onSubmitted: (_) => _submit(role),
+                  decoration: InputDecoration(
+                    labelText: lang.tr('ID', '아이디'),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -123,9 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: !_showPassword,
                   textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _submit(role, 'default'),
+                  onSubmitted: (_) => _submit(role),
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: lang.tr('Password', '비밀번호'),
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       onPressed: () => setState(() => _showPassword = !_showPassword),
@@ -137,8 +154,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () => _submit(role, 'default'),
-                  child: const Text('Login'),
+                  onPressed: () => _submit(role),
+                  child: Text(lang.tr('Login', '로그인')),
                 ),
               ],
             ),

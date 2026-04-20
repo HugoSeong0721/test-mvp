@@ -1,6 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/settings/app_language_controller.dart';
+import '../../../core/widgets/language_menu_button.dart';
 
 class PatientBriefScreen extends StatefulWidget {
   const PatientBriefScreen({super.key});
@@ -88,6 +90,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
     final arg = ModalRoute.of(context)?.settings.arguments;
     final historyArgs = arg is PatientHistoryArgs ? arg : null;
 
@@ -108,11 +111,12 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Patient Detail Brief'),
-        actions: const [
+        title: Text(lang.tr('Patient Detail Brief', '환자 상세 브리핑')),
+        actions: [
+          const LanguageMenuButton(),
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text('Practitioner View'))),
+            child: Center(child: Chip(label: Text(lang.tr('Practitioner View', '침술사 화면')))),
           ),
         ],
       ),
@@ -392,3 +396,6 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
     return grouped;
   }
 }
+
+
+

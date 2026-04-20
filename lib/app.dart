@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'core/settings/app_language_controller.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/patient_beta_auth_screen.dart';
 import 'features/home/presentation/role_home_screen.dart';
@@ -14,24 +15,30 @@ class TestMvpApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Test MVP',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F766E)),
-        useMaterial3: true,
-      ),
-      initialRoute: RoleHomeScreen.routeName,
-      routes: {
-        RoleHomeScreen.routeName: (_) => const RoleHomeScreen(),
-        LoginScreen.routeName: (_) => const LoginScreen(),
-        PatientBetaAuthScreen.routeName: (_) => const PatientBetaAuthScreen(),
-        PatientIntakeScreen.routeName: (_) => const PatientIntakeScreen(),
-        PractitionerDashboardScreen.routeName: (_) =>
-            const PractitionerDashboardScreen(),
-        PractitionerInsightsScreen.routeName: (_) =>
-            const PractitionerInsightsScreen(),
-        SymptomTrendScreen.routeName: (_) => const SymptomTrendScreen(),
-        PatientBriefScreen.routeName: (_) => const PatientBriefScreen(),
+    return AnimatedBuilder(
+      animation: AppLanguageController.instance,
+      builder: (context, _) {
+        final lang = AppLanguageController.instance;
+        return MaterialApp(
+          title: lang.tr('Test MVP', '테스트 MVP'),
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F766E)),
+            useMaterial3: true,
+          ),
+          initialRoute: RoleHomeScreen.routeName,
+          routes: {
+            RoleHomeScreen.routeName: (_) => const RoleHomeScreen(),
+            LoginScreen.routeName: (_) => const LoginScreen(),
+            PatientBetaAuthScreen.routeName: (_) => const PatientBetaAuthScreen(),
+            PatientIntakeScreen.routeName: (_) => const PatientIntakeScreen(),
+            PractitionerDashboardScreen.routeName: (_) =>
+                const PractitionerDashboardScreen(),
+            PractitionerInsightsScreen.routeName: (_) =>
+                const PractitionerInsightsScreen(),
+            SymptomTrendScreen.routeName: (_) => const SymptomTrendScreen(),
+            PatientBriefScreen.routeName: (_) => const PatientBriefScreen(),
+          },
+        );
       },
     );
   }

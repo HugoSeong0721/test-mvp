@@ -1,5 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 
+import '../../../core/settings/app_language_controller.dart';
+import '../../../core/widgets/language_menu_button.dart';
+
 class SymptomTrendScreen extends StatelessWidget {
   const SymptomTrendScreen({super.key});
 
@@ -7,16 +10,18 @@ class SymptomTrendScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
     final arg = ModalRoute.of(context)?.settings.arguments;
     final data = arg is SymptomTrendPageArgs ? arg : const SymptomTrendPageArgs.empty();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weekly Similar Symptom Trends'),
-        actions: const [
+        title: Text(lang.tr('Weekly Similar Symptom Trends', '주간 유사 증상 추세')),
+        actions: [
+          const LanguageMenuButton(),
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text('Practitioner View'))),
+            child: Center(child: Chip(label: Text(lang.tr('Practitioner View', '침술사 화면')))),
           ),
         ],
       ),
@@ -96,3 +101,6 @@ class SymptomTrendPageArgs {
   final String periodLabel;
   final Map<String, List<int>> weekly;
 }
+
+
+

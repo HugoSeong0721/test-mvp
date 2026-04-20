@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../data/clinic_data_store.dart';
@@ -25,8 +25,8 @@ class PatientProfileService {
         phone: (data['phone'] as String?) ?? '',
         email: (data['email'] as String?) ?? '',
         birthYear: (data['birthYear'] as num?)?.toInt() ?? 1990,
-        sex: (data['sex'] as String?) ?? 'ë¯¸ìž…ë ¥',
-        ethnicity: (data['ethnicity'] as String?) ?? 'ë¯¸ìž…ë ¥',
+        sex: (data['sex'] as String?) ?? 'Not entered',
+        ethnicity: (data['ethnicity'] as String?) ?? 'Not entered',
         memo: (data['memo'] as String?) ?? '',
       );
     });
@@ -52,9 +52,9 @@ class PatientProfileService {
       'phone': '',
       'email': user.email ?? '',
       'birthYear': 1990,
-      'sex': 'ë¯¸ìž…ë ¥',
-      'ethnicity': 'ë¯¸ìž…ë ¥',
-      'memo': 'ë² íƒ€ íšŒì›ê°€ìž…ìœ¼ë¡œ ìƒì„±ëœ í”„ë¡œí•„',
+      'sex': 'Not entered',
+      'ethnicity': 'Not entered',
+      'memo': 'Profile created from beta sign-up',
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -75,4 +75,3 @@ class PatientProfileService {
 
   static Future<void> signOut() => _auth.signOut();
 }
-

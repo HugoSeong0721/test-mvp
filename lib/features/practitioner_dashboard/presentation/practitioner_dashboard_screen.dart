@@ -1,8 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
+import '../../../core/settings/app_language_controller.dart';
+import '../../../core/widgets/language_menu_button.dart';
 import '../../patient_brief/presentation/patient_brief_screen.dart';
 import '../../symptom_trend/presentation/symptom_trend_screen.dart';
 
@@ -20,44 +22,44 @@ class _PractitionerDashboardScreenState
     extends State<PractitionerDashboardScreen> {
   static const Map<String, List<String>> _questionLibraryByCategory = {
     'Temperature/Sweat': [
-      '몸이 쉽게 덥거나 춥게 느껴지나요?',
-      '식은땀/자한/도한이 있나요?',
+      'ëª¸ì´ ì‰½ê²Œ ë¥ê±°ë‚˜ ì¶¥ê²Œ ëŠê»´ì§€ë‚˜ìš”?',
+      'ì‹ì€ë•€/ìží•œ/ë„í•œì´ ìžˆë‚˜ìš”?',
     ],
     'Appetite/Thirst': [
-      '식욕은 평소와 비교해 어떤가요?',
-      '갈증이 잦거나 찬물/따뜻한 물 선호가 있나요?',
+      'ì‹ìš•ì€ í‰ì†Œì™€ ë¹„êµí•´ ì–´ë–¤ê°€ìš”?',
+      'ê°ˆì¦ì´ ìž¦ê±°ë‚˜ ì°¬ë¬¼/ë”°ëœ»í•œ ë¬¼ ì„ í˜¸ê°€ ìžˆë‚˜ìš”?',
     ],
     'Sleep': [
-      '잠드는 시간과 깨는 횟수는 어떤가요?',
-      '꿈이 많거나 자고 나도 개운하지 않나요?',
+      'ìž ë“œëŠ” ì‹œê°„ê³¼ ê¹¨ëŠ” íšŸìˆ˜ëŠ” ì–´ë–¤ê°€ìš”?',
+      'ê¿ˆì´ ë§Žê±°ë‚˜ ìžê³  ë‚˜ë„ ê°œìš´í•˜ì§€ ì•Šë‚˜ìš”?',
     ],
     'Digestion': [
-      '식후 더부룩함이나 속쓰림이 있나요?',
-      '트림/가스/역류 증상이 있나요?',
+      'ì‹í›„ ë”ë¶€ë£©í•¨ì´ë‚˜ ì†ì“°ë¦¼ì´ ìžˆë‚˜ìš”?',
+      'íŠ¸ë¦¼/ê°€ìŠ¤/ì—­ë¥˜ ì¦ìƒì´ ìžˆë‚˜ìš”?',
     ],
     'Urine': [
-      '소변 횟수나 급박뇨 변화가 있나요?',
-      '야간뇨가 늘었나요?',
+      'ì†Œë³€ íšŸìˆ˜ë‚˜ ê¸‰ë°•ë‡¨ ë³€í™”ê°€ ìžˆë‚˜ìš”?',
+      'ì•¼ê°„ë‡¨ê°€ ëŠ˜ì—ˆë‚˜ìš”?',
     ],
     'Stool': [
-      '배변 주기나 굳기 변화가 있나요?',
-      '변비와 설사가 번갈아 나타나나요?',
+      'ë°°ë³€ ì£¼ê¸°ë‚˜ êµ³ê¸° ë³€í™”ê°€ ìžˆë‚˜ìš”?',
+      'ë³€ë¹„ì™€ ì„¤ì‚¬ê°€ ë²ˆê°ˆì•„ ë‚˜íƒ€ë‚˜ë‚˜ìš”?',
     ],
     'Menses': [
-      '생리 주기/양/통증 변화가 있나요?',
-      '혈괴(덩어리)나 색 변화가 있나요?',
+      'ìƒë¦¬ ì£¼ê¸°/ì–‘/í†µì¦ ë³€í™”ê°€ ìžˆë‚˜ìš”?',
+      'í˜ˆê´´(ë©ì–´ë¦¬)ë‚˜ ìƒ‰ ë³€í™”ê°€ ìžˆë‚˜ìš”?',
     ],
     'HEENT': [
-      '두통, 눈피로, 이명, 코막힘 중 불편한 것이 있나요?',
-      '목/어깨 긴장과 연관된 증상이 있나요?',
+      'ë‘í†µ, ëˆˆí”¼ë¡œ, ì´ëª…, ì½”ë§‰íž˜ ì¤‘ ë¶ˆíŽ¸í•œ ê²ƒì´ ìžˆë‚˜ìš”?',
+      'ëª©/ì–´ê¹¨ ê¸´ìž¥ê³¼ ì—°ê´€ëœ ì¦ìƒì´ ìžˆë‚˜ìš”?',
     ],
     'Emotion': [
-      '최근 감정 기복이나 예민함이 늘었나요?',
-      '스트레스가 몸 증상에 영향을 주나요?',
+      'ìµœê·¼ ê°ì • ê¸°ë³µì´ë‚˜ ì˜ˆë¯¼í•¨ì´ ëŠ˜ì—ˆë‚˜ìš”?',
+      'ìŠ¤íŠ¸ë ˆìŠ¤ê°€ ëª¸ ì¦ìƒì— ì˜í–¥ì„ ì£¼ë‚˜ìš”?',
     ],
     'Energy': [
-      '하루 중 언제 가장 피곤한가요?',
-      '기운이 갑자기 떨어지는 시간이 있나요?',
+      'í•˜ë£¨ ì¤‘ ì–¸ì œ ê°€ìž¥ í”¼ê³¤í•œê°€ìš”?',
+      'ê¸°ìš´ì´ ê°‘ìžê¸° ë–¨ì–´ì§€ëŠ” ì‹œê°„ì´ ìžˆë‚˜ìš”?',
     ],
   };
 
@@ -66,7 +68,7 @@ class _PractitionerDashboardScreenState
       TextEditingController();
 
   late String _selectedDate;
-  String _selectedPatientFilter = '전체 환자';
+  String _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
 
@@ -92,14 +94,14 @@ class _PractitionerDashboardScreenState
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
+        return AnimatedBuilder(
       animation: _store,
       builder: (context, _) {
         final visibleVisits = _visibleVisits();
         final patientNames = visibleVisits.map((v) => v.profile.name).toSet().toList()
           ..sort();
         final keyword = _patientFilterController.text.trim().toLowerCase();
-        final dropdownFiltered = _selectedPatientFilter == '전체 환자'
+        final dropdownFiltered = _selectedPatientFilter == 'ì „ì²´ í™˜ìž'
             ? visibleVisits
             : visibleVisits
                 .where((v) => v.profile.name == _selectedPatientFilter)
@@ -117,22 +119,25 @@ class _PractitionerDashboardScreenState
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('침술사 대시보드'),
+            title: Text(AppLanguageController.instance.tr('Practitioner Dashboard', '침술사 대시보드')),
             actions: [
+              const LanguageMenuButton(),
               TextButton.icon(
                 onPressed: () => _openPatientManagement(context),
                 icon: const Icon(Icons.people_outline),
-                label: const Text('환자 정보 관리'),
+                label: Text(AppLanguageController.instance.tr('Patient Management', '환자 정보 관리')),
               ),
               IconButton(
-                tooltip: '유사증상 추세 보기',
+                tooltip: AppLanguageController.instance.tr('View symptom trends', '유사증상 추세 보기'),
                 onPressed: () =>
                     Navigator.pushNamed(context, SymptomTrendScreen.routeName),
                 icon: const Icon(Icons.insights_outlined),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(right: 12),
-                child: Center(child: Chip(label: Text('침술사 화면'))),
+                child: Center(
+                  child: Chip(label: Text(AppLanguageController.instance.tr('Practitioner View', '침술사 화면'))),
+                ),
               ),
             ],
           ),
@@ -175,8 +180,8 @@ class _PractitionerDashboardScreenState
                   Expanded(
                     child: Text(
                       _selectedDateRange == null
-                          ? '$_selectedDate 환자 ${filteredVisits.length}명'
-                          : '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} 환자 ${filteredVisits.length}명',
+                          ? '$_selectedDate í™˜ìž ${filteredVisits.length}ëª…'
+                          : '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} í™˜ìž ${filteredVisits.length}ëª…',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -187,9 +192,9 @@ class _PractitionerDashboardScreenState
                     width: 220,
                     child: DropdownButtonFormField<String>(
                       initialValue: patientNames.contains(_selectedPatientFilter) ||
-                              _selectedPatientFilter == '전체 환자'
+                              _selectedPatientFilter == 'ì „ì²´ í™˜ìž'
                           ? _selectedPatientFilter
-                          : '전체 환자',
+                          : 'ì „ì²´ í™˜ìž',
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         isDense: true,
@@ -200,8 +205,8 @@ class _PractitionerDashboardScreenState
                       ),
                       items: [
                         const DropdownMenuItem(
-                          value: '전체 환자',
-                          child: Text('전체 환자'),
+                          value: 'ì „ì²´ í™˜ìž',
+                          child: Text('ì „ì²´ í™˜ìž'),
                         ),
                         ...patientNames.map(
                           (name) =>
@@ -225,14 +230,14 @@ class _PractitionerDashboardScreenState
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
-                  hintText: '환자 이름 직접 검색',
+                  hintText: 'í™˜ìž ì´ë¦„ ì§ì ‘ ê²€ìƒ‰',
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 _selectedDateRange == null
-                    ? '총 내원 집계: ${summary.periodLabel}'
-                    : '선택 기간 집계: ${summary.periodLabel}',
+                    ? 'ì´ ë‚´ì› ì§‘ê³„: ${summary.periodLabel}'
+                    : 'ì„ íƒ ê¸°ê°„ ì§‘ê³„: ${summary.periodLabel}',
                 style: const TextStyle(color: Colors.black54),
               ),
               const SizedBox(height: 12),
@@ -240,7 +245,7 @@ class _PractitionerDashboardScreenState
                 const Card(
                   child: Padding(
                     padding: EdgeInsets.all(20),
-                    child: Text('선택한 조건에 맞는 환자가 없습니다.'),
+                    child: Text('ì„ íƒí•œ ì¡°ê±´ì— ë§žëŠ” í™˜ìžê°€ ì—†ìŠµë‹ˆë‹¤.'),
                   ),
                 ),
               ...filteredVisits.map(
@@ -267,7 +272,7 @@ class _PractitionerDashboardScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '현황표 (침술사 인사이트)',
+              'í˜„í™©í‘œ (ì¹¨ìˆ ì‚¬ ì¸ì‚¬ì´íŠ¸)',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
@@ -276,36 +281,36 @@ class _PractitionerDashboardScreenState
               runSpacing: 10,
               children: [
                 _MiniKpi(
-                  title: '총 내원 (${summary.days}일)',
-                  value: '${summary.totalVisits}명',
+                  title: 'ì´ ë‚´ì› (${summary.days}ì¼)',
+                  value: '${summary.totalVisits}ëª…',
                 ),
-                _MiniKpi(title: '등록 환자', value: '${profiles.length}명'),
+                _MiniKpi(title: 'ë“±ë¡ í™˜ìž', value: '${profiles.length}ëª…'),
                 _MiniKpi(
-                  title: '알림 가능',
+                  title: 'ì•Œë¦¼ ê°€ëŠ¥',
                   value:
-                      '${profiles.where((p) => p.hasRequiredAlertInfo).length}명',
+                      '${profiles.where((p) => p.hasRequiredAlertInfo).length}ëª…',
                 ),
-                const _MiniKpi(title: '재내원율', value: '63%'),
+                const _MiniKpi(title: 'ìž¬ë‚´ì›ìœ¨', value: '63%'),
               ],
             ),
             const SizedBox(height: 10),
             Text(
-              '집계 기간: ${summary.fromDate} ~ ${summary.toDate}',
+              'ì§‘ê³„ ê¸°ê°„: ${summary.fromDate} ~ ${summary.toDate}',
               style: const TextStyle(color: Colors.black54),
             ),
             const SizedBox(height: 12),
             Text(
-              '성별 구성: ${sexCounts.entries.map((e) => '${e.key} ${e.value}명').join(' · ')}',
+              'ì„±ë³„ êµ¬ì„±: ${sexCounts.entries.map((e) => '${e.key} ${e.value}ëª…').join(' Â· ')}',
             ),
             const SizedBox(height: 8),
             const Text(
-              '증상 추세 Top3',
+              'ì¦ìƒ ì¶”ì„¸ Top3',
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 4),
-            const Text('1) 수면/새벽 각성  2) 목/어깨 통증  3) 소화 불편'),
+            const Text('1) ìˆ˜ë©´/ìƒˆë²½ ê°ì„±  2) ëª©/ì–´ê¹¨ í†µì¦  3) ì†Œí™” ë¶ˆíŽ¸'),
             const SizedBox(height: 8),
-            const Text('자주 준 조언: 취침 전 스트레칭 · 카페인 시간 조절 · 식후 10분 걷기'),
+            const Text('ìžì£¼ ì¤€ ì¡°ì–¸: ì·¨ì¹¨ ì „ ìŠ¤íŠ¸ë ˆì¹­ Â· ì¹´íŽ˜ì¸ ì‹œê°„ ì¡°ì ˆ Â· ì‹í›„ 10ë¶„ ê±·ê¸°'),
           ],
         ),
       ),
@@ -322,11 +327,11 @@ class _PractitionerDashboardScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '날짜별 환자 보기',
+              'ë‚ ì§œë³„ í™˜ìž ë³´ê¸°',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 10),
-            const Text('기간 선택', style: TextStyle(fontWeight: FontWeight.w700)),
+            const Text('ê¸°ê°„ ì„ íƒ', style: TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -338,7 +343,7 @@ class _PractitionerDashboardScreenState
                 OutlinedButton.icon(
                   onPressed: _pickDateRangeWithDialog,
                   icon: const Icon(Icons.date_range_outlined),
-                  label: const Text('기간 선택'),
+                  label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
                 ),
               ],
             ),
@@ -352,12 +357,12 @@ class _PractitionerDashboardScreenState
                     _selectedDate == date && _selectedDateRange == null;
                 return ChoiceChip(
                   selected: isSelected,
-                  label: Text('$date  $count명'),
+                  label: Text('$date  $countëª…'),
                   onSelected: (_) {
                     setState(() {
                       _selectedDate = date;
                       _selectedDateRange = null;
-                      _selectedPatientFilter = '전체 환자';
+                      _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
                     });
                   },
                 );
@@ -369,14 +374,14 @@ class _PractitionerDashboardScreenState
                 OutlinedButton.icon(
                   onPressed: _pickDateFromCalendar,
                   icon: const Icon(Icons.calendar_month_outlined),
-                  label: const Text('날짜 선택'),
+                  label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     _selectedDateRange == null
-                        ? '선택 날짜: ${_formatDate(selectedDate)}'
-                        : '선택 기간: ${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)}',
+                        ? 'ì„ íƒ ë‚ ì§œ: ${_formatDate(selectedDate)}'
+                        : 'ì„ íƒ ê¸°ê°„: ${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)}',
                     style: const TextStyle(color: Colors.black54),
                   ),
                 ),
@@ -392,12 +397,12 @@ class _PractitionerDashboardScreenState
     final selected = _selectedDateRange == null && _selectedRangeDays == days;
     return ChoiceChip(
       selected: selected,
-      label: Text('최근 $days일'),
+      label: Text('ìµœê·¼ $daysì¼'),
       onSelected: (_) {
         setState(() {
           _selectedRangeDays = days;
           _selectedDateRange = null;
-          _selectedPatientFilter = '전체 환자';
+          _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
         });
       },
     );
@@ -411,7 +416,7 @@ class _PractitionerDashboardScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '다가오는 환자 보드',
+              'ë‹¤ê°€ì˜¤ëŠ” í™˜ìž ë³´ë“œ',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 10),
@@ -419,13 +424,13 @@ class _PractitionerDashboardScreenState
               final profile = scheduledVisit.profile;
               final visit = scheduledVisit.visit;
               final preview = visit.qaList.isEmpty
-                  ? '문진 미작성'
+                  ? 'ë¬¸ì§„ ë¯¸ìž‘ì„±'
                   : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
               return ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text('${visit.date} · ${visit.time} · ${profile.name}'),
+                title: Text('${visit.date} Â· ${visit.time} Â· ${profile.name}'),
                 subtitle: Text(
-                  '$preview\n연락처: ${profile.phone.isEmpty ? '미입력' : profile.phone}',
+                  '$preview\nì—°ë½ì²˜: ${profile.phone.isEmpty ? 'ë¯¸ìž…ë ¥' : profile.phone}',
                 ),
                 trailing: Chip(label: Text(visit.intakeStatus.label)),
               );
@@ -440,7 +445,7 @@ class _PractitionerDashboardScreenState
     final profile = scheduledVisit.profile;
     final visit = scheduledVisit.visit;
     final firstQa = visit.qaList.isEmpty
-        ? '문진 미제출 - 세션 전 직접 확인 필요'
+        ? 'ë¬¸ì§„ ë¯¸ì œì¶œ - ì„¸ì…˜ ì „ ì§ì ‘ í™•ì¸ í•„ìš”'
         : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
     final canSendRequest = profile.hasRequiredAlertInfo;
 
@@ -459,7 +464,7 @@ class _PractitionerDashboardScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${profile.name} · ${visit.date} ${visit.time}',
+                        '${profile.name} Â· ${visit.date} ${visit.time}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
@@ -468,7 +473,7 @@ class _PractitionerDashboardScreenState
                       const SizedBox(height: 6),
                       Text(firstQa),
                       const SizedBox(height: 6),
-                      Text('지난 방문: ${visit.lastVisitDate} (${visit.daysAgo}일 전)'),
+                      Text('ì§€ë‚œ ë°©ë¬¸: ${visit.lastVisitDate} (${visit.daysAgo}ì¼ ì „)'),
                       const SizedBox(height: 4),
                       Text(
                         _visitTrailLabel(visit),
@@ -480,11 +485,11 @@ class _PractitionerDashboardScreenState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '연락처: ${profile.phone.isEmpty ? '미입력' : profile.phone} / ${profile.email.isEmpty ? '이메일 미입력' : profile.email}',
+                        'ì—°ë½ì²˜: ${profile.phone.isEmpty ? 'ë¯¸ìž…ë ¥' : profile.phone} / ${profile.email.isEmpty ? 'ì´ë©”ì¼ ë¯¸ìž…ë ¥' : profile.email}',
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '환자 정보: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
+                        'í™˜ìž ì •ë³´: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
                       ),
                     ],
                   ),
@@ -501,7 +506,7 @@ class _PractitionerDashboardScreenState
                   onPressed:
                       canSendRequest ? () => _sendReminder(context, scheduledVisit) : null,
                   icon: const Icon(Icons.notifications_active_outlined),
-                  label: Text(canSendRequest ? '답변 요청' : '연락처 필요'),
+                  label: Text(canSendRequest ? 'ë‹µë³€ ìš”ì²­' : 'ì—°ë½ì²˜ í•„ìš”'),
                 ),
                 FilledButton.icon(
                   onPressed: () {
@@ -515,14 +520,14 @@ class _PractitionerDashboardScreenState
                     );
                   },
                   icon: const Icon(Icons.chevron_right),
-                  label: const Text('상세 보기'),
+                  label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
                 ),
               ],
             ),
             if (!canSendRequest) ...[
               const SizedBox(height: 8),
               const Text(
-                '환자 정보 관리에서 전화번호와 이메일을 모두 입력해야 답변 요청 전송이 가능합니다.',
+                'í™˜ìž ì •ë³´ ê´€ë¦¬ì—ì„œ ì „í™”ë²ˆí˜¸ì™€ ì´ë©”ì¼ì„ ëª¨ë‘ ìž…ë ¥í•´ì•¼ ë‹µë³€ ìš”ì²­ ì „ì†¡ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤.',
                 style: TextStyle(color: Colors.redAccent),
               ),
             ],
@@ -561,7 +566,7 @@ class _PractitionerDashboardScreenState
         fromDate: _formatDate(_selectedDateRange!.start),
         toDate: _formatDate(_selectedDateRange!.end),
         periodLabel:
-            '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} ${visits.length}명',
+            '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} ${visits.length}ëª…',
       );
     }
 
@@ -574,15 +579,15 @@ class _PractitionerDashboardScreenState
       totalVisits: visits.length,
       fromDate: _formatDate(start),
       toDate: _formatDate(selected),
-      periodLabel: '${_formatDate(start)} ~ ${_formatDate(selected)} ${visits.length}명',
+      periodLabel: '${_formatDate(start)} ~ ${_formatDate(selected)} ${visits.length}ëª…',
     );
   }
 
   String _visitTrailLabel(PatientVisit visit) {
     if (visit.scheduledSinceLast == 0 && visit.noShowSinceLast == 0) {
-      return '지난 방문 이후 추가 예약 없음 -> 이번 방문이 첫 재내원';
+      return 'ì§€ë‚œ ë°©ë¬¸ ì´í›„ ì¶”ê°€ ì˜ˆì•½ ì—†ìŒ -> ì´ë²ˆ ë°©ë¬¸ì´ ì²« ìž¬ë‚´ì›';
     }
-    return '지난 방문 이후 추가 예약 ${visit.scheduledSinceLast}건, 노쇼 ${visit.noShowSinceLast}건';
+    return 'ì§€ë‚œ ë°©ë¬¸ ì´í›„ ì¶”ê°€ ì˜ˆì•½ ${visit.scheduledSinceLast}ê±´, ë…¸ì‡¼ ${visit.noShowSinceLast}ê±´';
   }
 
   Future<void> _sendReminder(
@@ -599,7 +604,7 @@ class _PractitionerDashboardScreenState
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text('${profile.name}님 답변 요청'),
+          title: Text('${profile.name}ë‹˜ ë‹µë³€ ìš”ì²­'),
           content: SizedBox(
             width: 520,
             child: StatefulBuilder(
@@ -616,12 +621,12 @@ class _PractitionerDashboardScreenState
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          '전송 대상 연락처: ${profile.phone.isEmpty ? '전화번호 없음' : profile.phone}${profile.email.isEmpty ? ' / 이메일 없음' : ' / ${profile.email}'}',
+                          'ì „ì†¡ ëŒ€ìƒ ì—°ë½ì²˜: ${profile.phone.isEmpty ? 'ì „í™”ë²ˆí˜¸ ì—†ìŒ' : profile.phone}${profile.email.isEmpty ? ' / ì´ë©”ì¼ ì—†ìŒ' : ' / ${profile.email}'}',
                         ),
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        '요청할 질문 선택',
+                        'ìš”ì²­í•  ì§ˆë¬¸ ì„ íƒ',
                         style: TextStyle(fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 8),
@@ -657,27 +662,28 @@ class _PractitionerDashboardScreenState
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
-                                        title: Text('${entry.key} 직접 질문 입력'),
+                                        title: Text('${entry.key} ì§ì ‘ ì§ˆë¬¸ ìž…ë ¥'),
                                         content: TextField(
                                           controller: controller,
                                           decoration: const InputDecoration(
                                             border: OutlineInputBorder(),
                                             hintText:
-                                                '예: 특정 상황에서 증상이 더 심해지나요?',
+                                                'ì˜ˆ: íŠ¹ì • ìƒí™©ì—ì„œ ì¦ìƒì´ ë” ì‹¬í•´ì§€ë‚˜ìš”?',
                                           ),
                                         ),
                                         actions: [
+              const LanguageMenuButton(),
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context),
-                                            child: const Text('취소'),
+                                            child: const Text('ì·¨ì†Œ'),
                                           ),
                                           FilledButton(
                                             onPressed: () => Navigator.pop(
                                               context,
                                               controller.text.trim(),
                                             ),
-                                            child: const Text('추가'),
+                                            child: const Text('ì¶”ê°€'),
                                           ),
                                         ],
                                       );
@@ -694,7 +700,7 @@ class _PractitionerDashboardScreenState
                                   });
                                 },
                                 icon: const Icon(Icons.edit_outlined, size: 16),
-                                label: const Text('직접 입력하기'),
+                                label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
                               ),
                             ),
                           ],
@@ -733,7 +739,7 @@ class _PractitionerDashboardScreenState
                         maxLines: 3,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: '노트 (환자에게 전달할 말)',
+                          labelText: 'ë…¸íŠ¸ (í™˜ìžì—ê²Œ ì „ë‹¬í•  ë§)',
                         ),
                       ),
                     ],
@@ -743,12 +749,13 @@ class _PractitionerDashboardScreenState
             ),
           ),
           actions: [
+              const LanguageMenuButton(),
             TextButton(
               onPressed: () {
                 noteController.dispose();
                 Navigator.pop(dialogContext);
               },
-              child: const Text('취소'),
+              child: const Text('ì·¨ì†Œ'),
             ),
             FilledButton(
               onPressed: !profile.hasRequiredAlertInfo
@@ -761,7 +768,7 @@ class _PractitionerDashboardScreenState
                       if (selectedQuestions.isEmpty && customCount == 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('질문을 1개 이상 선택하거나 직접 추가해주세요.'),
+                            content: Text('ì§ˆë¬¸ì„ 1ê°œ ì´ìƒ ì„ íƒí•˜ê±°ë‚˜ ì§ì ‘ ì¶”ê°€í•´ì£¼ì„¸ìš”.'),
                           ),
                         );
                         return;
@@ -797,7 +804,7 @@ class _PractitionerDashboardScreenState
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${profile.name}님 답변 요청 저장 완료: $docId'),
+                            content: Text('${profile.name}ë‹˜ ë‹µë³€ ìš”ì²­ ì €ìž¥ ì™„ë£Œ: $docId'),
                           ),
                         );
                       } catch (error) {
@@ -805,11 +812,11 @@ class _PractitionerDashboardScreenState
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('답변 요청 저장 실패: $error')),
+                          SnackBar(content: Text('ë‹µë³€ ìš”ì²­ ì €ìž¥ ì‹¤íŒ¨: $error')),
                         );
                       }
                     },
-              child: const Text('전송'),
+              child: const Text('ì „ì†¡'),
             ),
           ],
         );
@@ -825,9 +832,9 @@ class _PractitionerDashboardScreenState
       initialDate: currentDate,
       firstDate: DateTime(2020, 1, 1),
       lastDate: DateTime(now.year + 10, now.month, now.day),
-      helpText: '날짜 선택',
-      cancelText: '취소',
-      confirmText: '확인',
+      helpText: 'ë‚ ì§œ ì„ íƒ',
+      cancelText: 'ì·¨ì†Œ',
+      confirmText: 'í™•ì¸',
     );
     if (picked == null) {
       return;
@@ -836,7 +843,7 @@ class _PractitionerDashboardScreenState
     setState(() {
       _selectedDate = _formatDate(picked);
       _selectedDateRange = null;
-      _selectedPatientFilter = '전체 환자';
+      _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
     });
   }
 
@@ -856,7 +863,7 @@ class _PractitionerDashboardScreenState
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('기간 선택'),
+              title: Text(AppLanguageController.instance.tr('Practitioner Dashboard', '침술사 대시보드')),
               content: SizedBox(
                 width: 340,
                 child: Column(
@@ -869,7 +876,7 @@ class _PractitionerDashboardScreenState
                           initialDate: start,
                           firstDate: DateTime(2020, 1, 1),
                           lastDate: DateTime(now.year + 10, now.month, now.day),
-                          helpText: '시작일 선택',
+                          helpText: 'ì‹œìž‘ì¼ ì„ íƒ',
                         );
                         if (picked == null) {
                           return;
@@ -885,7 +892,7 @@ class _PractitionerDashboardScreenState
                           }
                         });
                       },
-                      child: Text('시작일: ${_formatDate(start)}'),
+                      child: Text('ì‹œìž‘ì¼: ${_formatDate(start)}'),
                     ),
                     const SizedBox(height: 8),
                     OutlinedButton(
@@ -895,7 +902,7 @@ class _PractitionerDashboardScreenState
                           initialDate: end,
                           firstDate: DateTime(2020, 1, 1),
                           lastDate: DateTime(now.year + 10, now.month, now.day),
-                          helpText: '종료일 선택',
+                          helpText: 'ì¢…ë£Œì¼ ì„ íƒ',
                         );
                         if (picked == null) {
                           return;
@@ -911,20 +918,21 @@ class _PractitionerDashboardScreenState
                           }
                         });
                       },
-                      child: Text('종료일: ${_formatDate(end)}'),
+                      child: Text('ì¢…ë£Œì¼: ${_formatDate(end)}'),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '선택 범위: ${_formatDate(start)} ~ ${_formatDate(end)}',
+                      'ì„ íƒ ë²”ìœ„: ${_formatDate(start)} ~ ${_formatDate(end)}',
                       style: const TextStyle(color: Colors.black54),
                     ),
                   ],
                 ),
               ),
               actions: [
+              const LanguageMenuButton(),
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('취소'),
+                  child: const Text('ì·¨ì†Œ'),
                 ),
                 FilledButton(
                   onPressed: () {
@@ -932,11 +940,11 @@ class _PractitionerDashboardScreenState
                       _selectedDate = _formatDate(end);
                       _selectedDateRange = DateTimeRange(start: start, end: end);
                       _selectedRangeDays = end.difference(start).inDays + 1;
-                      _selectedPatientFilter = '전체 환자';
+                      _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
                     });
                     Navigator.pop(dialogContext);
                   },
-                  child: const Text('적용'),
+                  child: const Text('ì ìš©'),
                 ),
               ],
             );
@@ -995,7 +1003,7 @@ class _PatientRealtimeActivity extends StatelessWidget {
           builder: (context, requestSnapshot) {
             if (submissionSnapshot.hasError || requestSnapshot.hasError) {
               return const Text(
-                '실시간 활동을 불러오지 못했습니다.',
+                'ì‹¤ì‹œê°„ í™œë™ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
                 style: TextStyle(color: Colors.redAccent),
               );
             }
@@ -1048,22 +1056,22 @@ class _PatientRealtimeActivity extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    '실시간 앱 활동',
+                    'ì‹¤ì‹œê°„ ì•± í™œë™',
                     style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   if (latestRequest == null)
-                    const Text('최근 답변 요청 없음')
+                    const Text('ìµœê·¼ ë‹µë³€ ìš”ì²­ ì—†ìŒ')
                   else
                     Text(
-                      '최근 답변 요청: ${selectedQuestions.length}개 질문 · ${_formatDateTime(requestAt)}',
+                      'ìµœê·¼ ë‹µë³€ ìš”ì²­: ${selectedQuestions.length}ê°œ ì§ˆë¬¸ Â· ${_formatDateTime(requestAt)}',
                     ),
                   const SizedBox(height: 4),
                   if (latestSubmission == null)
-                    const Text('최근 제출 없음')
+                    const Text('ìµœê·¼ ì œì¶œ ì—†ìŒ')
                   else
                     Text(
-                      '최근 환자 제출: ${answers.length}개 답변 · ${_formatDateTime(submissionAt)}',
+                      'ìµœê·¼ í™˜ìž ì œì¶œ: ${answers.length}ê°œ ë‹µë³€ Â· ${_formatDateTime(submissionAt)}',
                     ),
                 ],
               ),
@@ -1076,7 +1084,7 @@ class _PatientRealtimeActivity extends StatelessWidget {
 
   String _formatDateTime(DateTime? value) {
     if (value == null) {
-      return '방금 전';
+      return 'ë°©ê¸ˆ ì „';
     }
     final y = value.year.toString().padLeft(4, '0');
     final m = value.month.toString().padLeft(2, '0');
@@ -1099,12 +1107,12 @@ class _BetaSubmissionBoard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '지인 베타 제출함',
+              'ì§€ì¸ ë² íƒ€ ì œì¶œí•¨',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(
-              '이메일/비밀번호로 가입한 지인들의 최근 제출을 확인합니다.',
+              'ì´ë©”ì¼/ë¹„ë°€ë²ˆí˜¸ë¡œ ê°€ìž…í•œ ì§€ì¸ë“¤ì˜ ìµœê·¼ ì œì¶œì„ í™•ì¸í•©ë‹ˆë‹¤.',
               style: TextStyle(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 12),
@@ -1115,7 +1123,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return const Text(
-                    '베타 제출함을 불러오지 못했습니다.',
+                    'ë² íƒ€ ì œì¶œí•¨ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
                     style: TextStyle(color: Colors.redAccent),
                   );
                 }
@@ -1131,7 +1139,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
                   });
 
                 if (docs.isEmpty) {
-                  return const Text('아직 베타 가입자의 제출이 없습니다.');
+                  return const Text('ì•„ì§ ë² íƒ€ ê°€ìž…ìžì˜ ì œì¶œì´ ì—†ìŠµë‹ˆë‹¤.');
                 }
 
                 return Column(
@@ -1151,7 +1159,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
                       ),
                       title: Text(patientName),
                       subtitle: Text(
-                        '${visitType == 'initial' ? '초진' : '재진'} · 답변 $answers개 · ${_formatDateTime(submittedAt)}',
+                        '${visitType == 'initial' ? 'ì´ˆì§„' : 'ìž¬ì§„'} Â· ë‹µë³€ $answersê°œ Â· ${_formatDateTime(submittedAt)}',
                       ),
                     );
                   }).toList(),
@@ -1166,7 +1174,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
 
   static String _formatDateTime(DateTime? value) {
     if (value == null) {
-      return '방금 전';
+      return 'ë°©ê¸ˆ ì „';
     }
     final y = value.year.toString().padLeft(4, '0');
     final m = value.month.toString().padLeft(2, '0');
@@ -1189,12 +1197,12 @@ class _BetaRegistrantBoard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '지인 베타 가입자',
+              'ì§€ì¸ ë² íƒ€ ê°€ìž…ìž',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(
-              '회원가입만 한 사람, 연락처가 빠진 사람, 이미 제출까지 한 사람을 여기서 바로 확인합니다.',
+              'íšŒì›ê°€ìž…ë§Œ í•œ ì‚¬ëžŒ, ì—°ë½ì²˜ê°€ ë¹ ì§„ ì‚¬ëžŒ, ì´ë¯¸ ì œì¶œê¹Œì§€ í•œ ì‚¬ëžŒì„ ì—¬ê¸°ì„œ ë°”ë¡œ í™•ì¸í•©ë‹ˆë‹¤.',
               style: TextStyle(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 12),
@@ -1205,7 +1213,7 @@ class _BetaRegistrantBoard extends StatelessWidget {
               builder: (context, patientSnapshot) {
                 if (patientSnapshot.hasError) {
                   return const Text(
-                    '베타 가입자 목록을 불러오지 못했습니다.',
+                    'ë² íƒ€ ê°€ìž…ìž ëª©ë¡ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
                     style: TextStyle(color: Colors.redAccent),
                   );
                 }
@@ -1220,7 +1228,7 @@ class _BetaRegistrantBoard extends StatelessWidget {
                   builder: (context, submissionSnapshot) {
                     if (submissionSnapshot.hasError) {
                       return const Text(
-                        '베타 제출 데이터를 불러오지 못했습니다.',
+                        'ë² íƒ€ ì œì¶œ ë°ì´í„°ë¥¼ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
                         style: TextStyle(color: Colors.redAccent),
                       );
                     }
@@ -1249,7 +1257,7 @@ class _BetaRegistrantBoard extends StatelessWidget {
                     }
 
                     if (patientDocs.isEmpty) {
-                      return const Text('아직 가입한 베타 사용자가 없습니다.');
+                      return const Text('ì•„ì§ ê°€ìž…í•œ ë² íƒ€ ì‚¬ìš©ìžê°€ ì—†ìŠµë‹ˆë‹¤.');
                     }
 
                     return Column(
@@ -1258,24 +1266,24 @@ class _BetaRegistrantBoard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _BetaOverviewChip(
-                                label: '가입자',
-                                value: '${patientDocs.length}명',
+                                label: 'ê°€ìž…ìž',
+                                value: '${patientDocs.length}ëª…',
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _BetaOverviewChip(
-                                label: '연락처 완성',
+                                label: 'ì—°ë½ì²˜ ì™„ì„±',
                                 value:
-                                    '${patientDocs.where((doc) => _hasRequiredInfo(doc.data())).length}명',
+                                    '${patientDocs.where((doc) => _hasRequiredInfo(doc.data())).length}ëª…',
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _BetaOverviewChip(
-                                label: '제출 완료',
+                                label: 'ì œì¶œ ì™„ë£Œ',
                                 value:
-                                    '${patientDocs.where((doc) => (submissionsByPatient[doc.id] ?? const []).isNotEmpty).length}명',
+                                    '${patientDocs.where((doc) => (submissionsByPatient[doc.id] ?? const []).isNotEmpty).length}ëª…',
                               ),
                             ),
                           ],
@@ -1345,8 +1353,8 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                     Chip(
                                       label: Text(
                                         hasRequired
-                                            ? '연락처 준비됨'
-                                            : '필수 정보 부족',
+                                            ? 'ì—°ë½ì²˜ ì¤€ë¹„ë¨'
+                                            : 'í•„ìˆ˜ ì •ë³´ ë¶€ì¡±',
                                       ),
                                       backgroundColor: hasRequired
                                           ? const Color(0xFFE3F3EF)
@@ -1357,12 +1365,12 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 Text(
                                   phone.isEmpty && email.isEmpty
-                                      ? '연락처 없음'
-                                      : '${phone.isEmpty ? '전화번호 없음' : phone} · ${email.isEmpty ? '이메일 없음' : email}',
+                                      ? 'ì—°ë½ì²˜ ì—†ìŒ'
+                                      : '${phone.isEmpty ? 'ì „í™”ë²ˆí˜¸ ì—†ìŒ' : phone} Â· ${email.isEmpty ? 'ì´ë©”ì¼ ì—†ìŒ' : email}',
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${birthYear?.toString() ?? '출생연도 미입력'} · ${sex.isEmpty ? '성별 미입력' : sex} · ${ethnicity.isEmpty ? '인종/민족 미입력' : ethnicity}',
+                                  '${birthYear?.toString() ?? 'ì¶œìƒì—°ë„ ë¯¸ìž…ë ¥'} Â· ${sex.isEmpty ? 'ì„±ë³„ ë¯¸ìž…ë ¥' : sex} Â· ${ethnicity.isEmpty ? 'ì¸ì¢…/ë¯¼ì¡± ë¯¸ìž…ë ¥' : ethnicity}',
                                   style: const TextStyle(color: Colors.black54),
                                 ),
                                 const SizedBox(height: 8),
@@ -1372,26 +1380,26 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                   children: [
                                     _StatusTag(
                                       label: submissions.isEmpty
-                                          ? '아직 제출 없음'
-                                          : '제출 ${submissions.length}회',
+                                          ? 'ì•„ì§ ì œì¶œ ì—†ìŒ'
+                                          : 'ì œì¶œ ${submissions.length}íšŒ',
                                       color: submissions.isEmpty
                                           ? const Color(0xFFF6E9C9)
                                           : const Color(0xFFDDF0E8),
                                     ),
                                     _StatusTag(
                                       label:
-                                          '가입: ${_formatDateTime(createdAt)}',
+                                          'ê°€ìž…: ${_formatDateTime(createdAt)}',
                                       color: const Color(0xFFEAECEF),
                                     ),
                                     _StatusTag(
                                       label:
-                                          '프로필 수정: ${_formatDateTime(updatedAt)}',
+                                          'í”„ë¡œí•„ ìˆ˜ì •: ${_formatDateTime(updatedAt)}',
                                       color: const Color(0xFFEAECEF),
                                     ),
                                     if (latestSubmissionAt != null)
                                       _StatusTag(
                                         label:
-                                            '최근 제출: ${_formatDateTime(latestSubmissionAt)}',
+                                            'ìµœê·¼ ì œì¶œ: ${_formatDateTime(latestSubmissionAt)}',
                                         color: const Color(0xFFDDF0E8),
                                       ),
                                   ],
@@ -1420,7 +1428,7 @@ class _BetaRegistrantBoard extends StatelessWidget {
 
   static String _formatDateTime(DateTime? value) {
     if (value == null) {
-      return '기록 없음';
+      return 'ê¸°ë¡ ì—†ìŒ';
     }
     final y = value.year.toString().padLeft(4, '0');
     final m = value.month.toString().padLeft(2, '0');
@@ -1511,7 +1519,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         : _store.profileById(_selectedProfileId!);
 
     return AlertDialog(
-      title: const Text('환자 정보 관리'),
+      title: Text(AppLanguageController.instance.tr('Practitioner Dashboard', '침술사 대시보드')),
       content: SizedBox(
         width: 960,
         child: Row(
@@ -1530,7 +1538,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                         phone: '',
                         email: '',
                         birthYear: 1990,
-                        sex: '여성',
+                        sex: 'ì—¬ì„±',
                         ethnicity: 'Unknown',
                         memo: '',
                       );
@@ -1538,7 +1546,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                       setState(() => _selectedProfileId = newProfile.id);
                     },
                     icon: const Icon(Icons.person_add_alt_1),
-                    label: const Text('환자 추가'),
+                    label: Text(AppLanguageController.instance.tr('Patient Management', '환자 정보 관리')),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
@@ -1548,8 +1556,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                         final profile = profiles[index];
                         final isSelected = selected?.id == profile.id;
                         final missingFields = <String>[
-                          if (profile.phone.trim().isEmpty) '????',
-                          if (profile.email.trim().isEmpty) '???',
+                          if (profile.phone.trim().isEmpty) '전화번호',
+                          if (profile.email.trim().isEmpty) '이메일',
                         ];
                         return Card(
                           color: isSelected ? const Color(0xFFF4FBFA) : null,
@@ -1607,7 +1615,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
             const SizedBox(width: 16),
             Expanded(
               child: selected == null
-                  ? const Center(child: Text('관리할 환자를 선택하세요.'))
+                  ? const Center(child: Text('ê´€ë¦¬í•  í™˜ìžë¥¼ ì„ íƒí•˜ì„¸ìš”.'))
                   : _PatientProfileEditor(
                       profile: selected,
                       onSave: (updated) {
@@ -1620,9 +1628,10 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         ),
       ),
       actions: [
+              const LanguageMenuButton(),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('닫기'),
+          child: const Text('ë‹«ê¸°'),
         ),
       ],
     );
@@ -1701,14 +1710,14 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '등록된 환자 정보가 있어야 대시보드와 답변 요청에서 사용됩니다.',
+            'ë“±ë¡ëœ í™˜ìž ì •ë³´ê°€ ìžˆì–´ì•¼ ëŒ€ì‹œë³´ë“œì™€ ë‹µë³€ ìš”ì²­ì—ì„œ ì‚¬ìš©ë©ë‹ˆë‹¤.',
             style: TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _nameController,
             decoration: const InputDecoration(
-              labelText: '이름',
+              labelText: 'ì´ë¦„',
               border: OutlineInputBorder(),
             ),
           ),
@@ -1719,7 +1728,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
                 child: TextField(
                   controller: _phoneController,
                   decoration: const InputDecoration(
-                    labelText: '전화번호',
+                    labelText: 'ì „í™”ë²ˆí˜¸',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1729,7 +1738,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
                 child: TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: '이메일',
+                    labelText: 'ì´ë©”ì¼',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1743,7 +1752,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
                 child: TextField(
                   controller: _birthYearController,
                   decoration: const InputDecoration(
-                    labelText: '출생연도',
+                    labelText: 'ì¶œìƒì—°ë„',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
@@ -1754,7 +1763,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
                 child: TextField(
                   controller: _sexController,
                   decoration: const InputDecoration(
-                    labelText: '성별',
+                    labelText: 'ì„±ë³„',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1764,7 +1773,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
                 child: TextField(
                   controller: _ethnicityController,
                   decoration: const InputDecoration(
-                    labelText: '인종/민족',
+                    labelText: 'ì¸ì¢…/ë¯¼ì¡±',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1776,7 +1785,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
             controller: _memoController,
             maxLines: 3,
             decoration: const InputDecoration(
-              labelText: '관리 메모',
+              labelText: 'ê´€ë¦¬ ë©”ëª¨',
               border: OutlineInputBorder(),
             ),
           ),
@@ -1801,11 +1810,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               );
               widget.onSave(updated);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('환자 정보 저장 완료')),
+                const SnackBar(content: Text('í™˜ìž ì •ë³´ ì €ìž¥ ì™„ë£Œ')),
               );
             },
             icon: const Icon(Icons.save_outlined),
-            label: const Text('환자 정보 저장'),
+            label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
           ),
         ],
       ),
@@ -1863,3 +1872,6 @@ class _MiniKpi extends StatelessWidget {
     );
   }
 }
+
+
+
