@@ -14,10 +14,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static const _practitionerId = '123';
-  static const _practitionerPassword = '123';
-  static const _patientId = 'hugo';
-  static const _patientPassword = 'hugo';
+  static const _sharedTestId = '123';
+  static const _sharedTestPassword = '123';
+  static const _hugoId = 'hugo';
+  static const _hugoPassword = 'hugo';
 
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -31,18 +31,29 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _submit(String role) {
+  void _submit(String role, String loginMode) {
     final id = _idController.text.trim();
     final password = _passwordController.text.trim();
 
     final isPractitionerLogin =
         role == 'practitioner' &&
-        id == _practitionerId &&
-        password == _practitionerPassword;
-    final isPatientLogin =
-        role == 'patient' && id == _patientId && password == _patientPassword;
+        loginMode == 'default' &&
+        id == _sharedTestId &&
+        password == _sharedTestPassword;
 
-    if (!isPractitionerLogin && !isPatientLogin) {
+    final isPatientDefaultLogin =
+        role == 'patient' &&
+        loginMode == 'default' &&
+        id == _sharedTestId &&
+        password == _sharedTestPassword;
+
+    final isPatientHugoLogin =
+        role == 'patient' &&
+        loginMode == 'hugo' &&
+        id == _hugoId &&
+        password == _hugoPassword;
+
+    if (!isPractitionerLogin && !isPatientDefaultLogin && !isPatientHugoLogin) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('ID 또는 비밀번호가 올바르지 않습니다.')),
       );
@@ -54,17 +65,35 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    ClinicDataStore.instance.setCurrentPatientProfile('hugo_demo');
+    if (isPatientHugoLogin) {
+      ClinicDataStore.instance.setCurrentPatientProfile('hugo_demo');
+    } else {
+      ClinicDataStore.instance.setCurrentPatientProfile('jane_kim');
+    }
+
     Navigator.pushReplacementNamed(context, PatientIntakeScreen.routeName);
   }
 
   @override
   Widget build(BuildContext context) {
-    final roleArg = ModalRoute.of(context)?.settings.arguments;
-    final role = roleArg is String ? roleArg : 'patient';
+    final routeArgs = ModalRoute.of(context)?.settings.arguments;
+
+    String role = 'patient';
+    String loginMode = 'default';
+
+    if (routeArgs is Map) {
+      role = (routeArgs['role'] as String?) ?? 'patient';
+      loginMode = (routeArgs['loginMode'] as String?) ?? 'default';
+    } else if (routeArgs is String) {
+      role = routeArgs;
+    }
+
     final roleLabel = role == 'practitioner' ? '침술사' : '환자';
-    final helperText =
-        role == 'practitioner' ? '테스트 계정: 123 / 123' : '테스트 계정: hugo / hugo';
+    final helperText = role == 'practitioner'
+        ? '테스트 계정: 123 / 123'
+        : loginMode == 'hugo'
+            ? '내 계정 테스트: hugo / hugo'
+            : '환자 테스트 계정: 123 / 123';
 
     return Scaffold(
       appBar: AppBar(title: const Text('로그인')),
@@ -91,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: _idController,
                   textInputAction: TextInputAction.next,
-                  onSubmitted: (_) => _submit(role),
+                  onSubmitted: (_) => _submit(role, loginMode),
                   decoration: const InputDecoration(
                     labelText: 'ID',
                     border: OutlineInputBorder(),
@@ -102,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: !_showPassword,
                   textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _submit(role),
+                  onSubmitted: (_) => _submit(role, loginMode),
                   decoration: InputDecoration(
                     labelText: 'Password',
                     border: const OutlineInputBorder(),
@@ -116,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: () => _submit(role),
+                  onPressed: () => _submit(role, loginMode),
                   child: const Text('로그인'),
                 ),
               ],
