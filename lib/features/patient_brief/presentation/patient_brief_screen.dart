@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
+import '../../../core/data/clinic_data_store.dart';
 
 class PatientBriefScreen extends StatefulWidget {
   const PatientBriefScreen({super.key});
@@ -27,12 +27,13 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
 
   final TextEditingController _thisSessionTreatmentAreaController =
       TextEditingController();
-  final TextEditingController _thisSessionMemoController = TextEditingController();
-  final TextEditingController _nextObservationController = TextEditingController();
+  final TextEditingController _thisSessionMemoController =
+      TextEditingController();
+  final TextEditingController _nextObservationController =
+      TextEditingController();
   final TextEditingController _adviceGivenController = TextEditingController();
   final TextEditingController _adherenceFollowupController =
       TextEditingController();
-
   final TextEditingController _patientAlertController = TextEditingController();
   final TextEditingController _weeklyMustDoController = TextEditingController();
   final TextEditingController _currentStatusController = TextEditingController();
@@ -47,7 +48,6 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
       return;
     }
     _initialized = true;
-
     _adviceGivenController.text = '수면 전 카페인 줄이고, 어깨 스트레칭 5분.';
     _adherenceFollowupController.text = '다음 방문 시 스트레칭 실천 횟수 확인.';
     _patientAlertController.text = '이번 주는 수면/피로 변화가 핵심 관찰 포인트입니다.';
@@ -80,31 +80,19 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
   Widget build(BuildContext context) {
     final arg = ModalRoute.of(context)?.settings.arguments;
     final historyArgs = arg is PatientHistoryArgs ? arg : null;
-    final patient = historyArgs?.current ??
-        (arg is PatientItem
-            ? arg
-            : const PatientItem(
-                name: 'Jane Kim',
-                time: '3:30 PM',
-                lastVisitDate: '2026-04-08',
-                daysAgo: 7,
-                scheduledSinceLast: 1,
-                noShowSinceLast: 0,
-                intakeStatus: IntakeStatus.completed,
-                previousTreatmentArea: '우측 견갑 주변 + 경추 C5-C7 주변',
-                previousSessionNote: '견갑 내측 압통 강함, 새벽 각성 빈도 높음.',
-                qaList: [
-                  QAItem('Sleep', '최근 수면은 어떠셨나요?', '새벽 3시에 자주 깨고 다시 잠들기 어려워요.'),
-                  QAItem('Energy', '오후 피로감은 어떤가요?', '오후 2시 이후 급격히 피곤해져요.'),
-                ],
-              ));
-    final history = historyArgs?.history ??
-        <PatientVisitRecord>[
-          PatientVisitRecord(visitDate: '2026-04-08', patient: patient),
-        ];
 
-    final grouped = _buildGroupedMap(patient.qaList);
-    final coveredCount = grouped.values.where((e) => e.isNotEmpty).length;
+    if (historyArgs == null) {
+      return const Scaffold(
+        body: Center(child: Text('환자 기록을 불러오지 못했습니다.')),
+      );
+    }
+
+    final current = historyArgs.current;
+    final patient = current.profile;
+    final visit = current.visit;
+    final history = historyArgs.history;
+    final grouped = _buildGroupedMap(visit.qaList);
+    final coveredCount = grouped.values.where((items) => items.isNotEmpty).length;
     final unasked =
         _categoryOrder.where((category) => grouped[category]!.isEmpty).toList();
 
@@ -114,9 +102,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(
-              child: Chip(label: Text('침술사 화면')),
-            ),
+            child: Center(child: Chip(label: Text('침술사 화면'))),
           ),
         ],
       ),
@@ -124,12 +110,17 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            '${patient.name} · ${patient.time}',
+            '${patient.name} · ${visit.time}',
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
           Text(
-            '지난 방문: ${patient.lastVisitDate} (${patient.daysAgo}일 전)',
+            '지난 방문: ${visit.lastVisitDate} (${visit.daysAgo}일 전)',
+            style: const TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '환자 정보: ${patient.sex}, ${patient.ageRange}, ${patient.ethnicity}',
             style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
           const SizedBox(height: 10),
@@ -144,11 +135,10 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
-                  ...history.map((record) {
-                    final p = record.patient;
-                    final preview = p.qaList.isEmpty
+                  ...history.map((item) {
+                    final preview = item.visit.qaList.isEmpty
                         ? '문진 기록 없음'
-                        : '${p.qaList.first.question} / ${p.qaList.first.answer}';
+                        : '${item.visit.qaList.first.question} / ${item.visit.qaList.first.answer}';
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Container(
@@ -161,12 +151,12 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${record.visitDate} · ${p.time}',
+                              '${item.visit.date} · ${item.visit.time}',
                               style: const TextStyle(fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 4),
-                            Text('치료 부위: ${p.previousTreatmentArea}'),
-                            Text('기록: ${p.previousSessionNote}'),
+                            Text('치료 부위: ${item.visit.previousTreatmentArea}'),
+                            Text('기록: ${item.visit.previousSessionNote}'),
                             Text('요약: $preview'),
                           ],
                         ),
@@ -189,7 +179,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),
-                  Text('총 질문 수: ${patient.qaList.length}개'),
+                  Text('총 질문 수: ${visit.qaList.length}개'),
                   if (unasked.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
@@ -225,9 +215,8 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                         '아직 질문 없음',
                         style: TextStyle(color: Colors.black54),
                       ),
-                    ...list.asMap().entries.map((entry) {
-                      final qa = entry.value;
-                      return Padding(
+                    ...list.map(
+                      (qa) => Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,164 +225,160 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                             Text('  A: ${qa.answer}'),
                           ],
                         ),
-                      );
-                    }),
+                      ),
+                    ),
                   ],
                 ),
               ),
             );
           }),
           const SizedBox(height: 12),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '지난 방문 기록 (비공유)',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('지난 치료 부위: ${patient.previousTreatmentArea}'),
-                  const SizedBox(height: 6),
-                  Text('지난 노트: ${patient.previousSessionNote}'),
-                ],
-              ),
+          _buildMemoCard(
+            title: '지난 방문 기록 (비공유)',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('지난 치료 부위: ${visit.previousTreatmentArea}'),
+                const SizedBox(height: 6),
+                Text('지난 노트: ${visit.previousSessionNote}'),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '이번 세션 기록 (비공유)',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+          const SizedBox(height: 10),
+          _buildMemoCard(
+            title: '이번 방문 메모',
+            child: Column(
+              children: [
+                TextField(
+                  controller: _thisSessionTreatmentAreaController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '이번 치료 부위',
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _thisSessionTreatmentAreaController,
-                    decoration: const InputDecoration(
-                      labelText: '이번 치료 부위',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _thisSessionMemoController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '이번 세션 메모',
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _thisSessionMemoController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: '이번 세션 메모',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _nextObservationController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '다음 방문 때 관찰할 것',
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _nextObservationController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: '다음 방문 관찰 포인트 (기대 변화)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _adviceGivenController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: '내가 준 조언',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _adherenceFollowupController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: '조언 이행 팔로업 체크',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '공유 메모 (환자에게 보임)',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+          const SizedBox(height: 10),
+          _buildMemoCard(
+            title: '조언 / 팔로업',
+            child: Column(
+              children: [
+                TextField(
+                  controller: _adviceGivenController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '이번에 준 조언',
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _patientAlertController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: '환자 알림',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _adherenceFollowupController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '다음 방문에서 확인할 이행 사항',
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _weeklyMustDoController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: '주중 꼭 지켜야 할 내용',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _currentStatusController,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: '지금 상태 설명',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _actionGuideController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: '어떻게 해야 하는지 안내',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton(
-              onPressed: _saveMemos,
-              child: const Text('기록 저장'),
+          const SizedBox(height: 10),
+          _buildMemoCard(
+            title: '공유 메모 (환자에게 보임)',
+            child: Column(
+              children: [
+                TextField(
+                  controller: _patientAlertController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '환자 알림',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _weeklyMustDoController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '이번 주 꼭 지켜줬으면 하는 것',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _currentStatusController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '지금 상태 안내',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _actionGuideController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '어떻게 해야 하는지 안내',
+                  ),
+                ),
+              ],
             ),
+          ),
+          const SizedBox(height: 14),
+          FilledButton.icon(
+            onPressed: _saveMemos,
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('메모 저장'),
           ),
         ],
       ),
     );
   }
 
-  Map<String, List<QAItem>> _buildGroupedMap(List<QAItem> list) {
-    final map = <String, List<QAItem>>{
-      for (final category in _categoryOrder) category: <QAItem>[],
+  Widget _buildMemoCard({required String title, required Widget child}) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Map<String, List<QaItem>> _buildGroupedMap(List<QaItem> qaList) {
+    final grouped = {
+      for (final category in _categoryOrder) category: <QaItem>[],
     };
-    for (final item in list) {
-      if (map.containsKey(item.category)) {
-        map[item.category]!.add(item);
-      }
+    for (final qa in qaList) {
+      grouped.putIfAbsent(qa.category, () => <QaItem>[]).add(qa);
     }
-    return map;
+    return grouped;
   }
 }

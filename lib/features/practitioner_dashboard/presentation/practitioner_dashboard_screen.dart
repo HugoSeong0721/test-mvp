@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/data/clinic_data_store.dart';
+import '../../../core/services/app_firestore_service.dart';
 import '../../patient_brief/presentation/patient_brief_screen.dart';
+import '../../symptom_trend/presentation/symptom_trend_screen.dart';
 
 class PractitionerDashboardScreen extends StatefulWidget {
   const PractitionerDashboardScreen({super.key});
@@ -12,7 +15,8 @@ class PractitionerDashboardScreen extends StatefulWidget {
       _PractitionerDashboardScreenState();
 }
 
-class _PractitionerDashboardScreenState extends State<PractitionerDashboardScreen> {
+class _PractitionerDashboardScreenState
+    extends State<PractitionerDashboardScreen> {
   static const Map<String, List<String>> _questionLibraryByCategory = {
     'Temperature/Sweat': [
       '몸이 쉽게 덥거나 춥게 느껴지나요?',
@@ -56,173 +60,27 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
     ],
   };
 
-  final List<String> _dates = [
-    '2026-04-01',
-    '2026-04-08',
-    '2026-04-12',
-    '2026-04-15',
-  ];
+  final ClinicDataStore _store = ClinicDataStore.instance;
+  final TextEditingController _patientFilterController =
+      TextEditingController();
 
   late String _selectedDate;
   String _selectedPatientFilter = '전체 환자';
-  final TextEditingController _patientFilterController = TextEditingController();
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
-
-  static final Map<String, List<PatientItem>> _patientsByDate = {
-    '2026-04-01': [
-      PatientItem(
-        name: 'Daniel Cho',
-        time: '4:00 PM',
-        lastVisitDate: '2026-03-18',
-        daysAgo: 14,
-        scheduledSinceLast: 1,
-        noShowSinceLast: 0,
-        intakeStatus: IntakeStatus.completed,
-        previousTreatmentArea: '승모근 상부 + 측두부',
-        previousSessionNote: '긴장성 두통 패턴.',
-        qaList: const [
-          QAItem('HEENT', '두통/눈피로는?', '오후에 눈이 뻑뻑하고 두통이 와요.'),
-          QAItem('Emotion', '감정 기복은?', '예민해지고 짜증이 늘었어요.'),
-        ],
-      ),
-      PatientItem(
-        name: 'Min Park',
-        time: '5:30 PM',
-        lastVisitDate: '2026-03-15',
-        daysAgo: 17,
-        scheduledSinceLast: 2,
-        noShowSinceLast: 1,
-        intakeStatus: IntakeStatus.notStarted,
-        previousTreatmentArea: '요추 주변 + 둔부 트리거포인트',
-        previousSessionNote: '장시간 앉을 때 통증 악화.',
-        qaList: const [],
-      ),
-    ],
-    '2026-04-08': [
-      PatientItem(
-        name: 'Jane Kim',
-        time: '3:30 PM',
-        lastVisitDate: '2026-04-01',
-        daysAgo: 7,
-        scheduledSinceLast: 1,
-        noShowSinceLast: 0,
-        intakeStatus: IntakeStatus.completed,
-        previousTreatmentArea: '우측 견갑 주변 + 경추 C5-C7 주변',
-        previousSessionNote: '견갑 내측 압통 강함, 새벽 각성 빈도 높음.',
-        qaList: const [
-          QAItem('Sleep', '최근 수면은 어떠셨나요?', '새벽 3시에 자주 깨고 다시 잠들기 어려워요.'),
-          QAItem('Energy', '오후 피로감은 어떤가요?', '오후 2시 이후 급격히 피곤해져요.'),
-        ],
-      ),
-    ],
-    '2026-04-12': [
-      PatientItem(
-        name: 'Hana Yoo',
-        time: '5:30 PM',
-        lastVisitDate: '2026-04-08',
-        daysAgo: 4,
-        scheduledSinceLast: 0,
-        noShowSinceLast: 0,
-        intakeStatus: IntakeStatus.inProgress,
-        previousTreatmentArea: '측두부 + 흉쇄유돌근',
-        previousSessionNote: '두통 빈도 추적 중.',
-        qaList: const [
-          QAItem('Temperature/Sweat', '땀/체온 변화는?', '밤에 식은땀이 가끔 나요.'),
-        ],
-      ),
-    ],
-    '2026-04-15': [
-      PatientItem(
-        name: 'Jane Kim',
-        time: '3:30 PM',
-        lastVisitDate: '2026-04-08',
-        daysAgo: 7,
-        scheduledSinceLast: 1,
-        noShowSinceLast: 0,
-        intakeStatus: IntakeStatus.completed,
-        previousTreatmentArea: '우측 견갑 주변 + 경추 C5-C7 주변',
-        previousSessionNote: '견갑 내측 압통 강함, 새벽 각성 빈도 높음.',
-        qaList: const [
-          QAItem('Sleep', '최근 수면은 어떠셨나요?', '새벽 3시에 자주 깨고 다시 잠들기 어려워요.'),
-          QAItem('Energy', '오후 피로감은 어떤가요?', '오후 2시 이후 급격히 피곤해져요.'),
-          QAItem('Emotion', '최근 스트레스 정도는?', '업무 스트레스가 높은 편이에요.'),
-        ],
-      ),
-      PatientItem(
-        name: 'Min Park',
-        time: '4:00 PM',
-        lastVisitDate: '2026-03-31',
-        daysAgo: 15,
-        scheduledSinceLast: 2,
-        noShowSinceLast: 1,
-        intakeStatus: IntakeStatus.notStarted,
-        previousTreatmentArea: '요추 주변 + 둔부 트리거포인트',
-        previousSessionNote: '장시간 앉을 때 통증 악화.',
-        qaList: const [],
-      ),
-      PatientItem(
-        name: 'Eunji Lee',
-        time: '4:30 PM',
-        lastVisitDate: '2026-04-10',
-        daysAgo: 5,
-        scheduledSinceLast: 0,
-        noShowSinceLast: 0,
-        intakeStatus: IntakeStatus.inProgress,
-        previousTreatmentArea: '복부 + 비위 관련 포인트',
-        previousSessionNote: '식후 복부팽만 호소.',
-        qaList: const [
-          QAItem('Appetite/Thirst', '식욕/갈증은 어떠셨나요?', '입이 자주 마르고 찬물 찾게 돼요.'),
-        ],
-      ),
-      PatientItem(
-        name: 'Daniel Cho',
-        time: '5:00 PM',
-        lastVisitDate: '2026-04-01',
-        daysAgo: 14,
-        scheduledSinceLast: 3,
-        noShowSinceLast: 1,
-        intakeStatus: IntakeStatus.completed,
-        previousTreatmentArea: '승모근 상부 + 측두부',
-        previousSessionNote: '긴장성 두통 패턴.',
-        qaList: const [
-          QAItem('HEENT', '두통/눈피로는?', '오후에 눈이 뻑뻑하고 두통이 와요.'),
-          QAItem('Emotion', '감정 기복은?', '예민해지고 짜증이 늘었어요.'),
-        ],
-      ),
-      PatientItem(
-        name: 'Hana Yoo',
-        time: '5:30 PM',
-        lastVisitDate: '2026-04-12',
-        daysAgo: 3,
-        scheduledSinceLast: 0,
-        noShowSinceLast: 0,
-        intakeStatus: IntakeStatus.inProgress,
-        previousTreatmentArea: '측두부 + 흉쇄유돌근',
-        previousSessionNote: '두통 빈도 추적 중.',
-        qaList: const [
-          QAItem('Temperature/Sweat', '땀/체온 변화는?', '밤에 식은땀이 가끔 나요.'),
-        ],
-      ),
-      PatientItem(
-        name: 'Chris Jung',
-        time: '6:00 PM',
-        lastVisitDate: '2026-03-20',
-        daysAgo: 26,
-        scheduledSinceLast: 2,
-        noShowSinceLast: 2,
-        intakeStatus: IntakeStatus.notStarted,
-        previousTreatmentArea: '요추 기립근 + 햄스트링',
-        previousSessionNote: '장시간 운전 후 악화.',
-        qaList: const [],
-      ),
-    ],
-  };
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = _dates.last;
+    final dates = _store.allDates;
+    final today = _formatDate(DateTime.now());
+    if (dates.contains(today)) {
+      _selectedDate = today;
+      return;
+    }
+    final pastOrToday = dates.where((d) => d.compareTo(today) <= 0).toList()
+      ..sort();
+    _selectedDate = pastOrToday.isNotEmpty ? pastOrToday.last : dates.first;
   }
 
   @override
@@ -233,109 +91,116 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
 
   @override
   Widget build(BuildContext context) {
-    final selectedDate = _parseDate(_selectedDate);
-    final isRangeMode = _selectedDateRange != null;
-    final visibleVisits = _collectVisibleVisits();
-    final patientNames = <String>{...visibleVisits.map((v) => v.patient.name)}.toList()
-      ..sort();
-    final keyword = _patientFilterController.text.trim().toLowerCase();
-    final filteredPatients = _selectedPatientFilter == '전체 환자'
-        ? visibleVisits
-        : visibleVisits.where((v) => v.patient.name == _selectedPatientFilter).toList();
-    final nameFilteredPatients = keyword.isEmpty
-        ? filteredPatients
-        : filteredPatients
-            .where((v) => v.patient.name.toLowerCase().contains(keyword))
+    return AnimatedBuilder(
+      animation: _store,
+      builder: (context, _) {
+        final visibleVisits = _visibleVisits();
+        final patientNames = visibleVisits.map((v) => v.profile.name).toSet().toList()
+          ..sort();
+        final keyword = _patientFilterController.text.trim().toLowerCase();
+        final dropdownFiltered = _selectedPatientFilter == '전체 환자'
+            ? visibleVisits
+            : visibleVisits
+                .where((v) => v.profile.name == _selectedPatientFilter)
+                .toList();
+        final filteredVisits = keyword.isEmpty
+            ? dropdownFiltered
+            : dropdownFiltered
+                .where((v) => v.profile.name.toLowerCase().contains(keyword))
+                .toList();
+        final summary = _visitWindowSummary();
+        final upcoming = _store
+            .upcomingVisits(_parseDate(_selectedDate) ?? DateTime.now())
+            .take(6)
             .toList();
-    final visitWindow = _visitWindowSummary();
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('침술사 대시보드'),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Center(
-              child: Chip(label: Text('침술사 화면')),
-            ),
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('침술사 대시보드'),
+            actions: [
+              TextButton.icon(
+                onPressed: () => _openPatientManagement(context),
+                icon: const Icon(Icons.people_outline),
+                label: const Text('환자 정보 관리'),
+              ),
+              IconButton(
+                tooltip: '유사증상 추세 보기',
+                onPressed: () =>
+                    Navigator.pushNamed(context, SymptomTrendScreen.routeName),
+                icon: const Icon(Icons.insights_outlined),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: Center(child: Chip(label: Text('침술사 화면'))),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth >= 1000;
-              if (wide) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 11, child: _insightPanel(visitWindow)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 9,
-                      child: Column(
-                        children: [
-                          _dateSelectorPanel(context),
-                          const SizedBox(height: 10),
-                          _similarSymptomTrendPanel(),
-                        ],
+          body: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth >= 1000;
+                  if (!wide) {
+                    return Column(
+                      children: [
+                        _buildInsightPanel(summary),
+                        const SizedBox(height: 12),
+                        _buildDateSelectorPanel(),
+                      ],
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(flex: 11, child: _buildInsightPanel(summary)),
+                      const SizedBox(width: 12),
+                      Expanded(flex: 9, child: _buildDateSelectorPanel()),
+                    ],
+                  );
+                },
+              ),
+              if (upcoming.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _buildUpcomingBoard(upcoming),
+              ],
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _selectedDateRange == null
+                          ? '$_selectedDate 환자 ${filteredVisits.length}명'
+                          : '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} 환자 ${filteredVisits.length}명',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ],
-                );
-              }
-              return Column(
-                children: [
-                  _insightPanel(visitWindow),
-                  const SizedBox(height: 10),
-                  _dateSelectorPanel(context),
-                  const SizedBox(height: 10),
-                  _similarSymptomTrendPanel(),
-                ],
-              );
-            },
-          ),
-          if (visibleVisits.isEmpty) ...[
-            const SizedBox(height: 10),
-            const Text(
-              '선택한 날짜에 등록된 환자가 없습니다.',
-              style: TextStyle(color: Colors.black54),
-            ),
-          ],
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  isRangeMode && _selectedDateRange != null
-                      ? '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} 환자 ${nameFilteredPatients.length}명'
-                      : '${selectedDate == null ? _selectedDate : _formatDate(selectedDate)} 환자 ${nameFilteredPatients.length}명',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                ),
-              ),
-              SizedBox(
-                width: 220,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedPatientFilter,
-                      isExpanded: true,
+                  SizedBox(
+                    width: 220,
+                    child: DropdownButtonFormField<String>(
+                      initialValue: patientNames.contains(_selectedPatientFilter) ||
+                              _selectedPatientFilter == '전체 환자'
+                          ? _selectedPatientFilter
+                          : '전체 환자',
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
+                      ),
                       items: [
                         const DropdownMenuItem(
                           value: '전체 환자',
                           child: Text('전체 환자'),
                         ),
                         ...patientNames.map(
-                          (name) => DropdownMenuItem(
-                            value: name,
-                            child: Text(name),
-                          ),
+                          (name) =>
+                              DropdownMenuItem(value: name, child: Text(name)),
                         ),
                       ],
                       onChanged: (value) {
@@ -346,261 +211,171 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
                       },
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _patientFilterController,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                  hintText: '환자 이름 직접 검색',
                 ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _selectedDateRange == null
+                    ? '총 내원 집계: ${summary.periodLabel}'
+                    : '선택 기간 집계: ${summary.periodLabel}',
+                style: const TextStyle(color: Colors.black54),
+              ),
+              const SizedBox(height: 12),
+              if (filteredVisits.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text('선택한 조건에 맞는 환자가 없습니다.'),
+                  ),
+                ),
+              ...filteredVisits.map(
+                (scheduledVisit) => _buildPatientCard(context, scheduledVisit),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          SizedBox(
-            width: 320,
-            child: TextField(
-              controller: _patientFilterController,
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                isDense: true,
-                prefixIcon: const Icon(Icons.search, size: 18),
-                suffixIcon: keyword.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.close, size: 18),
-                        onPressed: () => setState(() {
-                          _patientFilterController.clear();
-                        }),
-                      ),
-                hintText: '환자 이름 직접 검색',
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '총 내원 집계: ${visitWindow.periodLabel}',
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
-          ),
-          const SizedBox(height: 12),
-          ...nameFilteredPatients.map(
-            (visit) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _patientCard(context, visit),
-            ),
-          ),
-          if (nameFilteredPatients.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 14),
-              child: Text(
-                '선택한 환자 필터에 해당하는 내역이 없습니다.',
-                style: TextStyle(color: Colors.black54),
-              ),
-            ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _patientCard(BuildContext context, _PatientVisitItem visit) {
-    final patient = visit.patient;
-    final preview = patient.qaList.isEmpty
-        ? '문진 미제출 - 세션 전 직접 확인 필요'
-        : '${patient.qaList.first.question} / ${patient.qaList.first.answer}';
-    final appointmentStatus = _buildAppointmentStatus(patient);
+  Widget _buildInsightPanel(_VisitWindowSummary summary) {
+    final profiles = _store.profiles;
+    final sexCounts = <String, int>{};
+    for (final profile in profiles) {
+      sexCounts.update(profile.sex, (value) => value + 1, ifAbsent: () => 1);
+    }
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${patient.name} · ${visit.date} ${patient.time}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                _responseRateBadge(patient.intakeStatus),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(preview),
-            const SizedBox(height: 4),
-            Text(
-              '지난 방문: ${patient.lastVisitDate} (${patient.daysAgo}일 전)',
-              style: const TextStyle(fontSize: 12),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              appointmentStatus,
-              style: TextStyle(
-                fontSize: 12,
-                color: patient.noShowSinceLast > 0 ? Colors.redAccent : Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () => _sendReminder(context, patient),
-                  icon: const Icon(Icons.notifications_active_outlined, size: 18),
-                  label: const Text('답변 요청'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton.icon(
-                  onPressed: () {
-                    final history = _buildPatientHistory(patient.name);
-                    Navigator.pushNamed(
-                      context,
-                      PatientBriefScreen.routeName,
-                      arguments: PatientHistoryArgs(
-                        current: patient,
-                        history: history,
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.chevron_right, size: 18),
-                  label: const Text('상세 보기'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _insightPanel(_VisitWindowSummary visitWindow) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               '현황표 (침술사 인사이트)',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 10,
+              runSpacing: 10,
               children: [
                 _MiniKpi(
-                  title: '총 내원 (${visitWindow.days}일)',
-                  value: '${visitWindow.totalVisits}명',
+                  title: '총 내원 (${summary.days}일)',
+                  value: '${summary.totalVisits}명',
+                ),
+                _MiniKpi(title: '등록 환자', value: '${profiles.length}명'),
+                _MiniKpi(
+                  title: '알림 가능',
+                  value:
+                      '${profiles.where((p) => p.hasRequiredAlertInfo).length}명',
                 ),
                 const _MiniKpi(title: '재내원율', value: '63%'),
-                const _MiniKpi(title: '문진 응답률', value: '71%'),
-                const _MiniKpi(title: '노쇼율', value: '9%'),
               ],
             ),
-            const SizedBox(height: 6),
-            Text(
-              '집계 기간: ${visitWindow.fromDate} ~ ${visitWindow.toDate}',
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
-            ),
             const SizedBox(height: 10),
-            const Text('증상 추세 Top3', style: TextStyle(fontWeight: FontWeight.w700)),
+            Text(
+              '집계 기간: ${summary.fromDate} ~ ${summary.toDate}',
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '성별 구성: ${sexCounts.entries.map((e) => '${e.key} ${e.value}명').join(' · ')}',
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '증상 추세 Top3',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 4),
             const Text('1) 수면/새벽 각성  2) 목/어깨 통증  3) 소화 불편'),
-            const SizedBox(height: 6),
-            const Text(
-              '자주 준 조언: 취침 전 스트레칭 · 카페인 시간 조절 · 식후 10분 걷기',
-              style: TextStyle(color: Colors.black87),
-            ),
+            const SizedBox(height: 8),
+            const Text('자주 준 조언: 취침 전 스트레칭 · 카페인 시간 조절 · 식후 10분 걷기'),
           ],
         ),
       ),
     );
   }
 
-  Widget _dateSelectorPanel(BuildContext context) {
+  Widget _buildDateSelectorPanel() {
+    final dates = _store.allDates;
+    final selectedDate = _parseDate(_selectedDate) ?? DateTime.now();
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               '날짜별 환자 보기',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             const Text('기간 선택', style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Wrap(
-              spacing: 6,
-              children: [7, 14, 30].map((days) {
-                final selected = _selectedRangeDays == days;
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _rangeChip(7),
+                _rangeChip(14),
+                _rangeChip(30),
+                OutlinedButton.icon(
+                  onPressed: _pickDateRangeWithDialog,
+                  icon: const Icon(Icons.date_range_outlined),
+                  label: const Text('기간 선택'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: dates.map((date) {
+                final count = _store.visitsForDate(date).length;
+                final isSelected =
+                    _selectedDate == date && _selectedDateRange == null;
                 return ChoiceChip(
-                  label: Text('최근 $days일'),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _selectedRangeDays = days),
+                  selected: isSelected,
+                  label: Text('$date  $count명'),
+                  onSelected: (_) {
+                    setState(() {
+                      _selectedDate = date;
+                      _selectedDateRange = null;
+                      _selectedPatientFilter = '전체 환자';
+                    });
+                  },
                 );
               }).toList(),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 42,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _dates.length,
-                      separatorBuilder: (_, index) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final date = _dates[index];
-                        final selected = date == _selectedDate;
-                        final count = (_patientsByDate[date] ?? const <PatientItem>[]).length;
-                        return ChoiceChip(
-                          label: RichText(
-                            text: TextSpan(
-                              style: DefaultTextStyle.of(context).style,
-                              children: [
-                                TextSpan(text: date),
-                                TextSpan(
-                                  text: '  $count명',
-                                  style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                ),
-                              ],
-                            ),
-                          ),
-                          selected: selected,
-                          onSelected: (_) => setState(() {
-                            _selectedDate = date;
-                            _selectedDateRange = null;
-                            _selectedPatientFilter = '전체 환자';
-                          }),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton.filledTonal(
-                  tooltip: '달력에서 날짜 선택',
+                OutlinedButton.icon(
                   onPressed: _pickDateFromCalendar,
                   icon: const Icon(Icons.calendar_month_outlined),
+                  label: const Text('날짜 선택'),
                 ),
-                const SizedBox(width: 6),
-                OutlinedButton.icon(
-                  onPressed: _pickDateRangeFromCalendar,
-                  icon: const Icon(Icons.date_range_outlined, size: 18),
-                  label: const Text('기간 선택'),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _selectedDateRange == null
+                        ? '선택 날짜: ${_formatDate(selectedDate)}'
+                        : '선택 기간: ${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)}',
+                    style: const TextStyle(color: Colors.black54),
+                  ),
                 ),
               ],
-            ),
-            if (_selectedDateRange != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                '선택 기간: ${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)}',
-                style: const TextStyle(fontSize: 12, color: Colors.black54),
-              ),
-            ],
-            const SizedBox(height: 6),
-            const Text(
-              '날짜를 클릭하면 아래에 해당 날짜 환자 정보가 표시됩니다.',
-              style: TextStyle(fontSize: 12, color: Colors.black54),
             ),
           ],
         ),
@@ -608,255 +383,216 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
     );
   }
 
-  Widget _responseRateBadge(IntakeStatus status) {
-    final rate = _responseRate(status);
-    final label = rate == 100 ? '사전문진 응답률 100%' : '사전문진 응답률 $rate%';
-    return Chip(label: Text(label));
+  Widget _rangeChip(int days) {
+    final selected = _selectedDateRange == null && _selectedRangeDays == days;
+    return ChoiceChip(
+      selected: selected,
+      label: Text('최근 $days일'),
+      onSelected: (_) {
+        setState(() {
+          _selectedRangeDays = days;
+          _selectedDateRange = null;
+          _selectedPatientFilter = '전체 환자';
+        });
+      },
+    );
   }
 
-  int _responseRate(IntakeStatus status) {
-    switch (status) {
-      case IntakeStatus.notStarted:
-        return 0;
-      case IntakeStatus.inProgress:
-        return 50;
-      case IntakeStatus.completed:
-        return 100;
-    }
-  }
-
-  Widget _similarSymptomTrendPanel() {
-    final weekly = _weeklySymptomTrend();
-    final selected = _parseDate(_selectedDate);
+  Widget _buildUpcomingBoard(List<ScheduledVisit> upcoming) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '유사증상 주별 추세',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              '다가오는 환자 보드',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 4),
-            Text(
-              '최근 4주 기준 (선택일 ${selected == null ? '-' : _formatDate(selected)} / 기간 반영)',
-              style: TextStyle(fontSize: 12, color: Colors.black54),
-            ),
-            const SizedBox(height: 6),
-            ...weekly.entries.map((entry) {
-              final values = entry.value;
-              final rowMax = values.fold<int>(1, (m, v) => v > m ? v : m).toDouble();
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: values.map((v) {
-                        final ratio = rowMax == 0 ? 0.0 : v / rowMax;
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: Column(
-                              children: [
-                                Container(
-                                  height: 14 * ratio + 4,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF0F766E),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                                const SizedBox(height: 1),
-                                Text('$v', style: const TextStyle(fontSize: 11)),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+            const SizedBox(height: 10),
+            ...upcoming.map((scheduledVisit) {
+              final profile = scheduledVisit.profile;
+              final visit = scheduledVisit.visit;
+              final preview = visit.qaList.isEmpty
+                  ? '문진 미작성'
+                  : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text('${visit.date} · ${visit.time} · ${profile.name}'),
+                subtitle: Text(
+                  '$preview\n연락처: ${profile.phone.isEmpty ? '미입력' : profile.phone}',
                 ),
+                trailing: Chip(label: Text(visit.intakeStatus.label)),
               );
             }),
-            const SizedBox(height: 2),
-            const Text(
-              'W-3   W-2   W-1   이번주',
-              style: TextStyle(fontSize: 11, color: Colors.black54),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Map<String, List<int>> _weeklySymptomTrend() {
+  Widget _buildPatientCard(BuildContext context, ScheduledVisit scheduledVisit) {
+    final profile = scheduledVisit.profile;
+    final visit = scheduledVisit.visit;
+    final firstQa = visit.qaList.isEmpty
+        ? '문진 미제출 - 세션 전 직접 확인 필요'
+        : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
+    final canSendRequest = profile.hasRequiredAlertInfo;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${profile.name} · ${visit.date} ${visit.time}',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(firstQa),
+                      const SizedBox(height: 6),
+                      Text('지난 방문: ${visit.lastVisitDate} (${visit.daysAgo}일 전)'),
+                      const SizedBox(height: 4),
+                      Text(
+                        _visitTrailLabel(visit),
+                        style: TextStyle(
+                          color: visit.noShowSinceLast > 0
+                              ? Colors.redAccent
+                              : Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '연락처: ${profile.phone.isEmpty ? '미입력' : profile.phone} / ${profile.email.isEmpty ? '이메일 미입력' : profile.email}',
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '환자 정보: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
+                      ),
+                    ],
+                  ),
+                ),
+                Chip(label: Text(visit.intakeStatus.label)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                FilledButton.tonalIcon(
+                  onPressed:
+                      canSendRequest ? () => _sendReminder(context, scheduledVisit) : null,
+                  icon: const Icon(Icons.notifications_active_outlined),
+                  label: Text(canSendRequest ? '답변 요청' : '연락처 필요'),
+                ),
+                FilledButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      PatientBriefScreen.routeName,
+                      arguments: PatientHistoryArgs(
+                        current: scheduledVisit,
+                        history: _store.historyForPatient(profile.id),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.chevron_right),
+                  label: const Text('상세 보기'),
+                ),
+              ],
+            ),
+            if (!canSendRequest) ...[
+              const SizedBox(height: 8),
+              const Text(
+                '환자 정보 관리에서 전화번호와 이메일을 모두 입력해야 답변 요청 전송이 가능합니다.',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<ScheduledVisit> _visibleVisits() {
+    if (_selectedDateRange != null) {
+      return _store.visitsInRange(
+        _selectedDateRange!.start,
+        _selectedDateRange!.end,
+      );
+    }
     final selected = _parseDate(_selectedDate);
     if (selected == null) {
-      return {
-        '수면/각성': [0, 0, 0, 0],
-        '목/어깨 통증': [0, 0, 0, 0],
-        '소화 불편': [0, 0, 0, 0],
-      };
+      return const [];
     }
-
-    final periodStart = DateTime(
-      selected.year,
-      selected.month,
-      selected.day,
-    ).subtract(Duration(days: _selectedRangeDays - 1));
-
-    final sleepTrend = <int>[];
-    final neckTrend = <int>[];
-    final digestionTrend = <int>[];
-
-    for (var week = 3; week >= 0; week--) {
-      final weekEnd = DateTime(
-        selected.year,
-        selected.month,
-        selected.day,
-      ).subtract(Duration(days: 7 * week));
-      final weekStart = weekEnd.subtract(const Duration(days: 6));
-
-      var sleep = 0;
-      var neck = 0;
-      var digestion = 0;
-
-      for (final entry in _patientsByDate.entries) {
-        final visitDate = _parseDate(entry.key);
-        if (visitDate == null) {
-          continue;
-        }
-        final normalized = DateTime(visitDate.year, visitDate.month, visitDate.day);
-        final inSelectedPeriod =
-            !normalized.isBefore(periodStart) &&
-            !normalized.isAfter(DateTime(selected.year, selected.month, selected.day));
-        final inWeek = !normalized.isBefore(weekStart) && !normalized.isAfter(weekEnd);
-        if (!inSelectedPeriod || !inWeek) {
-          continue;
-        }
-
-        for (final patient in entry.value) {
-          for (final qa in patient.qaList) {
-            if (qa.category == 'Sleep' || qa.category == 'Energy') {
-              sleep++;
-            }
-            if (qa.category == 'Appetite/Thirst' ||
-                qa.category == 'Digestion' ||
-                qa.category == 'Stool') {
-              digestion++;
-            }
-            if (qa.category == 'HEENT' ||
-                qa.question.contains('어깨') ||
-                qa.answer.contains('어깨') ||
-                qa.question.contains('목') ||
-                qa.answer.contains('목')) {
-              neck++;
-            }
-          }
-
-          if (patient.previousTreatmentArea.contains('어깨') ||
-              patient.previousTreatmentArea.contains('목')) {
-            neck++;
-          }
-        }
-      }
-
-      sleepTrend.add(sleep);
-      neckTrend.add(neck);
-      digestionTrend.add(digestion);
-    }
-
-    return {
-      '수면/각성': sleepTrend,
-      '목/어깨 통증': neckTrend,
-      '소화 불편': digestionTrend,
-    };
+    final start = selected.subtract(Duration(days: _selectedRangeDays - 1));
+    return _store.visitsInRange(start, selected);
   }
 
-  String _buildAppointmentStatus(PatientItem patient) {
-    if (patient.scheduledSinceLast == 0) {
+  _VisitWindowSummary _visitWindowSummary() {
+    if (_selectedDateRange != null) {
+      final visits = _store.visitsInRange(
+        _selectedDateRange!.start,
+        _selectedDateRange!.end,
+      );
+      return _VisitWindowSummary(
+        days: _selectedDateRange!.duration.inDays + 1,
+        totalVisits: visits.length,
+        fromDate: _formatDate(_selectedDateRange!.start),
+        toDate: _formatDate(_selectedDateRange!.end),
+        periodLabel:
+            '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} ${visits.length}명',
+      );
+    }
+
+    final selected = _parseDate(_selectedDate) ?? DateTime.now();
+    final start = selected.subtract(Duration(days: _selectedRangeDays - 1));
+    final visits = _store.visitsInRange(start, selected);
+
+    return _VisitWindowSummary(
+      days: _selectedRangeDays,
+      totalVisits: visits.length,
+      fromDate: _formatDate(start),
+      toDate: _formatDate(selected),
+      periodLabel: '${_formatDate(start)} ~ ${_formatDate(selected)} ${visits.length}명',
+    );
+  }
+
+  String _visitTrailLabel(PatientVisit visit) {
+    if (visit.scheduledSinceLast == 0 && visit.noShowSinceLast == 0) {
       return '지난 방문 이후 추가 예약 없음 -> 이번 방문이 첫 재내원';
     }
-    if (patient.noShowSinceLast == 0) {
-      return '지난 방문 이후 추가 예약 ${patient.scheduledSinceLast}건, 모두 내원';
-    }
-    return '지난 방문 이후 추가 예약 ${patient.scheduledSinceLast}건, 노쇼 ${patient.noShowSinceLast}건';
+    return '지난 방문 이후 추가 예약 ${visit.scheduledSinceLast}건, 노쇼 ${visit.noShowSinceLast}건';
   }
 
-  List<PatientVisitRecord> _buildPatientHistory(String name) {
-    final list = <PatientVisitRecord>[];
-    for (final entry in _patientsByDate.entries) {
-      for (final p in entry.value) {
-        if (p.name == name) {
-          list.add(
-            PatientVisitRecord(
-              visitDate: entry.key,
-              patient: p,
-            ),
-          );
-        }
-      }
-    }
-    list.sort((a, b) => b.visitDate.compareTo(a.visitDate));
-    return list;
-  }
-
-  List<_PatientVisitItem> _collectVisibleVisits() {
-    if (_selectedDateRange == null) {
-      final list = (_patientsByDate[_selectedDate] ?? const <PatientItem>[])
-          .map((patient) => _PatientVisitItem(date: _selectedDate, patient: patient))
-          .toList();
-      list.sort((a, b) => a.patient.time.compareTo(b.patient.time));
-      return list;
-    }
-
-    final start = DateTime(
-      _selectedDateRange!.start.year,
-      _selectedDateRange!.start.month,
-      _selectedDateRange!.start.day,
-    );
-    final end = DateTime(
-      _selectedDateRange!.end.year,
-      _selectedDateRange!.end.month,
-      _selectedDateRange!.end.day,
-    );
-
-    final visits = <_PatientVisitItem>[];
-    for (final entry in _patientsByDate.entries) {
-      final date = _parseDate(entry.key);
-      if (date == null) {
-        continue;
-      }
-      final normalized = DateTime(date.year, date.month, date.day);
-      if (!normalized.isBefore(start) && !normalized.isAfter(end)) {
-        visits.addAll(
-          entry.value.map((patient) => _PatientVisitItem(date: entry.key, patient: patient)),
-        );
-      }
-    }
-
-    visits.sort((a, b) {
-      final byDate = b.date.compareTo(a.date);
-      if (byDate != 0) {
-        return byDate;
-      }
-      return a.patient.time.compareTo(b.patient.time);
-    });
-    return visits;
-  }
-
-  void _sendReminder(BuildContext context, PatientItem patient) {
+  Future<void> _sendReminder(
+    BuildContext context,
+    ScheduledVisit scheduledVisit,
+  ) async {
+    final profile = scheduledVisit.profile;
+    final visit = scheduledVisit.visit;
     final selectedQuestions = <String>{};
     final noteController = TextEditingController();
     final customQuestionsByCategory = <String, List<String>>{};
-    showDialog<void>(
+
+    await showDialog<void>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
-          title: Text('${patient.name}님 답변 요청'),
+          title: Text('${profile.name}님 답변 요청'),
           content: SizedBox(
             width: 520,
             child: StatefulBuilder(
@@ -865,6 +601,18 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '전송 대상 연락처: ${profile.phone.isEmpty ? '전화번호 없음' : profile.phone}${profile.email.isEmpty ? ' / 이메일 없음' : ' / ${profile.email}'}',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       const Text(
                         '요청할 질문 선택',
                         style: TextStyle(fontWeight: FontWeight.w700),
@@ -874,7 +622,6 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
                         return ExpansionTile(
                           dense: true,
                           tilePadding: EdgeInsets.zero,
-                          childrenPadding: EdgeInsets.zero,
                           title: Text(entry.key),
                           children: [
                             ...entry.value.map((question) {
@@ -908,12 +655,14 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
                                           controller: controller,
                                           decoration: const InputDecoration(
                                             border: OutlineInputBorder(),
-                                            hintText: '예: 특정 상황에서 증상이 더 심해지나요?',
+                                            hintText:
+                                                '예: 특정 상황에서 증상이 더 심해지나요?',
                                           ),
                                         ),
                                         actions: [
                                           TextButton(
-                                            onPressed: () => Navigator.pop(context),
+                                            onPressed: () =>
+                                                Navigator.pop(context),
                                             child: const Text('취소'),
                                           ),
                                           FilledButton(
@@ -944,34 +693,30 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
                           ],
                         );
                       }),
-                      const SizedBox(height: 10),
                       if (customQuestionsByCategory.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         ...customQuestionsByCategory.entries.map((entry) {
-                          final category = entry.key;
-                          final questions = entry.value;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
-                              children: [
-                                Chip(label: Text(category)),
-                                ...questions.map(
-                                  (q) => Chip(
-                                    label: Text(q),
-                                    onDeleted: () {
-                                      setDialogState(() {
-                                        questions.remove(q);
-                                        if (questions.isEmpty) {
-                                          customQuestionsByCategory.remove(category);
-                                        }
-                                      });
-                                    },
-                                  ),
+                          return Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              Chip(label: Text(entry.key)),
+                              ...entry.value.map(
+                                (question) => Chip(
+                                  label: Text(question),
+                                  onDeleted: () {
+                                    setDialogState(() {
+                                      entry.value.remove(question);
+                                      if (entry.value.isEmpty) {
+                                        customQuestionsByCategory.remove(
+                                          entry.key,
+                                        );
+                                      }
+                                    });
+                                  },
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           );
                         }),
                       ],
@@ -982,7 +727,6 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: '노트 (환자에게 전달할 말)',
-                          hintText: '예: 이번 주에는 수면/소화 질문을 우선 답변 부탁드립니다.',
                         ),
                       ),
                     ],
@@ -995,111 +739,75 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
             TextButton(
               onPressed: () {
                 noteController.dispose();
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
               child: const Text('취소'),
             ),
             FilledButton(
-              onPressed: () {
-                final customCount = customQuestionsByCategory.values
-                    .fold<int>(0, (sum, list) => sum + list.length);
-                if (selectedQuestions.isEmpty && customCount == 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('질문을 1개 이상 선택하거나 직접 추가해주세요.')),
-                  );
-                  return;
-                }
-                final questionSummary = selectedQuestions.join(' / ');
-                final note = noteController.text.trim();
-                final customSummary = customQuestionsByCategory.entries
-                    .map((entry) => '[${entry.key}] ${entry.value.join(' / ')}')
-                    .join(' | ');
-                noteController.dispose();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      note.isEmpty
-                          ? '${patient.name}님께 질문 전송 완료 (${[
-                              if (questionSummary.isNotEmpty) questionSummary,
-                              if (customSummary.isNotEmpty) customSummary,
-                            ].join(' | ')})'
-                          : '${patient.name}님께 질문+노트 전송 완료',
-                    ),
-                  ),
-                );
-              },
+              onPressed: !profile.hasRequiredAlertInfo
+                  ? null
+                  : () async {
+                      final customCount = customQuestionsByCategory.values.fold<int>(
+                        0,
+                        (sum, list) => sum + list.length,
+                      );
+                      if (selectedQuestions.isEmpty && customCount == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('질문을 1개 이상 선택하거나 직접 추가해주세요.'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final selectedQuestionList = selectedQuestions.toList()
+                        ..sort();
+                      final note = noteController.text.trim();
+
+                      try {
+                        final docId = await AppFirestoreService.sendAnswerRequest(
+                          patientId: profile.id,
+                          patientName: profile.name,
+                          patientPhone: profile.phone,
+                          patientEmail: profile.email,
+                          patientTime: visit.time,
+                          lastVisitDate: visit.lastVisitDate,
+                          intakeStatus: visit.intakeStatus.name,
+                          selectedQuestions: selectedQuestionList,
+                          customQuestionsByCategory:
+                              customQuestionsByCategory.map(
+                            (key, value) =>
+                                MapEntry(key, List<String>.from(value)),
+                          ),
+                          note: note,
+                        );
+
+                        if (!mounted || !dialogContext.mounted) {
+                          return;
+                        }
+
+                        noteController.dispose();
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${profile.name}님 답변 요청 저장 완료: $docId'),
+                          ),
+                        );
+                      } catch (error) {
+                        if (!mounted || !dialogContext.mounted) {
+                          return;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('답변 요청 저장 실패: $error')),
+                        );
+                      }
+                    },
               child: const Text('전송'),
             ),
           ],
         );
       },
     );
-  }
-
-  _VisitWindowSummary _visitWindowSummary() {
-    if (_selectedDateRange != null) {
-      final start = DateTime(
-        _selectedDateRange!.start.year,
-        _selectedDateRange!.start.month,
-        _selectedDateRange!.start.day,
-      );
-      final end = DateTime(
-        _selectedDateRange!.end.year,
-        _selectedDateRange!.end.month,
-        _selectedDateRange!.end.day,
-      );
-      final totalVisits = _countVisitsInWindow(start, end);
-      final days = end.difference(start).inDays + 1;
-      return _VisitWindowSummary(
-        days: days,
-        totalVisits: totalVisits,
-        fromDate: _formatDate(start),
-        toDate: _formatDate(end),
-        periodLabel:
-            '선택 기간 (${_formatDate(start)} ~ ${_formatDate(end)}) $totalVisits명',
-      );
-    }
-
-    final selected = _parseDate(_selectedDate);
-    if (selected == null) {
-      return _VisitWindowSummary(
-        days: _selectedRangeDays,
-        totalVisits: 0,
-        fromDate: '-',
-        toDate: '-',
-        periodLabel: '지난 $_selectedRangeDays일 데이터 없음',
-      );
-    }
-
-    final start = selected.subtract(Duration(days: _selectedRangeDays - 1));
-    final windowStart = DateTime(start.year, start.month, start.day);
-    final windowEnd = DateTime(selected.year, selected.month, selected.day);
-    final totalVisits = _countVisitsInWindow(windowStart, windowEnd);
-
-    return _VisitWindowSummary(
-      days: _selectedRangeDays,
-      totalVisits: totalVisits,
-      fromDate: _formatDate(windowStart),
-      toDate: _formatDate(windowEnd),
-      periodLabel:
-          '지난 $_selectedRangeDays일 (${_formatDate(windowStart)} ~ ${_formatDate(windowEnd)}) $totalVisits명',
-    );
-  }
-
-  int _countVisitsInWindow(DateTime start, DateTime end) {
-    var totalVisits = 0;
-    for (final entry in _patientsByDate.entries) {
-      final date = _parseDate(entry.key);
-      if (date == null) {
-        continue;
-      }
-      final normalized = DateTime(date.year, date.month, date.day);
-      if (!normalized.isBefore(start) && !normalized.isAfter(end)) {
-        totalVisits += entry.value.length;
-      }
-    }
-    return totalVisits;
   }
 
   Future<void> _pickDateFromCalendar() async {
@@ -1118,49 +826,124 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
       return;
     }
 
-    final selected = _formatDate(picked);
     setState(() {
-      if (!_dates.contains(selected)) {
-        _dates.add(selected);
-        _dates.sort();
-      }
-      _selectedDate = selected;
+      _selectedDate = _formatDate(picked);
       _selectedDateRange = null;
       _selectedPatientFilter = '전체 환자';
     });
   }
 
-  Future<void> _pickDateRangeFromCalendar() async {
+  Future<void> _pickDateRangeWithDialog() async {
     final now = DateTime.now();
-    final selected = _parseDate(_selectedDate) ?? now;
-    final initialStart = selected.subtract(Duration(days: _selectedRangeDays - 1));
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2020, 1, 1),
-      lastDate: DateTime(now.year + 10, now.month, now.day),
-      initialDateRange: DateTimeRange(start: initialStart, end: selected),
-      helpText: '기간 선택',
-      cancelText: '취소',
-      confirmText: '확인',
-    );
-    if (picked == null) {
-      return;
-    }
+    DateTime start = _selectedDateRange?.start ??
+        (_parseDate(_selectedDate)?.subtract(
+              Duration(days: _selectedRangeDays - 1),
+            ) ??
+            now);
+    DateTime end =
+        _selectedDateRange?.end ?? (_parseDate(_selectedDate) ?? now);
 
-    final endDateString = _formatDate(picked.end);
-    setState(() {
-      if (!_dates.contains(endDateString)) {
-        _dates.add(endDateString);
-        _dates.sort();
-      }
-      _selectedDate = endDateString;
-      _selectedDateRange = DateTimeRange(
-        start: DateTime(picked.start.year, picked.start.month, picked.start.day),
-        end: DateTime(picked.end.year, picked.end.month, picked.end.day),
-      );
-      _selectedRangeDays = picked.end.difference(picked.start).inDays + 1;
-      _selectedPatientFilter = '전체 환자';
-    });
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('기간 선택'),
+              content: SizedBox(
+                width: 340,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: start,
+                          firstDate: DateTime(2020, 1, 1),
+                          lastDate: DateTime(now.year + 10, now.month, now.day),
+                          helpText: '시작일 선택',
+                        );
+                        if (picked == null) {
+                          return;
+                        }
+                        setDialogState(() {
+                          start = DateTime(
+                            picked.year,
+                            picked.month,
+                            picked.day,
+                          );
+                          if (end.isBefore(start)) {
+                            end = start;
+                          }
+                        });
+                      },
+                      child: Text('시작일: ${_formatDate(start)}'),
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: end,
+                          firstDate: DateTime(2020, 1, 1),
+                          lastDate: DateTime(now.year + 10, now.month, now.day),
+                          helpText: '종료일 선택',
+                        );
+                        if (picked == null) {
+                          return;
+                        }
+                        setDialogState(() {
+                          end = DateTime(
+                            picked.year,
+                            picked.month,
+                            picked.day,
+                          );
+                          if (end.isBefore(start)) {
+                            start = end;
+                          }
+                        });
+                      },
+                      child: Text('종료일: ${_formatDate(end)}'),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '선택 범위: ${_formatDate(start)} ~ ${_formatDate(end)}',
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('취소'),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedDate = _formatDate(end);
+                      _selectedDateRange = DateTimeRange(start: start, end: end);
+                      _selectedRangeDays = end.difference(start).inDays + 1;
+                      _selectedPatientFilter = '전체 환자';
+                    });
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('적용'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _openPatientManagement(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => const _PatientManagementDialog(),
+    );
   }
 
   String _formatDate(DateTime date) {
@@ -1173,9 +956,6 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
   DateTime? _parseDate(String value) {
     try {
       final parts = value.split('-');
-      if (parts.length != 3) {
-        return null;
-      }
       return DateTime(
         int.parse(parts[0]),
         int.parse(parts[1]),
@@ -1184,6 +964,299 @@ class _PractitionerDashboardScreenState extends State<PractitionerDashboardScree
     } catch (_) {
       return null;
     }
+  }
+}
+
+class _PatientManagementDialog extends StatefulWidget {
+  const _PatientManagementDialog();
+
+  @override
+  State<_PatientManagementDialog> createState() =>
+      _PatientManagementDialogState();
+}
+
+class _PatientManagementDialogState extends State<_PatientManagementDialog> {
+  final ClinicDataStore _store = ClinicDataStore.instance;
+  String? _selectedProfileId;
+
+  @override
+  Widget build(BuildContext context) {
+    final profiles = _store.profiles;
+    final selected = _selectedProfileId == null
+        ? (profiles.isNotEmpty ? profiles.first : null)
+        : _store.profileById(_selectedProfileId!);
+
+    return AlertDialog(
+      title: const Text('환자 정보 관리'),
+      content: SizedBox(
+        width: 960,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 280,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FilledButton.icon(
+                    onPressed: () {
+                      final newProfile = PatientProfile(
+                        id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
+                        name: 'New Patient',
+                        phone: '',
+                        email: '',
+                        birthYear: 1990,
+                        sex: '여성',
+                        ethnicity: 'Unknown',
+                        memo: '',
+                      );
+                      _store.saveProfile(newProfile);
+                      setState(() => _selectedProfileId = newProfile.id);
+                    },
+                    icon: const Icon(Icons.person_add_alt_1),
+                    label: const Text('환자 추가'),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: profiles.length,
+                      itemBuilder: (context, index) {
+                        final profile = profiles[index];
+                        final isSelected = selected?.id == profile.id;
+                        return Card(
+                          color: isSelected ? const Color(0xFFF4FBFA) : null,
+                          child: ListTile(
+                            title: Text(profile.name),
+                            subtitle: Text(
+                              profile.phone.isEmpty ? '연락처 미입력' : profile.phone,
+                            ),
+                            trailing: IconButton(
+                              onPressed: () {
+                                _store.deleteProfile(profile.id);
+                                setState(() {
+                                  if (_selectedProfileId == profile.id) {
+                                    _selectedProfileId = null;
+                                  }
+                                });
+                              },
+                              icon: const Icon(Icons.delete_outline),
+                            ),
+                            onTap: () =>
+                                setState(() => _selectedProfileId = profile.id),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: selected == null
+                  ? const Center(child: Text('관리할 환자를 선택하세요.'))
+                  : _PatientProfileEditor(
+                      profile: selected,
+                      onSave: (updated) {
+                        _store.saveProfile(updated);
+                        setState(() => _selectedProfileId = updated.id);
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('닫기'),
+        ),
+      ],
+    );
+  }
+}
+
+class _PatientProfileEditor extends StatefulWidget {
+  const _PatientProfileEditor({
+    required this.profile,
+    required this.onSave,
+  });
+
+  final PatientProfile profile;
+  final ValueChanged<PatientProfile> onSave;
+
+  @override
+  State<_PatientProfileEditor> createState() => _PatientProfileEditorState();
+}
+
+class _PatientProfileEditorState extends State<_PatientProfileEditor> {
+  late TextEditingController _nameController;
+  late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _birthYearController;
+  late TextEditingController _sexController;
+  late TextEditingController _ethnicityController;
+  late TextEditingController _memoController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initControllers();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PatientProfileEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.profile.id != widget.profile.id) {
+      _disposeControllers();
+      _initControllers();
+    }
+  }
+
+  void _initControllers() {
+    _nameController = TextEditingController(text: widget.profile.name);
+    _phoneController = TextEditingController(text: widget.profile.phone);
+    _emailController = TextEditingController(text: widget.profile.email);
+    _birthYearController = TextEditingController(
+      text: widget.profile.birthYear.toString(),
+    );
+    _sexController = TextEditingController(text: widget.profile.sex);
+    _ethnicityController = TextEditingController(text: widget.profile.ethnicity);
+    _memoController = TextEditingController(text: widget.profile.memo);
+  }
+
+  void _disposeControllers() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _birthYearController.dispose();
+    _sexController.dispose();
+    _ethnicityController.dispose();
+    _memoController.dispose();
+  }
+
+  @override
+  void dispose() {
+    _disposeControllers();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '등록된 환자 정보가 있어야 대시보드와 답변 요청에서 사용됩니다.',
+            style: TextStyle(color: Colors.black54),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: '이름',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: '전화번호',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: '이메일',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _birthYearController,
+                  decoration: const InputDecoration(
+                    labelText: '출생연도',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _sexController,
+                  decoration: const InputDecoration(
+                    labelText: '성별',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _ethnicityController,
+                  decoration: const InputDecoration(
+                    labelText: '인종/민족',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _memoController,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              labelText: '관리 메모',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          FilledButton.icon(
+            onPressed: () {
+              final updated = widget.profile.copyWith(
+                name: _nameController.text.trim().isEmpty
+                    ? widget.profile.name
+                    : _nameController.text.trim(),
+                phone: _phoneController.text.trim(),
+                email: _emailController.text.trim(),
+                birthYear: int.tryParse(_birthYearController.text.trim()) ??
+                    widget.profile.birthYear,
+                sex: _sexController.text.trim().isEmpty
+                    ? widget.profile.sex
+                    : _sexController.text.trim(),
+                ethnicity: _ethnicityController.text.trim().isEmpty
+                    ? widget.profile.ethnicity
+                    : _ethnicityController.text.trim(),
+                memo: _memoController.text.trim(),
+              );
+              widget.onSave(updated);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('환자 정보 저장 완료')),
+              );
+            },
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('환자 정보 저장'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -1203,72 +1276,6 @@ class _VisitWindowSummary {
   final String periodLabel;
 }
 
-class _PatientVisitItem {
-  const _PatientVisitItem({
-    required this.date,
-    required this.patient,
-  });
-
-  final String date;
-  final PatientItem patient;
-}
-
-class PatientHistoryArgs {
-  const PatientHistoryArgs({
-    required this.current,
-    required this.history,
-  });
-
-  final PatientItem current;
-  final List<PatientVisitRecord> history;
-}
-
-class PatientVisitRecord {
-  const PatientVisitRecord({
-    required this.visitDate,
-    required this.patient,
-  });
-
-  final String visitDate;
-  final PatientItem patient;
-}
-
-class PatientItem {
-  const PatientItem({
-    required this.name,
-    required this.time,
-    required this.lastVisitDate,
-    required this.daysAgo,
-    required this.scheduledSinceLast,
-    required this.noShowSinceLast,
-    required this.intakeStatus,
-    required this.previousTreatmentArea,
-    required this.previousSessionNote,
-    required this.qaList,
-  });
-
-  final String name;
-  final String time;
-  final String lastVisitDate;
-  final int daysAgo;
-  final int scheduledSinceLast;
-  final int noShowSinceLast;
-  final IntakeStatus intakeStatus;
-  final String previousTreatmentArea;
-  final String previousSessionNote;
-  final List<QAItem> qaList;
-}
-
-class QAItem {
-  const QAItem(this.category, this.question, this.answer);
-
-  final String category;
-  final String question;
-  final String answer;
-}
-
-enum IntakeStatus { notStarted, inProgress, completed }
-
 class _MiniKpi extends StatelessWidget {
   const _MiniKpi({required this.title, required this.value});
 
@@ -1278,9 +1285,9 @@ class _MiniKpi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 140,
+      width: 150,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(10),
@@ -1288,9 +1295,15 @@ class _MiniKpi extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+            ),
             const SizedBox(height: 2),
-            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            ),
           ],
         ),
       ),

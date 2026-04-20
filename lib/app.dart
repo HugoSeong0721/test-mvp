@@ -6,6 +6,7 @@ import 'features/insights/presentation/practitioner_insights_screen.dart';
 import 'features/patient_brief/presentation/patient_brief_screen.dart';
 import 'features/patient_intake/presentation/patient_intake_screen.dart';
 import 'features/practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
+import 'features/symptom_trend/presentation/symptom_trend_screen.dart';
 
 class TestMvpApp extends StatelessWidget {
   const TestMvpApp({super.key});
@@ -27,6 +28,7 @@ class TestMvpApp extends StatelessWidget {
             const PractitionerDashboardScreen(),
         PractitionerInsightsScreen.routeName: (_) =>
             const PractitionerInsightsScreen(),
+        SymptomTrendScreen.routeName: (_) => const SymptomTrendScreen(),
         PatientBriefScreen.routeName: (_) => const PatientBriefScreen(),
       },
     );

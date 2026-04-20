@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/data/clinic_data_store.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
 import '../../practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
 
@@ -13,8 +14,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static const _testId = '123';
-  static const _testPassword = '123';
+  static const _practitionerId = '123';
+  static const _practitionerPassword = '123';
+  static const _patientId = 'hugo';
+  static const _patientPassword = 'hugo';
 
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -32,18 +35,26 @@ class _LoginScreenState extends State<LoginScreen> {
     final id = _idController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (id != _testId || password != _testPassword) {
+    final isPractitionerLogin =
+        role == 'practitioner' &&
+        id == _practitionerId &&
+        password == _practitionerPassword;
+    final isPatientLogin =
+        role == 'patient' && id == _patientId && password == _patientPassword;
+
+    if (!isPractitionerLogin && !isPatientLogin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ID/PW가 올바르지 않습니다.')),
+        const SnackBar(content: Text('ID 또는 비밀번호가 올바르지 않습니다.')),
       );
       return;
     }
 
-    if (role == 'practitioner') {
+    if (isPractitionerLogin) {
       Navigator.pushReplacementNamed(context, PractitionerDashboardScreen.routeName);
       return;
     }
 
+    ClinicDataStore.instance.setCurrentPatientProfile('hugo_demo');
     Navigator.pushReplacementNamed(context, PatientIntakeScreen.routeName);
   }
 
@@ -52,6 +63,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final roleArg = ModalRoute.of(context)?.settings.arguments;
     final role = roleArg is String ? roleArg : 'patient';
     final roleLabel = role == 'practitioner' ? '침술사' : '환자';
+    final helperText =
+        role == 'practitioner' ? '테스트 계정: 123 / 123' : '테스트 계정: hugo / hugo';
 
     return Scaffold(
       appBar: AppBar(title: const Text('로그인')),
@@ -70,8 +83,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  '테스트 계정: 123 / 123',
+                Text(
+                  helperText,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
