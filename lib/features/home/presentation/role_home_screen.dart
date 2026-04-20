@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../auth/presentation/login_screen.dart';
+import '../../auth/presentation/patient_beta_auth_screen.dart';
 
 class RoleHomeScreen extends StatefulWidget {
   const RoleHomeScreen({super.key});
@@ -196,6 +197,35 @@ class _RoleHomeScreenState extends State<RoleHomeScreen> {
                             );
                           },
                           child: const Text('Hugo 전용 로그인'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          '지인 베타 회원가입/로그인',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('주변 사람들이 직접 가입해서 제출해보는 전용 흐름'),
+                        const SizedBox(height: 8),
+                        const Text('이메일/비밀번호로 계정 생성'),
+                        const SizedBox(height: 12),
+                        FilledButton.tonal(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              PatientBetaAuthScreen.routeName,
+                            );
+                          },
+                          child: const Text('지인 베타 회원가입/로그인'),
                         ),
                       ],
                     ),

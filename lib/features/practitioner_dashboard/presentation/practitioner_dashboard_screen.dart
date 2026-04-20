@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
@@ -164,6 +165,8 @@ class _PractitionerDashboardScreenState
                 const SizedBox(height: 12),
                 _buildUpcomingBoard(upcoming),
               ],
+              const SizedBox(height: 12),
+              const _BetaSubmissionBoard(),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -521,6 +524,8 @@ class _PractitionerDashboardScreenState
                 style: TextStyle(color: Colors.redAccent),
               ),
             ],
+            const SizedBox(height: 12),
+            _PatientRealtimeActivity(patientId: profile.id),
           ],
         ),
       ),
@@ -749,7 +754,7 @@ class _PractitionerDashboardScreenState
                   : () async {
                       final customCount = customQuestionsByCategory.values.fold<int>(
                         0,
-                        (sum, list) => sum + list.length,
+                        (runningTotal, list) => runningTotal + list.length,
                       );
                       if (selectedQuestions.isEmpty && customCount == 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -967,6 +972,209 @@ class _PractitionerDashboardScreenState
   }
 }
 
+class _PatientRealtimeActivity extends StatelessWidget {
+  const _PatientRealtimeActivity({required this.patientId});
+
+  final String patientId;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('intake_submissions')
+          .where('patientId', isEqualTo: patientId)
+          .snapshots(),
+      builder: (context, submissionSnapshot) {
+        return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection('answer_requests')
+              .where('patientId', isEqualTo: patientId)
+              .snapshots(),
+          builder: (context, requestSnapshot) {
+            if (submissionSnapshot.hasError || requestSnapshot.hasError) {
+              return const Text(
+                '실시간 활동을 불러오지 못했습니다.',
+                style: TextStyle(color: Colors.redAccent),
+              );
+            }
+
+            if (!submissionSnapshot.hasData || !requestSnapshot.hasData) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: LinearProgressIndicator(minHeight: 4),
+              );
+            }
+
+            final submissionDocs = [...submissionSnapshot.data!.docs]
+              ..sort((a, b) {
+                final aDate = (a.data()['submittedAt'] as Timestamp?)?.toDate();
+                final bDate = (b.data()['submittedAt'] as Timestamp?)?.toDate();
+                return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
+              });
+
+            final requestDocs = [...requestSnapshot.data!.docs]
+              ..sort((a, b) {
+                final aDate = (a.data()['requestedAt'] as Timestamp?)?.toDate();
+                final bDate = (b.data()['requestedAt'] as Timestamp?)?.toDate();
+                return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
+              });
+
+            final latestSubmission =
+                submissionDocs.isNotEmpty ? submissionDocs.first.data() : null;
+            final latestRequest =
+                requestDocs.isNotEmpty ? requestDocs.first.data() : null;
+
+            final submissionAt =
+                (latestSubmission?['submittedAt'] as Timestamp?)?.toDate();
+            final requestAt =
+                (latestRequest?['requestedAt'] as Timestamp?)?.toDate();
+
+            final answers =
+                (latestSubmission?['answers'] as List<dynamic>? ?? const []);
+            final selectedQuestions =
+                (latestRequest?['selectedQuestions'] as List<dynamic>? ?? const []);
+
+            return Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7FBFA),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFD7EAE6)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '실시간 앱 활동',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  if (latestRequest == null)
+                    const Text('최근 답변 요청 없음')
+                  else
+                    Text(
+                      '최근 답변 요청: ${selectedQuestions.length}개 질문 · ${_formatDateTime(requestAt)}',
+                    ),
+                  const SizedBox(height: 4),
+                  if (latestSubmission == null)
+                    const Text('최근 제출 없음')
+                  else
+                    Text(
+                      '최근 환자 제출: ${answers.length}개 답변 · ${_formatDateTime(submissionAt)}',
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _formatDateTime(DateTime? value) {
+    if (value == null) {
+      return '방금 전';
+    }
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    final hh = value.hour.toString().padLeft(2, '0');
+    final mm = value.minute.toString().padLeft(2, '0');
+    return '$y-$m-$d $hh:$mm';
+  }
+}
+
+class _BetaSubmissionBoard extends StatelessWidget {
+  const _BetaSubmissionBoard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '지인 베타 제출함',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '이메일/비밀번호로 가입한 지인들의 최근 제출을 확인합니다.',
+              style: TextStyle(color: Colors.grey.shade700),
+            ),
+            const SizedBox(height: 12),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('intake_submissions')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    '베타 제출함을 불러오지 못했습니다.',
+                    style: TextStyle(color: Colors.redAccent),
+                  );
+                }
+                if (!snapshot.hasData) {
+                  return const LinearProgressIndicator(minHeight: 4);
+                }
+
+                final docs = [...snapshot.data!.docs]
+                  ..sort((a, b) {
+                    final aDate = (a.data()['submittedAt'] as Timestamp?)?.toDate();
+                    final bDate = (b.data()['submittedAt'] as Timestamp?)?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
+                  });
+
+                if (docs.isEmpty) {
+                  return const Text('아직 베타 가입자의 제출이 없습니다.');
+                }
+
+                return Column(
+                  children: docs.take(5).map((doc) {
+                    final data = doc.data();
+                    final patientName = (data['patientName'] as String?) ?? 'Unknown';
+                    final visitType = (data['visitType'] as String?) ?? 'follow_up';
+                    final answers =
+                        (data['answers'] as List<dynamic>? ?? const []).length;
+                    final submittedAt =
+                        (data['submittedAt'] as Timestamp?)?.toDate();
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const CircleAvatar(
+                        child: Icon(Icons.assignment_turned_in_outlined),
+                      ),
+                      title: Text(patientName),
+                      subtitle: Text(
+                        '${visitType == 'initial' ? '초진' : '재진'} · 답변 $answers개 · ${_formatDateTime(submittedAt)}',
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _formatDateTime(DateTime? value) {
+    if (value == null) {
+      return '방금 전';
+    }
+    final y = value.year.toString().padLeft(4, '0');
+    final m = value.month.toString().padLeft(2, '0');
+    final d = value.day.toString().padLeft(2, '0');
+    final hh = value.hour.toString().padLeft(2, '0');
+    final mm = value.minute.toString().padLeft(2, '0');
+    return '$y-$m-$d $hh:$mm';
+  }
+}
+
 class _PatientManagementDialog extends StatefulWidget {
   const _PatientManagementDialog();
 
@@ -1023,12 +1231,41 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                       itemBuilder: (context, index) {
                         final profile = profiles[index];
                         final isSelected = selected?.id == profile.id;
+                        final missingFields = <String>[
+                          if (profile.phone.trim().isEmpty) '????',
+                          if (profile.email.trim().isEmpty) '???',
+                        ];
                         return Card(
                           color: isSelected ? const Color(0xFFF4FBFA) : null,
                           child: ListTile(
-                            title: Text(profile.name),
+                            title: Row(
+                              children: [
+                                Expanded(child: Text(profile.name)),
+                                if (missingFields.isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFE2E2),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: const Text(
+                                      '?? ?? ??',
+                                      style: TextStyle(
+                                        color: Colors.redAccent,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                             subtitle: Text(
-                              profile.phone.isEmpty ? '연락처 미입력' : profile.phone,
+                              missingFields.isEmpty
+                                  ? '${profile.phone} ? ${profile.email}'
+                                  : '??: ${missingFields.join(', ')}',
                             ),
                             trailing: IconButton(
                               onPressed: () {

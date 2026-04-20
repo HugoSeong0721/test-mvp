@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
+import '../../../core/services/patient_profile_service.dart';
 
 class PatientIntakeScreen extends StatefulWidget {
   const PatientIntakeScreen({super.key});
@@ -17,6 +21,9 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
   final TextEditingController _answerController = TextEditingController();
   final TextEditingController _extraMemoController = TextEditingController();
+  StreamSubscription<User?>? _authSubscription;
+  StreamSubscription<PatientProfile?>? _profileSubscription;
+  PatientProfile? _authBackedProfile;
 
   static const List<String> _initialVisitQuestions = [
     '체온이나 땀의 변화가 있었나요? 쉽게 덥거나 춥고, 식은땀이나 자한이 있었는지도 알려주세요.',
@@ -77,7 +84,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
       ? _initialRememberQuestionIndexes
       : _followUpRememberQuestionIndexes;
 
-  PatientProfile get _currentProfile => _store.currentPatientProfile;
+  PatientProfile get _currentProfile =>
+      _authBackedProfile ?? _store.currentPatientProfile;
 
   String get _questionModeTitle => _isFirstVisitPreview ? '초진 10카테고리 문진' : '재진 추적 문진';
 
@@ -89,10 +97,33 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   void initState() {
     super.initState();
     _answerController.text = _activeAnswers[_currentQuestionIndex] ?? '';
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen(
+      (user) async {
+        await _profileSubscription?.cancel();
+        if (user == null) {
+          if (mounted) {
+            setState(() => _authBackedProfile = null);
+          }
+          return;
+        }
+
+        await PatientProfileService.ensureProfileForUser(user);
+        _profileSubscription = PatientProfileService.watchProfile(user.uid).listen(
+          (profile) {
+            if (!mounted || profile == null) {
+              return;
+            }
+            setState(() => _authBackedProfile = profile);
+          },
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
+    _profileSubscription?.cancel();
     _answerController.dispose();
     _extraMemoController.dispose();
     super.dispose();
@@ -256,13 +287,20 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           PopupMenuButton<String>(
             tooltip: '계정 메뉴',
             icon: const Icon(Icons.account_circle_outlined),
-            onSelected: (value) {
+            onSelected: (value) async {
+              final navigator = Navigator.of(context);
               if (value == 'profile') {
                 _openProfileDialog();
                 return;
               }
               if (value == 'logout') {
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                if (FirebaseAuth.instance.currentUser != null) {
+                  await PatientProfileService.signOut();
+                }
+                if (!mounted) {
+                  return;
+                }
+                navigator.popUntil((route) => route.isFirst);
                 return;
               }
               ScaffoldMessenger.of(context).showSnackBar(
@@ -335,6 +373,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 12),
+          _PatientAlertSummary(patientId: profile.id),
           const SizedBox(height: 12),
           _SectionCard(
             child: Column(
@@ -699,6 +739,98 @@ class _StatusPill extends StatelessWidget {
   }
 }
 
+class _PatientAlertSummary extends StatelessWidget {
+  const _PatientAlertSummary({required this.patientId});
+
+  final String patientId;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('answer_requests')
+          .where('patientId', isEqualTo: patientId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const SizedBox.shrink();
+        }
+
+        if (!snapshot.hasData) {
+          return const Card(
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: LinearProgressIndicator(minHeight: 4),
+            ),
+          );
+        }
+
+        final docs = [...snapshot.data!.docs]
+          ..sort((a, b) {
+            final aDate = (a.data()['requestedAt'] as Timestamp?)?.toDate();
+            final bDate = (b.data()['requestedAt'] as Timestamp?)?.toDate();
+            return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
+          });
+
+        if (docs.isEmpty) {
+          return Card(
+            color: const Color(0xFFF7FBFA),
+            child: const Padding(
+              padding: EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  Icon(Icons.notifications_none_outlined),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('새로운 답변 요청은 아직 없습니다.')),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final latest = docs.first.data();
+        final selectedQuestions =
+            (latest['selectedQuestions'] as List<dynamic>? ?? const []);
+        final note = (latest['note'] as String? ?? '').trim();
+
+        return Card(
+          color: const Color(0xFFE9F7F4),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.notifications_active_outlined,
+                      color: Color(0xFF0F766E),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '침술사 답변 요청 ${docs.length}건',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F766E),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text('가장 최근 요청 질문 수: ${selectedQuestions.length}개'),
+                if (note.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text('최근 메모: $note'),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _AnswerRequestsSection extends StatelessWidget {
   const _AnswerRequestsSection({required this.patientId});
 
@@ -960,7 +1092,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
           child: const Text('취소'),
         ),
         FilledButton(
-          onPressed: () {
+          onPressed: () async {
             if (!_formKey.currentState!.validate()) {
               return;
             }
@@ -973,17 +1105,40 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
               return;
             }
 
-            ClinicDataStore.instance.saveProfile(
-              widget.profile.copyWith(
-                name: _nameController.text.trim(),
-                phone: _phoneController.text.trim(),
-                email: _emailController.text.trim(),
-                birthYear: birthYear,
-                sex: _sexController.text.trim(),
-                ethnicity: _ethnicityController.text.trim(),
-                memo: _memoController.text.trim(),
-              ),
+            final updated = widget.profile.copyWith(
+              name: _nameController.text.trim(),
+              phone: _phoneController.text.trim(),
+              email: _emailController.text.trim(),
+              birthYear: birthYear,
+              sex: _sexController.text.trim(),
+              ethnicity: _ethnicityController.text.trim(),
+              memo: _memoController.text.trim(),
             );
+
+            final isAuthProfile =
+                FirebaseAuth.instance.currentUser?.uid == widget.profile.id;
+
+            if (isAuthProfile) {
+              final messenger = ScaffoldMessenger.of(context);
+              final navigator = Navigator.of(context);
+              try {
+                await PatientProfileService.saveProfile(updated);
+                if (!mounted) {
+                  return;
+                }
+                navigator.pop();
+              } catch (error) {
+                if (!mounted) {
+                  return;
+                }
+                messenger.showSnackBar(
+                  SnackBar(content: Text('프로필 저장 실패: $error')),
+                );
+              }
+              return;
+            }
+
+            ClinicDataStore.instance.saveProfile(updated);
             Navigator.of(context).pop();
           },
           child: const Text('저장'),

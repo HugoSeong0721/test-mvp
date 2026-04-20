@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/auth/presentation/login_screen.dart';
+import 'features/auth/presentation/patient_beta_auth_screen.dart';
 import 'features/home/presentation/role_home_screen.dart';
 import 'features/insights/presentation/practitioner_insights_screen.dart';
 import 'features/patient_brief/presentation/patient_brief_screen.dart';
@@ -23,6 +24,7 @@ class TestMvpApp extends StatelessWidget {
       routes: {
         RoleHomeScreen.routeName: (_) => const RoleHomeScreen(),
         LoginScreen.routeName: (_) => const LoginScreen(),
+        PatientBetaAuthScreen.routeName: (_) => const PatientBetaAuthScreen(),
         PatientIntakeScreen.routeName: (_) => const PatientIntakeScreen(),
         PractitionerDashboardScreen.routeName: (_) =>
             const PractitionerDashboardScreen(),
