@@ -28,6 +28,25 @@ class AppFirestoreService {
     return doc.id;
   }
 
+  static Future<void> markPendingRequestsCompleted({
+    required String patientId,
+    required String submissionId,
+  }) async {
+    final snapshot = await _db
+        .collection('answer_requests')
+        .where('patientId', isEqualTo: patientId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+    for (final doc in snapshot.docs) {
+      await doc.reference.update({
+        'status': 'completed',
+        'completedBySubmissionId': submissionId,
+        'completedAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
   static Future<String> sendAnswerRequest({
     required String patientId,
     required String patientName,

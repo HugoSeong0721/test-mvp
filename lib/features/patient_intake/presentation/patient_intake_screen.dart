@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,36 +26,36 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   PatientProfile? _authBackedProfile;
 
   static const List<String> _initialVisitQuestions = [
-    '체온이나 땀의 변화가 있었나요? 쉽게 덥거나 춥고, 식은땀이나 자한이 있었는지도 알려주세요.',
-    '식욕과 갈증은 어땠나요? 물을 자주 찾는지, 차가운 음료를 선호하는지도 알려주세요.',
-    '수면은 어떠셨나요? 잠드는 시간, 자주 깨는지, 꿈이 많은지도 적어주세요.',
-    '소화는 어떠셨나요? 더부룩함, 속쓰림, 역류, 가스, 트림 변화를 알려주세요.',
-    '소변은 어떠셨나요? 횟수, 색, 야간뇨, 급한 느낌이 있었는지 적어주세요.',
-    '배변은 어떠셨나요? 횟수, 굳기, 변비나 설사 경향을 알려주세요.',
-    '생리 관련 변화가 있었나요? 주기, 양, 통증, 혈색이 평소와 달랐는지 적어주세요.',
-    '머리/눈/귀/코/목 쪽 불편감이 있었나요? 두통, 눈피로, 코막힘, 목 건조 등을 알려주세요.',
-    '감정이나 스트레스는 어땠나요? 예민함, 답답함, 불안, 짜증 변화가 있었는지 적어주세요.',
-    '기력과 기타 증상은 어땠나요? 하루 중 특히 힘든 시간과 꼭 말하고 싶은 증상을 적어주세요.',
+    'ì²´ì˜¨ì´ë‚˜ ë•€ì˜ ë³€í™”ê°€ ìžˆì—ˆë‚˜ìš”? ì‰½ê²Œ ë¥ê±°ë‚˜ ì¶¥ê³ , ì‹ì€ë•€ì´ë‚˜ ìží•œì´ ìžˆì—ˆëŠ”ì§€ë„ ì•Œë ¤ì£¼ì„¸ìš”.',
+    'ì‹ìš•ê³¼ ê°ˆì¦ì€ ì–´ë• ë‚˜ìš”? ë¬¼ì„ ìžì£¼ ì°¾ëŠ”ì§€, ì°¨ê°€ìš´ ìŒë£Œë¥¼ ì„ í˜¸í•˜ëŠ”ì§€ë„ ì•Œë ¤ì£¼ì„¸ìš”.',
+    'ìˆ˜ë©´ì€ ì–´ë– ì…¨ë‚˜ìš”? ìž ë“œëŠ” ì‹œê°„, ìžì£¼ ê¹¨ëŠ”ì§€, ê¿ˆì´ ë§Žì€ì§€ë„ ì ì–´ì£¼ì„¸ìš”.',
+    'ì†Œí™”ëŠ” ì–´ë– ì…¨ë‚˜ìš”? ë”ë¶€ë£©í•¨, ì†ì“°ë¦¼, ì—­ë¥˜, ê°€ìŠ¤, íŠ¸ë¦¼ ë³€í™”ë¥¼ ì•Œë ¤ì£¼ì„¸ìš”.',
+    'ì†Œë³€ì€ ì–´ë– ì…¨ë‚˜ìš”? íšŸìˆ˜, ìƒ‰, ì•¼ê°„ë‡¨, ê¸‰í•œ ëŠë‚Œì´ ìžˆì—ˆëŠ”ì§€ ì ì–´ì£¼ì„¸ìš”.',
+    'ë°°ë³€ì€ ì–´ë– ì…¨ë‚˜ìš”? íšŸìˆ˜, êµ³ê¸°, ë³€ë¹„ë‚˜ ì„¤ì‚¬ ê²½í–¥ì„ ì•Œë ¤ì£¼ì„¸ìš”.',
+    'ìƒë¦¬ ê´€ë ¨ ë³€í™”ê°€ ìžˆì—ˆë‚˜ìš”? ì£¼ê¸°, ì–‘, í†µì¦, í˜ˆìƒ‰ì´ í‰ì†Œì™€ ë‹¬ëžëŠ”ì§€ ì ì–´ì£¼ì„¸ìš”.',
+    'ë¨¸ë¦¬/ëˆˆ/ê·€/ì½”/ëª© ìª½ ë¶ˆíŽ¸ê°ì´ ìžˆì—ˆë‚˜ìš”? ë‘í†µ, ëˆˆí”¼ë¡œ, ì½”ë§‰íž˜, ëª© ê±´ì¡° ë“±ì„ ì•Œë ¤ì£¼ì„¸ìš”.',
+    'ê°ì •ì´ë‚˜ ìŠ¤íŠ¸ë ˆìŠ¤ëŠ” ì–´ë• ë‚˜ìš”? ì˜ˆë¯¼í•¨, ë‹µë‹µí•¨, ë¶ˆì•ˆ, ì§œì¦ ë³€í™”ê°€ ìžˆì—ˆëŠ”ì§€ ì ì–´ì£¼ì„¸ìš”.',
+    'ê¸°ë ¥ê³¼ ê¸°íƒ€ ì¦ìƒì€ ì–´ë• ë‚˜ìš”? í•˜ë£¨ ì¤‘ íŠ¹ížˆ íž˜ë“  ì‹œê°„ê³¼ ê¼­ ë§í•˜ê³  ì‹¶ì€ ì¦ìƒì„ ì ì–´ì£¼ì„¸ìš”.',
   ];
 
   static const List<String> _followUpQuestions = [
-    '최근 수면은 어떠셨나요?',
-    '오늘 가장 불편한 부위는 어디인가요?',
-    '지난번에 안내한 스트레칭은 얼마나 지키셨나요?',
-    '식욕과 갈증은 지난 방문 이후 어떻게 변했나요?',
-    '소화 상태는 어땠나요? 더부룩함이나 속쓰림이 있었나요?',
-    '오후 2시 이후 카페인 줄이기는 어느 정도 지켜졌나요?',
-    '배변이나 소변은 지난번보다 달라진 점이 있었나요?',
-    '두통, 눈피로, 코막힘 같은 HEENT 증상은 어땠나요?',
-    '스트레스나 감정 기복은 어땠나요?',
-    '하루 중 피로가 가장 심해지는 시간은 언제인가요?',
+    'ìµœê·¼ ìˆ˜ë©´ì€ ì–´ë– ì…¨ë‚˜ìš”?',
+    'ì˜¤ëŠ˜ ê°€ìž¥ ë¶ˆíŽ¸í•œ ë¶€ìœ„ëŠ” ì–´ë””ì¸ê°€ìš”?',
+    'ì§€ë‚œë²ˆì— ì•ˆë‚´í•œ ìŠ¤íŠ¸ë ˆì¹­ì€ ì–¼ë§ˆë‚˜ ì§€í‚¤ì…¨ë‚˜ìš”?',
+    'ì‹ìš•ê³¼ ê°ˆì¦ì€ ì§€ë‚œ ë°©ë¬¸ ì´í›„ ì–´ë–»ê²Œ ë³€í–ˆë‚˜ìš”?',
+    'ì†Œí™” ìƒíƒœëŠ” ì–´ë• ë‚˜ìš”? ë”ë¶€ë£©í•¨ì´ë‚˜ ì†ì“°ë¦¼ì´ ìžˆì—ˆë‚˜ìš”?',
+    'ì˜¤í›„ 2ì‹œ ì´í›„ ì¹´íŽ˜ì¸ ì¤„ì´ê¸°ëŠ” ì–´ëŠ ì •ë„ ì§€ì¼œì¡Œë‚˜ìš”?',
+    'ë°°ë³€ì´ë‚˜ ì†Œë³€ì€ ì§€ë‚œë²ˆë³´ë‹¤ ë‹¬ë¼ì§„ ì ì´ ìžˆì—ˆë‚˜ìš”?',
+    'ë‘í†µ, ëˆˆí”¼ë¡œ, ì½”ë§‰íž˜ ê°™ì€ HEENT ì¦ìƒì€ ì–´ë• ë‚˜ìš”?',
+    'ìŠ¤íŠ¸ë ˆìŠ¤ë‚˜ ê°ì • ê¸°ë³µì€ ì–´ë• ë‚˜ìš”?',
+    'í•˜ë£¨ ì¤‘ í”¼ë¡œê°€ ê°€ìž¥ ì‹¬í•´ì§€ëŠ” ì‹œê°„ì€ ì–¸ì œì¸ê°€ìš”?',
   ];
 
   final Map<int, String> _initialVisitAnswers = {};
   final Map<int, String> _followUpAnswers = {
-    0: '새벽 3시에 자주 깨고 다시 잠들기 어려워요.',
-    1: '오른쪽 어깨 통증이 가장 심해요.',
-    3: '입이 자주 마르고 찬물을 찾게 돼요.',
+    0: 'ìƒˆë²½ 3ì‹œì— ìžì£¼ ê¹¨ê³  ë‹¤ì‹œ ìž ë“¤ê¸° ì–´ë ¤ì›Œìš”.',
+    1: 'ì˜¤ë¥¸ìª½ ì–´ê¹¨ í†µì¦ì´ ê°€ìž¥ ì‹¬í•´ìš”.',
+    3: 'ìž…ì´ ìžì£¼ ë§ˆë¥´ê³  ì°¬ë¬¼ì„ ì°¾ê²Œ ë¼ìš”.',
   };
 
   int _currentQuestionIndex = 0;
@@ -87,11 +87,11 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   PatientProfile get _currentProfile =>
       _authBackedProfile ?? _store.currentPatientProfile;
 
-  String get _questionModeTitle => _isFirstVisitPreview ? '초진 10카테고리 문진' : '재진 추적 문진';
+  String get _questionModeTitle => _isFirstVisitPreview ? 'ì´ˆì§„ 10ì¹´í…Œê³ ë¦¬ ë¬¸ì§„' : 'ìž¬ì§„ ì¶”ì  ë¬¸ì§„';
 
   String get _questionModeDescription => _isFirstVisitPreview
-      ? '처음 방문한 환자처럼 10가지 기본 카테고리를 전체적으로 확인하는 흐름입니다.'
-      : '지난 방문 기록과 침술사 조언을 바탕으로 추적 관찰이 필요한 부분을 중심으로 묻는 흐름입니다.';
+      ? 'ì²˜ìŒ ë°©ë¬¸í•œ í™˜ìžì²˜ëŸ¼ 10ê°€ì§€ ê¸°ë³¸ ì¹´í…Œê³ ë¦¬ë¥¼ ì „ì²´ì ìœ¼ë¡œ í™•ì¸í•˜ëŠ” íë¦„ìž…ë‹ˆë‹¤.'
+      : 'ì§€ë‚œ ë°©ë¬¸ ê¸°ë¡ê³¼ ì¹¨ìˆ ì‚¬ ì¡°ì–¸ì„ ë°”íƒ•ìœ¼ë¡œ ì¶”ì  ê´€ì°°ì´ í•„ìš”í•œ ë¶€ë¶„ì„ ì¤‘ì‹¬ìœ¼ë¡œ ë¬»ëŠ” íë¦„ìž…ë‹ˆë‹¤.';
 
   @override
   void initState() {
@@ -146,7 +146,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     if (!_currentProfile.hasRequiredAlertInfo) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('전화번호와 이메일을 모두 입력해야 실제 테스트 흐름을 확인할 수 있어요.'),
+          content: Text('ì „í™”ë²ˆí˜¸ì™€ ì´ë©”ì¼ì„ ëª¨ë‘ ìž…ë ¥í•´ì•¼ ì‹¤ì œ í…ŒìŠ¤íŠ¸ íë¦„ì„ í™•ì¸í•  ìˆ˜ ìžˆì–´ìš”.'),
         ),
       );
       _openProfileDialog();
@@ -193,7 +193,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('문진 제출 완료: $docId')),
+        SnackBar(content: Text('ë¬¸ì§„ ì œì¶œ ì™„ë£Œ: $docId')),
       );
     } catch (error) {
       if (!mounted) {
@@ -201,7 +201,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('문진 저장 실패: $error')),
+        SnackBar(content: Text('ë¬¸ì§„ ì €ìž¥ ì‹¤íŒ¨: $error')),
       );
     } finally {
       if (mounted) {
@@ -282,10 +282,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('환자 사전 문진'),
+        title: const Text('í™˜ìž ì‚¬ì „ ë¬¸ì§„'),
         actions: [
           PopupMenuButton<String>(
-            tooltip: '계정 메뉴',
+            tooltip: 'ê³„ì • ë©”ë‰´',
             icon: const Icon(Icons.account_circle_outlined),
             onSelected: (value) async {
               final navigator = Navigator.of(context);
@@ -304,19 +304,19 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 return;
               }
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$value 준비 중입니다.')),
+                SnackBar(content: Text('$value ì¤€ë¹„ ì¤‘ìž…ë‹ˆë‹¤.')),
               );
             },
             itemBuilder: (context) => const [
-              PopupMenuItem(value: 'profile', child: Text('내 프로필 수정')),
-              PopupMenuItem(value: 'settings', child: Text('설정')),
+              PopupMenuItem(value: 'profile', child: Text('ë‚´ í”„ë¡œí•„ ìˆ˜ì •')),
+              PopupMenuItem(value: 'settings', child: Text('ì„¤ì •')),
               PopupMenuDivider(),
               PopupMenuItem(value: 'logout', child: Text('Log out')),
             ],
           ),
           const Padding(
             padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text('환자 화면'))),
+            child: Center(child: Chip(label: Text('í™˜ìž í™”ë©´'))),
           ),
         ],
       ),
@@ -327,27 +327,27 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('내 프로필', style: TextStyle(fontWeight: FontWeight.w700)),
+                const Text('ë‚´ í”„ë¡œí•„', style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
-                Text('${profile.name} · ${profile.sex} · ${profile.ageRange} · ${profile.ethnicity}'),
+                Text('${profile.name} Â· ${profile.sex} Â· ${profile.ageRange} Â· ${profile.ethnicity}'),
                 const SizedBox(height: 6),
-                Text('전화번호: ${profile.phone.isEmpty ? '미입력' : profile.phone}'),
-                Text('이메일: ${profile.email.isEmpty ? '미입력' : profile.email}'),
+                Text('ì „í™”ë²ˆí˜¸: ${profile.phone.isEmpty ? 'ë¯¸ìž…ë ¥' : profile.phone}'),
+                Text('ì´ë©”ì¼: ${profile.email.isEmpty ? 'ë¯¸ìž…ë ¥' : profile.email}'),
                 const SizedBox(height: 8),
                 Text(
-                  '현재 데모 환자 계정은 이 프로필에 연결됩니다. 이름, 전화번호, 이메일을 본인 정보로 바꾸면 답변 요청 테스트를 직접 확인할 수 있어요.',
+                  'í˜„ìž¬ ë°ëª¨ í™˜ìž ê³„ì •ì€ ì´ í”„ë¡œí•„ì— ì—°ê²°ë©ë‹ˆë‹¤. ì´ë¦„, ì „í™”ë²ˆí˜¸, ì´ë©”ì¼ì„ ë³¸ì¸ ì •ë³´ë¡œ ë°”ê¾¸ë©´ ë‹µë³€ ìš”ì²­ í…ŒìŠ¤íŠ¸ë¥¼ ì§ì ‘ í™•ì¸í•  ìˆ˜ ìžˆì–´ìš”.',
                   style: TextStyle(color: Colors.grey.shade700),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     _StatusPill(
-                      label: profile.phone.isEmpty ? '전화번호 필요' : '전화번호 입력 완료',
+                      label: profile.phone.isEmpty ? 'ì „í™”ë²ˆí˜¸ í•„ìš”' : 'ì „í™”ë²ˆí˜¸ ìž…ë ¥ ì™„ë£Œ',
                       good: profile.phone.isNotEmpty,
                     ),
                     const SizedBox(width: 8),
                     _StatusPill(
-                      label: profile.email.isEmpty ? '이메일 필요' : '이메일 입력 완료',
+                      label: profile.email.isEmpty ? 'ì´ë©”ì¼ í•„ìš”' : 'ì´ë©”ì¼ ìž…ë ¥ ì™„ë£Œ',
                       good: profile.email.isNotEmpty,
                     ),
                   ],
@@ -355,8 +355,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 const SizedBox(height: 8),
                 Text(
                   profile.hasRequiredAlertInfo
-                      ? '알림 테스트 준비 완료: 전화번호와 이메일이 모두 입력되어 있습니다.'
-                      : '답변 요청을 진짜처럼 테스트하려면 전화번호와 이메일을 모두 입력해 주세요.',
+                      ? 'ì•Œë¦¼ í…ŒìŠ¤íŠ¸ ì¤€ë¹„ ì™„ë£Œ: ì „í™”ë²ˆí˜¸ì™€ ì´ë©”ì¼ì´ ëª¨ë‘ ìž…ë ¥ë˜ì–´ ìžˆìŠµë‹ˆë‹¤.'
+                      : 'ë‹µë³€ ìš”ì²­ì„ ì§„ì§œì²˜ëŸ¼ í…ŒìŠ¤íŠ¸í•˜ë ¤ë©´ ì „í™”ë²ˆí˜¸ì™€ ì´ë©”ì¼ì„ ëª¨ë‘ ìž…ë ¥í•´ ì£¼ì„¸ìš”.',
                   style: TextStyle(
                     color: profile.hasRequiredAlertInfo
                         ? const Color(0xFF0F766E)
@@ -368,7 +368,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 OutlinedButton.icon(
                   onPressed: _openProfileDialog,
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text('내 프로필 자세히 수정'),
+                  label: const Text('ë‚´ í”„ë¡œí•„ ìžì„¸ížˆ ìˆ˜ì •'),
                 ),
               ],
             ),
@@ -380,10 +380,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('침술사 답변 요청', style: TextStyle(fontWeight: FontWeight.w700)),
+                const Text('ì¹¨ìˆ ì‚¬ ë‹µë³€ ìš”ì²­', style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 Text(
-                  '침술사가 보낸 질문 요청이 여기 쌓입니다. 실제 이메일/SMS 발송은 아직 연결 전이고, 지금은 Firestore 저장과 화면 반영까지 테스트하는 단계예요.',
+                  'ì¹¨ìˆ ì‚¬ê°€ ë³´ë‚¸ ì§ˆë¬¸ ìš”ì²­ì´ ì—¬ê¸° ìŒ“ìž…ë‹ˆë‹¤. ì‹¤ì œ ì´ë©”ì¼/SMS ë°œì†¡ì€ ì•„ì§ ì—°ê²° ì „ì´ê³ , ì§€ê¸ˆì€ Firestore ì €ìž¥ê³¼ í™”ë©´ ë°˜ì˜ê¹Œì§€ í…ŒìŠ¤íŠ¸í•˜ëŠ” ë‹¨ê³„ì˜ˆìš”.',
                   style: TextStyle(color: Colors.grey.shade700),
                 ),
                 const SizedBox(height: 12),
@@ -396,7 +396,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('내 최근 제출 기록', style: TextStyle(fontWeight: FontWeight.w700)),
+                const Text('ë‚´ ìµœê·¼ ì œì¶œ ê¸°ë¡', style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 _RecentSubmissionsSection(patientId: profile.id),
               ],
@@ -407,18 +407,18 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('문진 모드', style: TextStyle(fontWeight: FontWeight.w700)),
+                const Text('ë¬¸ì§„ ëª¨ë“œ', style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   children: [
                     ChoiceChip(
-                      label: const Text('초진 예시'),
+                      label: const Text('ì´ˆì§„ ì˜ˆì‹œ'),
                       selected: _isFirstVisitPreview,
                       onSelected: (_) => _switchQuestionMode(true),
                     ),
                     ChoiceChip(
-                      label: const Text('재진 예시'),
+                      label: const Text('ìž¬ì§„ ì˜ˆì‹œ'),
                       selected: !_isFirstVisitPreview,
                       onSelected: (_) => _switchQuestionMode(false),
                     ),
@@ -442,23 +442,23 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('지난 방문 요약', style: TextStyle(fontWeight: FontWeight.w700)),
+                const Text('ì§€ë‚œ ë°©ë¬¸ ìš”ì•½', style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 if (latestVisit == null)
-                  const Text('아직 저장된 방문 기록이 없습니다.')
+                  const Text('ì•„ì§ ì €ìž¥ëœ ë°©ë¬¸ ê¸°ë¡ì´ ì—†ìŠµë‹ˆë‹¤.')
                 else ...[
-                  Text('지난 방문일: ${latestVisit.visit.date} (${latestVisit.visit.daysAgo}일 전)'),
+                  Text('ì§€ë‚œ ë°©ë¬¸ì¼: ${latestVisit.visit.date} (${latestVisit.visit.daysAgo}ì¼ ì „)'),
                   const SizedBox(height: 4),
-                  Text('그날 치료/기록: ${latestVisit.visit.previousTreatmentArea}'),
+                  Text('ê·¸ë‚  ì¹˜ë£Œ/ê¸°ë¡: ${latestVisit.visit.previousTreatmentArea}'),
                   const SizedBox(height: 4),
-                  Text('침술사 코멘트: ${latestVisit.visit.previousSessionNote}'),
+                  Text('ì¹¨ìˆ ì‚¬ ì½”ë©˜íŠ¸: ${latestVisit.visit.previousSessionNote}'),
                 ],
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        '전체 히스토리 ${history.length}건',
+                        'ì „ì²´ ížˆìŠ¤í† ë¦¬ ${history.length}ê±´',
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.w600,
@@ -467,7 +467,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     ),
                     TextButton(
                       onPressed: () => _openVisitHistorySheet(context, history),
-                      child: const Text('전체 히스토리 보기'),
+                      child: const Text('ì „ì²´ ížˆìŠ¤í† ë¦¬ ë³´ê¸°'),
                     ),
                   ],
                 ),
@@ -480,15 +480,15 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '이번 주 해야할 것 (${_thisWeekRangeLabel()})',
+                  'ì´ë²ˆ ì£¼ í•´ì•¼í•  ê²ƒ (${_thisWeekRangeLabel()})',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
-                const Text('1) 취침 1시간 전 스트레칭 5분'),
-                const Text('2) 오후 2시 이후 카페인 줄이기'),
-                const Text('3) 수면/피로 변화 간단 기록'),
+                const Text('1) ì·¨ì¹¨ 1ì‹œê°„ ì „ ìŠ¤íŠ¸ë ˆì¹­ 5ë¶„'),
+                const Text('2) ì˜¤í›„ 2ì‹œ ì´í›„ ì¹´íŽ˜ì¸ ì¤„ì´ê¸°'),
+                const Text('3) ìˆ˜ë©´/í”¼ë¡œ ë³€í™” ê°„ë‹¨ ê¸°ë¡'),
                 const SizedBox(height: 12),
-                Text('내가 지킨 항목 체크 ($adherence%)', style: const TextStyle(fontWeight: FontWeight.w700)),
+                Text('ë‚´ê°€ ì§€í‚¨ í•­ëª© ì²´í¬ ($adherence%)', style: const TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 LinearProgressIndicator(
                   value: adherence / 100,
@@ -498,19 +498,19 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 ),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('취침 전 스트레칭'),
+                  title: const Text('ì·¨ì¹¨ ì „ ìŠ¤íŠ¸ë ˆì¹­'),
                   value: _stretchingDone,
                   onChanged: (value) => setState(() => _stretchingDone = value ?? false),
                 ),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('오후 카페인 조절'),
+                  title: const Text('ì˜¤í›„ ì¹´íŽ˜ì¸ ì¡°ì ˆ'),
                   value: _caffeineDone,
                   onChanged: (value) => setState(() => _caffeineDone = value ?? false),
                 ),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('수면/피로 기록 작성'),
+                  title: const Text('ìˆ˜ë©´/í”¼ë¡œ ê¸°ë¡ ìž‘ì„±'),
                   value: _sleepLogDone,
                   onChanged: (value) => setState(() => _sleepLogDone = value ?? false),
                 ),
@@ -518,7 +518,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          const Text('문진 진행 상태', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+          const Text('ë¬¸ì§„ ì§„í–‰ ìƒíƒœ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: progress,
@@ -527,10 +527,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             color: const Color(0xFF0F766E),
           ),
           const SizedBox(height: 8),
-          Text('진행률 $answeredQuestions/$totalQuestions · 남은 질문 $remaining개'),
+          Text('ì§„í–‰ë¥  $answeredQuestions/$totalQuestions Â· ë‚¨ì€ ì§ˆë¬¸ $remainingê°œ'),
           const SizedBox(height: 4),
           Text(
-            '천천히 괜찮아요. 지금처럼 하나씩 답해도 충분해요.',
+            'ì²œì²œížˆ ê´œì°®ì•„ìš”. ì§€ê¸ˆì²˜ëŸ¼ í•˜ë‚˜ì”© ë‹µí•´ë„ ì¶©ë¶„í•´ìš”.',
             style: TextStyle(color: Colors.grey.shade700),
           ),
           const SizedBox(height: 12),
@@ -542,7 +542,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        '현재 질문 (${_currentQuestionIndex + 1}/$totalQuestions): ${_activeQuestions[_currentQuestionIndex]}',
+                        'í˜„ìž¬ ì§ˆë¬¸ (${_currentQuestionIndex + 1}/$totalQuestions): ${_activeQuestions[_currentQuestionIndex]}',
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),
@@ -564,7 +564,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   maxLines: 5,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    hintText: '답변을 적어주세요.',
+                    hintText: 'ë‹µë³€ì„ ì ì–´ì£¼ì„¸ìš”.',
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -573,7 +573,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   maxLines: 3,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    hintText: '추가 메모 (침술사에게 전달)',
+                    hintText: 'ì¶”ê°€ ë©”ëª¨ (ì¹¨ìˆ ì‚¬ì—ê²Œ ì „ë‹¬)',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -583,17 +583,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   children: [
                     OutlinedButton(
                       onPressed: _currentQuestionIndex == 0 ? null : () => _moveQuestion(-1),
-                      child: const Text('이전 질문'),
+                      child: const Text('ì´ì „ ì§ˆë¬¸'),
                     ),
                     OutlinedButton(
                       onPressed: _currentQuestionIndex == totalQuestions - 1
                           ? null
                           : () => _moveQuestion(1),
-                      child: const Text('다음 질문'),
+                      child: const Text('ë‹¤ìŒ ì§ˆë¬¸'),
                     ),
                     FilterChip(
                       label: Text(
-                        isMainPainSelected ? '메인 통증으로 표시됨' : '메인 통증이에요',
+                        isMainPainSelected ? 'ë©”ì¸ í†µì¦ìœ¼ë¡œ í‘œì‹œë¨' : 'ë©”ì¸ í†µì¦ì´ì—ìš”',
                       ),
                       selected: isMainPainSelected,
                       onSelected: (selected) {
@@ -608,7 +608,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     ),
                     FilterChip(
                       label: Text(
-                        isRememberSelected ? '기억해줬으면 표시됨' : '기억해줬으면 해요',
+                        isRememberSelected ? 'ê¸°ì–µí•´ì¤¬ìœ¼ë©´ í‘œì‹œë¨' : 'ê¸°ì–µí•´ì¤¬ìœ¼ë©´ í•´ìš”',
                       ),
                       selected: isRememberSelected,
                       onSelected: (selected) {
@@ -634,17 +634,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   onPressed: () {
                     _saveCurrentAnswer();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('임시 저장 완료')),
+                      const SnackBar(content: Text('ìž„ì‹œ ì €ìž¥ ì™„ë£Œ')),
                     );
                   },
-                  child: const Text('임시 저장'),
+                  child: const Text('ìž„ì‹œ ì €ìž¥'),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: FilledButton(
                   onPressed: _isSubmitting ? null : _submitCurrentIntake,
-                  child: Text(_isSubmitting ? '제출 중...' : '제출하기'),
+                  child: Text(_isSubmitting ? 'ì œì¶œ ì¤‘...' : 'ì œì¶œí•˜ê¸°'),
                 ),
               ),
             ],
@@ -663,12 +663,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const Text(
-              '전체 방문 히스토리',
+              'ì „ì²´ ë°©ë¬¸ ížˆìŠ¤í† ë¦¬',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             if (history.isEmpty)
-              const Text('아직 방문 기록이 없습니다.')
+              const Text('ì•„ì§ ë°©ë¬¸ ê¸°ë¡ì´ ì—†ìŠµë‹ˆë‹¤.')
             else
               ...history.map((item) {
                 return Card(
@@ -678,13 +678,13 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${item.visit.date} · ${item.visit.time}',
+                          '${item.visit.date} Â· ${item.visit.time}',
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 4),
-                        Text('치료 부위: ${item.visit.previousTreatmentArea}'),
+                        Text('ì¹˜ë£Œ ë¶€ìœ„: ${item.visit.previousTreatmentArea}'),
                         const SizedBox(height: 4),
-                        Text('기록: ${item.visit.previousSessionNote}'),
+                        Text('ê¸°ë¡: ${item.visit.previousSessionNote}'),
                       ],
                     ),
                   ),
@@ -771,6 +771,9 @@ class _PatientAlertSummary extends StatelessWidget {
             final bDate = (b.data()['requestedAt'] as Timestamp?)?.toDate();
             return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
           });
+        final pendingDocs = docs
+            .where((doc) => (doc.data()['status'] as String? ?? 'pending') == 'pending')
+            .toList();
 
         if (docs.isEmpty) {
           return Card(
@@ -788,13 +791,14 @@ class _PatientAlertSummary extends StatelessWidget {
           );
         }
 
-        final latest = docs.first.data();
+        final latest = (pendingDocs.isNotEmpty ? pendingDocs.first : docs.first).data();
         final selectedQuestions =
             (latest['selectedQuestions'] as List<dynamic>? ?? const []);
         final note = (latest['note'] as String? ?? '').trim();
+        final hasPending = pendingDocs.isNotEmpty;
 
         return Card(
-          color: const Color(0xFFE9F7F4),
+          color: hasPending ? const Color(0xFFFFF3D6) : const Color(0xFFE9F7F4),
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -802,25 +806,44 @@ class _PatientAlertSummary extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(
-                      Icons.notifications_active_outlined,
-                      color: Color(0xFF0F766E),
+                    Icon(
+                      hasPending
+                          ? Icons.campaign_outlined
+                          : Icons.notifications_active_outlined,
+                      color: hasPending
+                          ? const Color(0xFF9A6700)
+                          : const Color(0xFF0F766E),
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '침술사 답변 요청 ${docs.length}건',
-                      style: const TextStyle(
+                      hasPending
+                          ? '새 답변 요청 ${pendingDocs.length}건'
+                          : '침술사 답변 요청 ${docs.length}건',
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF0F766E),
+                        color: hasPending
+                            ? const Color(0xFF9A6700)
+                            : const Color(0xFF0F766E),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text('가장 최근 요청 질문 수: ${selectedQuestions.length}개'),
+                Text(
+                  hasPending
+                      ? '지금 확인할 질문 ${selectedQuestions.length}개'
+                      : '가장 최근 요청 질문 수: ${selectedQuestions.length}개',
+                ),
                 if (note.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text('최근 메모: $note'),
+                ],
+                if (hasPending) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    '아래 답변 요청 섹션에서 요청 내용을 확인하고 제출해 주세요.',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ],
               ],
             ),
@@ -865,13 +888,22 @@ class _AnswerRequestsSection extends StatelessWidget {
           return const Text('아직 들어온 답변 요청이 없습니다.');
         }
 
+        final pendingDocs = docs
+            .where((doc) => (doc.data()['status'] as String? ?? 'pending') == 'pending')
+            .toList();
+        final completedDocs = docs
+            .where((doc) => (doc.data()['status'] as String? ?? '') == 'completed')
+            .toList();
+        final orderedDocs = [...pendingDocs, ...completedDocs];
+
         return Column(
-          children: docs.take(3).map((doc) {
+          children: orderedDocs.take(3).map((doc) {
             final data = doc.data();
             final selectedQuestions =
                 (data['selectedQuestions'] as List<dynamic>? ?? []).cast<String>();
             final note = (data['note'] as String? ?? '').trim();
             final requestedAt = (data['requestedAt'] as Timestamp?)?.toDate();
+            final status = (data['status'] as String? ?? 'pending');
 
             return Card(
               margin: const EdgeInsets.only(bottom: 10),
@@ -880,11 +912,21 @@ class _AnswerRequestsSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      requestedAt == null
-                          ? '최근 답변 요청'
-                          : '요청 시각: ${requestedAt.year}-${requestedAt.month.toString().padLeft(2, '0')}-${requestedAt.day.toString().padLeft(2, '0')} ${requestedAt.hour.toString().padLeft(2, '0')}:${requestedAt.minute.toString().padLeft(2, '0')}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            requestedAt == null
+                                ? '최근 답변 요청'
+                                : '요청 시각: ${requestedAt.year}-${requestedAt.month.toString().padLeft(2, '0')}-${requestedAt.day.toString().padLeft(2, '0')} ${requestedAt.hour.toString().padLeft(2, '0')}:${requestedAt.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        _StatusPill(
+                          label: status == 'completed' ? '응답 완료' : '새 요청',
+                          good: status == 'completed',
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 6),
                     if (selectedQuestions.isNotEmpty) ...[
@@ -921,7 +963,7 @@ class _RecentSubmissionsSection extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text('제출 기록을 불러오지 못했습니다: ${snapshot.error}');
+          return Text('ì œì¶œ ê¸°ë¡ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤: ${snapshot.error}');
         }
         if (!snapshot.hasData) {
           return const Padding(
@@ -938,7 +980,7 @@ class _RecentSubmissionsSection extends StatelessWidget {
           });
 
         if (docs.isEmpty) {
-          return const Text('아직 제출한 문진이 없습니다. 제출하면 여기 바로 쌓입니다.');
+          return const Text('ì•„ì§ ì œì¶œí•œ ë¬¸ì§„ì´ ì—†ìŠµë‹ˆë‹¤. ì œì¶œí•˜ë©´ ì—¬ê¸° ë°”ë¡œ ìŒ“ìž…ë‹ˆë‹¤.');
         }
 
         return Column(
@@ -956,14 +998,14 @@ class _RecentSubmissionsSection extends StatelessWidget {
                   children: [
                     Text(
                       submittedAt == null
-                          ? '방금 저장된 문진'
-                          : '제출 시각: ${submittedAt.year}-${submittedAt.month.toString().padLeft(2, '0')}-${submittedAt.day.toString().padLeft(2, '0')} ${submittedAt.hour.toString().padLeft(2, '0')}:${submittedAt.minute.toString().padLeft(2, '0')}',
+                          ? 'ë°©ê¸ˆ ì €ìž¥ëœ ë¬¸ì§„'
+                          : 'ì œì¶œ ì‹œê°: ${submittedAt.year}-${submittedAt.month.toString().padLeft(2, '0')}-${submittedAt.day.toString().padLeft(2, '0')} ${submittedAt.hour.toString().padLeft(2, '0')}:${submittedAt.minute.toString().padLeft(2, '0')}',
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 6),
-                    Text('문진 유형: ${visitType == 'initial' ? '초진' : '재진'}'),
-                    Text('저장된 답변 수: ${answers.length}개'),
-                    Text('문서 ID: ${doc.id}'),
+                    Text('ë¬¸ì§„ ìœ í˜•: ${visitType == 'initial' ? 'ì´ˆì§„' : 'ìž¬ì§„'}'),
+                    Text('ì €ìž¥ëœ ë‹µë³€ ìˆ˜: ${answers.length}ê°œ'),
+                    Text('ë¬¸ì„œ ID: ${doc.id}'),
                   ],
                 ),
               ),
@@ -1022,7 +1064,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('내 프로필 수정'),
+      title: const Text('ë‚´ í”„ë¡œí•„ ìˆ˜ì •'),
       content: SizedBox(
         width: 520,
         child: Form(
@@ -1031,27 +1073,27 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildField(_nameController, '이름', required: true),
+                _buildField(_nameController, 'ì´ë¦„', required: true),
                 const SizedBox(height: 10),
                 _buildField(
                   _phoneController,
-                  '전화번호',
+                  'ì „í™”ë²ˆí˜¸',
                   required: true,
-                  hint: '예: 201-555-0101',
+                  hint: 'ì˜ˆ: 201-555-0101',
                 ),
                 const SizedBox(height: 10),
                 _buildField(
                   _emailController,
-                  '이메일',
+                  'ì´ë©”ì¼',
                   required: true,
-                  hint: '예: me@example.com',
+                  hint: 'ì˜ˆ: me@example.com',
                   validator: (value) {
                     final text = (value ?? '').trim();
                     if (text.isEmpty) {
-                      return '이메일을 입력해 주세요.';
+                      return 'ì´ë©”ì¼ì„ ìž…ë ¥í•´ ì£¼ì„¸ìš”.';
                     }
                     if (!text.contains('@')) {
-                      return '이메일 형식으로 입력해 주세요.';
+                      return 'ì´ë©”ì¼ í˜•ì‹ìœ¼ë¡œ ìž…ë ¥í•´ ì£¼ì„¸ìš”.';
                     }
                     return null;
                   },
@@ -1059,26 +1101,26 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
                 const SizedBox(height: 10),
                 _buildField(
                   _birthYearController,
-                  '출생연도',
+                  'ì¶œìƒì—°ë„',
                   required: true,
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
-                _buildField(_sexController, '성별', required: true),
+                _buildField(_sexController, 'ì„±ë³„', required: true),
                 const SizedBox(height: 10),
-                _buildField(_ethnicityController, '인종/민족', required: true),
+                _buildField(_ethnicityController, 'ì¸ì¢…/ë¯¼ì¡±', required: true),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _memoController,
                   maxLines: 3,
                   decoration: const InputDecoration(
-                    labelText: '메모',
+                    labelText: 'ë©”ëª¨',
                     border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '전화번호와 이메일은 앞으로 실제 이메일/SMS 알림 연결 테스트를 위해 필수로 받습니다. 지금 단계에서는 Firestore 저장과 화면 반영까지 먼저 확인합니다.',
+                  'ì „í™”ë²ˆí˜¸ì™€ ì´ë©”ì¼ì€ ì•žìœ¼ë¡œ ì‹¤ì œ ì´ë©”ì¼/SMS ì•Œë¦¼ ì—°ê²° í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ í•„ìˆ˜ë¡œ ë°›ìŠµë‹ˆë‹¤. ì§€ê¸ˆ ë‹¨ê³„ì—ì„œëŠ” Firestore ì €ìž¥ê³¼ í™”ë©´ ë°˜ì˜ê¹Œì§€ ë¨¼ì € í™•ì¸í•©ë‹ˆë‹¤.',
                   style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
                 ),
               ],
@@ -1089,7 +1131,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('취소'),
+          child: const Text('ì·¨ì†Œ'),
         ),
         FilledButton(
           onPressed: () async {
@@ -1100,7 +1142,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
             final birthYear = int.tryParse(_birthYearController.text.trim());
             if (birthYear == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('출생연도는 숫자로 입력해 주세요.')),
+                const SnackBar(content: Text('ì¶œìƒì—°ë„ëŠ” ìˆ«ìžë¡œ ìž…ë ¥í•´ ì£¼ì„¸ìš”.')),
               );
               return;
             }
@@ -1132,7 +1174,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
                   return;
                 }
                 messenger.showSnackBar(
-                  SnackBar(content: Text('프로필 저장 실패: $error')),
+                  SnackBar(content: Text('í”„ë¡œí•„ ì €ìž¥ ì‹¤íŒ¨: $error')),
                 );
               }
               return;
@@ -1141,7 +1183,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
             ClinicDataStore.instance.saveProfile(updated);
             Navigator.of(context).pop();
           },
-          child: const Text('저장'),
+          child: const Text('ì €ìž¥'),
         ),
       ],
     );
@@ -1161,7 +1203,7 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
       validator: validator ??
           (value) {
             if (required && (value ?? '').trim().isEmpty) {
-              return '$label 입력이 필요합니다.';
+              return '$label ìž…ë ¥ì´ í•„ìš”í•©ë‹ˆë‹¤.';
             }
             return null;
           },
@@ -1173,3 +1215,4 @@ class _PatientProfileDialogState extends State<_PatientProfileDialog> {
     );
   }
 }
+
