@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
-import '../../patient_intake/presentation/patient_intake_screen.dart';
+import '../../patient_home/presentation/patient_home_screen.dart';
 import '../../practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ClinicDataStore.instance.setCurrentPatientProfile('jane_kim');
     }
 
-    Navigator.pushReplacementNamed(context, PatientIntakeScreen.routeName);
+    Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
   }
 
   @override

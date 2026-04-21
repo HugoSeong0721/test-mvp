@@ -9,6 +9,7 @@ import '../../../core/services/app_firestore_service.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../patient_home/presentation/patient_home_screen.dart';
 
 class PatientIntakeScreen extends StatefulWidget {
   const PatientIntakeScreen({super.key});
@@ -446,6 +447,14 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
       appBar: AppBar(
         title: Text(lang.tr('Patient Intake', '환자 사전 문진')),
         actions: [
+          IconButton(
+            tooltip: lang.tr('Patient home', '환자 홈'),
+            onPressed: () => Navigator.pushReplacementNamed(
+              context,
+              PatientHomeScreen.routeName,
+            ),
+            icon: const Icon(Icons.home_outlined),
+          ),
           IconButton(
             tooltip: lang.tr('Edit profile', '프로필 수정'),
             onPressed: _openProfileDialog,

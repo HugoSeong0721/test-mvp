@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
-import '../../patient_intake/presentation/patient_intake_screen.dart';
+import '../../patient_home/presentation/patient_home_screen.dart';
 
 class PatientBetaAuthScreen extends StatefulWidget {
   const PatientBetaAuthScreen({super.key});
@@ -77,7 +77,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         return;
       }
 
-      Navigator.pushReplacementNamed(context, PatientIntakeScreen.routeName);
+      Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
     } on FirebaseAuthException catch (error) {
       _showMessage(_friendlyAuthMessage(error));
     } catch (error) {
