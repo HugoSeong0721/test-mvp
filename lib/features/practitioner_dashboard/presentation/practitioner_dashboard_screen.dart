@@ -69,6 +69,7 @@ class _PractitionerDashboardScreenState
 
   late String _selectedDate;
   String _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
+  String _selectedStatusFilter = 'All';
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
 
@@ -106,9 +107,12 @@ class _PractitionerDashboardScreenState
             : visibleVisits
                 .where((v) => v.profile.name == _selectedPatientFilter)
                 .toList();
+        final statusFiltered = dropdownFiltered
+            .where((v) => _matchesStatusFilter(v))
+            .toList();
         final filteredVisits = keyword.isEmpty
-            ? dropdownFiltered
-            : dropdownFiltered
+            ? statusFiltered
+            : statusFiltered
                 .where((v) => v.profile.name.toLowerCase().contains(keyword))
                 .toList();
         final summary = _visitWindowSummary();
@@ -221,6 +225,18 @@ class _PractitionerDashboardScreenState
                       },
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _statusFilterChip('All'),
+                  _statusFilterChip('Missing Profile'),
+                  _statusFilterChip('No Response'),
+                  _statusFilterChip('In Progress'),
+                  _statusFilterChip('Complete'),
                 ],
               ),
               const SizedBox(height: 8),
@@ -406,6 +422,32 @@ class _PractitionerDashboardScreenState
         });
       },
     );
+  }
+
+  Widget _statusFilterChip(String value) {
+    return ChoiceChip(
+      selected: _selectedStatusFilter == value,
+      label: Text(value),
+      onSelected: (_) {
+        setState(() => _selectedStatusFilter = value);
+      },
+    );
+  }
+
+  bool _matchesStatusFilter(ScheduledVisit scheduledVisit) {
+    switch (_selectedStatusFilter) {
+      case 'Missing Profile':
+        return !scheduledVisit.profile.hasRequiredAlertInfo;
+      case 'No Response':
+        return scheduledVisit.visit.intakeStatus == IntakeStatus.notStarted;
+      case 'In Progress':
+        return scheduledVisit.visit.intakeStatus == IntakeStatus.inProgress;
+      case 'Complete':
+        return scheduledVisit.visit.intakeStatus == IntakeStatus.completed;
+      case 'All':
+      default:
+        return true;
+    }
   }
 
   Widget _buildUpcomingBoard(List<ScheduledVisit> upcoming) {
