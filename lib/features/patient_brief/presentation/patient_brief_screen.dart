@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/services/app_firestore_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
 
@@ -360,14 +362,99 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
             ),
           ),
           const SizedBox(height: 14),
+          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: FirebaseFirestore.instance
+                .collection('visit_record_feedback')
+                .doc(AppFirestoreService.visitFeedbackDocumentId(
+                  patientId: patient.id,
+                  visitId: visit.id,
+                ))
+                .snapshots(),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.data();
+              final hasFeedback = data != null && ((data['feedbackText'] ?? '') as String).trim().isNotEmpty;
+              final isReviewed = data?['status'] == 'reviewed';
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang.tr('Patient Visit Record Update Request', '?? ???? ?? ??'),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 8),
+                      if (!hasFeedback)
+                        Text(
+                          lang.tr('There is no patient correction or follow-up note for this visit yet.', '? ??? ?? ??? ?? ?? ?? ?? ??? ?? ????.'),
+                        )
+                      else ...[
+                        Text('${lang.tr('Status', '??')}: ${isReviewed ? lang.tr('Reviewed', '?? ??') : lang.tr('Pending Review', '?? ??')}'),
+                        const SizedBox(height: 6),
+                        Text('${lang.tr('Submitted At', '?? ??')}: ${_formatFeedbackTimestamp(data['submittedAt'] as Timestamp?)}'),
+                        if (data['reviewedAt'] != null)
+                          Text('${lang.tr('Reviewed At', '?? ??')}: ${_formatFeedbackTimestamp(data['reviewedAt'] as Timestamp?)}'),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF7FBFA),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text((data['feedbackText'] ?? '').toString()),
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FilledButton.icon(
+                            onPressed: isReviewed
+                                ? null
+                                : () async {
+                                    await AppFirestoreService.markVisitRecordFeedbackReviewed(
+                                      patientId: patient.id,
+                                      visitId: visit.id,
+                                    );
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(lang.tr('Marked as reviewed. The patient can now see that you checked it.', '?? ?? ???????. ?? ????? ?? ??? ????.')),
+                                      ),
+                                    );
+                                  },
+                            icon: const Icon(Icons.mark_email_read_outlined),
+                            label: Text(
+                              isReviewed
+                                  ? lang.tr('Already Reviewed', '?? ???')
+                                  : lang.tr('Mark as Reviewed', '?????'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 14),
           FilledButton.icon(
             onPressed: _saveMemos,
             icon: const Icon(Icons.save_outlined),
-            label: const Text('Save Notes'),
+            label: Text(lang.tr('Save Notes', '?? ??')),
           ),
         ],
       ),
     );
+  }
+
+  String _formatFeedbackTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) {
+      return '-';
+    }
+    final date = timestamp.toDate();
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   Widget _buildMemoCard({required String title, required Widget child}) {

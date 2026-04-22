@@ -124,6 +124,96 @@ class ScheduledVisit {
   final PatientVisit visit;
 }
 
+enum AppointmentRequestStatus {
+  pending,
+  confirmed,
+  declined,
+  canceledByPatient,
+}
+
+extension AppointmentRequestStatusLabel on AppointmentRequestStatus {
+  String get englishLabel {
+    switch (this) {
+      case AppointmentRequestStatus.pending:
+        return 'Pending Confirmation';
+      case AppointmentRequestStatus.confirmed:
+        return 'Confirmed';
+      case AppointmentRequestStatus.declined:
+        return 'Declined';
+      case AppointmentRequestStatus.canceledByPatient:
+        return 'Canceled by Patient';
+    }
+  }
+}
+
+class AppointmentSlot {
+  const AppointmentSlot({
+    required this.date,
+    required this.time,
+    required this.isOpen,
+  });
+
+  final String date;
+  final String time;
+  final bool isOpen;
+
+  AppointmentSlot copyWith({
+    String? date,
+    String? time,
+    bool? isOpen,
+  }) {
+    return AppointmentSlot(
+      date: date ?? this.date,
+      time: time ?? this.time,
+      isOpen: isOpen ?? this.isOpen,
+    );
+  }
+}
+
+class AppointmentRequest {
+  const AppointmentRequest({
+    required this.id,
+    required this.patientId,
+    required this.date,
+    required this.time,
+    required this.requestedAt,
+    required this.status,
+    this.reviewedAt,
+    this.practitionerNote,
+  });
+
+  final String id;
+  final String patientId;
+  final String date;
+  final String time;
+  final DateTime requestedAt;
+  final AppointmentRequestStatus status;
+  final DateTime? reviewedAt;
+  final String? practitionerNote;
+
+  AppointmentRequest copyWith({
+    String? id,
+    String? patientId,
+    String? date,
+    String? time,
+    DateTime? requestedAt,
+    AppointmentRequestStatus? status,
+    DateTime? reviewedAt,
+    String? practitionerNote,
+  }) {
+    return AppointmentRequest(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      requestedAt: requestedAt ?? this.requestedAt,
+      status: status ?? this.status,
+      reviewedAt: reviewedAt ?? this.reviewedAt,
+      practitionerNote: practitionerNote ?? this.practitionerNote,
+    );
+  }
+}
+
 class PatientHistoryArgs {
   const PatientHistoryArgs({
     required this.current,
@@ -392,10 +482,43 @@ class ClinicDataStore extends ChangeNotifier {
     ),
   ];
 
+  final List<AppointmentSlot> _slots = [
+    const AppointmentSlot(date: '2026-04-22', time: '9:00 AM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-22', time: '10:30 AM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-22', time: '1:30 PM', isOpen: false),
+    const AppointmentSlot(date: '2026-04-22', time: '3:00 PM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-22', time: '4:30 PM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-25', time: '9:00 AM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-25', time: '10:30 AM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-25', time: '1:30 PM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-25', time: '3:00 PM', isOpen: false),
+    const AppointmentSlot(date: '2026-04-25', time: '4:30 PM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-29', time: '9:00 AM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-29', time: '10:30 AM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-29', time: '1:30 PM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-29', time: '3:00 PM', isOpen: true),
+    const AppointmentSlot(date: '2026-04-29', time: '4:30 PM', isOpen: true),
+  ];
+
+  final List<AppointmentRequest> _appointmentRequests = [
+    AppointmentRequest(
+      id: 'appointment_request_hugo_1',
+      patientId: 'hugo_demo',
+      date: '2026-04-22',
+      time: '10:30 AM',
+      requestedAt: DateTime(2026, 4, 21, 9, 10),
+      status: AppointmentRequestStatus.pending,
+    ),
+  ];
+
   List<PatientProfile> get profiles => List.unmodifiable(_profiles);
 
   PatientProfile get currentPatientProfile =>
       profileById(_currentPatientId) ?? _profiles.first;
+
+  List<AppointmentSlot> get slots => List.unmodifiable(_slots);
+  List<AppointmentRequest> get appointmentRequests =>
+      List.unmodifiable(_appointmentRequests);
 
   List<String> get allDates {
     final dates = _visits
@@ -492,6 +615,134 @@ class ClinicDataStore extends ChangeNotifier {
       });
   }
 
+  List<AppointmentSlot> availableSlotsForPatient(String patientId) {
+    final pendingOrConfirmed = _appointmentRequests
+        .where(
+          (request) =>
+              request.patientId == patientId &&
+              (request.status == AppointmentRequestStatus.pending ||
+                  request.status == AppointmentRequestStatus.confirmed),
+        )
+        .map((request) => '${request.date}|${request.time}')
+        .toSet();
+
+    final confirmedVisits = _visits
+        .where((visit) => visit.patientId == patientId)
+        .map((visit) => '${visit.date}|${visit.time}')
+        .toSet();
+
+    return _slots
+        .where((slot) => slot.isOpen)
+        .where((slot) => !pendingOrConfirmed.contains('${slot.date}|${slot.time}'))
+        .where((slot) => !confirmedVisits.contains('${slot.date}|${slot.time}'))
+        .toList()
+      ..sort((a, b) {
+        final dateCompare = a.date.compareTo(b.date);
+        if (dateCompare != 0) {
+          return dateCompare;
+        }
+        return a.time.compareTo(b.time);
+      });
+  }
+
+  List<AppointmentRequest> requestsForPatient(String patientId) {
+    final items = _appointmentRequests
+        .where((request) => request.patientId == patientId)
+        .toList()
+      ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+    return items;
+  }
+
+  void requestAppointment({
+    required String patientId,
+    required String date,
+    required String time,
+  }) {
+    final slot = _slots.where((slot) => slot.date == date && slot.time == time && slot.isOpen);
+    if (slot.isEmpty) {
+      return;
+    }
+
+    final alreadyRequested = _appointmentRequests.any(
+      (request) =>
+          request.patientId == patientId &&
+          request.date == date &&
+          request.time == time &&
+          (request.status == AppointmentRequestStatus.pending ||
+              request.status == AppointmentRequestStatus.confirmed),
+    );
+    if (alreadyRequested) {
+      return;
+    }
+
+    _appointmentRequests.add(
+      AppointmentRequest(
+        id: 'appointment_request_${DateTime.now().millisecondsSinceEpoch}',
+        patientId: patientId,
+        date: date,
+        time: time,
+        requestedAt: DateTime.now(),
+        status: AppointmentRequestStatus.pending,
+      ),
+    );
+    notifyListeners();
+  }
+
+  void cancelAppointmentRequest(String requestId) {
+    final index = _appointmentRequests.indexWhere((request) => request.id == requestId);
+    if (index < 0) return;
+    final request = _appointmentRequests[index];
+    if (request.status != AppointmentRequestStatus.pending) {
+      return;
+    }
+    _appointmentRequests[index] = request.copyWith(
+      status: AppointmentRequestStatus.canceledByPatient,
+      reviewedAt: DateTime.now(),
+    );
+    notifyListeners();
+  }
+
+  void confirmAppointmentRequest(String requestId) {
+    final index = _appointmentRequests.indexWhere((request) => request.id == requestId);
+    if (index < 0) return;
+    final request = _appointmentRequests[index];
+    if (request.status != AppointmentRequestStatus.pending) {
+      return;
+    }
+
+    _appointmentRequests[index] = request.copyWith(
+      status: AppointmentRequestStatus.confirmed,
+      reviewedAt: DateTime.now(),
+    );
+    addAppointment(
+      patientId: request.patientId,
+      date: request.date,
+      time: request.time,
+    );
+  }
+
+  void declineAppointmentRequest(String requestId, {String? note}) {
+    final index = _appointmentRequests.indexWhere((request) => request.id == requestId);
+    if (index < 0) return;
+    final request = _appointmentRequests[index];
+    if (request.status != AppointmentRequestStatus.pending) {
+      return;
+    }
+    _appointmentRequests[index] = request.copyWith(
+      status: AppointmentRequestStatus.declined,
+      reviewedAt: DateTime.now(),
+      practitionerNote: note,
+    );
+    notifyListeners();
+  }
+
+  void setSlotOpen(String date, String time, bool isOpen) {
+    final index = _slots.indexWhere((slot) => slot.date == date && slot.time == time);
+    if (index < 0) return;
+    _slots[index] = _slots[index].copyWith(isOpen: isOpen);
+    notifyListeners();
+  }
+
   void saveProfile(PatientProfile profile) {
     final index = _profiles.indexWhere((item) => item.id == profile.id);
     if (index >= 0) {
@@ -504,6 +755,46 @@ class ClinicDataStore extends ChangeNotifier {
 
   void deleteProfile(String profileId) {
     _profiles.removeWhere((profile) => profile.id == profileId);
+    notifyListeners();
+  }
+
+  void addAppointment({
+    required String patientId,
+    required String date,
+    required String time,
+  }) {
+    final existingCount = _visits.where((visit) => visit.patientId == patientId).length;
+    final history = historyForPatient(patientId);
+    final latestVisit = history.isNotEmpty ? history.first.visit : null;
+
+    final selectedDate = DateTime.parse(date);
+    final daysAgo = latestVisit == null
+        ? 0
+        : selectedDate.difference(DateTime.parse(latestVisit.date)).inDays;
+
+    final visit = PatientVisit(
+      id: 'visit_${DateTime.now().millisecondsSinceEpoch}_$existingCount',
+      patientId: patientId,
+      date: date,
+      time: time,
+      lastVisitDate: latestVisit?.date ?? date,
+      daysAgo: daysAgo < 0 ? 0 : daysAgo,
+      scheduledSinceLast: latestVisit == null ? 0 : latestVisit.scheduledSinceLast + 1,
+      noShowSinceLast: 0,
+      intakeStatus: IntakeStatus.notStarted,
+      previousTreatmentArea: latestVisit?.previousTreatmentArea ?? 'To be updated after visit',
+      previousSessionNote: latestVisit?.previousSessionNote ?? 'New appointment booked by patient.',
+      qaList: const [],
+    );
+
+    _visits.add(visit);
+    _visits.sort((a, b) {
+      final dateCompare = a.date.compareTo(b.date);
+      if (dateCompare != 0) {
+        return dateCompare;
+      }
+      return a.time.compareTo(b.time);
+    });
     notifyListeners();
   }
 }

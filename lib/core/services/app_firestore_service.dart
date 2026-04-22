@@ -5,6 +5,13 @@ class AppFirestoreService {
 
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static String visitFeedbackDocumentId({
+    required String patientId,
+    required String visitId,
+  }) {
+    return '${patientId}_$visitId';
+  }
+
   static Future<String> submitPatientIntake({
     required String patientId,
     required String patientName,
@@ -90,6 +97,53 @@ class AppFirestoreService {
     return doc.id;
   }
 
+  static Future<void> submitVisitRecordFeedback({
+    required String patientId,
+    required String patientName,
+    required String visitId,
+    required String visitDate,
+    required String visitTime,
+    required String feedbackText,
+  }) async {
+    final docId = visitFeedbackDocumentId(patientId: patientId, visitId: visitId);
+    final ref = _db.collection('visit_record_feedback').doc(docId);
+    final existing = await ref.get();
+
+    if (existing.exists && (existing.data()?['status'] == 'reviewed')) {
+      throw StateError('reviewed');
+    }
+
+    await ref.set({
+      'patientId': patientId,
+      'patientName': patientName,
+      'visitId': visitId,
+      'visitDate': visitDate,
+      'visitTime': visitTime,
+      'feedbackText': feedbackText.trim(),
+      'status': 'pending',
+      'patientCanEdit': true,
+      'reviewedByPractitioner': false,
+      'submittedAt': existing.data()?['submittedAt'] ?? FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'reviewedAt': null,
+      'source': 'visit_history_screen',
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> markVisitRecordFeedbackReviewed({
+    required String patientId,
+    required String visitId,
+  }) async {
+    final docId = visitFeedbackDocumentId(patientId: patientId, visitId: visitId);
+    await _db.collection('visit_record_feedback').doc(docId).set({
+      'status': 'reviewed',
+      'patientCanEdit': false,
+      'reviewedByPractitioner': true,
+      'reviewedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   static Future<void> _queueAnswerRequestEmail({
     required String patientName,
     required String patientEmail,
@@ -171,4 +225,3 @@ After that, choose Friend Beta Sign Up / Login or log in with your existing acco
     });
   }
 }
-
