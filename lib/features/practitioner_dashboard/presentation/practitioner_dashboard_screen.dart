@@ -1,12 +1,15 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
 import '../../../core/settings/app_language_controller.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../patient_brief/presentation/patient_brief_screen.dart';
 import '../../symptom_trend/presentation/symptom_trend_screen.dart';
+import 'patient_record_workspace.dart';
 
 class PractitionerDashboardScreen extends StatefulWidget {
   const PractitionerDashboardScreen({super.key});
@@ -22,56 +25,65 @@ class _PractitionerDashboardScreenState
     extends State<PractitionerDashboardScreen> {
   static const Map<String, List<String>> _questionLibraryByCategory = {
     'Temperature/Sweat': [
-      'ëª¸ì´ ì‰½ê²Œ ë¥ê±°ë‚˜ ì¶¥ê²Œ ëŠê»´ì§€ë‚˜ìš”?',
-      'ì‹ì€ë•€/ìží•œ/ë„í•œì´ ìžˆë‚˜ìš”?',
+      'Do you feel unusually hot or cold lately?',
+      'Have you noticed spontaneous sweat, night sweat, or cold sweat?',
     ],
     'Appetite/Thirst': [
-      'ì‹ìš•ì€ í‰ì†Œì™€ ë¹„êµí•´ ì–´ë–¤ê°€ìš”?',
-      'ê°ˆì¦ì´ ìž¦ê±°ë‚˜ ì°¬ë¬¼/ë”°ëœ»í•œ ë¬¼ ì„ í˜¸ê°€ ìžˆë‚˜ìš”?',
+      'How has your appetite been compared with usual?',
+      'Have you been more thirsty, and do you prefer cold or warm drinks?',
     ],
     'Sleep': [
-      'ìž ë“œëŠ” ì‹œê°„ê³¼ ê¹¨ëŠ” íšŸìˆ˜ëŠ” ì–´ë–¤ê°€ìš”?',
-      'ê¿ˆì´ ë§Žê±°ë‚˜ ìžê³  ë‚˜ë„ ê°œìš´í•˜ì§€ ì•Šë‚˜ìš”?',
+      'How long does it take you to fall asleep, and how often do you wake up?',
+      'Have you been dreaming a lot or waking without feeling rested?',
     ],
     'Digestion': [
-      'ì‹í›„ ë”ë¶€ë£©í•¨ì´ë‚˜ ì†ì“°ë¦¼ì´ ìžˆë‚˜ìš”?',
-      'íŠ¸ë¦¼/ê°€ìŠ¤/ì—­ë¥˜ ì¦ìƒì´ ìžˆë‚˜ìš”?',
+      'Have you noticed bloating or heartburn after meals?',
+      'Have you been dealing with belching, gas, or reflux?',
     ],
     'Urine': [
-      'ì†Œë³€ íšŸìˆ˜ë‚˜ ê¸‰ë°•ë‡¨ ë³€í™”ê°€ ìžˆë‚˜ìš”?',
-      'ì•¼ê°„ë‡¨ê°€ ëŠ˜ì—ˆë‚˜ìš”?',
+      'Any change in urinary frequency or urgency?',
+      'Are you waking up more often to urinate at night?',
     ],
     'Stool': [
-      'ë°°ë³€ ì£¼ê¸°ë‚˜ êµ³ê¸° ë³€í™”ê°€ ìžˆë‚˜ìš”?',
-      'ë³€ë¹„ì™€ ì„¤ì‚¬ê°€ ë²ˆê°ˆì•„ ë‚˜íƒ€ë‚˜ë‚˜ìš”?',
+      'Any change in bowel movement timing or stool form?',
+      'Have constipation and loose stool been alternating?',
     ],
     'Menses': [
-      'ìƒë¦¬ ì£¼ê¸°/ì–‘/í†µì¦ ë³€í™”ê°€ ìžˆë‚˜ìš”?',
-      'í˜ˆê´´(ë©ì–´ë¦¬)ë‚˜ ìƒ‰ ë³€í™”ê°€ ìžˆë‚˜ìš”?',
+      'Any change in cycle, flow amount, or menstrual pain?',
+      'Any clotting or color change in menstrual blood?',
     ],
     'HEENT': [
-      'ë‘í†µ, ëˆˆí”¼ë¡œ, ì´ëª…, ì½”ë§‰íž˜ ì¤‘ ë¶ˆíŽ¸í•œ ê²ƒì´ ìžˆë‚˜ìš”?',
-      'ëª©/ì–´ê¹¨ ê¸´ìž¥ê³¼ ì—°ê´€ëœ ì¦ìƒì´ ìžˆë‚˜ìš”?',
+      'Any headache, eye strain, tinnitus, or sinus congestion?',
+      'Any symptom connected with neck and shoulder tension?',
     ],
     'Emotion': [
-      'ìµœê·¼ ê°ì • ê¸°ë³µì´ë‚˜ ì˜ˆë¯¼í•¨ì´ ëŠ˜ì—ˆë‚˜ìš”?',
-      'ìŠ¤íŠ¸ë ˆìŠ¤ê°€ ëª¸ ì¦ìƒì— ì˜í–¥ì„ ì£¼ë‚˜ìš”?',
+      'Have emotional swings or irritability increased lately?',
+      'Does stress seem to make the body symptoms worse?',
     ],
     'Energy': [
-      'í•˜ë£¨ ì¤‘ ì–¸ì œ ê°€ìž¥ í”¼ê³¤í•œê°€ìš”?',
-      'ê¸°ìš´ì´ ê°‘ìžê¸° ë–¨ì–´ì§€ëŠ” ì‹œê°„ì´ ìžˆë‚˜ìš”?',
+      'At what time of day do you feel the most tired?',
+      'Is there a time when your energy drops suddenly?',
     ],
   };
 
   final ClinicDataStore _store = ClinicDataStore.instance;
   final TextEditingController _patientFilterController =
       TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _appointmentInboxKey = GlobalKey();
+  final GlobalKey _availabilityBoardKey = GlobalKey();
+  final GlobalKey _dateSelectorKey = GlobalKey();
+  final GlobalKey _patientCardsKey = GlobalKey();
+  final GlobalKey _appointmentRequestsSectionKey = GlobalKey();
+  final GlobalKey _recordUpdatesSectionKey = GlobalKey();
+  final GlobalKey _recentSubmissionsSectionKey = GlobalKey();
 
   late String _selectedDate;
-  String _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
+  String _selectedPatientFilter = 'All Patients';
   String _selectedStatusFilter = 'All';
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
+  bool _showDashboardGuide = true;
 
   @override
   void initState() {
@@ -90,321 +102,1333 @@ class _PractitionerDashboardScreenState
   @override
   void dispose() {
     _patientFilterController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-        return AnimatedBuilder(
-      animation: _store,
+    return AnimatedBuilder(
+      animation: Listenable.merge([_store, AppLanguageController.instance]),
       builder: (context, _) {
+        final lang = AppLanguageController.instance;
+        final theme = Theme.of(context);
         final visibleVisits = _visibleVisits();
-        final patientNames = visibleVisits.map((v) => v.profile.name).toSet().toList()
-          ..sort();
+        final pendingAppointmentInboxCount = _pendingAppointmentRequestCount();
+        final showTopActionCards = MediaQuery.sizeOf(context).width >= 1460;
+        final patientNames =
+            visibleVisits.map((v) => v.profile.name).toSet().toList()..sort();
         final keyword = _patientFilterController.text.trim().toLowerCase();
-        final dropdownFiltered = _selectedPatientFilter == 'ì „ì²´ í™˜ìž'
+        final dropdownFiltered = _selectedPatientFilter == 'All Patients'
             ? visibleVisits
             : visibleVisits
-                .where((v) => v.profile.name == _selectedPatientFilter)
-                .toList();
+                  .where((v) => v.profile.name == _selectedPatientFilter)
+                  .toList();
         final statusFiltered = dropdownFiltered
             .where((v) => _matchesStatusFilter(v))
             .toList();
         final filteredVisits = keyword.isEmpty
             ? statusFiltered
             : statusFiltered
-                .where((v) => v.profile.name.toLowerCase().contains(keyword))
-                .toList();
+                  .where((v) => v.profile.name.toLowerCase().contains(keyword))
+                  .toList();
         final summary = _visitWindowSummary();
-        final upcoming = _store
-            .upcomingVisits(_parseDate(_selectedDate) ?? DateTime.now())
-            .take(6)
-            .toList();
+        final titleLabel = _selectedDateRange == null
+            ? lang.tr(
+                '${_formatStoredDateWithWeekday(_selectedDate)} Patients ${filteredVisits.length}',
+                '${_formatStoredDateWithWeekday(_selectedDate)} 환자 ${filteredVisits.length}명',
+              )
+            : lang.tr(
+                '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} Patients ${filteredVisits.length}',
+                '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} 환자 ${filteredVisits.length}명',
+              );
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(AppLanguageController.instance.tr('Practitioner Dashboard', '침술사 대시보드')),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(lang.tr('Practitioner Dashboard', '침술사 대시보드')),
+                Text(
+                  lang.tr(
+                    'Clinical operations and intake monitoring',
+                    '운영 현황 및 문진 모니터링',
+                  ),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
             actions: [
+              if (showTopActionCards) ...[
+                _buildTopInboxAction(pendingAppointmentInboxCount),
+                _buildTopDateAction(),
+              ] else ...[
+                _buildCompactTopInboxAction(pendingAppointmentInboxCount),
+                IconButton(
+                  tooltip: lang.tr('Open date quick actions', '날짜 빠른 선택 열기'),
+                  onPressed: _openDateQuickActionsSheet,
+                  icon: const Icon(Icons.calendar_month_outlined),
+                ),
+              ],
               const LanguageMenuButton(),
               TextButton.icon(
                 onPressed: () => _openPatientManagement(context),
                 icon: const Icon(Icons.people_outline),
-                label: Text(AppLanguageController.instance.tr('Patient Management', '환자 정보 관리')),
+                label: Text(lang.tr('Patient Management', '환자 정보 관리')),
               ),
               IconButton(
-                tooltip: AppLanguageController.instance.tr('View symptom trends', '유사증상 추세 보기'),
+                tooltip: lang.tr('View symptom trends', '유사증상 추세 보기'),
                 onPressed: () =>
                     Navigator.pushNamed(context, SymptomTrendScreen.routeName),
                 icon: const Icon(Icons.insights_outlined),
               ),
               Padding(
-                padding: EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.only(right: 12),
                 child: Center(
-                  child: Chip(label: Text(AppLanguageController.instance.tr('Practitioner View', '침술사 화면'))),
+                  child: Chip(
+                    label: Text(lang.tr('Practitioner View', '침술사 화면')),
+                  ),
                 ),
               ),
             ],
           ),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final wide = constraints.maxWidth >= 1000;
-                  if (!wide) {
-                    return Column(
+          body: AppBackdrop(
+            child: ListView(
+              controller: _scrollController,
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              children: [
+                _buildDashboardHero(
+                  summary,
+                  visibleVisits,
+                  filteredVisits.length,
+                ),
+                const SizedBox(height: 16),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth >= 1000;
+                    if (!wide) {
+                      return Column(
+                        children: [
+                          _buildInsightPanel(summary),
+                          const SizedBox(height: 12),
+                          KeyedSubtree(
+                            key: _dateSelectorKey,
+                            child: _buildDateSelectorPanel(),
+                          ),
+                        ],
+                      );
+                    }
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildInsightPanel(summary),
-                        const SizedBox(height: 12),
-                        _buildDateSelectorPanel(),
+                        Expanded(flex: 11, child: _buildInsightPanel(summary)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 9,
+                          child: KeyedSubtree(
+                            key: _dateSelectorKey,
+                            child: _buildDateSelectorPanel(),
+                          ),
+                        ),
                       ],
                     );
-                  }
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(flex: 11, child: _buildInsightPanel(summary)),
-                      const SizedBox(width: 12),
-                      Expanded(flex: 9, child: _buildDateSelectorPanel()),
-                    ],
-                  );
-                },
-              ),
-              if (upcoming.isNotEmpty) ...[
+                  },
+                ),
                 const SizedBox(height: 12),
-                _buildUpcomingBoard(upcoming),
-              ],
-              const SizedBox(height: 12),
-              const _BetaRegistrantBoard(),
-              const SizedBox(height: 12),
-              const _BetaSubmissionBoard(),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _selectedDateRange == null
-                          ? '$_selectedDate í™˜ìž ${filteredVisits.length}ëª…'
-                          : '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} í™˜ìž ${filteredVisits.length}ëª…',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 220,
-                    child: DropdownButtonFormField<String>(
-                      initialValue: patientNames.contains(_selectedPatientFilter) ||
-                              _selectedPatientFilter == 'ì „ì²´ í™˜ìž'
-                          ? _selectedPatientFilter
-                          : 'ì „ì²´ í™˜ìž',
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth >= 1000;
+                    if (!wide) {
+                      return Column(
+                        children: [
+                          KeyedSubtree(
+                            key: _appointmentInboxKey,
+                            child: _buildPatientInboxBoard(),
+                          ),
+                          const SizedBox(height: 12),
+                          KeyedSubtree(
+                            key: _availabilityBoardKey,
+                            child: _buildAvailabilityBoard(),
+                          ),
+                        ],
+                      );
+                    }
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 10,
+                          child: KeyedSubtree(
+                            key: _appointmentInboxKey,
+                            child: _buildPatientInboxBoard(),
+                          ),
                         ),
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: 'ì „ì²´ í™˜ìž',
-                          child: Text('ì „ì²´ í™˜ìž'),
-                        ),
-                        ...patientNames.map(
-                          (name) =>
-                              DropdownMenuItem(value: name, child: Text(name)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 8,
+                          child: KeyedSubtree(
+                            key: _availabilityBoardKey,
+                            child: _buildAvailabilityBoard(),
+                          ),
                         ),
                       ],
-                      onChanged: (value) {
-                        if (value == null) {
-                          return;
-                        }
-                        setState(() => _selectedPatientFilter = value);
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                KeyedSubtree(
+                  key: _patientCardsKey,
+                  child: AppPanel(
+                    padding: const EdgeInsets.all(20),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.92),
+                        AppTheme.blush.withValues(alpha: 0.62),
+                      ],
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final wide = constraints.maxWidth >= 780;
+                        final headerActions = Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: wide
+                              ? WrapAlignment.end
+                              : WrapAlignment.start,
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: _pickDateFromCalendar,
+                              icon: const Icon(Icons.calendar_month_outlined),
+                              label: Text(lang.tr('Pick date', '달력에서 날짜 선택')),
+                            ),
+                            FilledButton.tonalIcon(
+                              onPressed: _jumpToTodayDate,
+                              icon: const Icon(Icons.today_outlined),
+                              label: Text(lang.tr('Today', '오늘 날짜로 이동')),
+                            ),
+                          ],
+                        );
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (wide)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          titleLabel,
+                                          style: theme.textTheme.headlineMedium,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          lang.tr(
+                                            'Refine the active patient set with status, date, and direct name search before opening patient cards.',
+                                            '상태, 날짜, 이름 검색으로 활성 환자 목록을 먼저 좁힌 뒤 환자 카드를 열어보세요.',
+                                          ),
+                                          style: theme.textTheme.bodyLarge
+                                              ?.copyWith(
+                                                color: AppTheme.ink.withValues(
+                                                  alpha: 0.72,
+                                                ),
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      headerActions,
+                                      const SizedBox(height: 12),
+                                      SizedBox(
+                                        width: 240,
+                                        child: DropdownButtonFormField<String>(
+                                          initialValue:
+                                              patientNames.contains(
+                                                    _selectedPatientFilter,
+                                                  ) ||
+                                                  _selectedPatientFilter ==
+                                                      'All Patients'
+                                              ? _selectedPatientFilter
+                                              : 'All Patients',
+                                          decoration: InputDecoration(
+                                            labelText: lang.tr(
+                                              'Patient filter',
+                                              '환자 필터',
+                                            ),
+                                          ),
+                                          items: [
+                                            DropdownMenuItem(
+                                              value: 'All Patients',
+                                              child: Text(
+                                                lang.tr(
+                                                  'All Patients',
+                                                  '전체 환자',
+                                                ),
+                                              ),
+                                            ),
+                                            ...patientNames.map(
+                                              (name) => DropdownMenuItem(
+                                                value: name,
+                                                child: Text(name),
+                                              ),
+                                            ),
+                                          ],
+                                          onChanged: (value) {
+                                            if (value == null) {
+                                              return;
+                                            }
+                                            setState(
+                                              () => _selectedPatientFilter =
+                                                  value,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            else ...[
+                              Text(
+                                titleLabel,
+                                style: theme.textTheme.headlineMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                lang.tr(
+                                  'Refine the active patient set with status, date, and direct name search before opening patient cards.',
+                                  '상태, 날짜, 이름 검색으로 활성 환자 목록을 먼저 좁힌 뒤 환자 카드를 열어보세요.',
+                                ),
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: AppTheme.ink.withValues(alpha: 0.72),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              headerActions,
+                              const SizedBox(height: 14),
+                              DropdownButtonFormField<String>(
+                                initialValue:
+                                    patientNames.contains(
+                                          _selectedPatientFilter,
+                                        ) ||
+                                        _selectedPatientFilter == 'All Patients'
+                                    ? _selectedPatientFilter
+                                    : 'All Patients',
+                                decoration: InputDecoration(
+                                  labelText: lang.tr('Patient filter', '환자 필터'),
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'All Patients',
+                                    child: Text(
+                                      lang.tr('All Patients', '전체 환자'),
+                                    ),
+                                  ),
+                                  ...patientNames.map(
+                                    (name) => DropdownMenuItem(
+                                      value: name,
+                                      child: Text(name),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+                                  setState(
+                                    () => _selectedPatientFilter = value,
+                                  );
+                                },
+                              ),
+                            ],
+                            const SizedBox(height: 16),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _statusFilterChip('All'),
+                                _statusFilterChip('Alert Ready'),
+                                _statusFilterChip('Missing Profile'),
+                                _statusFilterChip('No Response'),
+                                _statusFilterChip('In Progress'),
+                                _statusFilterChip('Complete'),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            TextField(
+                              controller: _patientFilterController,
+                              onChanged: (_) => setState(() {}),
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                hintText: lang.tr(
+                                  'Search patient name',
+                                  '환자 이름 직접 검색',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              _selectedDateRange == null
+                                  ? lang.tr(
+                                      'Visit summary: ${summary.periodLabel}',
+                                      '방문 요약: ${summary.periodLabel}',
+                                    )
+                                  : lang.tr(
+                                      'Selected range summary: ${summary.periodLabel}',
+                                      '선택 기간 요약: ${summary.periodLabel}',
+                                    ),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: AppTheme.ink.withValues(alpha: 0.62),
+                              ),
+                            ),
+                            if (_selectedDateRange == null &&
+                                filteredVisits.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  lang.tr(
+                                    'Showing ${filteredVisits.length} of ${_store.visitsForDate(_selectedDate).length} patient(s) scheduled on ${_formatStoredDateWithWeekday(_selectedDate)}.',
+                                    '${_formatStoredDateWithWeekday(_selectedDate)} 일정 환자 ${_store.visitsForDate(_selectedDate).length}명 중 ${filteredVisits.length}명을 표시 중입니다.',
+                                  ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: AppTheme.ink.withValues(alpha: 0.62),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
                       },
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _statusFilterChip('All'),
-                  _statusFilterChip('Missing Profile'),
-                  _statusFilterChip('No Response'),
-                  _statusFilterChip('In Progress'),
-                  _statusFilterChip('Complete'),
-                ],
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _patientFilterController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                  hintText: 'í™˜ìž ì´ë¦„ ì§ì ‘ ê²€ìƒ‰',
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _selectedDateRange == null
-                    ? 'ì´ ë‚´ì› ì§‘ê³„: ${summary.periodLabel}'
-                    : 'ì„ íƒ ê¸°ê°„ ì§‘ê³„: ${summary.periodLabel}',
-                style: const TextStyle(color: Colors.black54),
-              ),
-              const SizedBox(height: 12),
-              if (filteredVisits.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text('ì„ íƒí•œ ì¡°ê±´ì— ë§žëŠ” í™˜ìžê°€ ì—†ìŠµë‹ˆë‹¤.'),
+                const SizedBox(height: 12),
+                if (filteredVisits.isEmpty)
+                  AppPanel(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          lang.tr(
+                            'No patients match the selected filters.',
+                            '선택한 필터에 맞는 환자가 없습니다.',
+                          ),
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        if (_selectedDateRange == null &&
+                            _store.visitsForDate(_selectedDate).isNotEmpty &&
+                            _selectedStatusFilter != 'All') ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            lang.tr(
+                              'There are visits on ${_formatStoredDateWithWeekday(_selectedDate)}, but the current status filter "${_statusFilterLabel(_selectedStatusFilter)}" is hiding them.',
+                              '${_formatStoredDateWithWeekday(_selectedDate)}에 일정은 있지만 현재 상태 필터 "${_statusFilterLabel(_selectedStatusFilter)}" 때문에 숨겨져 있습니다.',
+                            ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.ink.withValues(alpha: 0.66),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
+                ...filteredVisits.map(
+                  (scheduledVisit) =>
+                      _buildPatientCard(context, scheduledVisit),
                 ),
-              ...filteredVisits.map(
-                (scheduledVisit) => _buildPatientCard(context, scheduledVisit),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildInsightPanel(_VisitWindowSummary summary) {
-    final profiles = _store.profiles;
-    final sexCounts = <String, int>{};
-    for (final profile in profiles) {
-      sexCounts.update(profile.sex, (value) => value + 1, ifAbsent: () => 1);
+  Widget _buildDashboardHero(
+    _VisitWindowSummary summary,
+    List<ScheduledVisit> visibleVisits,
+    int filteredCount,
+  ) {
+    final readyAlerts = visibleVisits
+        .where((visit) => visit.profile.hasRequiredAlertInfo)
+        .length;
+    final inProgressIntakes = visibleVisits
+        .where((visit) => visit.visit.intakeStatus == IntakeStatus.inProgress)
+        .length;
+    final noResponse = visibleVisits
+        .where((visit) => visit.visit.intakeStatus == IntakeStatus.notStarted)
+        .length;
+    final visitsMetricLabel = _selectedDateRange == null
+        ? AppLanguageController.instance.tr(
+            'Visits in last $_selectedRangeDays days',
+            '최근 $_selectedRangeDays일 방문',
+          )
+        : AppLanguageController.instance.tr('Visits in range', '선택 기간 방문');
+    final selectionStart = _selectedDateRange == null
+        ? _parseDate(_selectedDate)
+        : DateTime(
+            _selectedDateRange!.start.year,
+            _selectedDateRange!.start.month,
+            _selectedDateRange!.start.day,
+          );
+    final selectionEnd = _selectedDateRange == null
+        ? _parseDate(_selectedDate)
+        : DateTime(
+            _selectedDateRange!.end.year,
+            _selectedDateRange!.end.month,
+            _selectedDateRange!.end.day,
+          );
+
+    bool isInSelection(String date) {
+      final parsed = _parseDate(date);
+      if (parsed == null || selectionStart == null || selectionEnd == null) {
+        return false;
+      }
+      return !parsed.isBefore(selectionStart) && !parsed.isAfter(selectionEnd);
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'í˜„í™©í‘œ (ì¹¨ìˆ ì‚¬ ì¸ì‚¬ì´íŠ¸)',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
+    final selectionSlots = _store.slots.where(
+      (slot) => isInSelection(slot.date),
+    );
+    var bookedSlots = 0;
+    var pendingSlotRequests = 0;
+    var openSlots = 0;
+    for (final slot in selectionSlots) {
+      final scheduledVisit = _store.scheduledVisitForSlot(slot.date, slot.time);
+      final latestRequest = _store.latestActiveRequestForSlot(
+        slot.date,
+        slot.time,
+      );
+      if (scheduledVisit != null) {
+        bookedSlots++;
+        continue;
+      }
+      if (latestRequest != null &&
+          latestRequest.status == AppointmentRequestStatus.pending) {
+        pendingSlotRequests++;
+        continue;
+      }
+      if (slot.isOpen) {
+        openSlots++;
+      }
+    }
+
+    return AppPanel(
+      padding: const EdgeInsets.all(24),
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppTheme.pine, AppTheme.jade, Color(0xFF2F7A67)],
+      ),
+      borderColor: Colors.white24,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final theme = Theme.of(context);
+          final wide = constraints.maxWidth >= 920;
+          Widget buildFocusCard({
+            required String step,
+            required String title,
+            required String value,
+            required String detail,
+            required IconData icon,
+            required Color accent,
+            VoidCallback? onTap,
+          }) {
+            return SizedBox(
+              width: wide ? 260 : double.infinity,
+              height: wide ? 252 : null,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onTap,
+                  borderRadius: BorderRadius.circular(24),
+                  child: Ink(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 34,
+                              height: 34,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: accent.withValues(alpha: 0.22),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(icon, color: Colors.white, size: 18),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                step,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.74),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          title,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          value,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (wide) const Spacer() else const SizedBox(height: 6),
+                        Text(
+                          detail,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.76),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          final intro = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLanguageController.instance.tr(
+                  'Clinic command center',
+                  '클리닉 운영 허브',
+                ),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.74),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                AppLanguageController.instance.tr(
+                  'Track patient movement, intake momentum, and follow-up risk in one place.',
+                  '환자 흐름, 문진 진행도, 후속 대응 리스크를 한 화면에서 관리합니다.',
+                ),
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                AppLanguageController.instance.tr(
+                  'Window: ${_formatStoredDateWithWeekday(summary.fromDate)} to ${_formatStoredDateWithWeekday(summary.toDate)} | Filtered patient cards: $filteredCount',
+                  '집계 기간: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)} | 현재 표시 환자 카드: $filteredCount',
+                ),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.82),
+                ),
+              ),
+            ],
+          );
+
+          final metrics = Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              AppMetricChip(
+                icon: Icons.calendar_today_outlined,
+                label: visitsMetricLabel,
+                value: '${summary.totalVisits}',
+                backgroundColor: Colors.white.withValues(alpha: 0.14),
+                labelColor: Colors.white.withValues(alpha: 0.72),
+                valueColor: Colors.white,
+                onTap: _scrollToDateSelectorPanel,
+              ),
+              AppMetricChip(
+                icon: Icons.notifications_active_outlined,
+                label: AppLanguageController.instance.tr(
+                  'Alert ready',
+                  '알림 가능',
+                ),
+                value: '$readyAlerts',
+                backgroundColor: Colors.white.withValues(alpha: 0.14),
+                labelColor: Colors.white.withValues(alpha: 0.72),
+                valueColor: Colors.white,
+                onTap: () => _focusPatientCards(statusFilter: 'Alert Ready'),
+              ),
+              AppMetricChip(
+                icon: Icons.pending_actions_outlined,
+                label: AppLanguageController.instance.tr(
+                  'Pending intakes',
+                  '진행중 문진',
+                ),
+                value: '$inProgressIntakes',
+                backgroundColor: Colors.white.withValues(alpha: 0.14),
+                labelColor: Colors.white.withValues(alpha: 0.72),
+                valueColor: Colors.white,
+                onTap: () => _focusPatientCards(statusFilter: 'In Progress'),
+              ),
+              AppMetricChip(
+                icon: Icons.mark_email_unread_outlined,
+                label: AppLanguageController.instance.tr('No response', '미응답'),
+                value: '$noResponse',
+                backgroundColor: Colors.white.withValues(alpha: 0.14),
+                labelColor: Colors.white.withValues(alpha: 0.72),
+                valueColor: Colors.white,
+                onTap: () => _focusPatientCards(statusFilter: 'No Response'),
+              ),
+            ],
+          );
+
+          final quickFocus = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLanguageController.instance.tr(
+                  'What to check first in this selection',
+                  '이 선택에서 먼저 볼 것',
+                ),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  buildFocusCard(
+                    step: AppLanguageController.instance.tr(
+                      '1. Requests',
+                      '1. 예약 신청',
+                    ),
+                    title: AppLanguageController.instance.tr(
+                      'Patient inbox first',
+                      '환자 쪽지함 먼저',
+                    ),
+                    value: AppLanguageController.instance.tr(
+                      '$pendingSlotRequests waiting',
+                      '$pendingSlotRequests건 대기',
+                    ),
+                    detail: AppLanguageController.instance.tr(
+                      'Open the inbox to confirm or decline appointment requests.',
+                      '먼저 예약 신청을 확인하고 확정/거절 처리하세요.',
+                    ),
+                    icon: Icons.mail_outline,
+                    accent: const Color(0xFF4E8EB4),
+                    onTap: _scrollToAppointmentInbox,
+                  ),
+                  buildFocusCard(
+                    step: AppLanguageController.instance.tr(
+                      '2. Schedule',
+                      '2. 예약 현황',
+                    ),
+                    title: AppLanguageController.instance.tr(
+                      'Shared slots and bookings',
+                      '공유 슬롯과 예약',
+                    ),
+                    value: AppLanguageController.instance.tr(
+                      '$bookedSlots booked · $openSlots open',
+                      '$bookedSlots건 예약 · $openSlots개 열림',
+                    ),
+                    detail: AppLanguageController.instance.tr(
+                      'Check which times are already booked and which slots patients can still request.',
+                      '이미 예약된 시간과 아직 열려 있는 슬롯을 바로 확인하세요.',
+                    ),
+                    icon: Icons.calendar_month_outlined,
+                    accent: const Color(0xFFC07A45),
+                    onTap: _scrollToAvailabilityBoard,
+                  ),
+                  buildFocusCard(
+                    step: AppLanguageController.instance.tr(
+                      '3. Follow-up',
+                      '3. 후속 확인',
+                    ),
+                    title: AppLanguageController.instance.tr(
+                      'Patients needing intake review',
+                      '문진 확인이 필요한 환자',
+                    ),
+                    value: AppLanguageController.instance.tr(
+                      '$inProgressIntakes pending · $noResponse no response',
+                      '$inProgressIntakes명 진행중 · $noResponse명 미응답',
+                    ),
+                    detail: AppLanguageController.instance.tr(
+                      'After inbox and schedule, review the patient cards that still need intake or follow-up attention.',
+                      '예약과 신청을 본 뒤에는 문진 미완료 환자 카드를 확인하면 됩니다.',
+                    ),
+                    icon: Icons.assignment_late_outlined,
+                    accent: const Color(0xFF2C8C6B),
+                    onTap: _scrollToPatientCards,
+                  ),
+                ],
+              ),
+            ],
+          );
+
+          final guideSteps = Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              AppGuideStep(
+                dark: true,
+                step: '1',
+                title: AppLanguageController.instance.tr(
+                  'Choose a date window',
+                  '날짜 범위 선택',
+                ),
+                description: AppLanguageController.instance.tr(
+                  'Start with the date or range panel so the rest of the dashboard reflects the right visit set.',
+                  '먼저 날짜나 기간을 정하면 대시보드 전체가 그 방문 집합에 맞춰집니다.',
+                ),
+              ),
+              AppGuideStep(
+                dark: true,
+                step: '2',
+                title: AppLanguageController.instance.tr(
+                  'Filter the patient list',
+                  '환자 목록 좁히기',
+                ),
+                description: AppLanguageController.instance.tr(
+                  'Use patient and status filters to reduce noise before opening a detailed card.',
+                  '환자와 상태 필터로 범위를 줄인 뒤 상세 카드를 여는 게 가장 빠릅니다.',
+                ),
+              ),
+              AppGuideStep(
+                dark: true,
+                step: '3',
+                title: AppLanguageController.instance.tr(
+                  'Open a patient card',
+                  '환자 카드 열기',
+                ),
+                description: AppLanguageController.instance.tr(
+                  'Once the list is narrowed down, move into the patient card and then the detail brief.',
+                  '목록이 정리되면 환자 카드를 열고 그 다음 상세 브리핑으로 들어가면 됩니다.',
+                ),
+              ),
+            ],
+          );
+          final guideSection = !_showDashboardGuide
+              ? const SizedBox.shrink()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          AppLanguageController.instance.tr(
+                            'Quick workflow guide',
+                            '빠른 사용 가이드',
+                          ),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          tooltip: AppLanguageController.instance.tr(
+                            'Hide guide',
+                            '가이드 숨기기',
+                          ),
+                          onPressed: () {
+                            setState(() => _showDashboardGuide = false);
+                          },
+                          icon: const Icon(Icons.close),
+                          color: Colors.white.withValues(alpha: 0.9),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    guideSteps,
+                  ],
+                );
+
+          if (!wide) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _MiniKpi(
-                  title: 'ì´ ë‚´ì› (${summary.days}ì¼)',
-                  value: '${summary.totalVisits}ëª…',
-                ),
-                _MiniKpi(title: 'ë“±ë¡ í™˜ìž', value: '${profiles.length}ëª…'),
-                _MiniKpi(
-                  title: 'ì•Œë¦¼ ê°€ëŠ¥',
-                  value:
-                      '${profiles.where((p) => p.hasRequiredAlertInfo).length}ëª…',
-                ),
-                const _MiniKpi(title: 'ìž¬ë‚´ì›ìœ¨', value: '63%'),
+                intro,
+                const SizedBox(height: 18),
+                metrics,
+                const SizedBox(height: 18),
+                quickFocus,
+                if (_showDashboardGuide) ...[
+                  const SizedBox(height: 18),
+                  guideSection,
+                ],
               ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'ì§‘ê³„ ê¸°ê°„: ${summary.fromDate} ~ ${summary.toDate}',
-              style: const TextStyle(color: Colors.black54),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'ì„±ë³„ êµ¬ì„±: ${sexCounts.entries.map((e) => '${e.key} ${e.value}ëª…').join(' Â· ')}',
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'ì¦ìƒ ì¶”ì„¸ Top3',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 4),
-            const Text('1) ìˆ˜ë©´/ìƒˆë²½ ê°ì„±  2) ëª©/ì–´ê¹¨ í†µì¦  3) ì†Œí™” ë¶ˆíŽ¸'),
-            const SizedBox(height: 8),
-            const Text('ìžì£¼ ì¤€ ì¡°ì–¸: ì·¨ì¹¨ ì „ ìŠ¤íŠ¸ë ˆì¹­ Â· ì¹´íŽ˜ì¸ ì‹œê°„ ì¡°ì ˆ Â· ì‹í›„ 10ë¶„ ê±·ê¸°'),
-          ],
-        ),
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 10, child: intro),
+                  const SizedBox(width: 18),
+                  Expanded(
+                    flex: 9,
+                    child: Align(alignment: Alignment.topRight, child: metrics),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              quickFocus,
+              if (_showDashboardGuide) ...[
+                const SizedBox(height: 18),
+                guideSection,
+              ],
+            ],
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildInsightPanel(_VisitWindowSummary summary) {
+    final lang = AppLanguageController.instance;
+    final visibleVisits = _visibleVisits();
+    final visibleProfiles = {
+      for (final scheduledVisit in visibleVisits)
+        scheduledVisit.profile.id: scheduledVisit.profile,
+    }.values.toList();
+    final sexCounts = <String, int>{};
+    for (final profile in visibleProfiles) {
+      sexCounts.update(profile.sex, (value) => value + 1, ifAbsent: () => 1);
+    }
+    final contactReadyCount = visibleProfiles
+        .where((profile) => profile.hasRequiredAlertInfo)
+        .length;
+    final completedVisits = visibleVisits
+        .where((visit) => visit.visit.intakeStatus == IntakeStatus.completed)
+        .length;
+    final inProgressVisits = visibleVisits
+        .where((visit) => visit.visit.intakeStatus == IntakeStatus.inProgress)
+        .length;
+    final noResponseVisits = visibleVisits
+        .where((visit) => visit.visit.intakeStatus == IntakeStatus.notStarted)
+        .length;
+    final intakeCompletionRate = visibleVisits.isEmpty
+        ? 0
+        : ((completedVisits / visibleVisits.length) * 100).round();
+    final topCareFocus = _topCountEntry(_careFocusCounts(visibleVisits));
+    final topIntakeTopic = _topCountEntry(_intakeCategoryCounts(visibleVisits));
+    final signalLines = <String>[
+      if (topCareFocus != null)
+        lang.tr(
+          'Most repeated care focus: ${topCareFocus.key} (${topCareFocus.value} visits)',
+          '가장 자주 본 케어 포커스: ${topCareFocus.key} ${topCareFocus.value}건',
+        ),
+      if (topIntakeTopic != null)
+        lang.tr(
+          'Most repeated intake topic: ${topIntakeTopic.key} (${topIntakeTopic.value} mentions)',
+          '가장 자주 나온 문진 주제: ${topIntakeTopic.key} ${topIntakeTopic.value}건',
+        ),
+      if (noResponseVisits > 0 || inProgressVisits > 0)
+        lang.tr(
+          'Follow-up gap now: $noResponseVisits no response · $inProgressVisits in progress',
+          '바로 확인할 후속 대응: 미응답 $noResponseVisits명 · 진행중 $inProgressVisits명',
+        )
+      else
+        lang.tr(
+          'All visible visits have a completed intake.',
+          '현재 보이는 일정은 모두 문진 완료 상태입니다.',
+        ),
+    ];
+
+    final theme = Theme.of(context);
+
+    return AppPanel(
+      padding: const EdgeInsets.all(20),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.92),
+          AppTheme.mint.withValues(alpha: 0.58),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            lang.tr('Selection Snapshot', '선택 기간 요약'),
+            style: theme.textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            lang.tr(
+              'A quick read on how many visits are in this selection and what needs attention first.',
+              '지금 선택한 기간에 방문이 얼마나 있고, 무엇부터 확인하면 되는지 빠르게 보는 영역입니다.',
+            ),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.72),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _MiniKpi(
+                title: lang.tr('Visits in selection', '선택 기간 방문'),
+                value: AppLanguageController.instance.tr(
+                  '${summary.totalVisits}',
+                  '${summary.totalVisits}명',
+                ),
+                helper: lang.tr(
+                  'Total visit count in this range',
+                  '이 기간에 잡힌 전체 방문 수',
+                ),
+              ),
+              _MiniKpi(
+                title: lang.tr('Patients in view', '방문 환자'),
+                value: AppLanguageController.instance.tr(
+                  '${visibleProfiles.length}',
+                  '${visibleProfiles.length}명',
+                ),
+                helper: lang.tr('Unique patients, no duplicates', '중복 제외 환자 수'),
+              ),
+              _MiniKpi(
+                title: lang.tr('Contact ready', '연락 가능 환자'),
+                value: AppLanguageController.instance.tr(
+                  '$contactReadyCount',
+                  '$contactReadyCount명',
+                ),
+                helper: lang.tr(
+                  'Phone and email are both saved',
+                  '전화·이메일이 모두 저장됨',
+                ),
+              ),
+              _MiniKpi(
+                title: lang.tr('Intake completion', '문진 완료율'),
+                value: '$intakeCompletionRate%',
+                helper: lang.tr(
+                  'Share of visits with intake completed',
+                  '문진 완료된 일정 비율',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            lang.tr(
+              'Summary Window: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)}',
+              '집계 기간: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)}',
+            ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.62),
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (sexCounts.isNotEmpty)
+            Text(
+              lang.tr(
+                'Patient mix: ${sexCounts.entries.map((e) => '${e.key} ${e.value}').join(' · ')}',
+                '환자 구성: ${sexCounts.entries.map((e) => '${e.key} ${e.value}명').join(' · ')}',
+              ),
+              style: theme.textTheme.bodyLarge,
+            ),
+          if (signalLines.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              lang.tr('Current Care Signals', '이번 기간 인사이트'),
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            ...signalLines.map(
+              (line) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 6),
+                      child: Icon(Icons.circle, size: 7, color: AppTheme.pine),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        line,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.ink.withValues(alpha: 0.78),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Map<String, int> _intakeCategoryCounts(List<ScheduledVisit> visits) {
+    final counts = <String, int>{};
+    for (final scheduledVisit in visits) {
+      final seenCategories = <String>{};
+      for (final qa in scheduledVisit.visit.qaList) {
+        final label = _localizedQaCategory(qa.category);
+        if (label.isEmpty || !seenCategories.add(label)) {
+          continue;
+        }
+        counts.update(label, (value) => value + 1, ifAbsent: () => 1);
+      }
+    }
+    return counts;
+  }
+
+  Map<String, int> _careFocusCounts(List<ScheduledVisit> visits) {
+    final lang = AppLanguageController.instance;
+    final counts = <String, int>{};
+
+    void registerTheme(String label) {
+      counts.update(label, (value) => value + 1, ifAbsent: () => 1);
+    }
+
+    for (final scheduledVisit in visits) {
+      final visit = scheduledVisit.visit;
+      final text = [
+        visit.previousTreatmentArea,
+        visit.previousSessionNote,
+        ...visit.qaList.map(
+          (qa) => '${qa.category} ${qa.question} ${qa.answer}',
+        ),
+      ].join(' ').toLowerCase();
+      final matchedThemes = <String>{};
+
+      bool containsAny(List<String> keywords) =>
+          keywords.any((keyword) => text.contains(keyword));
+
+      if (containsAny([
+        'neck',
+        'shoulder',
+        'scapular',
+        'cervical',
+        'trapezius',
+      ])) {
+        matchedThemes.add(lang.tr('Neck / shoulder', '목·어깨'));
+      }
+      if (containsAny(['sleep', 'waking', 'fatigue', 'energy', '새벽', '수면'])) {
+        matchedThemes.add(lang.tr('Sleep / energy', '수면·기력'));
+      }
+      if (containsAny([
+        'digestion',
+        'digestive',
+        'abdominal',
+        'bloating',
+        'reflux',
+        '식후',
+        '소화',
+      ])) {
+        matchedThemes.add(lang.tr('Digestion', '소화'));
+      }
+      if (containsAny([
+        'headache',
+        'temple',
+        'sinus',
+        'eye strain',
+        'tinnitus',
+        '두통',
+      ])) {
+        matchedThemes.add(lang.tr('Head / HEENT', '두부·heent'));
+      }
+      if (containsAny([
+        'lumbar',
+        'glute',
+        'hamstring',
+        'low back',
+        'driving',
+        '허리',
+      ])) {
+        matchedThemes.add(lang.tr('Low back', '허리'));
+      }
+
+      for (final label in matchedThemes) {
+        registerTheme(label);
+      }
+    }
+
+    return counts;
+  }
+
+  String _localizedQaCategory(String value) {
+    final lang = AppLanguageController.instance;
+    switch (value.trim()) {
+      case 'Temperature/Sweat':
+        return lang.tr('Temperature / Sweat', '한열·땀');
+      case 'Appetite/Thirst':
+        return lang.tr('Appetite / Thirst', '식욕·갈증');
+      case 'Sleep':
+        return lang.tr('Sleep', '수면');
+      case 'Digestion':
+        return lang.tr('Digestion', '소화');
+      case 'Urine':
+        return lang.tr('Urine', '소변');
+      case 'Stool':
+        return lang.tr('Stool', '대변');
+      case 'Menses':
+        return lang.tr('Menses', '생리');
+      case 'HEENT':
+        return lang.tr('HEENT', '두부·heent');
+      case 'Emotion':
+        return lang.tr('Emotion', '감정·스트레스');
+      case 'Energy':
+        return lang.tr('Energy', '기력');
+      default:
+        return value.trim();
+    }
+  }
+
+  MapEntry<String, int>? _topCountEntry(Map<String, int> counts) {
+    if (counts.isEmpty) {
+      return null;
+    }
+    final entries = counts.entries.toList()
+      ..sort((a, b) {
+        final byCount = b.value.compareTo(a.value);
+        return byCount != 0 ? byCount : a.key.compareTo(b.key);
+      });
+    return entries.first;
   }
 
   Widget _buildDateSelectorPanel() {
     final dates = _store.allDates;
     final selectedDate = _parseDate(_selectedDate) ?? DateTime.now();
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'ë‚ ì§œë³„ í™˜ìž ë³´ê¸°',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+    final theme = Theme.of(context);
+    return AppPanel(
+      padding: const EdgeInsets.all(20),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.92),
+          AppTheme.blush.withValues(alpha: 0.54),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppLanguageController.instance.tr('Patients by Date', '날짜별 환자 보기'),
+            style: theme.textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            AppLanguageController.instance.tr(
+              'Switch between rolling windows and specific clinic dates without losing context.',
+              '최근 기간과 특정 날짜를 오가면서도 환자 문맥을 유지할 수 있습니다.',
             ),
-            const SizedBox(height: 10),
-            const Text('ê¸°ê°„ ì„ íƒ', style: TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _rangeChip(7),
-                _rangeChip(14),
-                _rangeChip(30),
-                OutlinedButton.icon(
-                  onPressed: _pickDateRangeWithDialog,
-                  icon: const Icon(Icons.date_range_outlined),
-                  label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.72),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            AppLanguageController.instance.tr('Range Selection', '기간 선택'),
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _rangeChip(7),
+              _rangeChip(14),
+              _rangeChip(30),
+              OutlinedButton.icon(
+                onPressed: _pickDateRangeWithDialog,
+                icon: const Icon(Icons.date_range_outlined),
+                label: Text(
+                  AppLanguageController.instance.tr('Select Range', '기간 선택'),
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: dates.map((date) {
-                final count = _store.visitsForDate(date).length;
-                final isSelected =
-                    _selectedDate == date && _selectedDateRange == null;
-                return ChoiceChip(
-                  selected: isSelected,
-                  label: Text('$date  $countëª…'),
-                  onSelected: (_) {
-                    setState(() {
-                      _selectedDate = date;
-                      _selectedDateRange = null;
-                      _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                OutlinedButton.icon(
-                  onPressed: _pickDateFromCalendar,
-                  icon: const Icon(Icons.calendar_month_outlined),
-                  label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _selectedDateRange == null
-                        ? 'ì„ íƒ ë‚ ì§œ: ${_formatDate(selectedDate)}'
-                        : 'ì„ íƒ ê¸°ê°„: ${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)}',
-                    style: const TextStyle(color: Colors.black54),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: dates.map((date) {
+              final count = _store.visitsForDate(date).length;
+              final isSelected =
+                  _selectedDate == date && _selectedDateRange == null;
+              return ChoiceChip(
+                selected: isSelected,
+                label: Text(
+                  AppLanguageController.instance.tr(
+                    '${_formatStoredDateWithWeekday(date)}  $count',
+                    '${_formatStoredDateWithWeekday(date)}  $count명',
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+                onSelected: (_) {
+                  setState(() {
+                    _selectedDate = date;
+                    _selectedDateRange = null;
+                    _selectedPatientFilter = 'All Patients';
+                    _selectedStatusFilter = 'All';
+                  });
+                },
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              OutlinedButton.icon(
+                onPressed: _pickDateFromCalendar,
+                icon: const Icon(Icons.calendar_month_outlined),
+                label: Text(
+                  AppLanguageController.instance.tr('Pick Date', '날짜 선택'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _selectedDateRange == null
+                      ? AppLanguageController.instance.tr(
+                          'Selected Date: ${_formatDateWithWeekday(selectedDate)}',
+                          '선택 날짜: ${_formatDateWithWeekday(selectedDate)}',
+                        )
+                      : AppLanguageController.instance.tr(
+                          'Selected Range: ${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)}',
+                          '선택 기간: ${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)}',
+                        ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.62),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -413,12 +1437,15 @@ class _PractitionerDashboardScreenState
     final selected = _selectedDateRange == null && _selectedRangeDays == days;
     return ChoiceChip(
       selected: selected,
-      label: Text('ìµœê·¼ $daysì¼'),
+      label: Text(
+        AppLanguageController.instance.tr('Last $days days', '최근 $days일'),
+      ),
       onSelected: (_) {
         setState(() {
           _selectedRangeDays = days;
           _selectedDateRange = null;
-          _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
+          _selectedPatientFilter = 'All Patients';
+          _selectedStatusFilter = 'All';
         });
       },
     );
@@ -427,15 +1454,36 @@ class _PractitionerDashboardScreenState
   Widget _statusFilterChip(String value) {
     return ChoiceChip(
       selected: _selectedStatusFilter == value,
-      label: Text(value),
+      label: Text(_statusFilterLabel(value)),
       onSelected: (_) {
         setState(() => _selectedStatusFilter = value);
       },
     );
   }
 
+  String _statusFilterLabel(String value) {
+    switch (value) {
+      case 'All':
+        return AppLanguageController.instance.tr('All', '전체');
+      case 'Alert Ready':
+        return AppLanguageController.instance.tr('Alert Ready', '알림 가능');
+      case 'Missing Profile':
+        return AppLanguageController.instance.tr('Missing Profile', '정보 부족');
+      case 'No Response':
+        return AppLanguageController.instance.tr('No Response', '미응답');
+      case 'In Progress':
+        return AppLanguageController.instance.tr('In Progress', '진행중');
+      case 'Complete':
+        return AppLanguageController.instance.tr('Complete', '완료');
+      default:
+        return value;
+    }
+  }
+
   bool _matchesStatusFilter(ScheduledVisit scheduledVisit) {
     switch (_selectedStatusFilter) {
+      case 'Alert Ready':
+        return scheduledVisit.profile.hasRequiredAlertInfo;
       case 'Missing Profile':
         return !scheduledVisit.profile.hasRequiredAlertInfo;
       case 'No Response':
@@ -450,44 +1498,17 @@ class _PractitionerDashboardScreenState
     }
   }
 
-  Widget _buildUpcomingBoard(List<ScheduledVisit> upcoming) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'ë‹¤ê°€ì˜¤ëŠ” í™˜ìž ë³´ë“œ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 10),
-            ...upcoming.map((scheduledVisit) {
-              final profile = scheduledVisit.profile;
-              final visit = scheduledVisit.visit;
-              final preview = visit.qaList.isEmpty
-                  ? 'ë¬¸ì§„ ë¯¸ìž‘ì„±'
-                  : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('${visit.date} Â· ${visit.time} Â· ${profile.name}'),
-                subtitle: Text(
-                  '$preview\nì—°ë½ì²˜: ${profile.phone.isEmpty ? 'ë¯¸ìž…ë ¥' : profile.phone}',
-                ),
-                trailing: Chip(label: Text(visit.intakeStatus.label)),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPatientCard(BuildContext context, ScheduledVisit scheduledVisit) {
+  Widget _buildPatientCard(
+    BuildContext context,
+    ScheduledVisit scheduledVisit,
+  ) {
     final profile = scheduledVisit.profile;
     final visit = scheduledVisit.visit;
     final firstQa = visit.qaList.isEmpty
-        ? 'ë¬¸ì§„ ë¯¸ì œì¶œ - ì„¸ì…˜ ì „ ì§ì ‘ í™•ì¸ í•„ìš”'
+        ? AppLanguageController.instance.tr(
+            'No intake submitted yet - please review directly before the session',
+            '문진 미제출 - 세션 전 직접 확인 필요',
+          )
         : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
     final canSendRequest = profile.hasRequiredAlertInfo;
 
@@ -506,7 +1527,7 @@ class _PractitionerDashboardScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${profile.name} Â· ${visit.date} ${visit.time}',
+                        '${profile.name} · ${_formatStoredDateWithWeekday(visit.date)} ${visit.time}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
@@ -515,7 +1536,12 @@ class _PractitionerDashboardScreenState
                       const SizedBox(height: 6),
                       Text(firstQa),
                       const SizedBox(height: 6),
-                      Text('ì§€ë‚œ ë°©ë¬¸: ${visit.lastVisitDate} (${visit.daysAgo}ì¼ ì „)'),
+                      Text(
+                        AppLanguageController.instance.tr(
+                          'Last Visit: ${_formatStoredDateWithWeekday(visit.lastVisitDate)} (${visit.daysAgo} days ago)',
+                          '지난 방문: ${_formatStoredDateWithWeekday(visit.lastVisitDate)} (${visit.daysAgo}일 전)',
+                        ),
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         _visitTrailLabel(visit),
@@ -527,11 +1553,11 @@ class _PractitionerDashboardScreenState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'ì—°ë½ì²˜: ${profile.phone.isEmpty ? 'ë¯¸ìž…ë ¥' : profile.phone} / ${profile.email.isEmpty ? 'ì´ë©”ì¼ ë¯¸ìž…ë ¥' : profile.email}',
+                        '${AppLanguageController.instance.tr('Contact', '연락처')}: ${profile.phone.isEmpty ? AppLanguageController.instance.tr('Missing', '미입력') : profile.phone} / ${profile.email.isEmpty ? AppLanguageController.instance.tr('Email missing', '이메일 미입력') : profile.email}',
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'í™˜ìž ì •ë³´: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
+                        '${AppLanguageController.instance.tr('Profile', '환자 정보')}: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
                       ),
                     ],
                   ),
@@ -545,10 +1571,28 @@ class _PractitionerDashboardScreenState
               runSpacing: 8,
               children: [
                 FilledButton.tonalIcon(
-                  onPressed:
-                      canSendRequest ? () => _sendReminder(context, scheduledVisit) : null,
+                  onPressed: canSendRequest
+                      ? () => _sendReminder(context, scheduledVisit)
+                      : null,
                   icon: const Icon(Icons.notifications_active_outlined),
-                  label: Text(canSendRequest ? 'ë‹µë³€ ìš”ì²­' : 'ì—°ë½ì²˜ í•„ìš”'),
+                  label: Text(
+                    canSendRequest
+                        ? AppLanguageController.instance.tr(
+                            'Request Answers',
+                            '답변 요청',
+                          )
+                        : AppLanguageController.instance.tr(
+                            'Contact Needed',
+                            '연락처 필요',
+                          ),
+                  ),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => _sendPatientNote(context, scheduledVisit),
+                  icon: const Icon(Icons.mail_outline),
+                  label: Text(
+                    AppLanguageController.instance.tr('Send Note', '쪽지 보내기'),
+                  ),
                 ),
                 FilledButton.icon(
                   onPressed: () {
@@ -562,15 +1606,20 @@ class _PractitionerDashboardScreenState
                     );
                   },
                   icon: const Icon(Icons.chevron_right),
-                  label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
+                  label: Text(
+                    AppLanguageController.instance.tr('View Detail', '상세 보기'),
+                  ),
                 ),
               ],
             ),
             if (!canSendRequest) ...[
               const SizedBox(height: 8),
-              const Text(
-                'í™˜ìž ì •ë³´ ê´€ë¦¬ì—ì„œ ì „í™”ë²ˆí˜¸ì™€ ì´ë©”ì¼ì„ ëª¨ë‘ ìž…ë ¥í•´ì•¼ ë‹µë³€ ìš”ì²­ ì „ì†¡ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤.',
-                style: TextStyle(color: Colors.redAccent),
+              Text(
+                AppLanguageController.instance.tr(
+                  'You can only send an answer request after both phone number and email are saved in Patient Management.',
+                  '환자 정보 관리에서 전화번호와 이메일을 모두 입력해야 답변 요청 전송이 가능합니다.',
+                ),
+                style: const TextStyle(color: Colors.redAccent),
               ),
             ],
             const SizedBox(height: 12),
@@ -588,12 +1637,915 @@ class _PractitionerDashboardScreenState
         _selectedDateRange!.end,
       );
     }
-    final selected = _parseDate(_selectedDate);
-    if (selected == null) {
+    if (_selectedDate.isEmpty) {
       return const [];
     }
-    final start = selected.subtract(Duration(days: _selectedRangeDays - 1));
-    return _store.visitsInRange(start, selected);
+    return _store.visitsForDate(_selectedDate);
+  }
+
+  Widget _buildPatientInboxBoard() {
+    final lang = AppLanguageController.instance;
+    final requests =
+        _store.appointmentRequests
+            .where(
+              (request) => request.status == AppointmentRequestStatus.pending,
+            )
+            .toList()
+          ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLanguageController.instance.tr('Patient Inbox', '환자 쪽지함'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              AppLanguageController.instance.tr(
+                'Check patient-sent appointment requests, visit-record updates, and recent intake submissions in one place.',
+                '환자가 보낸 예약 신청, 방문기록 수정 요청, 최근 문진 제출을 여기서 한 번에 확인합니다.',
+              ),
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 12),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('visit_record_feedback')
+                  .snapshots(),
+              builder: (context, feedbackSnapshot) {
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('intake_submissions')
+                      .snapshots(),
+                  builder: (context, submissionSnapshot) {
+                    final pendingFeedbackCount =
+                        [...?feedbackSnapshot.data?.docs].where((doc) {
+                          final data = doc.data();
+                          final feedbackText =
+                              (data['feedbackText'] as String? ?? '').trim();
+                          return feedbackText.isNotEmpty &&
+                              (data['status'] ?? 'pending') != 'reviewed';
+                        }).length;
+                    final recentSubmissionCount =
+                        [...?submissionSnapshot.data?.docs].where((doc) {
+                          final source = (doc.data()['source'] ?? '')
+                              .toString();
+                          return source.isEmpty ||
+                              source == 'patient_intake_screen';
+                        }).length;
+
+                    return Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        AppMetricChip(
+                          icon: Icons.calendar_today_outlined,
+                          label: lang.tr('Appointment requests', '예약 신청'),
+                          value: '${requests.length}',
+                          onTap: _scrollToAppointmentRequestsSection,
+                        ),
+                        AppMetricChip(
+                          icon: Icons.mark_email_unread_outlined,
+                          label: lang.tr('Record updates', '수정 요청'),
+                          value: '$pendingFeedbackCount',
+                          onTap: _scrollToRecordUpdatesSection,
+                        ),
+                        AppMetricChip(
+                          icon: Icons.assignment_turned_in_outlined,
+                          label: lang.tr('Recent submissions', '최근 제출'),
+                          value: '$recentSubmissionCount',
+                          onTap: _scrollToRecentSubmissionsSection,
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            KeyedSubtree(
+              key: _appointmentRequestsSectionKey,
+              child: Text(
+                lang.tr('Pending appointment requests', '대기 중인 예약 신청'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            const SizedBox(height: 6),
+            if (requests.isEmpty)
+              Text(
+                AppLanguageController.instance.tr(
+                  'There are no pending appointment requests right now.',
+                  '지금 확인할 예약 신청이 없습니다.',
+                ),
+              )
+            else
+              ...requests.map((request) {
+                final profile = _store.profileById(request.patientId);
+                if (profile == null) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${profile.name} · ${_formatStoredDateWithWeekday(request.date)} ${request.time}',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${AppLanguageController.instance.tr('Requested At', '신청 시각')}: '
+                          '${_formatDateTimeValue(request.requestedAt)}',
+                        ),
+                        Text(
+                          '${AppLanguageController.instance.tr('Contact', '연락처')}: '
+                          '${profile.phone.isEmpty ? AppLanguageController.instance.tr('Missing', '미입력') : profile.phone}'
+                          ' / '
+                          '${profile.email.isEmpty ? AppLanguageController.instance.tr('Email missing', '이메일 미입력') : profile.email}',
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            FilledButton.icon(
+                              onPressed: () {
+                                _store.confirmAppointmentRequest(request.id);
+                              },
+                              icon: const Icon(Icons.check_circle_outline),
+                              label: Text(
+                                AppLanguageController.instance.tr(
+                                  'Confirm',
+                                  '확정하기',
+                                ),
+                              ),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                _store.declineAppointmentRequest(request.id);
+                              },
+                              icon: const Icon(Icons.cancel_outlined),
+                              label: Text(
+                                AppLanguageController.instance.tr(
+                                  'Decline',
+                                  '거절하기',
+                                ),
+                              ),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () =>
+                                  _openLatestPatientBriefForProfile(profile),
+                              icon: const Icon(Icons.history_outlined),
+                              label: Text(lang.tr('Open History', '기존 기록 보기')),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () => _openPatientManagement(
+                                context,
+                                initialProfileId: profile.id,
+                              ),
+                              icon: const Icon(Icons.person_outline),
+                              label: Text(lang.tr('Patient Info', '환자 정보')),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            const SizedBox(height: 16),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('visit_record_feedback')
+                  .snapshots(),
+              builder: (context, feedbackSnapshot) {
+                final pendingFeedbackDocs = [...?feedbackSnapshot.data?.docs]
+                  ..sort((a, b) {
+                    final aDate = (a.data()['updatedAt'] as Timestamp?)
+                        ?.toDate();
+                    final bDate = (b.data()['updatedAt'] as Timestamp?)
+                        ?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(
+                      aDate ?? DateTime(2000),
+                    );
+                  });
+                final actionableDocs = pendingFeedbackDocs.where((doc) {
+                  final data = doc.data();
+                  final feedbackText = (data['feedbackText'] as String? ?? '')
+                      .trim();
+                  return feedbackText.isNotEmpty &&
+                      (data['status'] ?? 'pending') != 'reviewed';
+                }).toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KeyedSubtree(
+                      key: _recordUpdatesSectionKey,
+                      child: Text(
+                        lang.tr('Visit-record update requests', '방문기록 수정 요청'),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      lang.tr(
+                        'Patient notes from Visit History appear here until you mark them as reviewed.',
+                        '환자가 Visit History에서 보낸 수정 메모는 확인 처리 전까지 여기에 남습니다.',
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.66),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    if (!feedbackSnapshot.hasData)
+                      const LinearProgressIndicator(minHeight: 4)
+                    else if (feedbackSnapshot.hasError)
+                      Text(
+                        lang.tr(
+                          'Could not load patient update messages.',
+                          '환자 수정 요청을 불러오지 못했습니다.',
+                        ),
+                        style: const TextStyle(color: Colors.redAccent),
+                      )
+                    else if (actionableDocs.isEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceSoft.withValues(alpha: 0.62),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppTheme.border),
+                        ),
+                        child: Text(
+                          lang.tr(
+                            'No patient record-update messages are waiting right now.',
+                            '지금 대기 중인 방문기록 수정 요청이 없습니다.',
+                          ),
+                        ),
+                      )
+                    else
+                      ...actionableDocs.take(4).map((doc) {
+                        final data = doc.data();
+                        final patientId = (data['patientId'] ?? '').toString();
+                        final visitId = (data['visitId'] ?? '').toString();
+                        final patientName = (data['patientName'] ?? '')
+                            .toString();
+                        final visitDate = (data['visitDate'] ?? '-').toString();
+                        final visitTime = (data['visitTime'] ?? '-').toString();
+                        final feedbackText = (data['feedbackText'] ?? '')
+                            .toString()
+                            .trim();
+                        final updatedAt = (data['updatedAt'] as Timestamp?)
+                            ?.toDate();
+                        final profile = _store.profileById(patientId);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF7FBFA),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFD7EAE6),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$patientName · ${_formatStoredDateWithWeekday(visitDate)} $visitTime',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${lang.tr('Updated At', '수정 시각')}: ${updatedAt == null ? lang.tr('Just now', '방금 전') : _formatDateTimeValue(updatedAt)}',
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: AppTheme.border),
+                                  ),
+                                  child: Text(feedbackText),
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    FilledButton.tonalIcon(
+                                      onPressed:
+                                          patientId.isEmpty || visitId.isEmpty
+                                          ? null
+                                          : () async {
+                                              await AppFirestoreService.markVisitRecordFeedbackReviewed(
+                                                patientId: patientId,
+                                                visitId: visitId,
+                                              );
+                                              if (!context.mounted) {
+                                                return;
+                                              }
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    lang.tr(
+                                                      'Marked the patient update as reviewed.',
+                                                      '환자 수정 요청을 확인 완료로 표시했습니다.',
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                      icon: const Icon(
+                                        Icons.mark_email_read_outlined,
+                                      ),
+                                      label: Text(
+                                        lang.tr('Mark Reviewed', '확인 완료'),
+                                      ),
+                                    ),
+                                    OutlinedButton.icon(
+                                      onPressed: profile == null
+                                          ? null
+                                          : () => _openPatientManagement(
+                                              context,
+                                              initialProfileId: profile.id,
+                                            ),
+                                      icon: const Icon(Icons.person_outline),
+                                      label: Text(
+                                        lang.tr('Patient Info', '환자 정보'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('intake_submissions')
+                  .snapshots(),
+              builder: (context, submissionSnapshot) {
+                final recentSubmissionDocs = [...?submissionSnapshot.data?.docs]
+                  ..sort((a, b) {
+                    final aDate = (a.data()['submittedAt'] as Timestamp?)
+                        ?.toDate();
+                    final bDate = (b.data()['submittedAt'] as Timestamp?)
+                        ?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(
+                      aDate ?? DateTime(2000),
+                    );
+                  });
+                final patientSubmissions = recentSubmissionDocs
+                    .where((doc) {
+                      final source = (doc.data()['source'] ?? '').toString();
+                      return source.isEmpty ||
+                          source == 'patient_intake_screen';
+                    })
+                    .take(4)
+                    .toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KeyedSubtree(
+                      key: _recentSubmissionsSectionKey,
+                      child: Text(
+                        lang.tr('Recent intake submissions', '최근 문진 제출'),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      lang.tr(
+                        'When patients submit from their side, the newest intake updates appear here.',
+                        '환자 화면에서 문진을 제출하면 최신 내용이 여기로 올라옵니다.',
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.66),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    if (!submissionSnapshot.hasData)
+                      const LinearProgressIndicator(minHeight: 4)
+                    else if (submissionSnapshot.hasError)
+                      Text(
+                        lang.tr(
+                          'Could not load recent patient submissions.',
+                          '최근 환자 문진 제출을 불러오지 못했습니다.',
+                        ),
+                        style: const TextStyle(color: Colors.redAccent),
+                      )
+                    else if (patientSubmissions.isEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceSoft.withValues(alpha: 0.62),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppTheme.border),
+                        ),
+                        child: Text(
+                          lang.tr(
+                            'No recent patient intake submissions are available yet.',
+                            '아직 최근 환자 문진 제출이 없습니다.',
+                          ),
+                        ),
+                      )
+                    else
+                      ...patientSubmissions.map((doc) {
+                        final data = doc.data();
+                        final patientId = (data['patientId'] ?? '').toString();
+                        final patientName = (data['patientName'] ?? '')
+                            .toString();
+                        final visitType = (data['visitType'] ?? 'follow_up')
+                            .toString();
+                        final answers =
+                            (data['answers'] as List<dynamic>? ?? const [])
+                                .length;
+                        final extraMemo = (data['extraMemo'] as String? ?? '')
+                            .trim();
+                        final submittedAt = (data['submittedAt'] as Timestamp?)
+                            ?.toDate();
+                        final profile = _store.profileById(patientId);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  patientName.isEmpty
+                                      ? lang.tr('Unknown patient', '미확인 환자')
+                                      : patientName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${lang.tr('Submitted At', '제출 시각')}: ${submittedAt == null ? lang.tr('Just now', '방금 전') : _formatDateTimeValue(submittedAt)}',
+                                ),
+                                Text(
+                                  '${lang.tr('Visit Type', '방문 유형')}: ${visitType == 'initial' ? lang.tr('Initial', '초진') : lang.tr('Follow-up', '재진')} · ${lang.tr('Answers', '답변')} $answers',
+                                ),
+                                if (extraMemo.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text('${lang.tr('Memo', '메모')}: $extraMemo'),
+                                ],
+                                const SizedBox(height: 8),
+                                OutlinedButton.icon(
+                                  onPressed: profile == null
+                                      ? null
+                                      : () => _openPatientManagement(
+                                          context,
+                                          initialProfileId: profile.id,
+                                        ),
+                                  icon: const Icon(Icons.person_outline),
+                                  label: Text(lang.tr('Patient Info', '환자 정보')),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvailabilityBoard() {
+    final lang = AppLanguageController.instance;
+    final grouped = <String, List<AppointmentSlot>>{};
+    for (final slot in _store.slots) {
+      grouped.putIfAbsent(slot.date, () => <AppointmentSlot>[]).add(slot);
+    }
+    final dates = grouped.keys.toList()..sort();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    AppLanguageController.instance.tr(
+                      'Shared Time Slots',
+                      '공유 예약 슬롯',
+                    ),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: lang.tr('Open daily patient counts', '날짜별 환자 수 보기'),
+                  onPressed: _openAvailabilityDateCountsSheet,
+                  icon: const Icon(Icons.calendar_month_outlined),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              lang.tr(
+                'Turn off any time you do not want patients to see. Reserved patients appear by name, and you can tap them to open patient info.',
+                '침술사가 원하지 않는 시간은 꺼둘 수 있고, 예약된 환자는 이름으로 표시되며 눌러서 환자 정보를 볼 수 있습니다.',
+              ),
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 12),
+            ...dates.map((date) {
+              final slots = grouped[date]!
+                ..sort((a, b) => a.time.compareTo(b.time));
+              final patientCount = _store.visitsForDate(date).length;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _formatStoredDateWithWeekday(date),
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      lang.tr(
+                        'Patients on this date: $patientCount',
+                        '이 날짜 환자 수: $patientCount명',
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.68),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: slots.map((slot) {
+                        final occupancy = _slotOccupancyFor(slot);
+                        if (occupancy != null) {
+                          final isConfirmed = occupancy.scheduledVisit != null;
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: () => _openReservedSlotPatientInfo(
+                                context,
+                                occupancy,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isConfirmed
+                                      ? const Color(0xFFE3F3EF)
+                                      : const Color(0xFFF6E7D7),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: isConfirmed
+                                        ? const Color(0xFFCFE6DE)
+                                        : const Color(0xFFE2C6A6),
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          isConfirmed
+                                              ? Icons.event_available_outlined
+                                              : Icons.hourglass_top_outlined,
+                                          size: 16,
+                                          color: isConfirmed
+                                              ? AppTheme.pine
+                                              : AppTheme.copper,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Flexible(
+                                          child: Text(
+                                            occupancy.profile.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${slot.time} · ${isConfirmed ? lang.tr('Booked', '예약됨') : lang.tr('Pending', '대기중')}',
+                                      style: TextStyle(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.68,
+                                        ),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return FilterChip(
+                          selected: slot.isOpen,
+                          label: Text(
+                            slot.isOpen
+                                ? '${slot.time} ${lang.tr('Open', '열림')}'
+                                : '${slot.time} ${lang.tr('Hidden', '숨김')}',
+                          ),
+                          onSelected: (selected) {
+                            _store.setSlotOpen(slot.date, slot.time, selected);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openAvailabilityDateCountsSheet() async {
+    final lang = AppLanguageController.instance;
+    final dates = _store.allDates..sort();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  lang.tr('Daily patient counts', '날짜별 환자 수'),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  lang.tr(
+                    'Use this list to check how many patients are scheduled for each slot date.',
+                    '각 슬롯 날짜마다 몇 명의 환자가 잡혀 있는지 빠르게 확인하는 목록입니다.',
+                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ...dates.map((date) {
+                  final patientCount = _store.visitsForDate(date).length;
+                  return Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppTheme.border),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _formatStoredDateWithWeekday(date),
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.mint.withValues(alpha: 0.62),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            lang.tr('$patientCount patients', '$patientCount명'),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(
+                                  color: AppTheme.pine,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _SlotOccupancy? _slotOccupancyFor(AppointmentSlot slot) {
+    final scheduledVisit = _store.scheduledVisitForSlot(slot.date, slot.time);
+    if (scheduledVisit != null) {
+      return _SlotOccupancy(
+        profile: scheduledVisit.profile,
+        scheduledVisit: scheduledVisit,
+      );
+    }
+
+    final request = _store.latestActiveRequestForSlot(slot.date, slot.time);
+    if (request == null) {
+      return null;
+    }
+
+    final profile = _store.profileById(request.patientId);
+    if (profile == null) {
+      return null;
+    }
+
+    return _SlotOccupancy(profile: profile, appointmentRequest: request);
+  }
+
+  Future<void> _openReservedSlotPatientInfo(
+    BuildContext context,
+    _SlotOccupancy occupancy,
+  ) async {
+    final lang = AppLanguageController.instance;
+    final history = _store.historyForPatient(occupancy.profile.id);
+    final latestHistory = history.isNotEmpty ? history.first.visit : null;
+    final scheduledVisit = occupancy.scheduledVisit;
+    final request = occupancy.appointmentRequest;
+    final slotDate = _formatStoredDateWithWeekday(
+      scheduledVisit?.visit.date ?? request?.date ?? '-',
+    );
+    final slotTime = scheduledVisit?.visit.time ?? request?.time ?? '-';
+    final statusLabel = scheduledVisit != null
+        ? lang.tr('Booked appointment', '예약 확정')
+        : lang.tr('Pending appointment request', '예약 신청 대기');
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(occupancy.profile.name),
+          content: SizedBox(
+            width: 520,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    statusLabel,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text('${lang.tr('Slot', '슬롯')}: $slotDate $slotTime'),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${lang.tr('Contact', '연락처')}: '
+                    '${occupancy.profile.phone.isEmpty ? lang.tr('Phone missing', '전화번호 없음') : occupancy.profile.phone}'
+                    ' / '
+                    '${occupancy.profile.email.isEmpty ? lang.tr('Email missing', '이메일 없음') : occupancy.profile.email}',
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${lang.tr('Profile', '프로필')}: '
+                    '${occupancy.profile.sex}, ${occupancy.profile.ageRange}, ${occupancy.profile.ethnicity}',
+                  ),
+                  if (request != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lang.tr('Requested At', '신청 시각')}: '
+                      '${_formatDateTimeValue(request.requestedAt)}',
+                    ),
+                  ],
+                  if (latestHistory != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      lang.tr('Last Visit Summary', '지난 방문 요약'),
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${lang.tr('Last visit', '지난 방문')}: ${_formatStoredDateWithWeekday(latestHistory.date)} ${latestHistory.time}',
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lang.tr('Treatment area', '치료 부위')}: ${latestHistory.previousTreatmentArea}',
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lang.tr('Practitioner note', '침술사 메모')}: ${latestHistory.previousSessionNote}',
+                    ),
+                  ],
+                  if (occupancy.profile.memo.trim().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      lang.tr('Internal Note', '관리 메모'),
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(occupancy.profile.memo),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(lang.tr('Close', '닫기')),
+            ),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _openPatientManagement(
+                  context,
+                  initialProfileId: occupancy.profile.id,
+                );
+              },
+              icon: const Icon(Icons.badge_outlined),
+              label: Text(lang.tr('Patient Info', '환자 정보')),
+            ),
+            if (scheduledVisit != null)
+              FilledButton.icon(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  Navigator.pushNamed(
+                    context,
+                    PatientBriefScreen.routeName,
+                    arguments: PatientHistoryArgs(
+                      current: scheduledVisit,
+                      history: _store.historyForPatient(occupancy.profile.id),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.chevron_right),
+                label: Text(lang.tr('Open Detail', '상세 보기')),
+              ),
+          ],
+        );
+      },
+    );
   }
 
   _VisitWindowSummary _visitWindowSummary() {
@@ -607,8 +2559,10 @@ class _PractitionerDashboardScreenState
         totalVisits: visits.length,
         fromDate: _formatDate(_selectedDateRange!.start),
         toDate: _formatDate(_selectedDateRange!.end),
-        periodLabel:
-            '${_formatDate(_selectedDateRange!.start)} ~ ${_formatDate(_selectedDateRange!.end)} ${visits.length}ëª…',
+        periodLabel: AppLanguageController.instance.tr(
+          '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} ${visits.length}',
+          '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} ${visits.length}명',
+        ),
       );
     }
 
@@ -621,15 +2575,24 @@ class _PractitionerDashboardScreenState
       totalVisits: visits.length,
       fromDate: _formatDate(start),
       toDate: _formatDate(selected),
-      periodLabel: '${_formatDate(start)} ~ ${_formatDate(selected)} ${visits.length}ëª…',
+      periodLabel: AppLanguageController.instance.tr(
+        '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visits.length}',
+        '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visits.length}명',
+      ),
     );
   }
 
   String _visitTrailLabel(PatientVisit visit) {
     if (visit.scheduledSinceLast == 0 && visit.noShowSinceLast == 0) {
-      return 'ì§€ë‚œ ë°©ë¬¸ ì´í›„ ì¶”ê°€ ì˜ˆì•½ ì—†ìŒ -> ì´ë²ˆ ë°©ë¬¸ì´ ì²« ìž¬ë‚´ì›';
+      return AppLanguageController.instance.tr(
+        'No additional appointments since the last visit -> this is the first return visit',
+        '지난 방문 이후 추가 예약 없음 -> 이번 방문이 첫 재내원',
+      );
     }
-    return 'ì§€ë‚œ ë°©ë¬¸ ì´í›„ ì¶”ê°€ ì˜ˆì•½ ${visit.scheduledSinceLast}ê±´, ë…¸ì‡¼ ${visit.noShowSinceLast}ê±´';
+    return AppLanguageController.instance.tr(
+      'Since last visit: ${visit.scheduledSinceLast} more appointment(s), ${visit.noShowSinceLast} no-show(s)',
+      '지난 방문 이후 추가 예약 ${visit.scheduledSinceLast}건, 노쇼 ${visit.noShowSinceLast}건',
+    );
   }
 
   Future<void> _sendReminder(
@@ -641,12 +2604,25 @@ class _PractitionerDashboardScreenState
     final selectedQuestions = <String>{};
     final noteController = TextEditingController();
     final customQuestionsByCategory = <String, List<String>>{};
+    final answeredByCategory = <String, List<QaItem>>{};
+
+    for (final qa in visit.qaList) {
+      answeredByCategory.putIfAbsent(qa.category, () => <QaItem>[]).add(qa);
+    }
+
+    final totalAnsweredCount = visit.qaList.length;
+    final answeredCategoryCount = answeredByCategory.keys.length;
 
     await showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text('${profile.name}ë‹˜ ë‹µë³€ ìš”ì²­'),
+          title: Text(
+            AppLanguageController.instance.tr(
+              'Request Answers from ${profile.name}',
+              '${profile.name}님 답변 요청',
+            ),
+          ),
           content: SizedBox(
             width: 520,
             child: StatefulBuilder(
@@ -663,26 +2639,163 @@ class _PractitionerDashboardScreenState
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          'ì „ì†¡ ëŒ€ìƒ ì—°ë½ì²˜: ${profile.phone.isEmpty ? 'ì „í™”ë²ˆí˜¸ ì—†ìŒ' : profile.phone}${profile.email.isEmpty ? ' / ì´ë©”ì¼ ì—†ìŒ' : ' / ${profile.email}'}',
+                          '${AppLanguageController.instance.tr('Contact target', '전송 대상 연락처')}: '
+                          '${profile.phone.isEmpty ? AppLanguageController.instance.tr('Phone missing', '전화번호 없음') : profile.phone}'
+                          '${profile.email.isEmpty ? ' / ${AppLanguageController.instance.tr('Email missing', '이메일 없음')}' : ' / ${profile.email}'}',
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'ìš”ì²­í•  ì§ˆë¬¸ ì„ íƒ',
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF7FBFA),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFD7EAE6)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLanguageController.instance.tr(
+                                'Already Answered Snapshot',
+                                '이미 답한 내용 요약',
+                              ),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              AppLanguageController.instance.tr(
+                                '$totalAnsweredCount answered question(s) across $answeredCategoryCount categor${answeredCategoryCount == 1 ? 'y' : 'ies'}',
+                                '$answeredCategoryCount개 카테고리에서 총 $totalAnsweredCount개 질문에 이미 답했습니다',
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppLanguageController.instance.tr(
+                                'Use the category sections below to request what is still missing or what needs clarification.',
+                                '아래 카테고리에서 아직 안 물어본 것과 추가 확인이 필요한 것을 골라 요청할 수 있습니다.',
+                              ),
+                              style: const TextStyle(color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        AppLanguageController.instance.tr(
+                          'Select Questions to Request',
+                          '요청할 질문 선택',
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 8),
                       ..._questionLibraryByCategory.entries.map((entry) {
+                        final answeredItems =
+                            answeredByCategory[entry.key] ?? const <QaItem>[];
                         return ExpansionTile(
                           dense: true,
                           tilePadding: EdgeInsets.zero,
-                          title: Text(entry.key),
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(entry.key)),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: answeredItems.isEmpty
+                                      ? Colors.orange.withValues(alpha: 0.12)
+                                      : Colors.teal.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  answeredItems.isEmpty
+                                      ? AppLanguageController.instance.tr(
+                                          'No answers yet',
+                                          '아직 답변 없음',
+                                        )
+                                      : AppLanguageController.instance.tr(
+                                          '${answeredItems.length} answered',
+                                          '${answeredItems.length}개 답변됨',
+                                        ),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: answeredItems.isEmpty
+                                        ? Colors.orange.shade800
+                                        : Colors.teal.shade800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                           children: [
+                            if (answeredItems.isNotEmpty)
+                              Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppLanguageController.instance.tr(
+                                        'Already answered in this category',
+                                        '이 카테고리에서 이미 답한 내용',
+                                      ),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    ...answeredItems.map(
+                                      (qa) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 6,
+                                        ),
+                                        child: Text(
+                                          '• ${qa.question}\n  ${qa.answer}',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ...entry.value.map((question) {
+                              final answeredItem = answeredItems
+                                  .cast<QaItem?>()
+                                  .firstWhere(
+                                    (qa) => qa?.question == question,
+                                    orElse: () => null,
+                                  );
                               return CheckboxListTile(
                                 dense: true,
                                 contentPadding: EdgeInsets.zero,
                                 title: Text(question),
+                                subtitle: answeredItem == null
+                                    ? Text(
+                                        AppLanguageController.instance.tr(
+                                          'No answer saved yet',
+                                          '아직 저장된 답변 없음',
+                                        ),
+                                      )
+                                    : Text(
+                                        AppLanguageController.instance.tr(
+                                          'Already answered: ${answeredItem.answer}',
+                                          '이미 답변됨: ${answeredItem.answer}',
+                                        ),
+                                      ),
                                 value: selectedQuestions.contains(question),
                                 onChanged: (checked) {
                                   setDialogState(() {
@@ -704,28 +2817,46 @@ class _PractitionerDashboardScreenState
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
-                                        title: Text('${entry.key} ì§ì ‘ ì§ˆë¬¸ ìž…ë ¥'),
+                                        title: Text(
+                                          AppLanguageController.instance.tr(
+                                            'Add Custom Question for ${entry.key}',
+                                            '${entry.key} 직접 질문 입력',
+                                          ),
+                                        ),
                                         content: TextField(
                                           controller: controller,
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            hintText:
-                                                'ì˜ˆ: íŠ¹ì • ìƒí™©ì—ì„œ ì¦ìƒì´ ë” ì‹¬í•´ì§€ë‚˜ìš”?',
+                                          decoration: InputDecoration(
+                                            border: const OutlineInputBorder(),
+                                            hintText: AppLanguageController
+                                                .instance
+                                                .tr(
+                                                  'Example: Does the symptom get worse in a specific situation?',
+                                                  '예: 특정 상황에서 증상이 더 심해지나요?',
+                                                ),
                                           ),
                                         ),
                                         actions: [
-              const LanguageMenuButton(),
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context),
-                                            child: const Text('ì·¨ì†Œ'),
+                                            child: Text(
+                                              AppLanguageController.instance.tr(
+                                                'Cancel',
+                                                '취소',
+                                              ),
+                                            ),
                                           ),
                                           FilledButton(
                                             onPressed: () => Navigator.pop(
                                               context,
                                               controller.text.trim(),
                                             ),
-                                            child: const Text('ì¶”ê°€'),
+                                            child: Text(
+                                              AppLanguageController.instance.tr(
+                                                'Add',
+                                                '추가',
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       );
@@ -737,12 +2868,20 @@ class _PractitionerDashboardScreenState
                                   }
                                   setDialogState(() {
                                     customQuestionsByCategory
-                                        .putIfAbsent(entry.key, () => <String>[])
+                                        .putIfAbsent(
+                                          entry.key,
+                                          () => <String>[],
+                                        )
                                         .add(custom);
                                   });
                                 },
                                 icon: const Icon(Icons.edit_outlined, size: 16),
-                                label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
+                                label: Text(
+                                  AppLanguageController.instance.tr(
+                                    'Add Custom Question',
+                                    '직접 질문 추가',
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -779,9 +2918,12 @@ class _PractitionerDashboardScreenState
                       TextField(
                         controller: noteController,
                         maxLines: 3,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'ë…¸íŠ¸ (í™˜ìžì—ê²Œ ì „ë‹¬í•  ë§)',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: AppLanguageController.instance.tr(
+                            'Note (message for the patient)',
+                            '노트 (환자에게 전달할 말)',
+                          ),
                         ),
                       ),
                     ],
@@ -791,26 +2933,31 @@ class _PractitionerDashboardScreenState
             ),
           ),
           actions: [
-              const LanguageMenuButton(),
             TextButton(
               onPressed: () {
                 noteController.dispose();
                 Navigator.pop(dialogContext);
               },
-              child: const Text('ì·¨ì†Œ'),
+              child: Text(AppLanguageController.instance.tr('Cancel', '취소')),
             ),
             FilledButton(
               onPressed: !profile.hasRequiredAlertInfo
                   ? null
                   : () async {
-                      final customCount = customQuestionsByCategory.values.fold<int>(
-                        0,
-                        (runningTotal, list) => runningTotal + list.length,
-                      );
+                      final customCount = customQuestionsByCategory.values
+                          .fold<int>(
+                            0,
+                            (runningTotal, list) => runningTotal + list.length,
+                          );
                       if (selectedQuestions.isEmpty && customCount == 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('ì§ˆë¬¸ì„ 1ê°œ ì´ìƒ ì„ íƒí•˜ê±°ë‚˜ ì§ì ‘ ì¶”ê°€í•´ì£¼ì„¸ìš”.'),
+                          SnackBar(
+                            content: Text(
+                              AppLanguageController.instance.tr(
+                                'Please select at least one question or add a custom question.',
+                                '질문을 1개 이상 선택하거나 직접 추가해주세요.',
+                              ),
+                            ),
                           ),
                         );
                         return;
@@ -821,22 +2968,23 @@ class _PractitionerDashboardScreenState
                       final note = noteController.text.trim();
 
                       try {
-                        final docId = await AppFirestoreService.sendAnswerRequest(
-                          patientId: profile.id,
-                          patientName: profile.name,
-                          patientPhone: profile.phone,
-                          patientEmail: profile.email,
-                          patientTime: visit.time,
-                          lastVisitDate: visit.lastVisitDate,
-                          intakeStatus: visit.intakeStatus.name,
-                          selectedQuestions: selectedQuestionList,
-                          customQuestionsByCategory:
-                              customQuestionsByCategory.map(
-                            (key, value) =>
-                                MapEntry(key, List<String>.from(value)),
-                          ),
-                          note: note,
-                        );
+                        final docId =
+                            await AppFirestoreService.sendAnswerRequest(
+                              patientId: profile.id,
+                              patientName: profile.name,
+                              patientPhone: profile.phone,
+                              patientEmail: profile.email,
+                              patientTime: visit.time,
+                              lastVisitDate: visit.lastVisitDate,
+                              intakeStatus: visit.intakeStatus.name,
+                              selectedQuestions: selectedQuestionList,
+                              customQuestionsByCategory:
+                                  customQuestionsByCategory.map(
+                                    (key, value) =>
+                                        MapEntry(key, List<String>.from(value)),
+                                  ),
+                              note: note,
+                            );
 
                         if (!mounted || !dialogContext.mounted) {
                           return;
@@ -846,7 +2994,12 @@ class _PractitionerDashboardScreenState
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${profile.name}ë‹˜ ë‹µë³€ ìš”ì²­ ì €ìž¥ ì™„ë£Œ: $docId'),
+                            content: Text(
+                              AppLanguageController.instance.tr(
+                                'Answer request saved for ${profile.name}: $docId',
+                                '${profile.name}님 답변 요청 저장 완료: $docId',
+                              ),
+                            ),
                           ),
                         );
                       } catch (error) {
@@ -854,11 +3007,180 @@ class _PractitionerDashboardScreenState
                           return;
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('ë‹µë³€ ìš”ì²­ ì €ìž¥ ì‹¤íŒ¨: $error')),
+                          SnackBar(
+                            content: Text(
+                              AppLanguageController.instance.tr(
+                                'Failed to save answer request: $error',
+                                '답변 요청 저장 실패: $error',
+                              ),
+                            ),
+                          ),
                         );
                       }
                     },
-              child: const Text('ì „ì†¡'),
+              child: Text(AppLanguageController.instance.tr('Send', '전송')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _sendPatientNote(
+    BuildContext context,
+    ScheduledVisit scheduledVisit,
+  ) async {
+    final profile = scheduledVisit.profile;
+    final visit = scheduledVisit.visit;
+    final noteController = TextEditingController();
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(
+            AppLanguageController.instance.tr(
+              'Send a note to ${profile.name}',
+              '${profile.name}님께 쪽지 보내기',
+            ),
+          ),
+          content: SizedBox(
+            width: 500,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7FBFA),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFD7EAE6)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLanguageController.instance.tr(
+                          'This note will appear in the patient requests inbox.',
+                          '이 쪽지는 환자 요청함에 바로 표시됩니다.',
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        AppLanguageController.instance.tr(
+                          'Visit context: ${_formatStoredDateWithWeekday(visit.date)} ${visit.time}',
+                          '방문 맥락: ${_formatStoredDateWithWeekday(visit.date)} ${visit.time}',
+                        ),
+                      ),
+                      Text(
+                        profile.email.trim().isEmpty
+                            ? AppLanguageController.instance.tr(
+                                'No email is saved, so this will stay as an in-app portal note only.',
+                                '이메일이 저장되어 있지 않아 앱 안 포털 쪽지로만 전달됩니다.',
+                              )
+                            : AppLanguageController.instance.tr(
+                                'If email is saved, a portal notification email will also be queued.',
+                                '이메일이 저장되어 있으면 포털 알림 메일도 함께 대기열에 들어갑니다.',
+                              ),
+                        style: const TextStyle(color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: noteController,
+                  minLines: 4,
+                  maxLines: 7,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: AppLanguageController.instance.tr(
+                      'Message for the patient',
+                      '환자에게 보낼 내용',
+                    ),
+                    hintText: AppLanguageController.instance.tr(
+                      'Example: Please review your last visit note and come hydrated for the next session.',
+                      '예: 지난 방문 기록을 다시 보고, 다음 세션 전에는 물을 충분히 마시고 와주세요.',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                noteController.dispose();
+                Navigator.pop(dialogContext);
+              },
+              child: Text(AppLanguageController.instance.tr('Cancel', '취소')),
+            ),
+            FilledButton.icon(
+              onPressed: () async {
+                final note = noteController.text.trim();
+                if (note.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLanguageController.instance.tr(
+                          'Please enter a note before sending.',
+                          '쪽지 내용을 입력한 뒤 전송해주세요.',
+                        ),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                try {
+                  final docId = await AppFirestoreService.sendPractitionerNote(
+                    patientId: profile.id,
+                    patientName: profile.name,
+                    patientPhone: profile.phone,
+                    patientEmail: profile.email,
+                    patientTime: visit.time,
+                    lastVisitDate: visit.lastVisitDate,
+                    intakeStatus: visit.intakeStatus.name,
+                    note: note,
+                  );
+
+                  if (!mounted || !dialogContext.mounted) {
+                    return;
+                  }
+
+                  noteController.dispose();
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLanguageController.instance.tr(
+                          'Portal note saved for ${profile.name}: $docId',
+                          '${profile.name}님 쪽지 저장 완료: $docId',
+                        ),
+                      ),
+                    ),
+                  );
+                } catch (error) {
+                  if (!mounted || !dialogContext.mounted) {
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLanguageController.instance.tr(
+                          'Failed to save the patient note: $error',
+                          '환자 쪽지 저장 실패: $error',
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.send_outlined),
+              label: Text(AppLanguageController.instance.tr('Send', '전송')),
             ),
           ],
         );
@@ -869,32 +3191,277 @@ class _PractitionerDashboardScreenState
   Future<void> _pickDateFromCalendar() async {
     final now = DateTime.now();
     final currentDate = _parseDate(_selectedDate) ?? now;
-    final picked = await showDatePicker(
+    DateTime selectedDate = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+    );
+    final lang = AppLanguageController.instance;
+    final theme = Theme.of(context);
+    final picked = await showDialog<DateTime>(
       context: context,
-      initialDate: currentDate,
-      firstDate: DateTime(2020, 1, 1),
-      lastDate: DateTime(now.year + 10, now.month, now.day),
-      helpText: 'ë‚ ì§œ ì„ íƒ',
-      cancelText: 'ì·¨ì†Œ',
-      confirmText: 'í™•ì¸',
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final storedDate = _formatDate(selectedDate);
+            final bookedCount = _bookedPatientCountForDate(storedDate);
+            final actualVisitCount = _actualVisitCountForDate(storedDate);
+
+            Widget buildCountCard({
+              required String label,
+              required String value,
+            }) {
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.66),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      value,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Dialog(
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 24,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth >= 620;
+
+                    final summaryPanel = Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceSoft.withValues(alpha: 0.58),
+                        border: wide
+                            ? Border(right: BorderSide(color: AppTheme.border))
+                            : Border(
+                                bottom: BorderSide(color: AppTheme.border),
+                              ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lang.tr('Pick Date', '날짜 선택'),
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            _formatDateWithWeekday(selectedDate),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          buildCountCard(
+                            label: lang.tr('Booked patients', '예약 환자'),
+                            value: lang.tr(
+                              '$bookedCount patients',
+                              '$bookedCount명',
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          buildCountCard(
+                            label: lang.tr('Actual visits', '실제 방문'),
+                            value: lang.tr(
+                              '$actualVisitCount patients',
+                              '$actualVisitCount명',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            lang.tr(
+                              'Booked = saved visits plus pending or confirmed reservations for that date.',
+                              '예약 환자 = 그 날짜의 저장된 방문과 대기/확정 예약을 함께 본 숫자입니다.',
+                            ),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.ink.withValues(alpha: 0.62),
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    final calendarPanel = Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            lang.tr(
+                              'Choose a clinic date to update the dashboard.',
+                              '대시보드에 반영할 날짜를 선택하세요.',
+                            ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.ink.withValues(alpha: 0.68),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          CalendarDatePicker(
+                            initialDate: selectedDate,
+                            firstDate: DateTime(2020, 1, 1),
+                            lastDate: DateTime(
+                              now.year + 10,
+                              now.month,
+                              now.day,
+                            ),
+                            currentDate: now,
+                            onDateChanged: (value) {
+                              setDialogState(() {
+                                selectedDate = value;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext),
+                                child: Text(lang.tr('Cancel', '취소')),
+                              ),
+                              const SizedBox(width: 8),
+                              FilledButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, selectedDate),
+                                child: Text(lang.tr('OK', '확인')),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+
+                    return wide
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(width: 240, child: summaryPanel),
+                              Expanded(child: calendarPanel),
+                            ],
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [summaryPanel, calendarPanel],
+                            ),
+                          );
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
     if (picked == null) {
       return;
     }
 
+    _applySelectedDate(picked);
+  }
+
+  int _bookedPatientCountForDate(String date) {
+    final patientIds = <String>{
+      ..._store.visitsForDate(date).map((visit) => visit.profile.id),
+      ..._store.appointmentRequests
+          .where(
+            (request) =>
+                request.date == date &&
+                (request.status == AppointmentRequestStatus.pending ||
+                    request.status == AppointmentRequestStatus.confirmed),
+          )
+          .map((request) => request.patientId),
+    };
+    return patientIds.length;
+  }
+
+  int _actualVisitCountForDate(String date) {
+    return _store.visitsForDate(date).length;
+  }
+
+  void _applySelectedDate(DateTime picked) {
     setState(() {
       _selectedDate = _formatDate(picked);
       _selectedDateRange = null;
-      _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
+      _selectedPatientFilter = 'All Patients';
+      _selectedStatusFilter = 'All';
+      _patientFilterController.clear();
     });
+  }
+
+  Future<void> _jumpToTodayDate() async {
+    final lang = AppLanguageController.instance;
+    final today = DateTime.now();
+    final normalizedToday = DateTime(today.year, today.month, today.day);
+    final dates =
+        _store.allDates
+            .map(_parseDate)
+            .whereType<DateTime>()
+            .map((date) => DateTime(date.year, date.month, date.day))
+            .toList()
+          ..sort();
+
+    DateTime targetDate = normalizedToday;
+    String? message;
+
+    final hasToday = dates.any((date) => date == normalizedToday);
+    if (!hasToday && dates.isNotEmpty) {
+      final earlierOrSame = dates.where(
+        (date) => !date.isAfter(normalizedToday),
+      );
+      targetDate = earlierOrSame.isNotEmpty ? earlierOrSame.last : dates.first;
+      message = lang.tr(
+        'No visits are saved for today, so the dashboard moved to the nearest clinic date ${_formatDateWithWeekday(targetDate)}.',
+        '오늘 일정이 없어 가장 가까운 클리닉 날짜 ${_formatDateWithWeekday(targetDate)} 로 이동했습니다.',
+      );
+    }
+
+    _applySelectedDate(targetDate);
+
+    if (message != null && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
   }
 
   Future<void> _pickDateRangeWithDialog() async {
     final now = DateTime.now();
-    DateTime start = _selectedDateRange?.start ??
-        (_parseDate(_selectedDate)?.subtract(
-              Duration(days: _selectedRangeDays - 1),
-            ) ??
+    DateTime start =
+        _selectedDateRange?.start ??
+        (_parseDate(
+              _selectedDate,
+            )?.subtract(Duration(days: _selectedRangeDays - 1)) ??
             now);
     DateTime end =
         _selectedDateRange?.end ?? (_parseDate(_selectedDate) ?? now);
@@ -905,7 +3472,12 @@ class _PractitionerDashboardScreenState
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: Text(AppLanguageController.instance.tr('Practitioner Dashboard', '침술사 대시보드')),
+              title: Text(
+                AppLanguageController.instance.tr(
+                  'Practitioner Dashboard',
+                  '침술사 대시보드',
+                ),
+              ),
               content: SizedBox(
                 width: 340,
                 child: Column(
@@ -918,7 +3490,10 @@ class _PractitionerDashboardScreenState
                           initialDate: start,
                           firstDate: DateTime(2020, 1, 1),
                           lastDate: DateTime(now.year + 10, now.month, now.day),
-                          helpText: 'ì‹œìž‘ì¼ ì„ íƒ',
+                          helpText: AppLanguageController.instance.tr(
+                            'Pick Start Date',
+                            '시작일 선택',
+                          ),
                         );
                         if (picked == null) {
                           return;
@@ -934,7 +3509,12 @@ class _PractitionerDashboardScreenState
                           }
                         });
                       },
-                      child: Text('ì‹œìž‘ì¼: ${_formatDate(start)}'),
+                      child: Text(
+                        AppLanguageController.instance.tr(
+                          'Start: ${_formatDateWithWeekday(start)}',
+                          '시작일: ${_formatDateWithWeekday(start)}',
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     OutlinedButton(
@@ -944,49 +3524,62 @@ class _PractitionerDashboardScreenState
                           initialDate: end,
                           firstDate: DateTime(2020, 1, 1),
                           lastDate: DateTime(now.year + 10, now.month, now.day),
-                          helpText: 'ì¢…ë£Œì¼ ì„ íƒ',
+                          helpText: AppLanguageController.instance.tr(
+                            'Pick End Date',
+                            '종료일 선택',
+                          ),
                         );
                         if (picked == null) {
                           return;
                         }
                         setDialogState(() {
-                          end = DateTime(
-                            picked.year,
-                            picked.month,
-                            picked.day,
-                          );
+                          end = DateTime(picked.year, picked.month, picked.day);
                           if (end.isBefore(start)) {
                             start = end;
                           }
                         });
                       },
-                      child: Text('ì¢…ë£Œì¼: ${_formatDate(end)}'),
+                      child: Text(
+                        AppLanguageController.instance.tr(
+                          'End: ${_formatDateWithWeekday(end)}',
+                          '종료일: ${_formatDateWithWeekday(end)}',
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'ì„ íƒ ë²”ìœ„: ${_formatDate(start)} ~ ${_formatDate(end)}',
+                      AppLanguageController.instance.tr(
+                        'Selected Range: ${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(end)}',
+                        '선택 범위: ${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(end)}',
+                      ),
                       style: const TextStyle(color: Colors.black54),
                     ),
                   ],
                 ),
               ),
               actions: [
-              const LanguageMenuButton(),
+                const LanguageMenuButton(),
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('ì·¨ì†Œ'),
+                  child: Text(
+                    AppLanguageController.instance.tr('Cancel', '취소'),
+                  ),
                 ),
                 FilledButton(
                   onPressed: () {
                     setState(() {
                       _selectedDate = _formatDate(end);
-                      _selectedDateRange = DateTimeRange(start: start, end: end);
+                      _selectedDateRange = DateTimeRange(
+                        start: start,
+                        end: end,
+                      );
                       _selectedRangeDays = end.difference(start).inDays + 1;
-                      _selectedPatientFilter = 'ì „ì²´ í™˜ìž';
+                      _selectedPatientFilter = 'All Patients';
+                      _selectedStatusFilter = 'All';
                     });
                     Navigator.pop(dialogContext);
                   },
-                  child: const Text('ì ìš©'),
+                  child: Text(AppLanguageController.instance.tr('Apply', '적용')),
                 ),
               ],
             );
@@ -996,10 +3589,248 @@ class _PractitionerDashboardScreenState
     );
   }
 
-  Future<void> _openPatientManagement(BuildContext context) async {
+  int _pendingAppointmentRequestCount() {
+    return _store.appointmentRequests
+        .where((request) => request.status == AppointmentRequestStatus.pending)
+        .length;
+  }
+
+  Future<void> _scrollToAppointmentInbox() async {
+    final targetContext = _appointmentInboxKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _scrollToAvailabilityBoard() async {
+    final targetContext = _availabilityBoardKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _scrollToAppointmentRequestsSection() async {
+    final targetContext = _appointmentRequestsSectionKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _scrollToRecordUpdatesSection() async {
+    final targetContext = _recordUpdatesSectionKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _scrollToRecentSubmissionsSection() async {
+    final targetContext = _recentSubmissionsSectionKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _scrollToDateSelectorPanel() async {
+    final targetContext = _dateSelectorKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _scrollToPatientCards() async {
+    final targetContext = _patientCardsKey.currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
+  }
+
+  Future<void> _focusPatientCards({String? statusFilter}) async {
+    if (mounted) {
+      setState(() {
+        _selectedPatientFilter = 'All Patients';
+        _patientFilterController.clear();
+        if (statusFilter != null) {
+          _selectedStatusFilter = statusFilter;
+        }
+      });
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 16));
+    await _scrollToPatientCards();
+  }
+
+  Future<void> _openDateQuickActionsSheet() async {
+    final lang = AppLanguageController.instance;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  lang.tr('Date quick actions', '날짜 빠른 선택'),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  lang.tr(
+                    'Current selection: ${_currentTopDateValue()}',
+                    '현재 선택: ${_currentTopDateValue()}',
+                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.tonal(
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        setState(() {
+                          _selectedRangeDays = 7;
+                          _selectedDateRange = null;
+                          _selectedPatientFilter = 'All Patients';
+                          _selectedStatusFilter = 'All';
+                        });
+                      },
+                      child: Text(lang.tr('Last 7 days', '최근 7일')),
+                    ),
+                    FilledButton.tonal(
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        setState(() {
+                          _selectedRangeDays = 14;
+                          _selectedDateRange = null;
+                          _selectedPatientFilter = 'All Patients';
+                          _selectedStatusFilter = 'All';
+                        });
+                      },
+                      child: Text(lang.tr('Last 14 days', '최근 14일')),
+                    ),
+                    FilledButton.tonal(
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        setState(() {
+                          _selectedRangeDays = 30;
+                          _selectedDateRange = null;
+                          _selectedPatientFilter = 'All Patients';
+                          _selectedStatusFilter = 'All';
+                        });
+                      },
+                      child: Text(lang.tr('Last 30 days', '최근 30일')),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.calendar_today_outlined),
+                  title: Text(lang.tr('Pick a single date', '하루 날짜 선택')),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _pickDateFromCalendar();
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.date_range_outlined),
+                  title: Text(lang.tr('Pick a custom range', '직접 기간 선택')),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _pickDateRangeWithDialog();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openPatientManagement(
+    BuildContext context, {
+    String? initialProfileId,
+  }) async {
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => const _PatientManagementDialog(),
+      builder: (dialogContext) =>
+          _PatientManagementDialog(initialProfileId: initialProfileId),
+    );
+  }
+
+  Future<void> _openLatestPatientBriefForProfile(PatientProfile profile) async {
+    final lang = AppLanguageController.instance;
+    final history = _store.historyForPatient(profile.id);
+    if (history.isEmpty) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            lang.tr(
+              'There is no previous visit history for this patient yet.',
+              '이 환자에게는 아직 이전 방문 기록이 없습니다.',
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    await Navigator.pushNamed(
+      context,
+      PatientBriefScreen.routeName,
+      arguments: PatientHistoryArgs(current: history.first, history: history),
     );
   }
 
@@ -1008,6 +3839,215 @@ class _PractitionerDashboardScreenState
     final m = date.month.toString().padLeft(2, '0');
     final d = date.day.toString().padLeft(2, '0');
     return '$y-$m-$d';
+  }
+
+  String _weekdayShort(DateTime date) {
+    const english = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const korean = ['월', '화', '수', '목', '금', '토', '일'];
+    return AppLanguageController.instance.tr(
+      english[date.weekday - 1],
+      korean[date.weekday - 1],
+    );
+  }
+
+  String _formatDateWithWeekday(DateTime date, {bool compact = false}) {
+    final base = compact
+        ? '${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}'
+        : _formatDate(date);
+    final weekday = _weekdayShort(date);
+    return AppLanguageController.instance.tr(
+      '$base ($weekday)',
+      '$base ($weekday)',
+    );
+  }
+
+  String _formatStoredDateWithWeekday(String value, {bool compact = false}) {
+    final parsed = _parseDate(value);
+    if (parsed == null) {
+      return value;
+    }
+    return _formatDateWithWeekday(parsed, compact: compact);
+  }
+
+  String _formatDateTimeValue(DateTime value) {
+    final dateLabel = _formatDateWithWeekday(value);
+    final hour = value.hour.toString().padLeft(2, '0');
+    final minute = value.minute.toString().padLeft(2, '0');
+    return '$dateLabel $hour:$minute';
+  }
+
+  String _currentTopDateTitle() {
+    return _selectedDateRange == null
+        ? AppLanguageController.instance.tr('Selected date', '선택 날짜')
+        : AppLanguageController.instance.tr('Selected range', '선택 기간');
+  }
+
+  String _currentTopDateValue() {
+    if (_selectedDateRange == null) {
+      return _formatStoredDateWithWeekday(_selectedDate);
+    }
+    return '${_formatDateWithWeekday(_selectedDateRange!.start)} - ${_formatDateWithWeekday(_selectedDateRange!.end)}';
+  }
+
+  Widget _buildTopInboxAction(int count) {
+    final lang = AppLanguageController.instance;
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: _scrollToAppointmentInbox,
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F2F8),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFBED5E4)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(Icons.mail_outline, color: Color(0xFF43799A)),
+                    if (count > 0)
+                      Positioned(
+                        right: -8,
+                        top: -8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF43799A),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            '$count',
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      lang.tr('Patient inbox', '환자 쪽지함'),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.72),
+                      ),
+                    ),
+                    Text(
+                      lang.tr('$count waiting', '$count건 대기'),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactTopInboxAction(int count) {
+    return IconButton(
+      tooltip: AppLanguageController.instance.tr(
+        'Open patient inbox',
+        '환자 쪽지함 열기',
+      ),
+      onPressed: _scrollToAppointmentInbox,
+      icon: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const Icon(Icons.mail_outline),
+          if (count > 0)
+            Positioned(
+              right: -6,
+              top: -6,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                decoration: BoxDecoration(
+                  color: AppTheme.copper,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '$count',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopDateAction() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: _openDateQuickActionsSheet,
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8E9E4),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFE3C3B7)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.calendar_month_outlined,
+                  color: Color(0xFFB0664C),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _currentTopDateTitle(),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.72),
+                      ),
+                    ),
+                    Text(
+                      _currentTopDateValue(),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   DateTime? _parseDate(String value) {
@@ -1043,80 +4083,178 @@ class _PatientRealtimeActivity extends StatelessWidget {
               .where('patientId', isEqualTo: patientId)
               .snapshots(),
           builder: (context, requestSnapshot) {
-            if (submissionSnapshot.hasError || requestSnapshot.hasError) {
-              return const Text(
-                'ì‹¤ì‹œê°„ í™œë™ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
-                style: TextStyle(color: Colors.redAccent),
-              );
-            }
+            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('visit_record_feedback')
+                  .where('patientId', isEqualTo: patientId)
+                  .snapshots(),
+              builder: (context, feedbackSnapshot) {
+                if (submissionSnapshot.hasError ||
+                    requestSnapshot.hasError ||
+                    feedbackSnapshot.hasError) {
+                  return Text(
+                    AppLanguageController.instance.tr(
+                      'Unable to load real-time activity.',
+                      '실시간 앱 활동을 불러올 수 없습니다.',
+                    ),
+                    style: const TextStyle(color: Colors.redAccent),
+                  );
+                }
 
-            if (!submissionSnapshot.hasData || !requestSnapshot.hasData) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: LinearProgressIndicator(minHeight: 4),
-              );
-            }
+                if (!submissionSnapshot.hasData ||
+                    !requestSnapshot.hasData ||
+                    !feedbackSnapshot.hasData) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: LinearProgressIndicator(minHeight: 4),
+                  );
+                }
 
-            final submissionDocs = [...submissionSnapshot.data!.docs]
-              ..sort((a, b) {
-                final aDate = (a.data()['submittedAt'] as Timestamp?)?.toDate();
-                final bDate = (b.data()['submittedAt'] as Timestamp?)?.toDate();
-                return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
-              });
+                final submissionDocs = [...submissionSnapshot.data!.docs]
+                  ..sort((a, b) {
+                    final aDate = (a.data()['submittedAt'] as Timestamp?)
+                        ?.toDate();
+                    final bDate = (b.data()['submittedAt'] as Timestamp?)
+                        ?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(
+                      aDate ?? DateTime(2000),
+                    );
+                  });
 
-            final requestDocs = [...requestSnapshot.data!.docs]
-              ..sort((a, b) {
-                final aDate = (a.data()['requestedAt'] as Timestamp?)?.toDate();
-                final bDate = (b.data()['requestedAt'] as Timestamp?)?.toDate();
-                return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
-              });
+                final requestDocs = [...requestSnapshot.data!.docs]
+                  ..sort((a, b) {
+                    final aDate = (a.data()['requestedAt'] as Timestamp?)
+                        ?.toDate();
+                    final bDate = (b.data()['requestedAt'] as Timestamp?)
+                        ?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(
+                      aDate ?? DateTime(2000),
+                    );
+                  });
 
-            final latestSubmission =
-                submissionDocs.isNotEmpty ? submissionDocs.first.data() : null;
-            final latestRequest =
-                requestDocs.isNotEmpty ? requestDocs.first.data() : null;
+                final feedbackDocs = [...feedbackSnapshot.data!.docs]
+                  ..sort((a, b) {
+                    final aDate = (a.data()['updatedAt'] as Timestamp?)
+                        ?.toDate();
+                    final bDate = (b.data()['updatedAt'] as Timestamp?)
+                        ?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(
+                      aDate ?? DateTime(2000),
+                    );
+                  });
 
-            final submissionAt =
-                (latestSubmission?['submittedAt'] as Timestamp?)?.toDate();
-            final requestAt =
-                (latestRequest?['requestedAt'] as Timestamp?)?.toDate();
+                final latestSubmission = submissionDocs.isNotEmpty
+                    ? submissionDocs.first.data()
+                    : null;
+                final latestRequest = requestDocs.isNotEmpty
+                    ? requestDocs.first.data()
+                    : null;
+                final latestFeedback = feedbackDocs.isNotEmpty
+                    ? feedbackDocs.first.data()
+                    : null;
+                final pendingFeedbackCount = feedbackDocs
+                    .where(
+                      (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
+                    )
+                    .length;
 
-            final answers =
-                (latestSubmission?['answers'] as List<dynamic>? ?? const []);
-            final selectedQuestions =
-                (latestRequest?['selectedQuestions'] as List<dynamic>? ?? const []);
+                final submissionAt =
+                    (latestSubmission?['submittedAt'] as Timestamp?)?.toDate();
+                final requestAt = (latestRequest?['requestedAt'] as Timestamp?)
+                    ?.toDate();
+                final feedbackAt = (latestFeedback?['updatedAt'] as Timestamp?)
+                    ?.toDate();
 
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7FBFA),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFD7EAE6)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'ì‹¤ì‹œê°„ ì•± í™œë™',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                final answers =
+                    (latestSubmission?['answers'] as List<dynamic>? ??
+                    const []);
+                final selectedQuestions =
+                    (latestRequest?['selectedQuestions'] as List<dynamic>? ??
+                    const []);
+                final latestRequestType =
+                    (latestRequest?['requestType'] ?? 'answer_request')
+                        .toString();
+
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7FBFA),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFD7EAE6)),
                   ),
-                  const SizedBox(height: 8),
-                  if (latestRequest == null)
-                    const Text('ìµœê·¼ ë‹µë³€ ìš”ì²­ ì—†ìŒ')
-                  else
-                    Text(
-                      'ìµœê·¼ ë‹µë³€ ìš”ì²­: ${selectedQuestions.length}ê°œ ì§ˆë¬¸ Â· ${_formatDateTime(requestAt)}',
-                    ),
-                  const SizedBox(height: 4),
-                  if (latestSubmission == null)
-                    const Text('ìµœê·¼ ì œì¶œ ì—†ìŒ')
-                  else
-                    Text(
-                      'ìµœê·¼ í™˜ìž ì œì¶œ: ${answers.length}ê°œ ë‹µë³€ Â· ${_formatDateTime(submissionAt)}',
-                    ),
-                ],
-              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLanguageController.instance.tr(
+                          'Real-Time App Activity',
+                          '실시간 앱 활동',
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 8),
+                      if (latestRequest == null)
+                        Text(
+                          AppLanguageController.instance.tr(
+                            'No recent answer request',
+                            '최근 답변 요청 없음',
+                          ),
+                        )
+                      else
+                        Text(
+                          latestRequestType == 'note'
+                              ? AppLanguageController.instance.tr(
+                                  'Latest practitioner note: ${_formatDateTime(requestAt)}',
+                                  '최근 침술사 쪽지: ${_formatDateTime(requestAt)}',
+                                )
+                              : AppLanguageController.instance.tr(
+                                  'Latest answer request: ${selectedQuestions.length} questions ? ${_formatDateTime(requestAt)}',
+                                  '최근 답변 요청: 질문 ${selectedQuestions.length}개 · ${_formatDateTime(requestAt)}',
+                                ),
+                        ),
+                      const SizedBox(height: 4),
+                      if (latestSubmission == null)
+                        Text(
+                          AppLanguageController.instance.tr(
+                            'No recent submission',
+                            '최근 제출 없음',
+                          ),
+                        )
+                      else
+                        Text(
+                          AppLanguageController.instance.tr(
+                            'Latest patient submission: ${answers.length} answers ? ${_formatDateTime(submissionAt)}',
+                            '최근 환자 제출: 답변 ${answers.length}개 · ${_formatDateTime(submissionAt)}',
+                          ),
+                        ),
+                      const SizedBox(height: 4),
+                      if (latestFeedback == null)
+                        Text(
+                          AppLanguageController.instance.tr(
+                            'No visit-record feedback yet',
+                            '방문 기록 피드백 없음',
+                          ),
+                        )
+                      else
+                        Text(
+                          AppLanguageController.instance.tr(
+                            'Visit-record feedback: $pendingFeedbackCount pending ? ${_formatDateTime(feedbackAt)}',
+                            '방문 기록 피드백: 미확인 $pendingFeedbackCount건 · ${_formatDateTime(feedbackAt)}',
+                          ),
+                          style: TextStyle(
+                            color: pendingFeedbackCount > 0
+                                ? Colors.deepOrange
+                                : Colors.black87,
+                            fontWeight: pendingFeedbackCount > 0
+                                ? FontWeight.w700
+                                : FontWeight.w400,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
@@ -1126,7 +4264,7 @@ class _PatientRealtimeActivity extends StatelessWidget {
 
   String _formatDateTime(DateTime? value) {
     if (value == null) {
-      return 'ë°©ê¸ˆ ì „';
+      return AppLanguageController.instance.tr('Just now', '방금 전');
     }
     final y = value.year.toString().padLeft(4, '0');
     final m = value.month.toString().padLeft(2, '0');
@@ -1137,6 +4275,7 @@ class _PatientRealtimeActivity extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _BetaSubmissionBoard extends StatelessWidget {
   const _BetaSubmissionBoard();
 
@@ -1148,13 +4287,19 @@ class _BetaSubmissionBoard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'ì§€ì¸ ë² íƒ€ ì œì¶œí•¨',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            Text(
+              AppLanguageController.instance.tr(
+                'Beta Submission Feed',
+                '지인 베타 제출함',
+              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(
-              'ì´ë©”ì¼/ë¹„ë°€ë²ˆí˜¸ë¡œ ê°€ìž…í•œ ì§€ì¸ë“¤ì˜ ìµœê·¼ ì œì¶œì„ í™•ì¸í•©ë‹ˆë‹¤.',
+              AppLanguageController.instance.tr(
+                'Review the most recent submissions from beta sign-ups using email and password.',
+                '이메일/비밀번호로 가입한 지인들의 최근 제출을 확인합니다.',
+              ),
               style: TextStyle(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 12),
@@ -1164,9 +4309,12 @@ class _BetaSubmissionBoard extends StatelessWidget {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return const Text(
-                    'ë² íƒ€ ì œì¶œí•¨ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
-                    style: TextStyle(color: Colors.redAccent),
+                  return Text(
+                    AppLanguageController.instance.tr(
+                      'Could not load beta submissions.',
+                      '베타 제출함을 불러오지 못했습니다.',
+                    ),
+                    style: const TextStyle(color: Colors.redAccent),
                   );
                 }
                 if (!snapshot.hasData) {
@@ -1175,24 +4323,35 @@ class _BetaSubmissionBoard extends StatelessWidget {
 
                 final docs = [...snapshot.data!.docs]
                   ..sort((a, b) {
-                    final aDate = (a.data()['submittedAt'] as Timestamp?)?.toDate();
-                    final bDate = (b.data()['submittedAt'] as Timestamp?)?.toDate();
-                    return (bDate ?? DateTime(2000)).compareTo(aDate ?? DateTime(2000));
+                    final aDate = (a.data()['submittedAt'] as Timestamp?)
+                        ?.toDate();
+                    final bDate = (b.data()['submittedAt'] as Timestamp?)
+                        ?.toDate();
+                    return (bDate ?? DateTime(2000)).compareTo(
+                      aDate ?? DateTime(2000),
+                    );
                   });
 
                 if (docs.isEmpty) {
-                  return const Text('ì•„ì§ ë² íƒ€ ê°€ìž…ìžì˜ ì œì¶œì´ ì—†ìŠµë‹ˆë‹¤.');
+                  return Text(
+                    AppLanguageController.instance.tr(
+                      'No beta submissions yet.',
+                      '아직 베타 가입자의 제출이 없습니다.',
+                    ),
+                  );
                 }
 
                 return Column(
                   children: docs.take(5).map((doc) {
                     final data = doc.data();
-                    final patientName = (data['patientName'] as String?) ?? 'Unknown';
-                    final visitType = (data['visitType'] as String?) ?? 'follow_up';
+                    final patientName =
+                        (data['patientName'] as String?) ?? 'Unknown';
+                    final visitType =
+                        (data['visitType'] as String?) ?? 'follow_up';
                     final answers =
                         (data['answers'] as List<dynamic>? ?? const []).length;
-                    final submittedAt =
-                        (data['submittedAt'] as Timestamp?)?.toDate();
+                    final submittedAt = (data['submittedAt'] as Timestamp?)
+                        ?.toDate();
 
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -1201,7 +4360,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
                       ),
                       title: Text(patientName),
                       subtitle: Text(
-                        '${visitType == 'initial' ? 'ì´ˆì§„' : 'ìž¬ì§„'} Â· ë‹µë³€ $answersê°œ Â· ${_formatDateTime(submittedAt)}',
+                        '${visitType == 'initial' ? AppLanguageController.instance.tr('Initial', '초진') : AppLanguageController.instance.tr('Follow-up', '재진')} · ${AppLanguageController.instance.tr('Answers', '답변')} $answers · ${_formatDateTime(submittedAt)}',
                       ),
                     );
                   }).toList(),
@@ -1216,7 +4375,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
 
   static String _formatDateTime(DateTime? value) {
     if (value == null) {
-      return 'ë°©ê¸ˆ ì „';
+      return AppLanguageController.instance.tr('Just now', '방금 전');
     }
     final y = value.year.toString().padLeft(4, '0');
     final m = value.month.toString().padLeft(2, '0');
@@ -1227,6 +4386,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _BetaRegistrantBoard extends StatelessWidget {
   const _BetaRegistrantBoard();
 
@@ -1238,13 +4398,19 @@ class _BetaRegistrantBoard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'ì§€ì¸ ë² íƒ€ ê°€ìž…ìž',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            Text(
+              AppLanguageController.instance.tr(
+                'Beta Registrants',
+                '지인 베타 가입자',
+              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(
-              'íšŒì›ê°€ìž…ë§Œ í•œ ì‚¬ëžŒ, ì—°ë½ì²˜ê°€ ë¹ ì§„ ì‚¬ëžŒ, ì´ë¯¸ ì œì¶œê¹Œì§€ í•œ ì‚¬ëžŒì„ ì—¬ê¸°ì„œ ë°”ë¡œ í™•ì¸í•©ë‹ˆë‹¤.',
+              AppLanguageController.instance.tr(
+                'See who only signed up, who still has missing contact details, and who already submitted.',
+                '회원가입만 한 사람, 연락처가 빠진 사람, 이미 제출까지 한 사람을 여기서 바로 확인합니다.',
+              ),
               style: TextStyle(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 12),
@@ -1254,9 +4420,12 @@ class _BetaRegistrantBoard extends StatelessWidget {
                   .snapshots(),
               builder: (context, patientSnapshot) {
                 if (patientSnapshot.hasError) {
-                  return const Text(
-                    'ë² íƒ€ ê°€ìž…ìž ëª©ë¡ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
-                    style: TextStyle(color: Colors.redAccent),
+                  return Text(
+                    AppLanguageController.instance.tr(
+                      'Could not load beta registrants.',
+                      '베타 가입자 목록을 불러오지 못했습니다.',
+                    ),
+                    style: const TextStyle(color: Colors.redAccent),
                   );
                 }
                 if (!patientSnapshot.hasData) {
@@ -1269,9 +4438,12 @@ class _BetaRegistrantBoard extends StatelessWidget {
                       .snapshots(),
                   builder: (context, submissionSnapshot) {
                     if (submissionSnapshot.hasError) {
-                      return const Text(
-                        'ë² íƒ€ ì œì¶œ ë°ì´í„°ë¥¼ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.',
-                        style: TextStyle(color: Colors.redAccent),
+                      return Text(
+                        AppLanguageController.instance.tr(
+                          'Could not load beta submission data.',
+                          '베타 제출 데이터를 불러오지 못했습니다.',
+                        ),
+                        style: const TextStyle(color: Colors.redAccent),
                       );
                     }
                     if (!submissionSnapshot.hasData) {
@@ -1280,26 +4452,35 @@ class _BetaRegistrantBoard extends StatelessWidget {
 
                     final patientDocs = [...patientSnapshot.data!.docs]
                       ..sort((a, b) {
-                        final aDate =
-                            (a.data()['updatedAt'] as Timestamp?)?.toDate();
-                        final bDate =
-                            (b.data()['updatedAt'] as Timestamp?)?.toDate();
-                        return (bDate ?? DateTime(2000))
-                            .compareTo(aDate ?? DateTime(2000));
+                        final aDate = (a.data()['updatedAt'] as Timestamp?)
+                            ?.toDate();
+                        final bDate = (b.data()['updatedAt'] as Timestamp?)
+                            ?.toDate();
+                        return (bDate ?? DateTime(2000)).compareTo(
+                          aDate ?? DateTime(2000),
+                        );
                       });
 
-                    final submissionsByPatient = <String, List<Map<String, dynamic>>>{};
+                    final submissionsByPatient =
+                        <String, List<Map<String, dynamic>>>{};
                     for (final doc in submissionSnapshot.data!.docs) {
                       final data = doc.data();
                       final patientId = (data['patientId'] as String?) ?? '';
                       if (patientId.isEmpty) {
                         continue;
                       }
-                      submissionsByPatient.putIfAbsent(patientId, () => []).add(data);
+                      submissionsByPatient
+                          .putIfAbsent(patientId, () => [])
+                          .add(data);
                     }
 
                     if (patientDocs.isEmpty) {
-                      return const Text('ì•„ì§ ê°€ìž…í•œ ë² íƒ€ ì‚¬ìš©ìžê°€ ì—†ìŠµë‹ˆë‹¤.');
+                      return Text(
+                        AppLanguageController.instance.tr(
+                          'No beta users have signed up yet.',
+                          '아직 가입한 베타 사용자가 없습니다.',
+                        ),
+                      );
                     }
 
                     return Column(
@@ -1308,24 +4489,40 @@ class _BetaRegistrantBoard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _BetaOverviewChip(
-                                label: 'ê°€ìž…ìž',
-                                value: '${patientDocs.length}ëª…',
+                                label: AppLanguageController.instance.tr(
+                                  'Registrants',
+                                  '가입자',
+                                ),
+                                value: AppLanguageController.instance.tr(
+                                  '${patientDocs.length}',
+                                  '${patientDocs.length}명',
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _BetaOverviewChip(
-                                label: 'ì—°ë½ì²˜ ì™„ì„±',
-                                value:
-                                    '${patientDocs.where((doc) => _hasRequiredInfo(doc.data())).length}ëª…',
+                                label: AppLanguageController.instance.tr(
+                                  'Contact Complete',
+                                  '연락처 완성',
+                                ),
+                                value: AppLanguageController.instance.tr(
+                                  '${patientDocs.where((doc) => _hasRequiredInfo(doc.data())).length}',
+                                  '${patientDocs.where((doc) => _hasRequiredInfo(doc.data())).length}명',
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _BetaOverviewChip(
-                                label: 'ì œì¶œ ì™„ë£Œ',
-                                value:
-                                    '${patientDocs.where((doc) => (submissionsByPatient[doc.id] ?? const []).isNotEmpty).length}ëª…',
+                                label: AppLanguageController.instance.tr(
+                                  'Submitted',
+                                  '제출 완료',
+                                ),
+                                value: AppLanguageController.instance.tr(
+                                  '${patientDocs.where((doc) => (submissionsByPatient[doc.id] ?? const []).isNotEmpty).length}',
+                                  '${patientDocs.where((doc) => (submissionsByPatient[doc.id] ?? const []).isNotEmpty).length}명',
+                                ),
                               ),
                             ),
                           ],
@@ -1334,32 +4531,38 @@ class _BetaRegistrantBoard extends StatelessWidget {
                         ...patientDocs.take(8).map((doc) {
                           final data = doc.data();
                           final name = ((data['name'] as String?) ?? '').trim();
-                          final displayName =
-                              name.isEmpty ? 'New Patient' : name;
-                          final phone = ((data['phone'] as String?) ?? '').trim();
-                          final email = ((data['email'] as String?) ?? '').trim();
+                          final displayName = name.isEmpty
+                              ? 'New Patient'
+                              : name;
+                          final phone = ((data['phone'] as String?) ?? '')
+                              .trim();
+                          final email = ((data['email'] as String?) ?? '')
+                              .trim();
                           final sex = ((data['sex'] as String?) ?? '').trim();
                           final ethnicity =
                               ((data['ethnicity'] as String?) ?? '').trim();
-                          final birthYear =
-                              (data['birthYear'] as num?)?.toInt();
-                          final updatedAt =
-                              (data['updatedAt'] as Timestamp?)?.toDate();
-                          final createdAt =
-                              (data['createdAt'] as Timestamp?)?.toDate();
-                          final hasRequired = phone.isNotEmpty && email.isNotEmpty;
+                          final birthYear = (data['birthYear'] as num?)
+                              ?.toInt();
+                          final updatedAt = (data['updatedAt'] as Timestamp?)
+                              ?.toDate();
+                          final createdAt = (data['createdAt'] as Timestamp?)
+                              ?.toDate();
+                          final hasRequired =
+                              phone.isNotEmpty && email.isNotEmpty;
                           final submissions =
                               submissionsByPatient[doc.id] ?? const [];
                           submissions.sort((a, b) {
-                            final aDate =
-                                (a['submittedAt'] as Timestamp?)?.toDate();
-                            final bDate =
-                                (b['submittedAt'] as Timestamp?)?.toDate();
-                            return (bDate ?? DateTime(2000))
-                                .compareTo(aDate ?? DateTime(2000));
+                            final aDate = (a['submittedAt'] as Timestamp?)
+                                ?.toDate();
+                            final bDate = (b['submittedAt'] as Timestamp?)
+                                ?.toDate();
+                            return (bDate ?? DateTime(2000)).compareTo(
+                              aDate ?? DateTime(2000),
+                            );
                           });
-                          final latestSubmission =
-                              submissions.isNotEmpty ? submissions.first : null;
+                          final latestSubmission = submissions.isNotEmpty
+                              ? submissions.first
+                              : null;
                           final latestSubmissionAt =
                               (latestSubmission?['submittedAt'] as Timestamp?)
                                   ?.toDate();
@@ -1395,8 +4598,14 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                     Chip(
                                       label: Text(
                                         hasRequired
-                                            ? 'ì—°ë½ì²˜ ì¤€ë¹„ë¨'
-                                            : 'í•„ìˆ˜ ì •ë³´ ë¶€ì¡±',
+                                            ? AppLanguageController.instance.tr(
+                                                'Contact Ready',
+                                                '연락처 준비됨',
+                                              )
+                                            : AppLanguageController.instance.tr(
+                                                'Missing Required Info',
+                                                '필수 정보 부족',
+                                              ),
                                       ),
                                       backgroundColor: hasRequired
                                           ? const Color(0xFFE3F3EF)
@@ -1407,12 +4616,15 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 Text(
                                   phone.isEmpty && email.isEmpty
-                                      ? 'ì—°ë½ì²˜ ì—†ìŒ'
-                                      : '${phone.isEmpty ? 'ì „í™”ë²ˆí˜¸ ì—†ìŒ' : phone} Â· ${email.isEmpty ? 'ì´ë©”ì¼ ì—†ìŒ' : email}',
+                                      ? AppLanguageController.instance.tr(
+                                          'No contact info',
+                                          '연락처 없음',
+                                        )
+                                      : '${phone.isEmpty ? AppLanguageController.instance.tr('Phone missing', '전화번호 없음') : phone} · ${email.isEmpty ? AppLanguageController.instance.tr('Email missing', '이메일 없음') : email}',
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${birthYear?.toString() ?? 'ì¶œìƒì—°ë„ ë¯¸ìž…ë ¥'} Â· ${sex.isEmpty ? 'ì„±ë³„ ë¯¸ìž…ë ¥' : sex} Â· ${ethnicity.isEmpty ? 'ì¸ì¢…/ë¯¼ì¡± ë¯¸ìž…ë ¥' : ethnicity}',
+                                  '${birthYear?.toString() ?? AppLanguageController.instance.tr('Birth year missing', '출생연도 미입력')} · ${sex.isEmpty ? AppLanguageController.instance.tr('Sex missing', '성별 미입력') : sex} · ${ethnicity.isEmpty ? AppLanguageController.instance.tr('Ethnicity missing', '인종/민족 미입력') : ethnicity}',
                                   style: const TextStyle(color: Colors.black54),
                                 ),
                                 const SizedBox(height: 8),
@@ -1422,26 +4634,38 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                   children: [
                                     _StatusTag(
                                       label: submissions.isEmpty
-                                          ? 'ì•„ì§ ì œì¶œ ì—†ìŒ'
-                                          : 'ì œì¶œ ${submissions.length}íšŒ',
+                                          ? AppLanguageController.instance.tr(
+                                              'No submission yet',
+                                              '아직 제출 없음',
+                                            )
+                                          : AppLanguageController.instance.tr(
+                                              'Submitted ${submissions.length} time(s)',
+                                              '제출 ${submissions.length}회',
+                                            ),
                                       color: submissions.isEmpty
                                           ? const Color(0xFFF6E9C9)
                                           : const Color(0xFFDDF0E8),
                                     ),
                                     _StatusTag(
-                                      label:
-                                          'ê°€ìž…: ${_formatDateTime(createdAt)}',
+                                      label: AppLanguageController.instance.tr(
+                                        'Signed up: ${_formatDateTime(createdAt)}',
+                                        '가입: ${_formatDateTime(createdAt)}',
+                                      ),
                                       color: const Color(0xFFEAECEF),
                                     ),
                                     _StatusTag(
-                                      label:
-                                          'í”„ë¡œí•„ ìˆ˜ì •: ${_formatDateTime(updatedAt)}',
+                                      label: AppLanguageController.instance.tr(
+                                        'Profile updated: ${_formatDateTime(updatedAt)}',
+                                        '프로필 수정: ${_formatDateTime(updatedAt)}',
+                                      ),
                                       color: const Color(0xFFEAECEF),
                                     ),
                                     if (latestSubmissionAt != null)
                                       _StatusTag(
-                                        label:
-                                            'ìµœê·¼ ì œì¶œ: ${_formatDateTime(latestSubmissionAt)}',
+                                        label: AppLanguageController.instance.tr(
+                                          'Latest submission: ${_formatDateTime(latestSubmissionAt)}',
+                                          '최근 제출: ${_formatDateTime(latestSubmissionAt)}',
+                                        ),
                                         color: const Color(0xFFDDF0E8),
                                       ),
                                   ],
@@ -1470,7 +4694,7 @@ class _BetaRegistrantBoard extends StatelessWidget {
 
   static String _formatDateTime(DateTime? value) {
     if (value == null) {
-      return 'ê¸°ë¡ ì—†ìŒ';
+      return AppLanguageController.instance.tr('No record', '기록 없음');
     }
     final y = value.year.toString().padLeft(4, '0');
     final m = value.month.toString().padLeft(2, '0');
@@ -1482,10 +4706,7 @@ class _BetaRegistrantBoard extends StatelessWidget {
 }
 
 class _BetaOverviewChip extends StatelessWidget {
-  const _BetaOverviewChip({
-    required this.label,
-    required this.value,
-  });
+  const _BetaOverviewChip({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -1517,10 +4738,7 @@ class _BetaOverviewChip extends StatelessWidget {
 }
 
 class _StatusTag extends StatelessWidget {
-  const _StatusTag({
-    required this.label,
-    required this.color,
-  });
+  const _StatusTag({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -1542,7 +4760,9 @@ class _StatusTag extends StatelessWidget {
 }
 
 class _PatientManagementDialog extends StatefulWidget {
-  const _PatientManagementDialog();
+  const _PatientManagementDialog({this.initialProfileId});
+
+  final String? initialProfileId;
 
   @override
   State<_PatientManagementDialog> createState() =>
@@ -1554,6 +4774,12 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
   String? _selectedProfileId;
 
   @override
+  void initState() {
+    super.initState();
+    _selectedProfileId = widget.initialProfileId;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final profiles = _store.profiles;
     final selected = _selectedProfileId == null
@@ -1561,9 +4787,12 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         : _store.profileById(_selectedProfileId!);
 
     return AlertDialog(
-      title: Text(AppLanguageController.instance.tr('Practitioner Dashboard', '침술사 대시보드')),
+      title: Text(
+        AppLanguageController.instance.tr('Patient Management', '환자 정보 관리'),
+      ),
       content: SizedBox(
-        width: 960,
+        width: 1280,
+        height: 760,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1580,7 +4809,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                         phone: '',
                         email: '',
                         birthYear: 1990,
-                        sex: 'ì—¬ì„±',
+                        sex: 'Female',
                         ethnicity: 'Unknown',
                         memo: '',
                       );
@@ -1588,7 +4817,9 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                       setState(() => _selectedProfileId = newProfile.id);
                     },
                     icon: const Icon(Icons.person_add_alt_1),
-                    label: Text(AppLanguageController.instance.tr('Patient Management', '환자 정보 관리')),
+                    label: Text(
+                      AppLanguageController.instance.tr('Add Patient', '환자 추가'),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
@@ -1617,8 +4848,11 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                                       color: const Color(0xFFFFE2E2),
                                       borderRadius: BorderRadius.circular(999),
                                     ),
-                                    child: const Text(
-                                      '?? ?? ??',
+                                    child: Text(
+                                      AppLanguageController.instance.tr(
+                                        'Missing Required Info',
+                                        '필수 정보 부족',
+                                      ),
                                       style: TextStyle(
                                         color: Colors.redAccent,
                                         fontSize: 12,
@@ -1630,8 +4864,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                             ),
                             subtitle: Text(
                               missingFields.isEmpty
-                                  ? '${profile.phone} ? ${profile.email}'
-                                  : '??: ${missingFields.join(', ')}',
+                                  ? '${profile.phone} · ${profile.email}'
+                                  : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
                             ),
                             trailing: IconButton(
                               onPressed: () {
@@ -1657,7 +4891,14 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
             const SizedBox(width: 16),
             Expanded(
               child: selected == null
-                  ? const Center(child: Text('ê´€ë¦¬í•  í™˜ìžë¥¼ ì„ íƒí•˜ì„¸ìš”.'))
+                  ? Center(
+                      child: Text(
+                        AppLanguageController.instance.tr(
+                          'Select a patient to manage.',
+                          '관리할 환자를 선택하세요.',
+                        ),
+                      ),
+                    )
                   : _PatientProfileEditor(
                       profile: selected,
                       onSave: (updated) {
@@ -1670,10 +4911,9 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         ),
       ),
       actions: [
-              const LanguageMenuButton(),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('ë‹«ê¸°'),
+          child: Text(AppLanguageController.instance.tr('Close', '닫기')),
         ),
       ],
     );
@@ -1681,10 +4921,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
 }
 
 class _PatientProfileEditor extends StatefulWidget {
-  const _PatientProfileEditor({
-    required this.profile,
-    required this.onSave,
-  });
+  const _PatientProfileEditor({required this.profile, required this.onSave});
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
@@ -1725,7 +4962,9 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
       text: widget.profile.birthYear.toString(),
     );
     _sexController = TextEditingController(text: widget.profile.sex);
-    _ethnicityController = TextEditingController(text: widget.profile.ethnicity);
+    _ethnicityController = TextEditingController(
+      text: widget.profile.ethnicity,
+    );
     _memoController = TextEditingController(text: widget.profile.memo);
   }
 
@@ -1747,19 +4986,27 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
 
   @override
   Widget build(BuildContext context) {
+    return PatientRecordWorkspace(
+      profile: widget.profile,
+      onSave: widget.onSave,
+    );
+    /*
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ë“±ë¡ëœ í™˜ìž ì •ë³´ê°€ ìžˆì–´ì•¼ ëŒ€ì‹œë³´ë“œì™€ ë‹µë³€ ìš”ì²­ì—ì„œ ì‚¬ìš©ë©ë‹ˆë‹¤.',
-            style: TextStyle(color: Colors.black54),
+          Text(
+            AppLanguageController.instance.tr(
+              'Registered patient information is used across the dashboard and answer request flow.',
+              '등록된 환자 정보가 있어야 대시보드와 답변 요청에서 사용됩니다.',
+            ),
+            style: const TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'ì´ë¦„',
+            decoration: InputDecoration(
+              labelText: AppLanguageController.instance.tr('Name', '이름'),
               border: OutlineInputBorder(),
             ),
           ),
@@ -1769,8 +5016,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               Expanded(
                 child: TextField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'ì „í™”ë²ˆí˜¸',
+                  decoration: InputDecoration(
+                    labelText: AppLanguageController.instance.tr(
+                      'Phone',
+                      '전화번호',
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1779,8 +5029,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               Expanded(
                 child: TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'ì´ë©”ì¼',
+                  decoration: InputDecoration(
+                    labelText: AppLanguageController.instance.tr(
+                      'Email',
+                      '이메일',
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1793,8 +5046,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               Expanded(
                 child: TextField(
                   controller: _birthYearController,
-                  decoration: const InputDecoration(
-                    labelText: 'ì¶œìƒì—°ë„',
+                  decoration: InputDecoration(
+                    labelText: AppLanguageController.instance.tr(
+                      'Birth Year',
+                      '출생연도',
+                    ),
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
@@ -1804,8 +5060,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               Expanded(
                 child: TextField(
                   controller: _sexController,
-                  decoration: const InputDecoration(
-                    labelText: 'ì„±ë³„',
+                  decoration: InputDecoration(
+                    labelText: AppLanguageController.instance.tr(
+                      'Sex / Gender',
+                      '성별',
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1814,8 +5073,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               Expanded(
                 child: TextField(
                   controller: _ethnicityController,
-                  decoration: const InputDecoration(
-                    labelText: 'ì¸ì¢…/ë¯¼ì¡±',
+                  decoration: InputDecoration(
+                    labelText: AppLanguageController.instance.tr(
+                      'Ethnicity',
+                      '인종/민족',
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1826,8 +5088,11 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
           TextField(
             controller: _memoController,
             maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'ê´€ë¦¬ ë©”ëª¨',
+            decoration: InputDecoration(
+              labelText: AppLanguageController.instance.tr(
+                'Internal Note',
+                '관리 메모',
+              ),
               border: OutlineInputBorder(),
             ),
           ),
@@ -1840,7 +5105,8 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
                     : _nameController.text.trim(),
                 phone: _phoneController.text.trim(),
                 email: _emailController.text.trim(),
-                birthYear: int.tryParse(_birthYearController.text.trim()) ??
+                birthYear:
+                    int.tryParse(_birthYearController.text.trim()) ??
                     widget.profile.birthYear,
                 sex: _sexController.text.trim().isEmpty
                     ? widget.profile.sex
@@ -1852,16 +5118,41 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
               );
               widget.onSave(updated);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('í™˜ìž ì •ë³´ ì €ìž¥ ì™„ë£Œ')),
+                SnackBar(
+                  content: Text(
+                    AppLanguageController.instance.tr(
+                      'Patient information saved',
+                      '환자 정보 저장 완료',
+                    ),
+                  ),
+                ),
               );
             },
             icon: const Icon(Icons.save_outlined),
-            label: Text(AppLanguageController.instance.tr('Patient Management', '?? ?? ??')),
+            label: Text(
+              AppLanguageController.instance.tr(
+                'Save Patient Info',
+                '환자 정보 저장',
+              ),
+            ),
           ),
         ],
       ),
     );
+    */
   }
+}
+
+class _SlotOccupancy {
+  const _SlotOccupancy({
+    required this.profile,
+    this.scheduledVisit,
+    this.appointmentRequest,
+  });
+
+  final PatientProfile profile;
+  final ScheduledVisit? scheduledVisit;
+  final AppointmentRequest? appointmentRequest;
 }
 
 class _VisitWindowSummary {
@@ -1881,32 +5172,57 @@ class _VisitWindowSummary {
 }
 
 class _MiniKpi extends StatelessWidget {
-  const _MiniKpi({required this.title, required this.value});
+  const _MiniKpi({
+    required this.title,
+    required this.value,
+    required this.helper,
+  });
 
   final String title;
   final String value;
+  final String helper;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 150,
+      width: 172,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(10),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withValues(alpha: 0.74),
+              AppTheme.surfaceSoft.withValues(alpha: 0.78),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTheme.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: AppTheme.ink.withValues(alpha: 0.62),
+              ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontSize: 26),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              helper,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.ink.withValues(alpha: 0.68),
+                height: 1.25,
+              ),
             ),
           ],
         ),
@@ -1914,6 +5230,3 @@ class _MiniKpi extends StatelessWidget {
     );
   }
 }
-
-
-

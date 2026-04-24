@@ -1,21 +1,28 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:iottie_automation/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('unlocks the web entry screen with the shared password', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(const TestMvpApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('환자 사전 문진'), findsOneWidget);
-    await tester.pump();
+    expect(find.text('Preview Login'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Daisy');
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Login'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Login'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Choose the right portal route'), findsOneWidget);
+    expect(find.text('Practitioner Login'), findsWidgets);
+    expect(find.text('Patient Test Login'), findsWidgets);
+    expect(find.text('Friend Beta Sign Up / Login'), findsWidgets);
   });
 }

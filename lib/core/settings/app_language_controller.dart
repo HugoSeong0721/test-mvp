@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'app_language_storage.dart';
 
 enum AppLanguage { english, korean }
 
@@ -20,8 +21,7 @@ class AppLanguageController extends ChangeNotifier {
   }
 
   Future<void> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_storageKey);
+    final saved = await AppLanguageStorage.getString(_storageKey);
     if (saved == 'korean') {
       _language = AppLanguage.korean;
     } else {
@@ -35,8 +35,7 @@ class AppLanguageController extends ChangeNotifier {
     }
     _language = language;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
+    await AppLanguageStorage.setString(
       _storageKey,
       language == AppLanguage.korean ? 'korean' : 'english',
     );

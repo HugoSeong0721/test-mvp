@@ -3,6 +3,7 @@ import 'package:iottie_automation/features/patient_requests/presentation/patient
 import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
 
 import 'core/settings/app_language_controller.dart';
+import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/patient_beta_auth_screen.dart';
 import 'features/home/presentation/role_home_screen.dart';
@@ -23,11 +24,9 @@ class TestMvpApp extends StatelessWidget {
       builder: (context, _) {
         final lang = AppLanguageController.instance;
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: lang.tr('Test MVP', '테스트 MVP'),
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F766E)),
-            useMaterial3: true,
-          ),
+          theme: AppTheme.light(),
           initialRoute: RoleHomeScreen.routeName,
           routes: {
             RoleHomeScreen.routeName: (_) => const RoleHomeScreen(),
