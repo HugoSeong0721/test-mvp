@@ -22,14 +22,15 @@ class PractitionerNavSpec {
   final String routeName;
 }
 
-const List<PractitionerNavSpec> kPractitionerNavSpecs = [
-  PractitionerNavSpec(
-    item: PractitionerNavItem.dashboard,
-    icon: Icons.space_dashboard_outlined,
-    labelEn: 'Dashboard',
-    labelKo: '대시보드',
-    routeName: '/dashboard',
-  ),
+const PractitionerNavSpec _dashboardNavSpec = PractitionerNavSpec(
+  item: PractitionerNavItem.dashboard,
+  icon: Icons.space_dashboard_outlined,
+  labelEn: 'Dashboard',
+  labelKo: '대시보드',
+  routeName: '/dashboard',
+);
+
+const List<PractitionerNavSpec> _analyticsNavSpecs = [
   PractitionerNavSpec(
     item: PractitionerNavItem.insights,
     icon: Icons.insights_outlined,
@@ -44,6 +45,11 @@ const List<PractitionerNavSpec> kPractitionerNavSpecs = [
     labelKo: '증상 추세',
     routeName: '/symptom-trend',
   ),
+];
+
+const List<PractitionerNavSpec> kPractitionerNavSpecs = [
+  _dashboardNavSpec,
+  ..._analyticsNavSpecs,
 ];
 
 class PractitionerToolItem {
@@ -222,25 +228,29 @@ class _Sidebar extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               children: [
-                for (final spec in kPractitionerNavSpecs)
+                _NavTile(
+                  spec: _dashboardNavSpec,
+                  selected: _dashboardNavSpec.item == currentItem,
+                ),
+                if (tools.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  _SidebarSectionLabel(
+                    label: AppLanguageController.instance.tr('Tools', '도구'),
+                  ),
+                  for (final tool in tools) _ToolTile(tool: tool),
+                ],
+                const SizedBox(height: 14),
+                _SidebarSectionLabel(
+                  label: AppLanguageController.instance.tr(
+                    'Analytics',
+                    '분석',
+                  ),
+                ),
+                for (final spec in _analyticsNavSpecs)
                   _NavTile(
                     spec: spec,
                     selected: spec.item == currentItem,
                   ),
-                if (tools.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 4, 14, 6),
-                    child: Text(
-                      AppLanguageController.instance.tr('Tools', '도구'),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.55),
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ),
-                  for (final tool in tools) _ToolTile(tool: tool),
-                ],
               ],
             ),
           ),
@@ -305,6 +315,26 @@ class _NavTile extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarSectionLabel extends StatelessWidget {
+  const _SidebarSectionLabel({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 6),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Colors.white.withValues(alpha: 0.55),
+          letterSpacing: 0.6,
         ),
       ),
     );
