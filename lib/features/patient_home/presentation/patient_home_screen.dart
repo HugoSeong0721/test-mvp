@@ -33,6 +33,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   Timer? _loadTimeoutTimer;
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
+  bool _sessionResolved = false;
   bool _showStartGuide = true;
   bool _loadTimedOut = false;
   Object? _loadError;
@@ -43,10 +44,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   List<ScheduledVisit> get _history =>
       _store.historyForPatient(_currentProfile.id);
 
-  bool get _waitingForRealProfile =>
-      _activeSession != null &&
-      _activeSession!.usesFirebaseAuth &&
-      _sessionBackedProfile == null;
+  bool get _waitingForRealProfile {
+    if (!_sessionResolved) {
+      return true;
+    }
+    if (_activeSession == null) {
+      return false;
+    }
+    return _activeSession!.usesFirebaseAuth && _sessionBackedProfile == null;
+  }
 
   @override
   void initState() {
@@ -56,6 +62,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       session,
     ) async {
       _activeSession = session;
+      if (mounted) {
+        setState(() => _sessionResolved = true);
+      } else {
+        _sessionResolved = true;
+      }
       await _profileSubscription?.cancel();
       if (session == null) {
         if (mounted) {

@@ -2280,92 +2280,14 @@ class _PractitionerDashboardScreenState
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: slots.map((slot) {
                         final occupancy = _slotOccupancyFor(slot);
-                        if (occupancy != null) {
-                          final isConfirmed = occupancy.scheduledVisit != null;
-                          return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(14),
-                              onTap: () => _openReservedSlotPatientInfo(
-                                context,
-                                occupancy,
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isConfirmed
-                                      ? const Color(0xFFE3F3EF)
-                                      : const Color(0xFFF6E7D7),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: isConfirmed
-                                        ? const Color(0xFFCFE6DE)
-                                        : const Color(0xFFE2C6A6),
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          isConfirmed
-                                              ? Icons.event_available_outlined
-                                              : Icons.hourglass_top_outlined,
-                                          size: 16,
-                                          color: isConfirmed
-                                              ? AppTheme.pine
-                                              : AppTheme.copper,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Flexible(
-                                          child: Text(
-                                            occupancy.profile.name,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${slot.time} · ${isConfirmed ? lang.tr('Booked', '예약됨') : lang.tr('Pending', '대기중')}',
-                                      style: TextStyle(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.68,
-                                        ),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-
-                        return FilterChip(
-                          selected: slot.isOpen,
-                          label: Text(
-                            slot.isOpen
-                                ? '${slot.time} ${lang.tr('Open', '열림')}'
-                                : '${slot.time} ${lang.tr('Hidden', '숨김')}',
-                          ),
-                          onSelected: (selected) {
-                            _store.setSlotOpen(slot.date, slot.time, selected);
-                          },
+                        return _buildAvailabilitySlotRow(
+                          slot: slot,
+                          occupancy: occupancy,
+                          lang: lang,
                         );
                       }).toList(),
                     ),
@@ -2377,6 +2299,140 @@ class _PractitionerDashboardScreenState
         ),
       ),
     );
+  }
+
+  Widget _buildAvailabilitySlotRow({
+    required AppointmentSlot slot,
+    required _SlotOccupancy? occupancy,
+    required AppLanguageController lang,
+  }) {
+    final reserved = occupancy != null;
+    final isConfirmed = reserved && occupancy.scheduledVisit != null;
+    final reservedColor = isConfirmed ? AppTheme.pine : AppTheme.copper;
+
+    final timeText = Text(
+      slot.time,
+      style: TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: 15,
+        color: reserved ? Colors.black87 : Colors.black,
+        decoration: reserved ? TextDecoration.lineThrough : null,
+        decorationColor: reservedColor,
+        decorationThickness: 2,
+      ),
+    );
+
+    final Widget rightSide;
+    if (reserved) {
+      rightSide = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isConfirmed
+                ? Icons.event_available_outlined
+                : Icons.hourglass_top_outlined,
+            size: 16,
+            color: reservedColor,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            isConfirmed ? lang.tr('Booked', '예약됨') : lang.tr('Pending', '대기중'),
+            style: TextStyle(
+              color: reservedColor,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      );
+    } else {
+      rightSide = Switch(
+        value: slot.isOpen,
+        onChanged: (selected) {
+          _store.setSlotOpen(slot.date, slot.time, selected);
+        },
+      );
+    }
+
+    final Widget body = Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: reserved
+            ? (isConfirmed
+                ? const Color(0xFFE3F3EF)
+                : const Color(0xFFF6E7D7))
+            : (slot.isOpen ? const Color(0xFFEFEFEF) : Colors.white),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: reserved
+              ? (isConfirmed
+                  ? const Color(0xFFCFE6DE)
+                  : const Color(0xFFE2C6A6))
+              : (slot.isOpen
+                  ? const Color(0xFFCCCCCC)
+                  : const Color(0xFFE0E0E0)),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(child: timeText),
+              const SizedBox(width: 8),
+              rightSide,
+            ],
+          ),
+          if (reserved) ...[
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.only(left: 2),
+              child: Row(
+                children: [
+                  Icon(Icons.person_outline, size: 16, color: reservedColor),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      occupancy.profile.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: Colors.black.withValues(alpha: 0.84),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 4),
+            Text(
+              slot.isOpen
+                  ? lang.tr('Open · patients can book', '열림 · 환자가 예약 가능')
+                  : lang.tr('Hidden · not visible to patients', '숨김 · 환자에게 보이지 않음'),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.black.withValues(alpha: 0.58),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+
+    if (reserved) {
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => _openReservedSlotPatientInfo(context, occupancy),
+          child: body,
+        ),
+      );
+    }
+    return body;
   }
 
   Future<void> _openAvailabilityDateCountsSheet() async {
