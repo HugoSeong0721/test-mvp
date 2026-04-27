@@ -7,8 +7,8 @@ import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../../core/widgets/practitioner_shell.dart';
 import '../../patient_brief/presentation/patient_brief_screen.dart';
-import '../../symptom_trend/presentation/symptom_trend_screen.dart';
 import 'patient_record_workspace.dart';
 
 class PractitionerDashboardScreen extends StatefulWidget {
@@ -143,60 +143,33 @@ class _PractitionerDashboardScreenState
                 '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} 환자 ${filteredVisits.length}명',
               );
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(lang.tr('Practitioner Dashboard', '침술사 대시보드')),
-                Text(
-                  lang.tr(
-                    'Clinical operations and intake monitoring',
-                    '운영 현황 및 문진 모니터링',
-                  ),
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: AppTheme.ink.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              if (showTopActionCards) ...[
-                _buildTopInboxAction(pendingAppointmentInboxCount),
-                _buildTopDateAction(),
-              ] else ...[
-                _buildCompactTopInboxAction(pendingAppointmentInboxCount),
-                IconButton(
-                  tooltip: lang.tr('Open date quick actions', '날짜 빠른 선택 열기'),
-                  onPressed: _openDateQuickActionsSheet,
-                  icon: const Icon(Icons.calendar_month_outlined),
-                ),
-              ],
-              const LanguageMenuButton(),
-              TextButton.icon(
-                onPressed: () => _openPatientManagement(context),
-                icon: const Icon(Icons.people_outline),
-                label: Text(lang.tr('Patient Management', '환자 정보 관리')),
-              ),
+        return PractitionerShell(
+          currentItem: PractitionerNavItem.dashboard,
+          title: lang.tr('Practitioner Dashboard', '침술사 대시보드'),
+          subtitle: lang.tr(
+            'Clinical operations and intake monitoring',
+            '운영 현황 및 문진 모니터링',
+          ),
+          actions: [
+            if (showTopActionCards) ...[
+              _buildTopInboxAction(pendingAppointmentInboxCount),
+              _buildTopDateAction(),
+            ] else ...[
+              _buildCompactTopInboxAction(pendingAppointmentInboxCount),
               IconButton(
-                tooltip: lang.tr('View symptom trends', '유사증상 추세 보기'),
-                onPressed: () =>
-                    Navigator.pushNamed(context, SymptomTrendScreen.routeName),
-                icon: const Icon(Icons.insights_outlined),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Center(
-                  child: Chip(
-                    label: Text(lang.tr('Practitioner View', '침술사 화면')),
-                  ),
-                ),
+                tooltip: lang.tr('Open date quick actions', '날짜 빠른 선택 열기'),
+                onPressed: _openDateQuickActionsSheet,
+                icon: const Icon(Icons.calendar_month_outlined),
               ),
             ],
-          ),
-          body: AppBackdrop(
-            child: ListView(
+            const LanguageMenuButton(),
+            TextButton.icon(
+              onPressed: () => _openPatientManagement(context),
+              icon: const Icon(Icons.people_outline),
+              label: Text(lang.tr('Patient Management', '환자 정보 관리')),
+            ),
+          ],
+          body: ListView(
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
@@ -550,7 +523,6 @@ class _PractitionerDashboardScreenState
                 ),
               ],
             ),
-          ),
         );
       },
     );
