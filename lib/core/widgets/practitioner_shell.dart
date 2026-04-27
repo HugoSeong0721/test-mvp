@@ -46,7 +46,7 @@ const List<PractitionerNavSpec> kPractitionerNavSpecs = [
   ),
 ];
 
-class PractitionerShell extends StatelessWidget {
+class PractitionerShell extends StatefulWidget {
   const PractitionerShell({
     super.key,
     required this.currentItem,
@@ -64,39 +64,70 @@ class PractitionerShell extends StatelessWidget {
 
   static const double _sidebarWidth = 232;
   static const double _wideBreakpoint = 1100;
+  static const Duration _animationDuration = Duration(milliseconds: 220);
+
+  @override
+  State<PractitionerShell> createState() => _PractitionerShellState();
+}
+
+class _PractitionerShellState extends State<PractitionerShell> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _sidebarExpanded = true;
 
   @override
   Widget build(BuildContext context) {
-    final wide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
+    final wide =
+        MediaQuery.sizeOf(context).width >= PractitionerShell._wideBreakpoint;
+    final showSidebar = wide && _sidebarExpanded;
 
     return Scaffold(
+      key: _scaffoldKey,
       drawer: wide
           ? null
           : Drawer(
               backgroundColor: AppTheme.pine,
-              child: SafeArea(child: _Sidebar(currentItem: currentItem)),
+              child: SafeArea(
+                child: _Sidebar(currentItem: widget.currentItem),
+              ),
             ),
       body: AppBackdrop(
         child: SafeArea(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (wide)
-                SizedBox(
-                  width: _sidebarWidth,
-                  child: _Sidebar(currentItem: currentItem),
+              AnimatedContainer(
+                duration: PractitionerShell._animationDuration,
+                curve: Curves.easeInOut,
+                width: showSidebar ? PractitionerShell._sidebarWidth : 0,
+                child: ClipRect(
+                  child: OverflowBox(
+                    minWidth: PractitionerShell._sidebarWidth,
+                    maxWidth: PractitionerShell._sidebarWidth,
+                    alignment: Alignment.centerLeft,
+                    child: _Sidebar(currentItem: widget.currentItem),
+                  ),
                 ),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _TopBar(
-                      title: title,
-                      subtitle: subtitle,
-                      actions: actions,
-                      showMenuButton: !wide,
+                      title: widget.title,
+                      subtitle: widget.subtitle,
+                      actions: widget.actions,
+                      onToggleSidebar: () {
+                        if (wide) {
+                          setState(
+                            () => _sidebarExpanded = !_sidebarExpanded,
+                          );
+                        } else {
+                          _scaffoldKey.currentState?.openDrawer();
+                        }
+                      },
+                      sidebarVisible: showSidebar,
                     ),
-                    Expanded(child: body),
+                    Expanded(child: widget.body),
                   ],
                 ),
               ),
@@ -275,21 +306,24 @@ class _TopBar extends StatelessWidget {
   const _TopBar({
     required this.title,
     required this.actions,
-    required this.showMenuButton,
+    required this.onToggleSidebar,
+    required this.sidebarVisible,
     this.subtitle,
   });
 
   final String title;
   final String? subtitle;
   final List<Widget> actions;
-  final bool showMenuButton;
+  final VoidCallback onToggleSidebar;
+  final bool sidebarVisible;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final lang = AppLanguageController.instance;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.78),
         border: Border(
@@ -298,14 +332,14 @@ class _TopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          if (showMenuButton)
-            Builder(
-              builder: (innerContext) => IconButton(
-                onPressed: () => Scaffold.of(innerContext).openDrawer(),
-                icon: const Icon(Icons.menu),
-                tooltip: 'Menu',
-              ),
-            ),
+          IconButton(
+            onPressed: onToggleSidebar,
+            icon: Icon(sidebarVisible ? Icons.menu_open : Icons.menu),
+            tooltip: sidebarVisible
+                ? lang.tr('Hide menu', '메뉴 숨기기')
+                : lang.tr('Show menu', '메뉴 표시'),
+          ),
+          const SizedBox(width: 4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
