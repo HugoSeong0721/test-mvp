@@ -83,7 +83,11 @@ class _PractitionerDashboardScreenState
   String _selectedStatusFilter = 'All';
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
-  bool _showDashboardGuide = true;
+  bool _showDashboardGuide = false;
+  bool _showOpsHub = false;
+  bool _showInsightPanel = false;
+  bool _showAppointmentInbox = false;
+  bool _showAvailabilityBoard = false;
 
   @override
   void initState() {
@@ -151,10 +155,9 @@ class _PractitionerDashboardScreenState
             '운영 현황 및 문진 모니터링',
           ),
           actions: [
-            if (showTopActionCards) ...[
-              _buildTopInboxAction(pendingAppointmentInboxCount),
-              _buildTopDateAction(),
-            ] else ...[
+            if (showTopActionCards)
+              _buildCompactTopInboxAction(pendingAppointmentInboxCount)
+            else ...[
               _buildCompactTopInboxAction(pendingAppointmentInboxCount),
               IconButton(
                 tooltip: lang.tr('Open date quick actions', '날짜 빠른 선택 열기'),
@@ -163,34 +166,85 @@ class _PractitionerDashboardScreenState
               ),
             ],
             const LanguageMenuButton(),
-            TextButton.icon(
-              onPressed: () => _openPatientManagement(context),
-              icon: const Icon(Icons.people_outline),
-              label: Text(lang.tr('Patient Management', '환자 정보 관리')),
+          ],
+          tools: [
+            PractitionerToolItem(
+              icon: Icons.people_outline,
+              labelEn: 'Patient Management',
+              labelKo: '환자 정보 관리',
+              onTap: () => _openPatientManagement(context),
+            ),
+            PractitionerToolItem(
+              icon: Icons.dashboard_outlined,
+              labelEn: 'Operations Hub',
+              labelKo: '운영 허브',
+              active: _showOpsHub,
+              onTap: () => setState(() => _showOpsHub = !_showOpsHub),
+            ),
+            PractitionerToolItem(
+              icon: Icons.query_stats_outlined,
+              labelEn: 'Visit Window Insights',
+              labelKo: '방문 구간 인사이트',
+              active: _showInsightPanel,
+              onTap: () =>
+                  setState(() => _showInsightPanel = !_showInsightPanel),
+            ),
+            PractitionerToolItem(
+              icon: Icons.mark_email_unread_outlined,
+              labelEn: 'Appointment Inbox',
+              labelKo: '예약 신청 Inbox',
+              active: _showAppointmentInbox,
+              onTap: () => setState(
+                () => _showAppointmentInbox = !_showAppointmentInbox,
+              ),
+            ),
+            PractitionerToolItem(
+              icon: Icons.event_available_outlined,
+              labelEn: 'Schedule / Slots',
+              labelKo: '일정 · 슬롯 관리',
+              active: _showAvailabilityBoard,
+              onTap: () => setState(
+                () => _showAvailabilityBoard = !_showAvailabilityBoard,
+              ),
+            ),
+            PractitionerToolItem(
+              icon: Icons.help_outline,
+              labelEn: 'Quick Guide',
+              labelKo: '빠른 사용 가이드',
+              active: _showDashboardGuide,
+              onTap: () =>
+                  setState(() => _showDashboardGuide = !_showDashboardGuide),
             ),
           ],
           body: ListView(
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                _buildDashboardHero(
-                  summary,
-                  visibleVisits,
-                  filteredVisits.length,
-                ),
-                const SizedBox(height: 16),
+                if (_showOpsHub) ...[
+                  _buildDashboardHero(
+                    summary,
+                    visibleVisits,
+                    filteredVisits.length,
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final wide = constraints.maxWidth >= 1000;
+                    final showInsight = _showInsightPanel;
+                    final dateSelector = KeyedSubtree(
+                      key: _dateSelectorKey,
+                      child: _buildDateSelectorPanel(),
+                    );
+                    if (!showInsight) {
+                      return dateSelector;
+                    }
                     if (!wide) {
                       return Column(
                         children: [
                           _buildInsightPanel(summary),
                           const SizedBox(height: 12),
-                          KeyedSubtree(
-                            key: _dateSelectorKey,
-                            child: _buildDateSelectorPanel(),
-                          ),
+                          dateSelector,
                         ],
                       );
                     }
@@ -199,58 +253,53 @@ class _PractitionerDashboardScreenState
                       children: [
                         Expanded(flex: 11, child: _buildInsightPanel(summary)),
                         const SizedBox(width: 12),
-                        Expanded(
-                          flex: 9,
-                          child: KeyedSubtree(
-                            key: _dateSelectorKey,
-                            child: _buildDateSelectorPanel(),
-                          ),
-                        ),
+                        Expanded(flex: 9, child: dateSelector),
                       ],
                     );
                   },
                 ),
-                const SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth >= 1000;
-                    if (!wide) {
-                      return Column(
+                if (_showAppointmentInbox || _showAvailabilityBoard) ...[
+                  const SizedBox(height: 12),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final wide = constraints.maxWidth >= 1000;
+                      final inbox = _showAppointmentInbox
+                          ? KeyedSubtree(
+                              key: _appointmentInboxKey,
+                              child: _buildPatientInboxBoard(),
+                            )
+                          : null;
+                      final availability = _showAvailabilityBoard
+                          ? KeyedSubtree(
+                              key: _availabilityBoardKey,
+                              child: _buildAvailabilityBoard(),
+                            )
+                          : null;
+
+                      if (inbox != null && availability == null) return inbox;
+                      if (inbox == null && availability != null) {
+                        return availability;
+                      }
+                      if (!wide) {
+                        return Column(
+                          children: [
+                            inbox!,
+                            const SizedBox(height: 12),
+                            availability!,
+                          ],
+                        );
+                      }
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          KeyedSubtree(
-                            key: _appointmentInboxKey,
-                            child: _buildPatientInboxBoard(),
-                          ),
-                          const SizedBox(height: 12),
-                          KeyedSubtree(
-                            key: _availabilityBoardKey,
-                            child: _buildAvailabilityBoard(),
-                          ),
+                          Expanded(flex: 10, child: inbox!),
+                          const SizedBox(width: 12),
+                          Expanded(flex: 8, child: availability!),
                         ],
                       );
-                    }
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 10,
-                          child: KeyedSubtree(
-                            key: _appointmentInboxKey,
-                            child: _buildPatientInboxBoard(),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          flex: 8,
-                          child: KeyedSubtree(
-                            key: _availabilityBoardKey,
-                            child: _buildAvailabilityBoard(),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                    },
+                  ),
+                ],
                 const SizedBox(height: 16),
                 KeyedSubtree(
                   key: _patientCardsKey,

@@ -46,6 +46,22 @@ const List<PractitionerNavSpec> kPractitionerNavSpecs = [
   ),
 ];
 
+class PractitionerToolItem {
+  const PractitionerToolItem({
+    required this.icon,
+    required this.labelEn,
+    required this.labelKo,
+    required this.onTap,
+    this.active = false,
+  });
+
+  final IconData icon;
+  final String labelEn;
+  final String labelKo;
+  final VoidCallback onTap;
+  final bool active;
+}
+
 class PractitionerShell extends StatefulWidget {
   const PractitionerShell({
     super.key,
@@ -54,12 +70,14 @@ class PractitionerShell extends StatefulWidget {
     required this.body,
     this.subtitle,
     this.actions = const [],
+    this.tools = const [],
   });
 
   final PractitionerNavItem currentItem;
   final String title;
   final String? subtitle;
   final List<Widget> actions;
+  final List<PractitionerToolItem> tools;
   final Widget body;
 
   static const double _sidebarWidth = 232;
@@ -87,7 +105,10 @@ class _PractitionerShellState extends State<PractitionerShell> {
           : Drawer(
               backgroundColor: AppTheme.pine,
               child: SafeArea(
-                child: _Sidebar(currentItem: widget.currentItem),
+                child: _Sidebar(
+                  currentItem: widget.currentItem,
+                  tools: widget.tools,
+                ),
               ),
             ),
       body: AppBackdrop(
@@ -104,7 +125,10 @@ class _PractitionerShellState extends State<PractitionerShell> {
                     minWidth: PractitionerShell._sidebarWidth,
                     maxWidth: PractitionerShell._sidebarWidth,
                     alignment: Alignment.centerLeft,
-                    child: _Sidebar(currentItem: widget.currentItem),
+                    child: _Sidebar(
+                      currentItem: widget.currentItem,
+                      tools: widget.tools,
+                    ),
                   ),
                 ),
               ),
@@ -140,9 +164,13 @@ class _PractitionerShellState extends State<PractitionerShell> {
 }
 
 class _Sidebar extends StatelessWidget {
-  const _Sidebar({required this.currentItem});
+  const _Sidebar({
+    required this.currentItem,
+    this.tools = const [],
+  });
 
   final PractitionerNavItem currentItem;
+  final List<PractitionerToolItem> tools;
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +227,20 @@ class _Sidebar extends StatelessWidget {
                     spec: spec,
                     selected: spec.item == currentItem,
                   ),
+                if (tools.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 4, 14, 6),
+                    child: Text(
+                      AppLanguageController.instance.tr('Tools', '도구'),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.55),
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ),
+                  for (final tool in tools) _ToolTile(tool: tool),
+                ],
               ],
             ),
           ),
@@ -256,6 +298,59 @@ class _NavTile extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: fg,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ToolTile extends StatelessWidget {
+  const _ToolTile({required this.tool});
+
+  final PractitionerToolItem tool;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    final fg = Colors.white;
+    final bg = tool.active
+        ? Colors.white.withValues(alpha: 0.16)
+        : Colors.transparent;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Material(
+        color: bg,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            if (Scaffold.of(context).hasDrawer &&
+                Scaffold.of(context).isDrawerOpen) {
+              Navigator.of(context).pop();
+            }
+            tool.onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Icon(tool.icon, size: 17, color: fg.withValues(alpha: 0.9)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    lang.tr(tool.labelEn, tool.labelKo),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: fg.withValues(alpha: 0.92),
+                      fontWeight:
+                          tool.active ? FontWeight.w700 : FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

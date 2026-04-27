@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -163,6 +165,13 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       }
 
       Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
+    } on _SignUpTimeoutException {
+      _setFormError(
+        lang.tr(
+          'Sign up is taking longer than expected. Please check your network or VPN and try again.',
+          '서버 응답이 너무 느립니다. 네트워크 또는 VPN 상태를 확인하고 다시 시도해주세요.',
+        ),
+      );
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));
     } on FirebaseAuthException catch (error) {
@@ -181,6 +190,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
   }
 
+  static const Duration _authTimeout = Duration(seconds: 12);
+
   Future<void> _registerTester({
     required String name,
     required String email,
@@ -188,14 +199,17 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   }) async {
     try {
       final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      await credential.user?.updateDisplayName(name);
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .timeout(_authTimeout);
+      await credential.user?.updateDisplayName(name).timeout(_authTimeout);
       if (credential.user != null) {
         await PatientProfileService.ensureProfileForUser(
           credential.user!,
           nameHint: name,
-        );
+        ).timeout(_authTimeout);
       }
+    } on TimeoutException {
+      throw const _SignUpTimeoutException();
     } on FirebaseAuthException catch (error) {
       if (error.code != 'operation-not-allowed') {
         rethrow;
@@ -218,13 +232,16 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     required String password,
   }) async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(_authTimeout);
       if (credential.user != null) {
-        await PatientProfileService.ensureProfileForUser(credential.user!);
+        await PatientProfileService.ensureProfileForUser(
+          credential.user!,
+        ).timeout(_authTimeout);
       }
+    } on TimeoutException {
+      throw const _SignUpTimeoutException();
     } on FirebaseAuthException catch (error) {
       if (!_shouldTryLocalLogin(error)) {
         rethrow;
@@ -604,4 +621,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       ),
     );
   }
+}
+
+class _SignUpTimeoutException implements Exception {
+  const _SignUpTimeoutException();
 }
