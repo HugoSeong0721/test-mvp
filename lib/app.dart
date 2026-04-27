@@ -59,6 +59,30 @@ class TestMvpApp extends StatelessWidget {
             TesterFeedbackInboxScreen.routeName: (_) =>
                 const TesterFeedbackInboxScreen(),
           },
+          onGenerateRoute: (settings) {
+            // Shareable shortcut URLs that go straight to a single role.
+            // /clinic  -> practitioner login
+            // /patient -> patient sign-up / login (absorbs the old beta flow)
+            switch (settings.name) {
+              case '/clinic':
+                return MaterialPageRoute<void>(
+                  settings: const RouteSettings(
+                    name: '/clinic',
+                    arguments: {
+                      'role': 'practitioner',
+                      'loginMode': 'default',
+                    },
+                  ),
+                  builder: (_) => const LoginScreen(),
+                );
+              case '/patient':
+                return MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: '/patient'),
+                  builder: (_) => const PatientBetaAuthScreen(),
+                );
+            }
+            return null;
+          },
         );
       },
     );
