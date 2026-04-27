@@ -38,8 +38,31 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   bool _loadTimedOut = false;
   Object? _loadError;
 
-  PatientProfile get _currentProfile =>
-      _sessionBackedProfile ?? _store.currentPatientProfile;
+  PatientProfile get _currentProfile {
+    if (_sessionBackedProfile != null) {
+      return _sessionBackedProfile!;
+    }
+    final session = _activeSession;
+    if (session != null && !session.usesFirebaseAuth) {
+      // Local session: synthesize a basic profile from session info so we
+      // do not fall back to the demo patient (jane_kim).
+      return PatientProfile(
+        id: session.id,
+        name: session.displayName.isNotEmpty
+            ? session.displayName
+            : (session.email.isNotEmpty
+                ? session.email.split('@').first
+                : 'New Patient'),
+        phone: '',
+        email: session.email,
+        birthYear: 1990,
+        sex: 'Not entered',
+        ethnicity: 'Not entered',
+        memo: '',
+      );
+    }
+    return _store.currentPatientProfile;
+  }
 
   List<ScheduledVisit> get _history =>
       _store.historyForPatient(_currentProfile.id);

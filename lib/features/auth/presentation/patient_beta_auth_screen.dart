@@ -62,8 +62,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
 
   Future<void> _signOutTester() async {
     final lang = AppLanguageController.instance;
+    setState(() => _loading = true);
     try {
-      await PatientProfileService.signOut();
+      await PatientProfileService.signOut().timeout(_authTimeout);
       if (!mounted) {
         return;
       }
@@ -74,13 +75,24 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           '현재 테스터 세션에서 로그아웃했습니다.',
         ),
       );
+    } on TimeoutException {
+      _showMessage(
+        lang.tr(
+          'Sign out is slow — Firebase may be blocked. Try again with VPN off.',
+          '로그아웃이 느립니다. VPN을 끄고 다시 시도해주세요.',
+        ),
+      );
     } catch (error) {
       _showMessage(
         lang.tr(
-          'Could not sign out right now: $error',
-          '지금 로그아웃하지 못했습니다: $error',
+          'Could not sign out right now.',
+          '지금 로그아웃하지 못했습니다.',
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -88,18 +100,27 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     final lang = AppLanguageController.instance;
     setState(() => _loading = true);
     try {
-      await TesterFlowService.resetPortalData(patientId: session.id);
+      await TesterFlowService.resetPortalData(
+        patientId: session.id,
+      ).timeout(_authTimeout);
       _showMessage(
         lang.tr(
           'Tester flow data was reset.',
           '테스터 흐름 데이터가 초기화되었습니다.',
         ),
       );
+    } on TimeoutException {
+      _showMessage(
+        lang.tr(
+          'Reset is slow — Firebase may be blocked. Try again with VPN off.',
+          '초기화가 느립니다. VPN을 끄고 다시 시도해주세요.',
+        ),
+      );
     } catch (error) {
       _showMessage(
         lang.tr(
-          'Could not reset tester flow data right now: $error',
-          '지금은 테스터 흐름 데이터를 초기화하지 못했습니다: $error',
+          'Could not reset right now.',
+          '지금 초기화할 수 없습니다.',
         ),
       );
     } finally {

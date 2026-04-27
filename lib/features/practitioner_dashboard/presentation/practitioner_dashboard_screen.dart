@@ -171,21 +171,15 @@ class _PractitionerDashboardScreenState
               icon: Icons.people_outline,
               labelEn: 'Patient Management',
               labelKo: '환자 정보 관리',
-              onTap: () => _openPatientManagement(context),
+              active: _subView == _DashboardSubView.patientManagement,
+              onTap: () => _selectSubView(_DashboardSubView.patientManagement),
             ),
             PractitionerToolItem(
               icon: Icons.dashboard_outlined,
-              labelEn: 'Operations Hub',
-              labelKo: '운영 허브',
+              labelEn: 'Today Summary',
+              labelKo: '오늘 요약',
               active: _subView == _DashboardSubView.opsHub,
               onTap: () => _selectSubView(_DashboardSubView.opsHub),
-            ),
-            PractitionerToolItem(
-              icon: Icons.query_stats_outlined,
-              labelEn: 'Visit Window Insights',
-              labelKo: '방문 구간 인사이트',
-              active: _subView == _DashboardSubView.visitInsights,
-              onTap: () => _selectSubView(_DashboardSubView.visitInsights),
             ),
             PractitionerToolItem(
               icon: Icons.mark_email_unread_outlined,
@@ -193,6 +187,13 @@ class _PractitionerDashboardScreenState
               labelKo: '예약 신청 Inbox',
               active: _subView == _DashboardSubView.inbox,
               onTap: () => _selectSubView(_DashboardSubView.inbox),
+            ),
+            PractitionerToolItem(
+              icon: Icons.query_stats_outlined,
+              labelEn: 'Visit Window Insights',
+              labelKo: '방문 구간 인사이트',
+              active: _subView == _DashboardSubView.visitInsights,
+              onTap: () => _selectSubView(_DashboardSubView.visitInsights),
             ),
             PractitionerToolItem(
               icon: Icons.event_available_outlined,
@@ -235,6 +236,16 @@ class _PractitionerDashboardScreenState
                   KeyedSubtree(
                     key: _availabilityBoardKey,
                     child: _buildAvailabilityBoard(),
+                  ),
+                ],
+                if (_subView == _DashboardSubView.patientManagement) ...[
+                  const SizedBox(height: 4),
+                  AppPanel(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      height: 720,
+                      child: _PatientManagementDialog(embedded: true),
+                    ),
                   ),
                 ],
                 const SizedBox(height: 16),
@@ -2214,7 +2225,28 @@ class _PractitionerDashboardScreenState
   Widget _buildAvailabilityBoard() {
     final lang = AppLanguageController.instance;
     final grouped = <String, List<AppointmentSlot>>{};
+
+    bool slotInRange(String slotDate) {
+      if (_selectedDateRange == null) {
+        return true;
+      }
+      final parsed = _parseDate(slotDate);
+      if (parsed == null) return true;
+      final start = DateTime(
+        _selectedDateRange!.start.year,
+        _selectedDateRange!.start.month,
+        _selectedDateRange!.start.day,
+      );
+      final end = DateTime(
+        _selectedDateRange!.end.year,
+        _selectedDateRange!.end.month,
+        _selectedDateRange!.end.day,
+      );
+      return !parsed.isBefore(start) && !parsed.isAfter(end);
+    }
+
     for (final slot in _store.slots) {
+      if (!slotInRange(slot.date)) continue;
       grouped.putIfAbsent(slot.date, () => <AppointmentSlot>[]).add(slot);
     }
     final dates = grouped.keys.toList()..sort();
@@ -4871,9 +4903,13 @@ class _StatusTag extends StatelessWidget {
 }
 
 class _PatientManagementDialog extends StatefulWidget {
-  const _PatientManagementDialog({this.initialProfileId});
+  const _PatientManagementDialog({
+    this.initialProfileId,
+    this.embedded = false,
+  });
 
   final String? initialProfileId;
+  final bool embedded;
 
   @override
   State<_PatientManagementDialog> createState() =>
@@ -4897,18 +4933,11 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         ? (profiles.isNotEmpty ? profiles.first : null)
         : _store.profileById(_selectedProfileId!);
 
-    return AlertDialog(
-      title: Text(
-        AppLanguageController.instance.tr('Patient Management', '환자 정보 관리'),
-      ),
-      content: SizedBox(
-        width: 1280,
-        height: 760,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 280,
+    final body = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 280,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -5017,10 +5046,19 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                         setState(() => _selectedProfileId = updated.id);
                       },
                     ),
-            ),
-          ],
         ),
+      ],
+    );
+
+    if (widget.embedded) {
+      return body;
+    }
+
+    return AlertDialog(
+      title: Text(
+        AppLanguageController.instance.tr('Patient Management', '환자 정보 관리'),
       ),
+      content: SizedBox(width: 1280, height: 760, child: body),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -5345,7 +5383,8 @@ class _MiniKpi extends StatelessWidget {
 enum _DashboardSubView {
   main,
   opsHub,
-  visitInsights,
   inbox,
+  visitInsights,
   schedule,
+  patientManagement,
 }
