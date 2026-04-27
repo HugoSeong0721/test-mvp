@@ -28,6 +28,20 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _isRegisterMode = true;
   bool _showPassword = false;
   bool _loading = false;
+  String? _formError;
+
+  void _setFormError(String? message) {
+    if (!mounted) {
+      return;
+    }
+    setState(() => _formError = message);
+  }
+
+  void _clearFormErrorOnChange() {
+    if (_formError != null) {
+      _setFormError(null);
+    }
+  }
 
   @override
   void dispose() {
@@ -99,14 +113,37 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     final password = _passwordController.text.trim();
     final name = _nameController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showMessage(
+    _setFormError(null);
+
+    if (email.isEmpty && password.isEmpty) {
+      _setFormError(
         lang.tr('Please enter your email and password.', '이메일과 비밀번호를 입력해주세요.'),
       );
       return;
     }
+    if (email.isEmpty) {
+      _setFormError(
+        lang.tr('Please enter your email.', '이메일을 입력해주세요.'),
+      );
+      return;
+    }
+    if (password.isEmpty) {
+      _setFormError(
+        lang.tr('Please enter your password.', '비밀번호를 입력해주세요.'),
+      );
+      return;
+    }
+    if (_isRegisterMode && password.length < 6) {
+      _setFormError(
+        lang.tr(
+          'Password must be at least 6 characters.',
+          '비밀번호는 6자 이상이어야 합니다.',
+        ),
+      );
+      return;
+    }
     if (_isRegisterMode && name.isEmpty) {
-      _showMessage(
+      _setFormError(
         lang.tr('A name is required to sign up.', '회원가입에는 이름이 필요합니다.'),
       );
       return;
@@ -127,11 +164,11 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
 
       Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
     } on LocalBetaAuthException catch (error) {
-      _showMessage(_friendlyLocalAuthMessage(error));
+      _setFormError(_friendlyLocalAuthMessage(error));
     } on FirebaseAuthException catch (error) {
-      _showMessage(_friendlyAuthMessage(error));
+      _setFormError(_friendlyAuthMessage(error));
     } catch (error) {
-      _showMessage(
+      _setFormError(
         lang.tr(
           'An error occurred during sign up / login: $error',
           '회원가입 또는 로그인 중 오류가 발생했습니다: $error',
@@ -389,15 +426,23 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             selected: {_isRegisterMode},
             onSelectionChanged: _loading
                 ? null
-                : (selection) => setState(
-                    () => _isRegisterMode = selection.first,
-                  ),
+                : (selection) {
+                    setState(() {
+                      _isRegisterMode = selection.first;
+                      _formError = null;
+                    });
+                  },
           ),
+          if (_formError != null) ...[
+            const SizedBox(height: 14),
+            _buildErrorBanner(context, _formError!),
+          ],
           const SizedBox(height: 18),
           if (_isRegisterMode) ...[
             TextField(
               controller: _nameController,
               textInputAction: TextInputAction.next,
+              onChanged: (_) => _clearFormErrorOnChange(),
               decoration: InputDecoration(
                 labelText: lang.tr('Name', '이름'),
                 prefixIcon: const Icon(Icons.person_outline),
@@ -409,6 +454,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
+            onChanged: (_) => _clearFormErrorOnChange(),
             decoration: InputDecoration(
               labelText: lang.tr('Email', '이메일'),
               prefixIcon: const Icon(Icons.alternate_email),
@@ -419,9 +465,13 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             controller: _passwordController,
             obscureText: !_showPassword,
             textInputAction: TextInputAction.done,
+            onChanged: (_) => _clearFormErrorOnChange(),
             onSubmitted: (_) => _submit(),
             decoration: InputDecoration(
               labelText: lang.tr('Password', '비밀번호'),
+              helperText: _isRegisterMode
+                  ? lang.tr('At least 6 characters', '최소 6자 이상')
+                  : null,
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 onPressed: () => setState(
@@ -452,7 +502,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           TextButton(
             onPressed: _loading
                 ? null
-                : () => setState(() => _isRegisterMode = !_isRegisterMode),
+                : () => setState(() {
+                    _isRegisterMode = !_isRegisterMode;
+                    _formError = null;
+                  }),
             child: Text(toggleLabel),
           ),
         ],
@@ -517,6 +570,35 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                 label: Text(lang.tr('Reset data', '데이터 초기화')),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorBanner(BuildContext context, String message) {
+    final errorColor = Theme.of(context).colorScheme.error;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: errorColor.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: errorColor.withValues(alpha: 0.45)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.error_outline, color: errorColor, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: errorColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
