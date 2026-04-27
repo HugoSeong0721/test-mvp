@@ -2,6 +2,7 @@
 
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../../core/widgets/practitioner_shell.dart';
 
 class SymptomTrendScreen extends StatelessWidget {
   const SymptomTrendScreen({super.key});
@@ -14,17 +15,11 @@ class SymptomTrendScreen extends StatelessWidget {
     final arg = ModalRoute.of(context)?.settings.arguments;
     final data = arg is SymptomTrendPageArgs ? arg : const SymptomTrendPageArgs.empty();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(lang.tr('Weekly Similar Symptom Trends', '주간 유사 증상 추세')),
-        actions: [
-          const LanguageMenuButton(),
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Center(child: Chip(label: Text(lang.tr('Practitioner View', '침술사 화면')))),
-          ),
-        ],
-      ),
+    return PractitionerShell(
+      currentItem: PractitionerNavItem.symptomTrend,
+      title: lang.tr('Symptom Trends', '증상 추세'),
+      subtitle: lang.tr('Weekly similar-symptom signals', '주간 유사 증상 신호'),
+      actions: const [LanguageMenuButton()],
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

@@ -10,6 +10,7 @@ import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../../core/widgets/patient_shell.dart';
 import '../../patient_home/presentation/patient_home_screen.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
 import '../../visit_history/presentation/visit_history_screen.dart';
@@ -392,11 +393,10 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
         final lang = AppLanguageController.instance;
         final profile = _currentProfile;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(lang.tr('Requests Inbox', '답변 요청함')),
-            actions: const [LanguageMenuButton()],
-          ),
+        return PatientShell(
+          currentItem: PatientNavItem.requests,
+          title: lang.tr('Requests Inbox', '답변 요청함'),
+          actions: const [LanguageMenuButton()],
           body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance
                 .collection('answer_requests')

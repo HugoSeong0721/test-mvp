@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../../core/widgets/practitioner_shell.dart';
 
 class PractitionerInsightsScreen extends StatelessWidget {
   const PractitionerInsightsScreen({super.key});
@@ -11,19 +12,14 @@ class PractitionerInsightsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(lang.tr('Practitioner Insights Dashboard', '침술사 인사이트 대시보드')),
-        actions: [
-          const LanguageMenuButton(),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Center(
-              child: Chip(label: Text(lang.tr('Practitioner View', '침술사 화면'))),
-            ),
-          ),
-        ],
+    return PractitionerShell(
+      currentItem: PractitionerNavItem.insights,
+      title: lang.tr('Insights', '인사이트'),
+      subtitle: lang.tr(
+        'Last 12 weeks summary and patient mix',
+        '최근 12주 요약 및 환자 구성',
       ),
+      actions: const [LanguageMenuButton()],
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

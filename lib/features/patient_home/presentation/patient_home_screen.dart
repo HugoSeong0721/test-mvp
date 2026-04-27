@@ -12,6 +12,7 @@ import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../../core/widgets/patient_shell.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
 
 class PatientHomeScreen extends StatefulWidget {
@@ -421,24 +422,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ? upcomingVisits.first.visit
             : null;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(lang.tr('Patient Home', '환자 홈')),
-            actions: [
-              IconButton(
-                tooltip: lang.tr('Edit profile', '프로필 수정'),
-                onPressed: _openProfileDialog,
-                icon: const Icon(Icons.account_circle_outlined),
-              ),
-              const LanguageMenuButton(),
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Center(
-                  child: Chip(label: Text(lang.tr('Patient View', '환자 화면'))),
-                ),
-              ),
-            ],
-          ),
+        return PatientShell(
+          currentItem: PatientNavItem.home,
+          title: lang.tr('Patient Home', '환자 홈'),
+          actions: [
+            IconButton(
+              tooltip: lang.tr('Edit profile', '프로필 수정'),
+              onPressed: _openProfileDialog,
+              icon: const Icon(Icons.account_circle_outlined),
+            ),
+            const LanguageMenuButton(),
+          ],
           body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance
                 .collection('answer_requests')

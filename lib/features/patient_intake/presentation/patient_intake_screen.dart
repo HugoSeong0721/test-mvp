@@ -11,7 +11,7 @@ import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
-import '../../patient_home/presentation/patient_home_screen.dart';
+import '../../../core/widgets/patient_shell.dart';
 import '../../patient_requests/presentation/patient_requests_screen.dart';
 import '../../visit_history/presentation/visit_history_screen.dart';
 
@@ -736,32 +736,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
         _activeAnswers.values.where((value) => value.trim().isNotEmpty).length;
     final remainingCount = _activeQuestions.length - answeredCount;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(lang.tr('Patient Intake', '환자 사전 문진')),
-        actions: [
-          IconButton(
-            tooltip: lang.tr('Patient home', '환자 홈'),
-            onPressed: () => Navigator.pushReplacementNamed(
-              context,
-              PatientHomeScreen.routeName,
-            ),
-            icon: const Icon(Icons.home_outlined),
-          ),
-          IconButton(
-            tooltip: lang.tr('Edit profile', '프로필 수정'),
-            onPressed: _openProfileDialog,
-            icon: const Icon(Icons.account_circle_outlined),
-          ),
-          const LanguageMenuButton(),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Center(
-              child: Chip(label: Text(lang.tr('Patient View', '환자 화면'))),
-            ),
-          ),
-        ],
-      ),
+    return PatientShell(
+      currentItem: PatientNavItem.intake,
+      title: lang.tr('Patient Intake', '환자 사전 문진'),
+      actions: [
+        IconButton(
+          tooltip: lang.tr('Edit profile', '프로필 수정'),
+          onPressed: _openProfileDialog,
+          icon: const Icon(Icons.account_circle_outlined),
+        ),
+        const LanguageMenuButton(),
+      ],
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -1233,38 +1218,20 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
         ? lang.tr('Initial visit', '초진')
         : lang.tr('Follow-up', '재진');
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(lang.tr('Patient Intake', '환자 사전 문진')),
-        actions: [
-          IconButton(
-            tooltip: lang.tr('Patient home', '환자 홈'),
-            onPressed: () => Navigator.pushReplacementNamed(
-              context,
-              PatientHomeScreen.routeName,
-            ),
-            icon: const Icon(Icons.home_outlined),
-          ),
-          IconButton(
-            tooltip: lang.tr('Edit profile', '프로필 수정'),
-            onPressed: _openProfileDialog,
-            icon: const Icon(Icons.account_circle_outlined),
-          ),
-          const LanguageMenuButton(),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Center(
-              child: Chip(label: Text(lang.tr('Patient View', '환자 화면'))),
-            ),
-          ),
-        ],
-      ),
-      body: AppBackdrop(
-        child: SafeArea(
-          child: SingleChildScrollView(
-            primary: true,
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+    return PatientShell(
+      currentItem: PatientNavItem.intake,
+      title: lang.tr('Patient Intake', '환자 사전 문진'),
+      actions: [
+        IconButton(
+          tooltip: lang.tr('Edit profile', '프로필 수정'),
+          onPressed: _openProfileDialog,
+          icon: const Icon(Icons.account_circle_outlined),
+        ),
+        const LanguageMenuButton(),
+      ],
+      body: SingleChildScrollView(
+        primary: true,
+        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection('answer_requests')
                   .where('patientId', isEqualTo: profile.id)
@@ -2382,8 +2349,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
               },
             ),
           ),
-        ),
-      ),
     );
   }
 }

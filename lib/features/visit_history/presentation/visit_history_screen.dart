@@ -11,6 +11,7 @@ import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
+import '../../../core/widgets/patient_shell.dart';
 
 class VisitHistoryScreen extends StatefulWidget {
   const VisitHistoryScreen({super.key});
@@ -202,11 +203,10 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
         final history = _history;
         final lastVisit = history.isNotEmpty ? history.first.visit : null;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(lang.tr('Visit History', '방문 기록')),
-            actions: const [LanguageMenuButton()],
-          ),
+        return PatientShell(
+          currentItem: PatientNavItem.history,
+          title: lang.tr('Visit History', '방문 기록'),
+          actions: const [LanguageMenuButton()],
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
