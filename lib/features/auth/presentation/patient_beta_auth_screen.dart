@@ -165,13 +165,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       }
 
       Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
-    } on _SignUpTimeoutException {
-      _setFormError(
-        lang.tr(
-          'Sign up is taking longer than expected. Please check your network or VPN and try again.',
-          '서버 응답이 너무 느립니다. 네트워크 또는 VPN 상태를 확인하고 다시 시도해주세요.',
-        ),
-      );
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));
     } on FirebaseAuthException catch (error) {
@@ -190,7 +183,17 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
   }
 
-  static const Duration _authTimeout = Duration(seconds: 12);
+  static const Duration _authTimeout = Duration(seconds: 6);
+
+  bool _isUserFacingFirebaseAuthError(FirebaseAuthException error) {
+    const userErrors = {
+      'email-already-in-use',
+      'invalid-email',
+      'weak-password',
+      'wrong-password',
+    };
+    return userErrors.contains(error.code);
+  }
 
   Future<void> _registerTester({
     required String name,
@@ -201,29 +204,41 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password)
           .timeout(_authTimeout);
-      await credential.user?.updateDisplayName(name).timeout(_authTimeout);
-      if (credential.user != null) {
-        await PatientProfileService.ensureProfileForUser(
-          credential.user!,
-          nameHint: name,
-        ).timeout(_authTimeout);
+      try {
+        await credential.user?.updateDisplayName(name).timeout(_authTimeout);
+        if (credential.user != null) {
+          await PatientProfileService.ensureProfileForUser(
+            credential.user!,
+            nameHint: name,
+          ).timeout(_authTimeout);
+        }
+      } catch (_) {
+        // Profile setup hiccup is fine — auth already succeeded.
       }
-    } on TimeoutException {
-      throw const _SignUpTimeoutException();
+      return;
     } on FirebaseAuthException catch (error) {
-      if (error.code != 'operation-not-allowed') {
+      if (_isUserFacingFirebaseAuthError(error)) {
         rethrow;
       }
+      // Network / unavailable / config issue — fall through to local.
+    } on TimeoutException {
+      // Firebase blocked or slow — fall through to local.
+    } catch (_) {
+      // Any other failure — fall through to local.
+    }
 
-      final session = await BetaSessionService.signUpLocally(
-        name: name,
-        email: email,
-        password: password,
-      );
+    final session = await BetaSessionService.signUpLocally(
+      name: name,
+      email: email,
+      password: password,
+    );
+    try {
       await PatientProfileService.ensureProfileForSession(
         session,
         nameHint: name,
-      );
+      ).timeout(_authTimeout);
+    } catch (_) {
+      // Local profile sync best-effort.
     }
   }
 
@@ -235,23 +250,49 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
           .timeout(_authTimeout);
-      if (credential.user != null) {
-        await PatientProfileService.ensureProfileForUser(
-          credential.user!,
-        ).timeout(_authTimeout);
+      try {
+        if (credential.user != null) {
+          await PatientProfileService.ensureProfileForUser(
+            credential.user!,
+          ).timeout(_authTimeout);
+        }
+      } catch (_) {
+        // Profile sync best-effort.
       }
-    } on TimeoutException {
-      throw const _SignUpTimeoutException();
+      return;
     } on FirebaseAuthException catch (error) {
-      if (!_shouldTryLocalLogin(error)) {
-        rethrow;
+      if (_isUserFacingFirebaseAuthError(error)) {
+        // Try local with same credentials before surfacing to user — the
+        // account may exist locally even when Firebase says otherwise.
+        try {
+          final session = await BetaSessionService.logInLocally(
+            email: email,
+            password: password,
+          );
+          await PatientProfileService.ensureProfileForSession(session);
+          return;
+        } on LocalBetaAuthException {
+          rethrow;
+        } catch (_) {
+          rethrow;
+        }
       }
+      // Network / unavailable — fall through to local.
+    } on TimeoutException {
+      // Fall through to local.
+    } catch (_) {
+      // Fall through to local.
+    }
 
-      final session = await BetaSessionService.logInLocally(
-        email: email,
-        password: password,
-      );
-      await PatientProfileService.ensureProfileForSession(session);
+    final session = await BetaSessionService.logInLocally(
+      email: email,
+      password: password,
+    );
+    try {
+      await PatientProfileService.ensureProfileForSession(session)
+          .timeout(_authTimeout);
+    } catch (_) {
+      // best-effort
     }
   }
 
@@ -623,6 +664,3 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   }
 }
 
-class _SignUpTimeoutException implements Exception {
-  const _SignUpTimeoutException();
-}
