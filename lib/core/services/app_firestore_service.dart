@@ -184,6 +184,114 @@ class AppFirestoreService {
     }, SetOptions(merge: true));
   }
 
+  static Future<void> sendTesterFeedback({
+    required String category,
+    required String routeName,
+    required String summary,
+    required String details,
+    required String reporterName,
+    required String reporterEmail,
+  }) async {
+    const feedbackInbox = 'mg.seong0721@gmail.com';
+    final feedbackRef = _db.collection('tester_feedback').doc();
+    final screenLabel = routeName.trim().isEmpty ? 'unknown_screen' : routeName;
+    final summaryLine = summary.trim().isEmpty
+        ? 'No short summary added'
+        : summary.trim();
+    final detailsLine = details.trim().isEmpty
+        ? 'No extra detail added'
+        : details.trim();
+    final nameLine = reporterName.trim().isEmpty
+        ? 'Anonymous tester'
+        : reporterName.trim();
+    final emailLine = reporterEmail.trim().isEmpty
+        ? 'No email provided'
+        : reporterEmail.trim();
+    final submittedAt = DateTime.now().toIso8601String();
+
+    final textBody =
+        '''
+Tester feedback was submitted from Test MVP.
+
+Category: $category
+Screen: $screenLabel
+Submitted at: $submittedAt
+Tester: $nameLine
+Email: $emailLine
+
+What they were trying to do:
+$summaryLine
+
+What happened / what should change:
+$detailsLine
+''';
+
+    final htmlBody =
+        '''
+<p><strong>Tester feedback was submitted from Test MVP.</strong></p>
+<p>
+Category: <strong>$category</strong><br/>
+Screen: <strong>$screenLabel</strong><br/>
+Submitted at: <strong>$submittedAt</strong><br/>
+Tester: <strong>$nameLine</strong><br/>
+Email: <strong>$emailLine</strong>
+</p>
+<p><strong>What they were trying to do</strong><br/>$summaryLine</p>
+<p><strong>What happened / what should change</strong><br/>$detailsLine</p>
+''';
+
+    await feedbackRef.set({
+      'category': category,
+      'routeName': screenLabel,
+      'summary': summaryLine,
+      'details': detailsLine,
+      'reporterName': reporterName.trim(),
+      'reporterEmail': reporterEmail.trim(),
+      'status': 'open',
+      'source': 'global_feedback_launcher',
+      'submittedAt': FieldValue.serverTimestamp(),
+      'submittedAtIso': submittedAt,
+      'reviewedAt': null,
+    });
+
+    await _db.collection('mail').add({
+      'to': [feedbackInbox],
+      'message': {
+        'subject': '[Test MVP Feedback] $category · $screenLabel',
+        'text': textBody,
+        'html': htmlBody,
+      },
+      'meta': {
+        'type': 'tester_feedback',
+        'category': category,
+        'routeName': screenLabel,
+        'reporterName': reporterName.trim(),
+        'reporterEmail': reporterEmail.trim(),
+        'feedbackId': feedbackRef.id,
+        'queuedBy': 'global_feedback_launcher',
+      },
+      'queuedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  static Future<void> markTesterFeedbackReviewed({
+    required String feedbackId,
+  }) async {
+    await _db.collection('tester_feedback').doc(feedbackId).set({
+      'status': 'reviewed',
+      'reviewedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> reopenTesterFeedback({required String feedbackId}) async {
+    await _db.collection('tester_feedback').doc(feedbackId).set({
+      'status': 'open',
+      'reviewedAt': null,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   static Future<void> _queuePortalEmail({
     required String patientName,
     required String patientEmail,

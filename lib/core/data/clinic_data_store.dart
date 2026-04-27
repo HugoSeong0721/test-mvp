@@ -862,6 +862,33 @@ class ClinicDataStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetTestingStateForPatient(String patientId) {
+    _appointmentRequests.removeWhere(
+      (request) => request.patientId == patientId,
+    );
+    _visits.removeWhere((visit) => visit.patientId == patientId);
+    notifyListeners();
+  }
+
+  void addTestingVisit(PatientVisit visit) {
+    _visits.removeWhere((item) => item.id == visit.id);
+    _visits.removeWhere(
+      (item) =>
+          item.patientId == visit.patientId &&
+          item.date == visit.date &&
+          item.time == visit.time,
+    );
+    _visits.add(visit);
+    _visits.sort((a, b) {
+      final dateCompare = a.date.compareTo(b.date);
+      if (dateCompare != 0) {
+        return dateCompare;
+      }
+      return a.time.compareTo(b.time);
+    });
+    notifyListeners();
+  }
+
   void addAppointment({
     required String patientId,
     required String date,

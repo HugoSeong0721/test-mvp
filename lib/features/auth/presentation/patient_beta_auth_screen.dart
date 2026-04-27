@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
+import '../../../core/services/tester_flow_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
@@ -13,6 +14,7 @@ import '../../home/presentation/role_home_screen.dart';
 import '../../patient_home/presentation/patient_home_screen.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
 import '../../patient_requests/presentation/patient_requests_screen.dart';
+import '../../tester_feedback/presentation/tester_feedback_inbox_screen.dart';
 
 class PatientBetaAuthScreen extends StatefulWidget {
   const PatientBetaAuthScreen({super.key});
@@ -68,6 +70,108 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           '지금 로그아웃하지 못했습니다: $error',
         ),
       );
+    }
+  }
+
+  Future<bool> _confirmTesterToolsAction({
+    required String title,
+    required String body,
+    required String confirmLabel,
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final lang = AppLanguageController.instance;
+        return AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(lang.tr('Cancel', '취소')),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(confirmLabel),
+            ),
+          ],
+        );
+      },
+    );
+    return result ?? false;
+  }
+
+  Future<void> _resetTesterPortalData(PatientSession session) async {
+    final lang = AppLanguageController.instance;
+    final confirmed = await _confirmTesterToolsAction(
+      title: lang.tr('Reset tester flow data', '테스터 흐름 데이터 초기화'),
+      body: lang.tr(
+        'This keeps the beta account itself, but removes saved requests, intake submissions, and visit-feedback activity for this tester.',
+        '베타 계정 자체는 유지하면서, 이 테스터의 요청함 / 문진 제출 / 방문 피드백 활동 기록만 비웁니다.',
+      ),
+      confirmLabel: lang.tr('Reset now', '지금 초기화'),
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      await TesterFlowService.resetPortalData(patientId: session.id);
+      _showMessage(
+        lang.tr(
+          'Tester flow data was reset. The account is still available.',
+          '테스터 흐름 데이터가 초기화되었습니다. 계정은 그대로 유지됩니다.',
+        ),
+      );
+    } catch (error) {
+      _showMessage(
+        lang.tr(
+          'Could not reset tester flow data right now: $error',
+          '지금은 테스터 흐름 데이터를 초기화하지 못했습니다: $error',
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  Future<void> _resetAndSeedTesterPortalData(PatientProfile profile) async {
+    final lang = AppLanguageController.instance;
+    final confirmed = await _confirmTesterToolsAction(
+      title: lang.tr('Reset and reload sample data', '초기화 후 샘플 데이터 다시 넣기'),
+      body: lang.tr(
+        'This clears current tester activity, then adds one sample follow-up request and one sample intake submission so you can review the flow again right away.',
+        '현재 테스터 활동 기록을 지운 뒤, 샘플 follow-up 요청 1건과 샘플 문진 제출 1건을 다시 넣어 바로 흐름을 검토할 수 있게 합니다.',
+      ),
+      confirmLabel: lang.tr('Reload sample data', '샘플 데이터 다시 넣기'),
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      await TesterFlowService.resetAndSeedPortalData(profile: profile);
+      _showMessage(
+        lang.tr(
+          'Sample tester data was reloaded for this account.',
+          '이 계정용 샘플 테스터 데이터가 다시 준비되었습니다.',
+        ),
+      );
+    } catch (error) {
+      _showMessage(
+        lang.tr(
+          'Could not reload sample tester data right now: $error',
+          '지금은 샘플 테스터 데이터를 다시 넣지 못했습니다: $error',
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -1190,6 +1294,35 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                             ),
                             icon: const Icon(Icons.assignment_outlined),
                             label: Text(lang.tr('Open intake', '문진 열기')),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              TesterFeedbackInboxScreen.routeName,
+                            ),
+                            icon: const Icon(Icons.inbox_outlined),
+                            label: Text(
+                              lang.tr('Open feedback inbox', '피드백 인박스 열기'),
+                            ),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _loading
+                                ? null
+                                : () => _resetTesterPortalData(session),
+                            icon: const Icon(Icons.restart_alt),
+                            label: Text(
+                              lang.tr('Reset flow data', '흐름 데이터 초기화'),
+                            ),
+                          ),
+                          FilledButton.tonalIcon(
+                            onPressed:
+                                _loading || profile == null || hasDataError
+                                ? null
+                                : () => _resetAndSeedTesterPortalData(profile),
+                            icon: const Icon(Icons.inventory_2_outlined),
+                            label: Text(
+                              lang.tr('Reload sample data', '샘플 데이터 다시 넣기'),
+                            ),
                           ),
                         ],
                       ),

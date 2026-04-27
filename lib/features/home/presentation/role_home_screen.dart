@@ -6,6 +6,7 @@ import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../auth/presentation/patient_beta_auth_screen.dart';
+import '../../tester_feedback/presentation/tester_feedback_inbox_screen.dart';
 
 class RoleHomeScreen extends StatefulWidget {
   const RoleHomeScreen({super.key});
@@ -649,6 +650,105 @@ class _RoleHomeScreenState extends State<RoleHomeScreen> {
               ],
             );
           },
+        ),
+        const SizedBox(height: 18),
+        AppPanel(
+          padding: const EdgeInsets.all(22),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF7F5F1), Color(0xFFE9F0EB)],
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 960;
+              final overview = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lang.tr('Tester operations', '테스터 운영 도구'),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    lang.tr(
+                      'Use this area to manage beta onboarding and review incoming tester feedback without hunting through email first.',
+                      '이 영역에서는 베타 온보딩 관리와 테스터 피드백 확인을 메일함보다 먼저 제품 안에서 바로 처리할 수 있습니다.',
+                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppTheme.ink.withValues(alpha: 0.76),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      AppMetricChip(
+                        icon: Icons.inventory_2_outlined,
+                        label: lang.tr('Beta tools live', '베타 도구'),
+                        value: lang.tr(
+                          'Reset and reload sample data',
+                          '초기화 + 샘플 재로딩',
+                        ),
+                      ),
+                      AppMetricChip(
+                        icon: Icons.rate_review_outlined,
+                        label: lang.tr('Feedback loop', '피드백 루프'),
+                        value: lang.tr(
+                          'Collect and review in app',
+                          '앱 안에서 수집/검토',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+
+              final actions = Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton.icon(
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      PatientBetaAuthScreen.routeName,
+                    ),
+                    icon: const Icon(Icons.person_add_alt_1_outlined),
+                    label: Text(
+                      lang.tr('Open friend beta tools', '지인 베타 도구 열기'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      TesterFeedbackInboxScreen.routeName,
+                    ),
+                    icon: const Icon(Icons.inbox_outlined),
+                    label: Text(
+                      lang.tr('Open tester feedback inbox', '테스터 피드백 인박스 열기'),
+                    ),
+                  ),
+                ],
+              );
+
+              if (!wide) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [overview, const SizedBox(height: 18), actions],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 12, child: overview),
+                  const SizedBox(width: 18),
+                  Expanded(flex: 7, child: actions),
+                ],
+              );
+            },
+          ),
         ),
       ],
     );
