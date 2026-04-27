@@ -84,10 +84,13 @@ class _PractitionerDashboardScreenState
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
   bool _showDashboardGuide = false;
-  bool _showOpsHub = false;
-  bool _showInsightPanel = false;
-  bool _showAppointmentInbox = false;
-  bool _showAvailabilityBoard = false;
+  _DashboardSubView _subView = _DashboardSubView.main;
+
+  void _selectSubView(_DashboardSubView view) {
+    setState(
+      () => _subView = _subView == view ? _DashboardSubView.main : view,
+    );
+  }
 
   @override
   void initState() {
@@ -178,49 +181,36 @@ class _PractitionerDashboardScreenState
               icon: Icons.dashboard_outlined,
               labelEn: 'Operations Hub',
               labelKo: '운영 허브',
-              active: _showOpsHub,
-              onTap: () => setState(() => _showOpsHub = !_showOpsHub),
+              active: _subView == _DashboardSubView.opsHub,
+              onTap: () => _selectSubView(_DashboardSubView.opsHub),
             ),
             PractitionerToolItem(
               icon: Icons.query_stats_outlined,
               labelEn: 'Visit Window Insights',
               labelKo: '방문 구간 인사이트',
-              active: _showInsightPanel,
-              onTap: () =>
-                  setState(() => _showInsightPanel = !_showInsightPanel),
+              active: _subView == _DashboardSubView.visitInsights,
+              onTap: () => _selectSubView(_DashboardSubView.visitInsights),
             ),
             PractitionerToolItem(
               icon: Icons.mark_email_unread_outlined,
               labelEn: 'Appointment Inbox',
               labelKo: '예약 신청 Inbox',
-              active: _showAppointmentInbox,
-              onTap: () => setState(
-                () => _showAppointmentInbox = !_showAppointmentInbox,
-              ),
+              active: _subView == _DashboardSubView.inbox,
+              onTap: () => _selectSubView(_DashboardSubView.inbox),
             ),
             PractitionerToolItem(
               icon: Icons.event_available_outlined,
               labelEn: 'Schedule / Slots',
               labelKo: '일정 · 슬롯 관리',
-              active: _showAvailabilityBoard,
-              onTap: () => setState(
-                () => _showAvailabilityBoard = !_showAvailabilityBoard,
-              ),
-            ),
-            PractitionerToolItem(
-              icon: Icons.help_outline,
-              labelEn: 'Quick Guide',
-              labelKo: '빠른 사용 가이드',
-              active: _showDashboardGuide,
-              onTap: () =>
-                  setState(() => _showDashboardGuide = !_showDashboardGuide),
+              active: _subView == _DashboardSubView.schedule,
+              onTap: () => _selectSubView(_DashboardSubView.schedule),
             ),
           ],
           body: ListView(
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
-                if (_showOpsHub) ...[
+                if (_subView == _DashboardSubView.opsHub) ...[
                   _buildDashboardHero(
                     summary,
                     visibleVisits,
@@ -228,80 +218,31 @@ class _PractitionerDashboardScreenState
                   ),
                   const SizedBox(height: 16),
                 ],
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth >= 1000;
-                    final showInsight = _showInsightPanel;
-                    final dateSelector = KeyedSubtree(
-                      key: _dateSelectorKey,
-                      child: _buildDateSelectorPanel(),
-                    );
-                    if (!showInsight) {
-                      return dateSelector;
-                    }
-                    if (!wide) {
-                      return Column(
-                        children: [
-                          _buildInsightPanel(summary),
-                          const SizedBox(height: 12),
-                          dateSelector,
-                        ],
-                      );
-                    }
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 11, child: _buildInsightPanel(summary)),
-                        const SizedBox(width: 12),
-                        Expanded(flex: 9, child: dateSelector),
-                      ],
-                    );
-                  },
-                ),
-                if (_showAppointmentInbox || _showAvailabilityBoard) ...[
+                if (_subView == _DashboardSubView.visitInsights) ...[
+                  _buildInsightPanel(summary),
                   const SizedBox(height: 12),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final wide = constraints.maxWidth >= 1000;
-                      final inbox = _showAppointmentInbox
-                          ? KeyedSubtree(
-                              key: _appointmentInboxKey,
-                              child: _buildPatientInboxBoard(),
-                            )
-                          : null;
-                      final availability = _showAvailabilityBoard
-                          ? KeyedSubtree(
-                              key: _availabilityBoardKey,
-                              child: _buildAvailabilityBoard(),
-                            )
-                          : null;
-
-                      if (inbox != null && availability == null) return inbox;
-                      if (inbox == null && availability != null) {
-                        return availability;
-                      }
-                      if (!wide) {
-                        return Column(
-                          children: [
-                            inbox!,
-                            const SizedBox(height: 12),
-                            availability!,
-                          ],
-                        );
-                      }
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 10, child: inbox!),
-                          const SizedBox(width: 12),
-                          Expanded(flex: 8, child: availability!),
-                        ],
-                      );
-                    },
+                ],
+                if (_subView == _DashboardSubView.main)
+                  KeyedSubtree(
+                    key: _dateSelectorKey,
+                    child: _buildDateSelectorPanel(),
+                  ),
+                if (_subView == _DashboardSubView.inbox) ...[
+                  const SizedBox(height: 4),
+                  KeyedSubtree(
+                    key: _appointmentInboxKey,
+                    child: _buildPatientInboxBoard(),
+                  ),
+                ],
+                if (_subView == _DashboardSubView.schedule) ...[
+                  const SizedBox(height: 4),
+                  KeyedSubtree(
+                    key: _availabilityBoardKey,
+                    child: _buildAvailabilityBoard(),
                   ),
                 ],
                 const SizedBox(height: 16),
-                KeyedSubtree(
+                if (_subView == _DashboardSubView.main) KeyedSubtree(
                   key: _patientCardsKey,
                   child: AppPanel(
                     padding: const EdgeInsets.all(20),
@@ -566,10 +507,11 @@ class _PractitionerDashboardScreenState
                       ],
                     ),
                   ),
-                ...filteredVisits.map(
-                  (scheduledVisit) =>
-                      _buildPatientCard(context, scheduledVisit),
-                ),
+                if (_subView == _DashboardSubView.main)
+                  ...filteredVisits.map(
+                    (scheduledVisit) =>
+                        _buildPatientCard(context, scheduledVisit),
+                  ),
               ],
             ),
         );
@@ -5250,4 +5192,12 @@ class _MiniKpi extends StatelessWidget {
       ),
     );
   }
+}
+
+enum _DashboardSubView {
+  main,
+  opsHub,
+  visitInsights,
+  inbox,
+  schedule,
 }
