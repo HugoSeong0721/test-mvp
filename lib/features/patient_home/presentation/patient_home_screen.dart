@@ -43,9 +43,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       return _sessionBackedProfile!;
     }
     final session = _activeSession;
-    if (session != null && !session.usesFirebaseAuth) {
-      // Local session: synthesize a basic profile from session info so we
-      // do not fall back to the demo patient (jane_kim).
+    if (session != null) {
+      // Always synthesize a profile from session info immediately so the
+      // screen renders without waiting for Firestore. Firestore data
+      // populates _sessionBackedProfile in the background when it arrives.
       return PatientProfile(
         id: session.id,
         name: session.displayName.isNotEmpty
@@ -68,13 +69,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       _store.historyForPatient(_currentProfile.id);
 
   bool get _waitingForRealProfile {
-    if (!_sessionResolved) {
-      return true;
-    }
-    if (_activeSession == null) {
-      return false;
-    }
-    return _activeSession!.usesFirebaseAuth && _sessionBackedProfile == null;
+    // Only block on the very first session resolve. After that, the
+    // synthesized profile from _currentProfile keeps the screen usable
+    // even if Firestore is slow or blocked, so we never freeze.
+    return !_sessionResolved;
   }
 
   @override
@@ -84,12 +82,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     _sessionSubscription = BetaSessionService.watchSession().listen((
       session,
     ) async {
-      _activeSession = session;
       if (mounted) {
-        setState(() => _sessionResolved = true);
+        setState(() {
+          _activeSession = session;
+          _sessionResolved = true;
+        });
       } else {
+        _activeSession = session;
         _sessionResolved = true;
       }
+      _loadTimeoutTimer?.cancel();
       await _profileSubscription?.cancel();
       if (session == null) {
         if (mounted) {
@@ -98,27 +100,30 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return;
       }
 
-      try {
-        await PatientProfileService.ensureProfileForSession(session)
-            .timeout(_profileLoadTimeout);
-        _profileSubscription =
-            PatientProfileService.watchProfileForSession(session).listen((
-              profile,
-            ) {
-              if (!mounted || profile == null) {
-                return;
-              }
-              _loadTimeoutTimer?.cancel();
-              setState(() {
-                _sessionBackedProfile = profile;
-                _loadTimedOut = false;
-                _loadError = null;
-              });
+      // Subscribe to profile updates immediately so any cached or local
+      // data shows up without waiting on the Firestore write below.
+      _profileSubscription =
+          PatientProfileService.watchProfileForSession(session).listen((
+            profile,
+          ) {
+            if (!mounted || profile == null) {
+              return;
+            }
+            setState(() {
+              _sessionBackedProfile = profile;
+              _loadError = null;
             });
-      } catch (error) {
-        if (!mounted) return;
-        setState(() => _loadError = error);
-      }
+          });
+
+      // ensureProfileForSession can take ~minutes when Firestore is
+      // blocked by VPN. Fire-and-forget with a timeout so it never
+      // stalls the UI; whatever it writes will surface through the
+      // watch above when it actually completes.
+      unawaited(
+        PatientProfileService.ensureProfileForSession(session)
+            .timeout(_profileLoadTimeout)
+            .catchError((_) {}),
+      );
     });
   }
 
