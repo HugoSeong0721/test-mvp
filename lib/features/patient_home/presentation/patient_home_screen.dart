@@ -25,12 +25,17 @@ class PatientHomeScreen extends StatefulWidget {
 }
 
 class _PatientHomeScreenState extends State<PatientHomeScreen> {
+  static const Duration _profileLoadTimeout = Duration(seconds: 10);
+
   final ClinicDataStore _store = ClinicDataStore.instance;
   StreamSubscription<PatientSession?>? _sessionSubscription;
   StreamSubscription<PatientProfile?>? _profileSubscription;
+  Timer? _loadTimeoutTimer;
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
   bool _showStartGuide = true;
+  bool _loadTimedOut = false;
+  Object? _loadError;
 
   PatientProfile get _currentProfile =>
       _sessionBackedProfile ?? _store.currentPatientProfile;
@@ -38,9 +43,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   List<ScheduledVisit> get _history =>
       _store.historyForPatient(_currentProfile.id);
 
+  bool get _waitingForRealProfile =>
+      _activeSession != null &&
+      _activeSession!.usesFirebaseAuth &&
+      _sessionBackedProfile == null;
+
   @override
   void initState() {
     super.initState();
+    _startLoadTimer();
     _sessionSubscription = BetaSessionService.watchSession().listen((
       session,
     ) async {
@@ -53,21 +64,77 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return;
       }
 
-      await PatientProfileService.ensureProfileForSession(session);
-      _profileSubscription =
-          PatientProfileService.watchProfileForSession(session).listen((
-            profile,
-          ) {
-            if (!mounted || profile == null) {
-              return;
-            }
-            setState(() => _sessionBackedProfile = profile);
-          });
+      try {
+        await PatientProfileService.ensureProfileForSession(session)
+            .timeout(_profileLoadTimeout);
+        _profileSubscription =
+            PatientProfileService.watchProfileForSession(session).listen((
+              profile,
+            ) {
+              if (!mounted || profile == null) {
+                return;
+              }
+              _loadTimeoutTimer?.cancel();
+              setState(() {
+                _sessionBackedProfile = profile;
+                _loadTimedOut = false;
+                _loadError = null;
+              });
+            });
+      } catch (error) {
+        if (!mounted) return;
+        setState(() => _loadError = error);
+      }
     });
+  }
+
+  void _startLoadTimer() {
+    _loadTimeoutTimer?.cancel();
+    _loadTimeoutTimer = Timer(_profileLoadTimeout, () {
+      if (!mounted) return;
+      if (_sessionBackedProfile == null && _waitingForRealProfile) {
+        setState(() => _loadTimedOut = true);
+      }
+    });
+  }
+
+  void _retryLoad() {
+    setState(() {
+      _loadTimedOut = false;
+      _loadError = null;
+    });
+    _startLoadTimer();
+    final session = _activeSession;
+    if (session != null) {
+      _sessionSubscription?.cancel();
+      _sessionSubscription = BetaSessionService.watchSession().listen((s) async {
+        _activeSession = s;
+        if (s == null) return;
+        try {
+          await PatientProfileService.ensureProfileForSession(s)
+              .timeout(_profileLoadTimeout);
+          _profileSubscription?.cancel();
+          _profileSubscription =
+              PatientProfileService.watchProfileForSession(s).listen((profile) {
+                if (!mounted || profile == null) return;
+                _loadTimeoutTimer?.cancel();
+                setState(() {
+                  _sessionBackedProfile = profile;
+                  _loadTimedOut = false;
+                  _loadError = null;
+                });
+              });
+        } catch (error) {
+          if (!mounted) return;
+          setState(() => _loadError = error);
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
+    _loadTimeoutTimer?.cancel();
     _sessionSubscription?.cancel();
     _profileSubscription?.cancel();
     super.dispose();
@@ -407,6 +474,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       animation: AppLanguageController.instance,
       builder: (context, _) {
         final lang = AppLanguageController.instance;
+
+        if (_waitingForRealProfile) {
+          return PatientShell(
+            currentItem: PatientNavItem.home,
+            title: lang.tr('Patient Home', '환자 홈'),
+            actions: const [LanguageMenuButton()],
+            body: _buildLoadingOrErrorBody(context, lang),
+          );
+        }
+
         final profile = _currentProfile;
         final history = _history;
         final latestVisit = history.isNotEmpty ? history.first.visit : null;
@@ -1670,6 +1747,87 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLoadingOrErrorBody(
+    BuildContext context,
+    AppLanguageController lang,
+  ) {
+    final hasError = _loadError != null;
+    final timedOut = _loadTimedOut;
+    final showProblem = hasError || timedOut;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!showProblem) ...[
+                const CircularProgressIndicator(),
+                const SizedBox(height: 18),
+                Text(
+                  lang.tr(
+                    'Loading your patient profile...',
+                    '환자 프로필을 불러오는 중...',
+                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ] else ...[
+                Icon(
+                  Icons.cloud_off_outlined,
+                  size: 56,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  lang.tr(
+                    'Could not load your profile.',
+                    '프로필을 불러오지 못했습니다.',
+                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  lang.tr(
+                    'This usually means your network or VPN is blocking Firebase. Please turn off VPN, check your connection, then retry.',
+                    '네트워크 또는 VPN이 Firebase 호출을 막고 있는 경우가 많습니다. VPN을 끄고 연결을 확인한 뒤 다시 시도해주세요.',
+                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.black54,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 18),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: _retryLoad,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(lang.tr('Retry', '다시 시도')),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil('/', (_) => false),
+                      icon: const Icon(Icons.home_outlined),
+                      label: Text(lang.tr('Back to entry', '진입 화면으로')),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
