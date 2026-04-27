@@ -158,16 +158,12 @@ class _PractitionerDashboardScreenState
             '운영 현황 및 문진 모니터링',
           ),
           actions: [
-            if (showTopActionCards)
-              _buildCompactTopInboxAction(pendingAppointmentInboxCount)
-            else ...[
-              _buildCompactTopInboxAction(pendingAppointmentInboxCount),
-              IconButton(
-                tooltip: lang.tr('Open date quick actions', '날짜 빠른 선택 열기'),
-                onPressed: _openDateQuickActionsSheet,
-                icon: const Icon(Icons.calendar_month_outlined),
-              ),
-            ],
+            _buildCompactTopInboxAction(pendingAppointmentInboxCount),
+            IconButton(
+              tooltip: lang.tr('Pick date range', '날짜 범위 선택'),
+              onPressed: _pickDateRange,
+              icon: const Icon(Icons.calendar_month_outlined),
+            ),
             const LanguageMenuButton(),
           ],
           tools: [
@@ -1282,7 +1278,103 @@ class _PractitionerDashboardScreenState
     return entries.first;
   }
 
+  Future<void> _pickDateRange() async {
+    final lang = AppLanguageController.instance;
+    final now = DateTime.now();
+    final initial = _selectedDateRange ??
+        DateTimeRange(
+          start: now.subtract(const Duration(days: 6)),
+          end: now,
+        );
+    final picked = await showDateRangePicker(
+      context: context,
+      initialDateRange: initial,
+      firstDate: DateTime(now.year - 2),
+      lastDate: DateTime(now.year + 1, 12, 31),
+      helpText: lang.tr('Pick start and end dates', '시작일과 종료일을 선택하세요'),
+      saveText: lang.tr('Apply', '적용'),
+      cancelText: lang.tr('Cancel', '취소'),
+    );
+    if (picked == null || !mounted) {
+      return;
+    }
+    setState(() {
+      _selectedDateRange = picked;
+      _selectedDate = _formatDate(picked.end);
+    });
+  }
+
   Widget _buildDateSelectorPanel() {
+    final lang = AppLanguageController.instance;
+    final theme = Theme.of(context);
+    final rangeLabel = _selectedDateRange == null
+        ? lang.tr(
+            'Last $_selectedRangeDays days',
+            '최근 $_selectedRangeDays일',
+          )
+        : '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)}';
+
+    return AppPanel(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.92),
+          AppTheme.blush.withValues(alpha: 0.34),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.calendar_month_outlined,
+            color: AppTheme.pine,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  lang.tr('Date range', '날짜 범위'),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  rangeLabel,
+                  style: theme.textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            onPressed: _pickDateRange,
+            icon: const Icon(Icons.event_outlined, size: 18),
+            label: Text(lang.tr('Change', '변경')),
+          ),
+          if (_selectedDateRange != null) ...[
+            const SizedBox(width: 4),
+            IconButton(
+              tooltip: lang.tr('Reset to last 7 days', '최근 7일로 초기화'),
+              onPressed: () {
+                setState(() {
+                  _selectedDateRange = null;
+                  _selectedRangeDays = 7;
+                });
+              },
+              icon: const Icon(Icons.restart_alt, size: 20),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegacyDateSelectorPanelDeprecated() {
     final dates = _store.allDates;
     final selectedDate = _parseDate(_selectedDate) ?? DateTime.now();
     final theme = Theme.of(context);
