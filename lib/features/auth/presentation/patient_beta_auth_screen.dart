@@ -33,6 +33,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _showPassword = false;
   bool _loading = false;
   bool _loadedRouteArgs = false;
+  bool _autoResumeTriggered = false;
   String? _formError;
   String? _linkedClinicId;
 
@@ -87,12 +88,17 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     if (!mounted) {
       return;
     }
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      PatientHomeScreen.routeName,
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+        settings: RouteSettings(
+          name: PatientHomeScreen.routeName,
+          arguments: {
+            if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+          },
+        ),
+        builder: (_) => const PatientHomeScreen(),
+      ),
       (_) => false,
-      arguments: {
-        if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-      },
     );
   }
 
@@ -125,6 +131,28 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     } catch (_) {
       // Keep Continue responsive even if local clinic state is unavailable.
     }
+  }
+
+  bool _arrivedViaPatientHomeUrl() {
+    final fragment = Uri.base.fragment;
+    if (fragment.isEmpty) {
+      return false;
+    }
+    final path = fragment.split('?').first.trim();
+    return path == PatientHomeScreen.routeName;
+  }
+
+  void _maybeAutoResumePatientHome() {
+    if (_autoResumeTriggered || !_arrivedViaPatientHomeUrl()) {
+      return;
+    }
+    _autoResumeTriggered = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      unawaited(_continueToPatientHome());
+    });
   }
 
   Future<void> _signOutTester() async {
@@ -583,6 +611,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                 ? null
                 : _store.clinicById(_linkedClinicId!);
 
+            if (activeSession != null) {
+              _maybeAutoResumePatientHome();
+            }
+
             return Scaffold(
               extendBodyBehindAppBar: true,
               appBar: AppBar(
@@ -614,8 +646,11 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                                 session: activeSession,
                               ),
                               const SizedBox(height: 16),
+                              _buildSignedInHintCard(context, lang),
+                              const SizedBox(height: 16),
                             ],
-                            _buildAuthCard(context, lang),
+                            if (activeSession == null)
+                              _buildAuthCard(context, lang),
                             const SizedBox(height: 12),
                             TextButton.icon(
                               onPressed: _loading
@@ -822,6 +857,47 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                 label: Text(lang.tr('Reload sample', '샘플 다시 채우기')),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSignedInHintCard(
+    BuildContext context,
+    AppLanguageController lang,
+  ) {
+    final isAutoOpening = _loading && _arrivedViaPatientHomeUrl();
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isAutoOpening
+                ? lang.tr('Opening your patient home...', '환자 홈을 여는 중...')
+                : lang.tr(
+                    'This browser already has a saved patient session.',
+                    '이 브라우저에는 이미 저장된 환자 세션이 있습니다.',
+                  ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isAutoOpening
+                ? lang.tr(
+                    'If nothing changes within a moment, press Continue once more.',
+                    '잠시 뒤에도 화면이 바뀌지 않으면 Continue를 한 번 더 눌러주세요.',
+                  )
+                : lang.tr(
+                    'Use Continue to reopen the saved portal, or sign out first if you want to use a different patient account.',
+                    '저장된 포털로 다시 들어가려면 Continue를 누르고, 다른 환자 계정을 쓰려면 먼저 Sign out 해주세요.',
+                  ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.72),
+            ),
           ),
         ],
       ),
