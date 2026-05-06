@@ -300,6 +300,22 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 12),
                       ],
+                      if (isPractitioner) ...[
+                        _buildFieldHintCard(
+                          context,
+                          accent: accent,
+                          message: _isPractitionerRegisterMode
+                              ? lang.tr(
+                                  'Create a login ID for this clinic. Patients do not see this ID.',
+                                  '이 한의원에서 쓸 로그인 아이디를 만들어주세요. 환자에게는 보이지 않습니다.',
+                                )
+                              : lang.tr(
+                                  'Enter the practitioner login ID you created for this clinic.',
+                                  '이 한의원용으로 만든 침술사 로그인 아이디를 입력해주세요.',
+                                ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                       TextField(
                         controller: _idController,
                         textInputAction: TextInputAction.next,
@@ -309,6 +325,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           labelText: isPractitioner
                               ? lang.tr('Login ID', '로그인 아이디')
                               : lang.tr('ID', '아이디'),
+                          hintText: isPractitioner
+                              ? lang.tr(
+                                  'Enter your practitioner login ID',
+                                  '침술사 로그인 아이디를 입력해주세요',
+                                )
+                              : lang.tr(
+                                  'Enter your ID',
+                                  '아이디를 입력해주세요',
+                                ),
                           helperText: isPractitioner && _isPractitionerRegisterMode
                               ? lang.tr(
                                   'Use at least 3 letters or numbers.',
@@ -401,6 +426,39 @@ class _LoginScreenState extends State<LoginScreen> {
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: errorColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFieldHintCard(
+    BuildContext context, {
+    required Color accent,
+    required String message,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withValues(alpha: 0.16)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, color: accent, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.ink.withValues(alpha: 0.72),
+                height: 1.4,
                 fontWeight: FontWeight.w600,
               ),
             ),

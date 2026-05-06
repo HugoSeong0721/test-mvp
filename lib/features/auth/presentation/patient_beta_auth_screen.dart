@@ -739,6 +739,20 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             ),
             const SizedBox(height: 12),
           ],
+          _buildFieldHintCard(
+            context,
+            accent: AppTheme.copper,
+            message: _isRegisterMode
+                ? lang.tr(
+                    'Use the email address you want to keep using for this patient account.',
+                    '이 환자 계정에서 계속 사용할 이메일 주소를 입력해주세요.',
+                  )
+                : lang.tr(
+                    'Enter the email address you used when you signed up.',
+                    '가입할 때 사용한 이메일 주소를 입력해주세요.',
+                  ),
+          ),
+          const SizedBox(height: 10),
           TextField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
@@ -746,6 +760,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             onChanged: (_) => _clearFormErrorOnChange(),
             decoration: InputDecoration(
               labelText: lang.tr('Email', '이메일'),
+              hintText: lang.tr(
+                'Enter your email address',
+                '이메일 주소를 입력해주세요',
+              ),
               prefixIcon: const Icon(Icons.alternate_email),
             ),
           ),
@@ -924,6 +942,39 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: errorColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFieldHintCard(
+    BuildContext context, {
+    required Color accent,
+    required String message,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withValues(alpha: 0.16)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, color: accent, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.ink.withValues(alpha: 0.72),
+                height: 1.4,
                 fontWeight: FontWeight.w600,
               ),
             ),
