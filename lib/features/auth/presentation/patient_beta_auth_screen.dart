@@ -73,17 +73,58 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     _loadedRouteArgs = true;
   }
 
-  void _continueToPatientHome() {
+  Future<void> _continueToPatientHome() async {
+    if (!mounted || _loading) {
+      return;
+    }
+
+    setState(() => _loading = true);
+    final session = await BetaSessionService.currentSessionAsync();
+    if (session != null) {
+      await _preparePatientPortalContext(session);
+    }
+
     if (!mounted) {
       return;
     }
-    Navigator.pushReplacementNamed(
-      context,
+    Navigator.of(context).pushNamedAndRemoveUntil(
       PatientHomeScreen.routeName,
+      (_) => false,
       arguments: {
         if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
       },
     );
+  }
+
+  Future<void> _preparePatientPortalContext(PatientSession session) async {
+    PatientProfile profile;
+    try {
+      profile = await _loadTesterProfile(session).timeout(_authTimeout);
+    } catch (_) {
+      profile = PatientProfile(
+        id: session.id,
+        name: session.displayName.trim().isEmpty
+            ? 'New Patient'
+            : session.displayName.trim(),
+        phone: '',
+        email: session.email,
+        birthYear: 1990,
+        sex: 'Not entered',
+        ethnicity: 'Not entered',
+        memo: 'Profile created from beta sign-in fallback',
+      );
+    }
+
+    _store.saveProfile(profile);
+    _store.setCurrentPatientProfile(profile.id);
+    try {
+      await _store.applyPreferredClinicForPatient(
+        patientId: profile.id,
+        linkedClinicId: _linkedClinicId,
+      );
+    } catch (_) {
+      // Keep Continue responsive even if local clinic state is unavailable.
+    }
   }
 
   Future<void> _signOutTester() async {

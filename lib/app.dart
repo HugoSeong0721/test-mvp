@@ -3,6 +3,7 @@ import 'package:iottie_automation/features/patient_requests/presentation/patient
 import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
 
 import 'core/navigation/current_route_tracker.dart';
+import 'core/services/beta_session_service.dart';
 import 'core/services/practitioner_session_service.dart';
 import 'core/settings/app_language_controller.dart';
 import 'core/theme/app_theme.dart';
@@ -46,11 +47,18 @@ class TestMvpApp extends StatelessWidget {
             LoginScreen.routeName: (_) => const LoginScreen(),
             PatientBetaAuthScreen.routeName: (_) =>
                 const PatientBetaAuthScreen(),
-            PatientHomeScreen.routeName: (_) => const PatientHomeScreen(),
-            PatientIntakeScreen.routeName: (_) => const PatientIntakeScreen(),
-            PatientRequestsScreen.routeName: (_) =>
-                const PatientRequestsScreen(),
-            VisitHistoryScreen.routeName: (_) => const VisitHistoryScreen(),
+            PatientHomeScreen.routeName: (_) => const _PatientRouteGuard(
+              child: PatientHomeScreen(),
+            ),
+            PatientIntakeScreen.routeName: (_) => const _PatientRouteGuard(
+              child: PatientIntakeScreen(),
+            ),
+            PatientRequestsScreen.routeName: (_) => const _PatientRouteGuard(
+              child: PatientRequestsScreen(),
+            ),
+            VisitHistoryScreen.routeName: (_) => const _PatientRouteGuard(
+              child: VisitHistoryScreen(),
+            ),
             PractitionerDashboardScreen.routeName: (_) =>
                 const _PractitionerRouteGuard(
                   child: PractitionerDashboardScreen(),
@@ -109,6 +117,63 @@ class TestMvpApp extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _PatientRouteGuard extends StatefulWidget {
+  const _PatientRouteGuard({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_PatientRouteGuard> createState() => _PatientRouteGuardState();
+}
+
+class _PatientRouteGuardState extends State<_PatientRouteGuard> {
+  bool _initialized = false;
+  bool _redirecting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeGuard();
+  }
+
+  Future<void> _initializeGuard() async {
+    await BetaSessionService.initialize();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _initialized = true);
+  }
+
+  void _redirectToPatientLogin() {
+    if (_redirecting || !mounted) {
+      return;
+    }
+    _redirecting = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).pushReplacementNamed(
+        PatientBetaAuthScreen.routeName,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const _GuardLoadingScreen();
+    }
+
+    if (BetaSessionService.currentSession == null) {
+      _redirectToPatientLogin();
+      return const _GuardLoadingScreen();
+    }
+
+    return widget.child;
   }
 }
 
