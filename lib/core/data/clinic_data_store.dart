@@ -729,7 +729,6 @@ class ClinicDataStore extends ChangeNotifier {
     'chris_jung': 'elm_wellness_acupuncture',
   };
   final Map<String, String> _practitionerClinicIds = <String, String>{
-    'demo_practitioner': 'seong_acupuncture_center',
   };
   SharedPreferences? _prefs;
   bool _clinicStateReady = false;
@@ -1480,10 +1479,6 @@ class ClinicDataStore extends ChangeNotifier {
     for (final entry in _patientSelectedClinicIds.entries) {
       _patientDefaultClinicIds.putIfAbsent(entry.key, () => entry.value);
     }
-    _practitionerClinicIds.putIfAbsent(
-      'demo_practitioner',
-      () => 'seong_acupuncture_center',
-    );
   }
 
   void _ensureSlotsForExistingClinics() {

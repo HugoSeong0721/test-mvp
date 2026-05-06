@@ -53,26 +53,6 @@ class PractitionerSessionService {
 
   static PractitionerSession? get currentSession => _currentSession;
 
-  static Future<PractitionerSession> signInDemoPractitioner() async {
-    await _ensureInitialized();
-    const loginId = '123';
-    const password = '123';
-    try {
-      return await logInLocally(loginId: loginId, password: password);
-    } on LocalPractitionerAuthException catch (error) {
-      if (error.code != 'user-not-found') {
-        rethrow;
-      }
-    }
-
-    return signUpLocally(
-      loginId: loginId,
-      password: password,
-      displayName: 'Dr. Hugo Seong',
-      clinicName: 'Seong Acupuncture Center',
-    );
-  }
-
   static Future<PractitionerSession?> currentSessionAsync() async {
     await _ensureInitialized();
     return _currentSession;

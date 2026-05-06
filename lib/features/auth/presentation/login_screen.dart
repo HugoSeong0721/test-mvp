@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/practitioner_session_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../home/presentation/role_home_screen.dart';
-import '../../patient_home/presentation/patient_home_screen.dart';
+import '../../auth/presentation/patient_beta_auth_screen.dart';
 import '../../practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,11 +19,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static const _sharedTestId = '123';
-  static const _sharedTestPassword = '123';
-  static const _hugoId = 'hugo';
-  static const _hugoPassword = 'hugo';
-
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _practitionerNameController =
@@ -62,11 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _practitionerNameController.dispose();
     _clinicNameController.dispose();
     super.dispose();
-  }
-
-  void _applyCredentials(String id, String password) {
-    _idController.text = id;
-    _passwordController.text = password;
   }
 
   void _setFormError(String? message) {
@@ -111,8 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
             displayName: displayName,
             clinicName: clinicName,
           );
-        } else if (id == _sharedTestId && password == _sharedTestPassword) {
-          await PractitionerSessionService.signInDemoPractitioner();
         } else {
           await PractitionerSessionService.logInLocally(
             loginId: id,
@@ -137,29 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final isPatientDefaultLogin = id == _sharedTestId && password == _sharedTestPassword;
-    final isPatientHugoLogin = id == _hugoId && password == _hugoPassword;
-    if (!isPatientDefaultLogin && !isPatientHugoLogin) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            lang.tr(
-              'The ID or password is incorrect.',
-              '아이디 또는 비밀번호가 올바르지 않습니다.',
-            ),
-          ),
-        ),
-      );
-      return;
-    }
-
-    if (isPatientHugoLogin) {
-      ClinicDataStore.instance.setCurrentPatientProfile('hugo_demo');
-    } else {
-      ClinicDataStore.instance.setCurrentPatientProfile('jane_kim');
-    }
-
-    Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
+    Navigator.pushReplacementNamed(context, PatientBetaAuthScreen.routeName);
   }
 
   String _friendlyPractitionerAuthMessage(LocalPractitionerAuthException error) {
@@ -232,12 +197,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   '침술사 계정을 만들고, 환자가 보게 될 한의원 이름을 바로 등록할 수 있습니다.',
                 )
               : lang.tr(
-                  'Demo account: 123 / 123 or log in with a practitioner account created in this browser.',
-                  '데모 계정: 123 / 123 또는 이 브라우저에서 만든 침술사 계정으로 로그인할 수 있습니다.',
+                  'Log in with a practitioner account created in this browser.',
+                  '이 브라우저에서 만든 침술사 계정으로 로그인할 수 있습니다.',
                 ))
         : lang.tr(
-            'Demo accounts: 123 / 123 or hugo / hugo',
-            '데모 계정: 123 / 123 또는 hugo / hugo',
+            'Patient sign-in now starts from the patient portal page.',
+            '환자 로그인은 이제 환자 포털 화면에서 시작합니다.',
           );
     final submitLabel = isPractitioner && _isPractitionerRegisterMode
         ? lang.tr('Create account', '계정 만들기')
@@ -396,11 +361,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               : submitLabel,
                         ),
                       ),
-                      const SizedBox(height: 14),
-                      _buildDemoFillRow(
-                        context,
-                        isPractitioner: isPractitioner,
-                      ),
                       const SizedBox(height: 16),
                       TextButton.icon(
                         onPressed: () => Navigator.pushReplacementNamed(
@@ -418,39 +378,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDemoFillRow(
-    BuildContext context, {
-    required bool isPractitioner,
-  }) {
-    final lang = AppLanguageController.instance;
-    final buttons = isPractitioner
-        ? [
-            OutlinedButton(
-              onPressed: () =>
-                  _applyCredentials(_sharedTestId, _sharedTestPassword),
-              child: Text(lang.tr('Fill 123 / 123', '123 / 123 채우기')),
-            ),
-          ]
-        : [
-            OutlinedButton(
-              onPressed: () =>
-                  _applyCredentials(_sharedTestId, _sharedTestPassword),
-              child: Text(lang.tr('Fill 123 / 123', '123 / 123 채우기')),
-            ),
-            OutlinedButton(
-              onPressed: () => _applyCredentials(_hugoId, _hugoPassword),
-              child: Text(lang.tr('Fill hugo / hugo', 'hugo / hugo 채우기')),
-            ),
-          ];
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      alignment: WrapAlignment.center,
-      children: buttons,
     );
   }
 

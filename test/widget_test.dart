@@ -31,7 +31,7 @@ void main() {
     expect(find.text('Practitioner Login'), findsWidgets);
     expect(
       find.text(
-        'Demo account: 123 / 123 or log in with a practitioner account created in this browser.',
+        'Log in with a practitioner account created in this browser.',
       ),
       findsOneWidget,
     );
