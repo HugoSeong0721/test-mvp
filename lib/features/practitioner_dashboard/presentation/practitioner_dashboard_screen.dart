@@ -597,7 +597,6 @@ class _PractitionerDashboardScreenState
                     ),
                   ),
                 ),
-              const SizedBox(height: 12),
               if (filteredVisits.isEmpty)
                 AppPanel(
                   padding: const EdgeInsets.all(20),
@@ -830,7 +829,6 @@ class _PractitionerDashboardScreenState
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 12),
               Text(
                 AppLanguageController.instance.tr(
                   'Window: ${_formatStoredDateWithWeekday(summary.fromDate)} to ${_formatStoredDateWithWeekday(summary.toDate)} | Filtered patient cards: $filteredCount',
@@ -5465,6 +5463,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
   final ClinicDataStore _store = ClinicDataStore.instance;
   String? _selectedProfileId;
 
+  bool get _showManualPatientCreation => false;
+
   @override
   void initState() {
     super.initState();
@@ -5475,9 +5475,18 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
   Widget build(BuildContext context) {
     final activeClinicId = PractitionerSessionService.currentSession?.clinicId;
     final profiles = _store.profilesForClinic(activeClinicId);
-    final selected = _selectedProfileId == null
-        ? (profiles.isNotEmpty ? profiles.first : null)
-        : _store.profileById(_selectedProfileId!);
+    PatientProfile? selected;
+    if (_selectedProfileId == null) {
+      selected = profiles.isNotEmpty ? profiles.first : null;
+    } else {
+      for (final profile in profiles) {
+        if (profile.id == _selectedProfileId) {
+          selected = profile;
+          break;
+        }
+      }
+      selected ??= profiles.isNotEmpty ? profiles.first : null;
+    }
 
     final body = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -5487,7 +5496,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FilledButton.icon(
+              if (_showManualPatientCreation)
+                FilledButton.icon(
                 onPressed: () async {
                   final newProfile = PatientProfile(
                     id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
@@ -5515,10 +5525,49 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                 label: Text(
                   AppLanguageController.instance.tr('Add Patient', '환자 추가'),
                 ),
+                ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.82),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppTheme.border.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Text(
+                  AppLanguageController.instance.tr(
+                    'Patients appear here after they sign up in the patient portal and choose this clinic.',
+                    '환자가 환자 포털에서 가입하고 이 한의원을 선택하면 여기 나타납니다.',
+                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.74),
+                    height: 1.45,
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: ListView.builder(
+                child: profiles.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            AppLanguageController.instance.tr(
+                              'No patient account has selected this clinic yet.',
+                              '아직 이 한의원을 선택한 환자 계정이 없습니다.',
+                            ),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: AppTheme.ink.withValues(alpha: 0.68),
+                                  height: 1.45,
+                                ),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
                   itemCount: profiles.length,
                   itemBuilder: (context, index) {
                     final profile = profiles[index];

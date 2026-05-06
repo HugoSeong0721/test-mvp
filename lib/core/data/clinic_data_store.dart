@@ -302,6 +302,8 @@ class ClinicDataStore extends ChangeNotifier {
       'patient_default_clinics_v1';
   static const String _practitionerClinicIdsKey =
       'practitioner_clinic_ids_v1';
+  static const String _patientPortalRegisteredIdsKey =
+      'patient_portal_registered_ids_v1';
 
   static String _storedDate(DateTime date) {
     final normalized = DateTime(date.year, date.month, date.day);
@@ -403,6 +405,7 @@ class ClinicDataStore extends ChangeNotifier {
   ];
   final Map<String, String> _patientSelectedClinicIds = <String, String>{};
   final Map<String, String> _patientDefaultClinicIds = <String, String>{};
+  final Set<String> _patientPortalRegisteredIds = <String>{};
   final Map<String, String> _practitionerClinicIds = <String, String>{
   };
   SharedPreferences? _prefs;
@@ -821,6 +824,7 @@ class ClinicDataStore extends ChangeNotifier {
     _visits.removeWhere((visit) => visit.patientId == profileId);
     _patientSelectedClinicIds.remove(profileId);
     _patientDefaultClinicIds.remove(profileId);
+    _patientPortalRegisteredIds.remove(profileId);
     if (_currentPatientId == profileId) {
       _currentPatientId = _profiles.isNotEmpty ? _profiles.first.id : '';
     }
@@ -950,10 +954,16 @@ class ClinicDataStore extends ChangeNotifier {
   List<PatientProfile> profilesForClinic(String? clinicId) {
     final normalizedClinicId = clinicId?.trim();
     if (normalizedClinicId == null || normalizedClinicId.isEmpty) {
-      return profiles;
+      return profiles
+          .where((profile) => isPatientPortalRegistered(profile.id))
+          .toList()
+        ..sort((a, b) => a.name.compareTo(b.name));
     }
 
     final items = _profiles.where((profile) {
+      if (!isPatientPortalRegistered(profile.id)) {
+        return false;
+      }
       final selectedClinicId = selectedClinicIdForPatient(profile.id);
       final defaultClinicId = defaultClinicIdForPatient(profile.id);
       final hasVisit = _visits.any(
@@ -973,6 +983,21 @@ class ClinicDataStore extends ChangeNotifier {
 
     items.sort((a, b) => a.name.compareTo(b.name));
     return items;
+  }
+
+  bool isPatientPortalRegistered(String patientId) {
+    return _patientPortalRegisteredIds.contains(patientId);
+  }
+
+  Future<void> markPatientPortalRegistered(String patientId) async {
+    final normalizedPatientId = patientId.trim();
+    if (normalizedPatientId.isEmpty ||
+        _patientPortalRegisteredIds.contains(normalizedPatientId)) {
+      return;
+    }
+    _patientPortalRegisteredIds.add(normalizedPatientId);
+    notifyListeners();
+    await _persistClinicState();
   }
 
   List<ClinicCenter> searchClinics(String query) {
@@ -1146,6 +1171,11 @@ class ClinicDataStore extends ChangeNotifier {
     _patientDefaultClinicIds
       ..clear()
       ..addAll(_readPersistedMap(_patientDefaultClinicsKey));
+    _patientPortalRegisteredIds
+      ..clear()
+      ..addAll(
+        _prefs?.getStringList(_patientPortalRegisteredIdsKey) ?? const [],
+      );
     _practitionerClinicIds
       ..clear()
       ..addAll(_readPersistedMap(_practitionerClinicIdsKey));
@@ -1208,6 +1238,10 @@ class ClinicDataStore extends ChangeNotifier {
     await prefs.setString(
       _practitionerClinicIdsKey,
       jsonEncode(_practitionerClinicIds),
+    );
+    await prefs.setStringList(
+      _patientPortalRegisteredIdsKey,
+      _patientPortalRegisteredIds.toList()..sort(),
     );
   }
 }

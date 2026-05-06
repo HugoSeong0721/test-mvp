@@ -52,6 +52,7 @@ class PatientProfileService {
         'email': user.email ?? '',
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+      await _store.markPatientPortalRegistered(user.uid);
       return;
     }
 
@@ -70,6 +71,7 @@ class PatientProfileService {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    await _store.markPatientPortalRegistered(user.uid);
   }
 
   static Future<void> ensureProfileForSession(
@@ -168,6 +170,9 @@ class PatientProfileService {
       'memo': profile.memo,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+    if (session != null && session.id == profile.id) {
+      await _store.markPatientPortalRegistered(profile.id);
+    }
   }
 
   static Future<void> saveLocalProfile(PatientProfile profile) async {
@@ -176,6 +181,7 @@ class PatientProfileService {
       jsonEncode(_profileToMap(profile)),
     );
     _syncLocalProfileToStore(profile);
+    await _store.markPatientPortalRegistered(profile.id);
     await BetaSessionService.syncLocalAccountProfile(profile);
     _localControllerFor(profile.id).add(profile);
   }
@@ -240,5 +246,6 @@ class PatientProfileService {
   static void _syncLocalProfileToStore(PatientProfile profile) {
     _store.saveProfile(profile);
     _store.setCurrentPatientProfile(profile.id);
+    unawaited(_store.markPatientPortalRegistered(profile.id));
   }
 }
