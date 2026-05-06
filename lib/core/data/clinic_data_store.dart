@@ -351,331 +351,22 @@ class ClinicDataStore extends ChangeNotifier {
     ];
   }
 
-  String _currentPatientId = 'jane_kim';
+  static const PatientProfile _fallbackProfile = PatientProfile(
+    id: 'placeholder_patient',
+    name: 'New Patient',
+    phone: '',
+    email: '',
+    birthYear: 1990,
+    sex: 'Not entered',
+    ethnicity: 'Not entered',
+    memo: '',
+  );
 
-  final List<PatientProfile> _profiles = [
-    const PatientProfile(
-      id: 'hugo_demo',
-      name: 'Hugo Seong',
-      phone: '201-555-0199',
-      email: 'hugo.demo@example.com',
-      birthYear: 1991,
-      sex: 'Male',
-      ethnicity: 'Korean',
-      memo: 'My real-use test profile',
-    ),
-    const PatientProfile(
-      id: 'jane_kim',
-      name: 'Jane Kim',
-      phone: '201-555-0101',
-      email: 'jane.demo@example.com',
-      birthYear: 1990,
-      sex: 'Female',
-      ethnicity: 'Korean',
-      memo: 'Track sleep and shoulder pain',
-    ),
-    const PatientProfile(
-      id: 'min_park',
-      name: 'Min Park',
-      phone: '',
-      email: '',
-      birthYear: 1988,
-      sex: 'Male',
-      ethnicity: 'Korean',
-      memo: 'Example with missing contact info',
-    ),
-    const PatientProfile(
-      id: 'eunji_lee',
-      name: 'Eunji Lee',
-      phone: '646-555-0130',
-      email: 'eunji.demo@example.com',
-      birthYear: 1993,
-      sex: 'Female',
-      ethnicity: 'Korean',
-      memo: 'Track digestion and thirst patterns',
-    ),
-    const PatientProfile(
-      id: 'daniel_cho',
-      name: 'Daniel Cho',
-      phone: '917-555-0142',
-      email: '',
-      birthYear: 1985,
-      sex: 'Male',
-      ethnicity: 'Korean',
-      memo: 'Track tension headache pattern',
-    ),
-    const PatientProfile(
-      id: 'hana_yoo',
-      name: 'Hana Yoo',
-      phone: '718-555-0155',
-      email: 'hana.demo@example.com',
-      birthYear: 1997,
-      sex: 'Female',
-      ethnicity: 'Korean',
-      memo: 'Watch for night sweating and headaches',
-    ),
-    const PatientProfile(
-      id: 'chris_jung',
-      name: 'Chris Jung',
-      phone: '212-555-0170',
-      email: '',
-      birthYear: 1982,
-      sex: 'Male',
-      ethnicity: 'Korean',
-      memo: 'Review low back pain and no-show history',
-    ),
-  ];
+  String _currentPatientId = '';
 
-  final List<PatientVisit> _visits = [
-    PatientVisit(
-      id: 'visit_000',
-      patientId: 'hugo_demo',
-      clinicId: 'seong_acupuncture_center',
-      date: '2026-04-15',
-      time: '2:30 PM',
-      lastVisitDate: '2026-04-05',
-      daysAgo: 10,
-      scheduledSinceLast: 1,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: 'Cervical area + right scapular region',
-      previousSessionNote: 'Track changes in sleep and shoulder tension.',
-      qaList: const [
-        QaItem(
-          category: 'Sleep',
-          question: 'How has your sleep been recently?',
-          answer:
-              'There were days when I woke up once or twice during the night.',
-        ),
-        QaItem(
-          category: 'Energy',
-          question: 'How is your fatigue during the day?',
-          answer: 'My focus drops later in the afternoon.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_001',
-      patientId: 'daniel_cho',
-      clinicId: 'midtown_balance_clinic',
-      date: '2026-04-01',
-      time: '4:00 PM',
-      lastVisitDate: '2026-03-18',
-      daysAgo: 14,
-      scheduledSinceLast: 1,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: 'Upper trapezius + temple area',
-      previousSessionNote: 'Tension headache pattern.',
-      qaList: const [
-        QaItem(
-          category: 'HEENT',
-          question: 'How are your headaches and eye fatigue?',
-          answer: 'My eyes feel strained in the afternoon and I get headaches.',
-        ),
-        QaItem(
-          category: 'Emotion',
-          question: 'How have your mood swings been?',
-          answer: 'I have been more sensitive and irritable.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_002',
-      patientId: 'min_park',
-      clinicId: 'elm_wellness_acupuncture',
-      date: '2026-04-01',
-      time: '5:30 PM',
-      lastVisitDate: '2026-03-15',
-      daysAgo: 17,
-      scheduledSinceLast: 2,
-      noShowSinceLast: 1,
-      intakeStatus: IntakeStatus.notStarted,
-      previousTreatmentArea: 'Lumbar area + glute trigger points',
-      previousSessionNote: 'Pain gets worse when sitting for a long time.',
-      qaList: const [],
-    ),
-    PatientVisit(
-      id: 'visit_003',
-      patientId: 'jane_kim',
-      clinicId: 'midtown_balance_clinic',
-      date: '2026-04-08',
-      time: '3:30 PM',
-      lastVisitDate: '2026-04-01',
-      daysAgo: 7,
-      scheduledSinceLast: 1,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: 'Right scapular region + cervical C5-C7 area',
-      previousSessionNote:
-          'Strong tenderness along the medial scapula, frequent early waking.',
-      qaList: const [
-        QaItem(
-          category: 'Sleep',
-          question: 'How has your sleep been recently?',
-          answer:
-              'I often wake up around 3 AM and have trouble falling back asleep.',
-        ),
-        QaItem(
-          category: 'Energy',
-          question: 'How is your afternoon fatigue?',
-          answer: 'I get much more tired after 2 PM.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_004',
-      patientId: 'hana_yoo',
-      clinicId: 'midtown_balance_clinic',
-      date: '2026-04-12',
-      time: '5:30 PM',
-      lastVisitDate: '2026-04-08',
-      daysAgo: 4,
-      scheduledSinceLast: 0,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: 'Temple area + sternocleidomastoid',
-      previousSessionNote: 'Tracking headache frequency.',
-      qaList: const [
-        QaItem(
-          category: 'Temperature/Sweat',
-          question: 'How have sweating and temperature changes been?',
-          answer: 'I sometimes get cold sweats at night.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_005',
-      patientId: 'jane_kim',
-      clinicId: 'midtown_balance_clinic',
-      date: '2026-04-15',
-      time: '3:30 PM',
-      lastVisitDate: '2026-04-08',
-      daysAgo: 7,
-      scheduledSinceLast: 1,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: 'Right scapular region + cervical C5-C7 area',
-      previousSessionNote:
-          'Strong tenderness along the medial scapula, frequent early waking.',
-      qaList: const [
-        QaItem(
-          category: 'Sleep',
-          question: 'How has your sleep been recently?',
-          answer:
-              'I often wake up around 3 AM and have trouble falling back asleep.',
-        ),
-        QaItem(
-          category: 'Energy',
-          question: 'How is your afternoon fatigue?',
-          answer: 'I get much more tired after 2 PM.',
-        ),
-        QaItem(
-          category: 'Emotion',
-          question: 'How high has your stress been recently?',
-          answer: 'My work stress has been pretty high.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_006',
-      patientId: 'min_park',
-      clinicId: 'elm_wellness_acupuncture',
-      date: '2026-04-15',
-      time: '4:00 PM',
-      lastVisitDate: '2026-03-31',
-      daysAgo: 15,
-      scheduledSinceLast: 2,
-      noShowSinceLast: 1,
-      intakeStatus: IntakeStatus.notStarted,
-      previousTreatmentArea: 'Lumbar area + glute trigger points',
-      previousSessionNote: 'Pain gets worse when sitting for a long time.',
-      qaList: const [],
-    ),
-    PatientVisit(
-      id: 'visit_007',
-      patientId: 'eunji_lee',
-      clinicId: 'elm_wellness_acupuncture',
-      date: '2026-04-15',
-      time: '4:30 PM',
-      lastVisitDate: '2026-04-10',
-      daysAgo: 5,
-      scheduledSinceLast: 0,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: 'Abdominal area + digestive points',
-      previousSessionNote: 'Reports abdominal bloating after meals.',
-      qaList: const [
-        QaItem(
-          category: 'Appetite/Thirst',
-          question: 'How have your appetite and thirst been?',
-          answer: 'My mouth gets dry often and I keep reaching for cold water.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_008',
-      patientId: 'daniel_cho',
-      clinicId: 'midtown_balance_clinic',
-      date: '2026-04-15',
-      time: '5:00 PM',
-      lastVisitDate: '2026-04-01',
-      daysAgo: 14,
-      scheduledSinceLast: 3,
-      noShowSinceLast: 1,
-      intakeStatus: IntakeStatus.completed,
-      previousTreatmentArea: 'Upper trapezius + temple area',
-      previousSessionNote: 'Tension headache pattern.',
-      qaList: const [
-        QaItem(
-          category: 'HEENT',
-          question: 'How are your headaches and eye fatigue?',
-          answer: 'My eyes feel strained in the afternoon and I get headaches.',
-        ),
-        QaItem(
-          category: 'Emotion',
-          question: 'How have your mood swings been?',
-          answer: 'I have been more sensitive and irritable.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_009',
-      patientId: 'hana_yoo',
-      clinicId: 'midtown_balance_clinic',
-      date: '2026-04-15',
-      time: '5:30 PM',
-      lastVisitDate: '2026-04-12',
-      daysAgo: 3,
-      scheduledSinceLast: 0,
-      noShowSinceLast: 0,
-      intakeStatus: IntakeStatus.inProgress,
-      previousTreatmentArea: 'Temple area + sternocleidomastoid',
-      previousSessionNote: 'Tracking headache frequency.',
-      qaList: const [
-        QaItem(
-          category: 'Temperature/Sweat',
-          question: 'How have sweating and temperature changes been?',
-          answer: 'I sometimes get cold sweats at night.',
-        ),
-      ],
-    ),
-    PatientVisit(
-      id: 'visit_010',
-      patientId: 'chris_jung',
-      clinicId: 'elm_wellness_acupuncture',
-      date: '2026-04-15',
-      time: '6:00 PM',
-      lastVisitDate: '2026-03-20',
-      daysAgo: 26,
-      scheduledSinceLast: 2,
-      noShowSinceLast: 2,
-      intakeStatus: IntakeStatus.notStarted,
-      previousTreatmentArea: 'Lumbar erectors + hamstrings',
-      previousSessionNote: 'Worse after long periods of driving.',
-      qaList: const [],
-    ),
-  ];
+  final List<PatientProfile> _profiles = [];
+
+  final List<PatientVisit> _visits = [];
 
   final List<AppointmentSlot> _slots = _buildInitialSlots();
 
@@ -710,24 +401,8 @@ class ClinicDataStore extends ChangeNotifier {
       searchKeywords: 'new jersey digestion fatigue follow up portal',
     ),
   ];
-  final Map<String, String> _patientSelectedClinicIds = <String, String>{
-    'hugo_demo': 'seong_acupuncture_center',
-    'jane_kim': 'midtown_balance_clinic',
-    'min_park': 'elm_wellness_acupuncture',
-    'eunji_lee': 'elm_wellness_acupuncture',
-    'daniel_cho': 'midtown_balance_clinic',
-    'hana_yoo': 'midtown_balance_clinic',
-    'chris_jung': 'elm_wellness_acupuncture',
-  };
-  final Map<String, String> _patientDefaultClinicIds = <String, String>{
-    'hugo_demo': 'seong_acupuncture_center',
-    'jane_kim': 'midtown_balance_clinic',
-    'min_park': 'elm_wellness_acupuncture',
-    'eunji_lee': 'elm_wellness_acupuncture',
-    'daniel_cho': 'midtown_balance_clinic',
-    'hana_yoo': 'midtown_balance_clinic',
-    'chris_jung': 'elm_wellness_acupuncture',
-  };
+  final Map<String, String> _patientSelectedClinicIds = <String, String>{};
+  final Map<String, String> _patientDefaultClinicIds = <String, String>{};
   final Map<String, String> _practitionerClinicIds = <String, String>{
   };
   SharedPreferences? _prefs;
@@ -736,7 +411,8 @@ class ClinicDataStore extends ChangeNotifier {
   List<PatientProfile> get profiles => List.unmodifiable(_profiles);
 
   PatientProfile get currentPatientProfile =>
-      profileById(_currentPatientId) ?? _profiles.first;
+      profileById(_currentPatientId) ??
+      (_profiles.isNotEmpty ? _profiles.first : _fallbackProfile);
 
   List<AppointmentSlot> get slots => List.unmodifiable(_slots);
   List<AppointmentRequest> get appointmentRequests =>
@@ -1141,6 +817,13 @@ class ClinicDataStore extends ChangeNotifier {
 
   void deleteProfile(String profileId) {
     _profiles.removeWhere((profile) => profile.id == profileId);
+    _appointmentRequests.removeWhere((request) => request.patientId == profileId);
+    _visits.removeWhere((visit) => visit.patientId == profileId);
+    _patientSelectedClinicIds.remove(profileId);
+    _patientDefaultClinicIds.remove(profileId);
+    if (_currentPatientId == profileId) {
+      _currentPatientId = _profiles.isNotEmpty ? _profiles.first.id : '';
+    }
     notifyListeners();
   }
 
@@ -1262,6 +945,34 @@ class ClinicDataStore extends ChangeNotifier {
       return null;
     }
     return clinicById(clinicId);
+  }
+
+  List<PatientProfile> profilesForClinic(String? clinicId) {
+    final normalizedClinicId = clinicId?.trim();
+    if (normalizedClinicId == null || normalizedClinicId.isEmpty) {
+      return profiles;
+    }
+
+    final items = _profiles.where((profile) {
+      final selectedClinicId = selectedClinicIdForPatient(profile.id);
+      final defaultClinicId = defaultClinicIdForPatient(profile.id);
+      final hasVisit = _visits.any(
+        (visit) =>
+            visit.patientId == profile.id && visit.clinicId == normalizedClinicId,
+      );
+      final hasRequest = _appointmentRequests.any(
+        (request) =>
+            request.patientId == profile.id &&
+            request.clinicId == normalizedClinicId,
+      );
+      return selectedClinicId == normalizedClinicId ||
+          defaultClinicId == normalizedClinicId ||
+          hasVisit ||
+          hasRequest;
+    }).toList();
+
+    items.sort((a, b) => a.name.compareTo(b.name));
+    return items;
   }
 
   List<ClinicCenter> searchClinics(String query) {
@@ -1446,40 +1157,7 @@ class ClinicDataStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _applySeedClinicAssignments() {
-    _patientSelectedClinicIds.putIfAbsent(
-      'hugo_demo',
-      () => 'seong_acupuncture_center',
-    );
-    _patientSelectedClinicIds.putIfAbsent(
-      'jane_kim',
-      () => 'midtown_balance_clinic',
-    );
-    _patientSelectedClinicIds.putIfAbsent(
-      'min_park',
-      () => 'elm_wellness_acupuncture',
-    );
-    _patientSelectedClinicIds.putIfAbsent(
-      'eunji_lee',
-      () => 'elm_wellness_acupuncture',
-    );
-    _patientSelectedClinicIds.putIfAbsent(
-      'daniel_cho',
-      () => 'midtown_balance_clinic',
-    );
-    _patientSelectedClinicIds.putIfAbsent(
-      'hana_yoo',
-      () => 'midtown_balance_clinic',
-    );
-    _patientSelectedClinicIds.putIfAbsent(
-      'chris_jung',
-      () => 'elm_wellness_acupuncture',
-    );
-
-    for (final entry in _patientSelectedClinicIds.entries) {
-      _patientDefaultClinicIds.putIfAbsent(entry.key, () => entry.value);
-    }
-  }
+  void _applySeedClinicAssignments() {}
 
   void _ensureSlotsForExistingClinics() {
     for (final clinic in _clinicCenters) {

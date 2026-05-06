@@ -5473,7 +5473,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final profiles = _store.profiles;
+    final activeClinicId = PractitionerSessionService.currentSession?.clinicId;
+    final profiles = _store.profilesForClinic(activeClinicId);
     final selected = _selectedProfileId == null
         ? (profiles.isNotEmpty ? profiles.first : null)
         : _store.profileById(_selectedProfileId!);
@@ -5487,7 +5488,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FilledButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   final newProfile = PatientProfile(
                     id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
                     name: 'New Patient',
@@ -5499,6 +5500,15 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                     memo: '',
                   );
                   _store.saveProfile(newProfile);
+                  if (activeClinicId != null && activeClinicId.isNotEmpty) {
+                    await _store.setDefaultClinicForPatient(
+                      patientId: newProfile.id,
+                      clinicId: activeClinicId,
+                    );
+                  }
+                  if (!mounted) {
+                    return;
+                  }
                   setState(() => _selectedProfileId = newProfile.id);
                 },
                 icon: const Icon(Icons.person_add_alt_1),
