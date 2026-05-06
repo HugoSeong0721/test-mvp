@@ -14,6 +14,7 @@ class AppFirestoreService {
 
   static Future<String> submitPatientIntake({
     required String patientId,
+    required String clinicId,
     required String patientName,
     required String visitType,
     required List<Map<String, dynamic>> answers,
@@ -23,6 +24,7 @@ class AppFirestoreService {
   }) async {
     final doc = await _db.collection('intake_submissions').add({
       'patientId': patientId,
+      'clinicId': clinicId,
       'patientName': patientName,
       'visitType': visitType,
       'answers': answers,
@@ -37,6 +39,7 @@ class AppFirestoreService {
 
   static Future<void> markPendingRequestsCompleted({
     required String patientId,
+    required String clinicId,
     required String submissionId,
   }) async {
     final snapshot = await _db
@@ -46,6 +49,10 @@ class AppFirestoreService {
         .get();
 
     for (final doc in snapshot.docs) {
+      final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+      if (docClinicId != clinicId) {
+        continue;
+      }
       final requestType = (doc.data()['requestType'] ?? 'answer_request')
           .toString();
       if (requestType == 'note') {
@@ -61,6 +68,7 @@ class AppFirestoreService {
 
   static Future<String> sendAnswerRequest({
     required String patientId,
+    required String clinicId,
     required String patientName,
     required String patientPhone,
     required String patientEmail,
@@ -74,6 +82,7 @@ class AppFirestoreService {
   }) async {
     final doc = await _db.collection('answer_requests').add({
       'patientId': patientId,
+      'clinicId': clinicId,
       'patientName': patientName,
       'patientPhone': patientPhone,
       'patientEmail': patientEmail,
@@ -107,6 +116,7 @@ class AppFirestoreService {
 
   static Future<String> sendPractitionerNote({
     required String patientId,
+    required String clinicId,
     required String patientName,
     required String patientPhone,
     required String patientEmail,
@@ -117,6 +127,7 @@ class AppFirestoreService {
   }) {
     return sendAnswerRequest(
       patientId: patientId,
+      clinicId: clinicId,
       patientName: patientName,
       patientPhone: patientPhone,
       patientEmail: patientEmail,
@@ -132,6 +143,7 @@ class AppFirestoreService {
 
   static Future<void> submitVisitRecordFeedback({
     required String patientId,
+    required String clinicId,
     required String patientName,
     required String visitId,
     required String visitDate,
@@ -151,6 +163,7 @@ class AppFirestoreService {
 
     await ref.set({
       'patientId': patientId,
+      'clinicId': clinicId,
       'patientName': patientName,
       'visitId': visitId,
       'visitDate': visitDate,

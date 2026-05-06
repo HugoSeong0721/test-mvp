@@ -35,6 +35,8 @@ migrate_working_dir/
 .pub/
 /build/
 /web_build/
+/web_build_patient/
+/web_build_practitioner/
 /coverage/
 .env
 .env.*

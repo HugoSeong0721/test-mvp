@@ -1,14 +1,18 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
+import '../../../core/services/practitioner_session_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/practitioner_shell.dart';
 import '../../patient_brief/presentation/patient_brief_screen.dart';
+import 'clinic_profile_workspace.dart';
 import 'patient_record_workspace.dart';
 
 class PractitionerDashboardScreen extends StatefulWidget {
@@ -77,6 +81,10 @@ class _PractitionerDashboardScreenState
   final GlobalKey _appointmentRequestsSectionKey = GlobalKey();
   final GlobalKey _recordUpdatesSectionKey = GlobalKey();
   final GlobalKey _recentSubmissionsSectionKey = GlobalKey();
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      _intakeSubmissionSubscription;
+  Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
+      <String, Map<String, dynamic>>{};
 
   late String _selectedDate;
   String _selectedPatientFilter = 'All Patients';
@@ -86,28 +94,38 @@ class _PractitionerDashboardScreenState
   bool _showDashboardGuide = false;
   _DashboardSubView _subView = _DashboardSubView.main;
 
+  String? get _currentClinicId =>
+      PractitionerSessionService.currentSession?.clinicId;
+
+  bool get _hasClinicContext =>
+      _currentClinicId != null && _currentClinicId!.trim().isNotEmpty;
+
   void _selectSubView(_DashboardSubView view) {
-    setState(
-      () => _subView = _subView == view ? _DashboardSubView.main : view,
-    );
+    setState(() => _subView = _subView == view ? _DashboardSubView.main : view);
   }
 
   @override
   void initState() {
     super.initState();
-    final dates = _store.allDates;
-    final today = _formatDate(DateTime.now());
-    if (dates.contains(today)) {
-      _selectedDate = today;
-      return;
-    }
-    final pastOrToday = dates.where((d) => d.compareTo(today) <= 0).toList()
-      ..sort();
-    _selectedDate = pastOrToday.isNotEmpty ? pastOrToday.last : dates.first;
+    _selectedDate = _formatDate(DateTime.now());
+    _intakeSubmissionSubscription = FirebaseFirestore.instance
+        .collection('intake_submissions')
+        .snapshots()
+        .listen((snapshot) {
+          if (!mounted) {
+            return;
+          }
+          setState(() {
+            _latestPatientIntakeByPatient = _latestSubmissionByPatient(
+              snapshot.docs,
+            );
+          });
+        });
   }
 
   @override
   void dispose() {
+    _intakeSubmissionSubscription?.cancel();
     _patientFilterController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -120,9 +138,12 @@ class _PractitionerDashboardScreenState
       builder: (context, _) {
         final lang = AppLanguageController.instance;
         final theme = Theme.of(context);
-        final visibleVisits = _visibleVisits();
+        final activeClinic = _currentClinicId == null
+            ? null
+            : _store.clinicById(_currentClinicId!);
         final pendingAppointmentInboxCount = _pendingAppointmentRequestCount();
-        final showTopActionCards = MediaQuery.sizeOf(context).width >= 1460;
+        final visibleVisits = _visibleVisits();
+        final summaryVisits = _summaryWindowVisits();
         final patientNames =
             visibleVisits.map((v) => v.profile.name).toSet().toList()..sort();
         final keyword = _patientFilterController.text.trim().toLowerCase();
@@ -139,7 +160,7 @@ class _PractitionerDashboardScreenState
             : statusFiltered
                   .where((v) => v.profile.name.toLowerCase().contains(keyword))
                   .toList();
-        final summary = _visitWindowSummary();
+        final summary = _visitWindowSummary(summaryVisits);
         final titleLabel = _selectedDateRange == null
             ? lang.tr(
                 '${_formatStoredDateWithWeekday(_selectedDate)} Patients ${filteredVisits.length}',
@@ -163,6 +184,11 @@ class _PractitionerDashboardScreenState
               tooltip: lang.tr('Pick date range', '날짜 범위 선택'),
               onPressed: _pickDateRange,
               icon: const Icon(Icons.calendar_month_outlined),
+            ),
+            IconButton(
+              tooltip: 'Clinic settings',
+              onPressed: () => _selectSubView(_DashboardSubView.clinicProfile),
+              icon: const Icon(Icons.domain_add_outlined),
             ),
             const LanguageMenuButton(),
           ],
@@ -202,54 +228,117 @@ class _PractitionerDashboardScreenState
               active: _subView == _DashboardSubView.schedule,
               onTap: () => _selectSubView(_DashboardSubView.schedule),
             ),
+            PractitionerToolItem(
+              icon: Icons.domain_add_outlined,
+              labelEn: 'Clinic Profile',
+              labelKo: 'í•œì˜ì› ì •ë³´',
+              active: _subView == _DashboardSubView.clinicProfile,
+              onTap: () => _selectSubView(_DashboardSubView.clinicProfile),
+            ),
           ],
           body: ListView(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              children: [
-                if (_subView == _DashboardSubView.opsHub) ...[
-                  _buildDashboardHero(
-                    summary,
-                    visibleVisits,
-                    filteredVisits.length,
+            controller: _scrollController,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            children: [
+              if (!_hasClinicContext) ...[
+                AppPanel(
+                  padding: const EdgeInsets.all(18),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppTheme.blush.withValues(alpha: 0.72),
+                      Colors.white,
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                ],
-                if (_subView == _DashboardSubView.visitInsights) ...[
-                  _buildInsightPanel(summary),
-                  const SizedBox(height: 12),
-                ],
-                if (_subView == _DashboardSubView.main)
-                  KeyedSubtree(
-                    key: _dateSelectorKey,
-                    child: _buildDateSelectorPanel(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang.tr(
+                          'Set your clinic first',
+                          '먼저 한의원 정보를 설정해주세요',
+                        ),
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        lang.tr(
+                          'The practitioner dashboard only shows the clinic you are logged into. Open Clinic Profile and save your clinic name first.',
+                          '침술사 대시보드는 현재 로그인한 한의원 데이터만 보여줍니다. 먼저 Clinic Profile에서 한의원 이름을 저장해주세요.',
+                        ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.ink.withValues(alpha: 0.72),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      FilledButton.icon(
+                        onPressed: () =>
+                            _selectSubView(_DashboardSubView.clinicProfile),
+                        icon: const Icon(Icons.domain_add_outlined),
+                        label: Text(
+                          lang.tr(
+                            'Open clinic profile',
+                            '한의원 정보 설정 열기',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                if (_subView == _DashboardSubView.inbox) ...[
-                  const SizedBox(height: 4),
-                  KeyedSubtree(
-                    key: _appointmentInboxKey,
-                    child: _buildPatientInboxBoard(),
-                  ),
-                ],
-                if (_subView == _DashboardSubView.schedule) ...[
-                  const SizedBox(height: 4),
-                  KeyedSubtree(
-                    key: _availabilityBoardKey,
-                    child: _buildAvailabilityBoard(),
-                  ),
-                ],
-                if (_subView == _DashboardSubView.patientManagement) ...[
-                  const SizedBox(height: 4),
-                  AppPanel(
-                    padding: const EdgeInsets.all(16),
-                    child: SizedBox(
-                      height: 720,
-                      child: _PatientManagementDialog(embedded: true),
-                    ),
-                  ),
-                ],
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (_subView == _DashboardSubView.opsHub) ...[
+                _buildDashboardHero(
+                  summary,
+                  summaryVisits,
+                  filteredVisits.length,
+                ),
                 const SizedBox(height: 16),
-                if (_subView == _DashboardSubView.main) KeyedSubtree(
+              ],
+              if (_subView == _DashboardSubView.visitInsights) ...[
+                _buildInsightPanel(summary, summaryVisits),
+                const SizedBox(height: 12),
+              ],
+              if (_subView == _DashboardSubView.main)
+                KeyedSubtree(
+                  key: _dateSelectorKey,
+                  child: _buildDateSelectorPanel(),
+                ),
+              if (_subView == _DashboardSubView.inbox) ...[
+                const SizedBox(height: 4),
+                KeyedSubtree(
+                  key: _appointmentInboxKey,
+                  child: _buildPatientInboxBoard(),
+                ),
+              ],
+              if (_subView == _DashboardSubView.schedule) ...[
+                const SizedBox(height: 4),
+                KeyedSubtree(
+                  key: _availabilityBoardKey,
+                  child: _buildAvailabilityBoard(),
+                ),
+              ],
+              if (_subView == _DashboardSubView.patientManagement) ...[
+                const SizedBox(height: 4),
+                AppPanel(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    height: 720,
+                    child: _PatientManagementDialog(embedded: true),
+                  ),
+                ),
+              ],
+              if (_subView == _DashboardSubView.clinicProfile) ...[
+                const SizedBox(height: 4),
+                const SizedBox(
+                  height: 760,
+                  child: ClinicProfileWorkspace(),
+                ),
+              ],
+              const SizedBox(height: 16),
+              if (_subView == _DashboardSubView.main)
+                KeyedSubtree(
                   key: _patientCardsKey,
                   child: AppPanel(
                     padding: const EdgeInsets.all(20),
@@ -271,6 +360,31 @@ class _PractitionerDashboardScreenState
                               ? WrapAlignment.end
                               : WrapAlignment.start,
                           children: [
+                            if (activeClinic != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.mint.withValues(alpha: 0.16),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: AppTheme.border.withValues(
+                                      alpha: 0.75,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  lang.tr(
+                                    'Clinic: ${activeClinic.name}',
+                                    '현재 한의원: ${activeClinic.name}',
+                                  ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             OutlinedButton.icon(
                               onPressed: _pickDateFromCalendar,
                               icon: const Icon(Icons.calendar_month_outlined),
@@ -469,8 +583,8 @@ class _PractitionerDashboardScreenState
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   lang.tr(
-                                    'Showing ${filteredVisits.length} of ${_store.visitsForDate(_selectedDate).length} patient(s) scheduled on ${_formatStoredDateWithWeekday(_selectedDate)}.',
-                                    '${_formatStoredDateWithWeekday(_selectedDate)} 일정 환자 ${_store.visitsForDate(_selectedDate).length}명 중 ${filteredVisits.length}명을 표시 중입니다.',
+                                    'Showing ${filteredVisits.length} of ${visibleVisits.length} patient portal booking(s) on ${_formatStoredDateWithWeekday(_selectedDate)}.',
+                                    '${_formatStoredDateWithWeekday(_selectedDate)} 환자 포털 일정 ${visibleVisits.length}건 중 ${filteredVisits.length}건을 표시 중입니다.',
                                   ),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: AppTheme.ink.withValues(alpha: 0.62),
@@ -483,44 +597,44 @@ class _PractitionerDashboardScreenState
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                if (filteredVisits.isEmpty)
-                  AppPanel(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+              const SizedBox(height: 12),
+              if (filteredVisits.isEmpty)
+                AppPanel(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang.tr(
+                          'No patients match the selected filters.',
+                          '선택한 필터에 맞는 환자가 없습니다.',
+                        ),
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      if (_selectedDateRange == null &&
+                          visibleVisits.isNotEmpty &&
+                          _selectedStatusFilter != 'All') ...[
+                        const SizedBox(height: 8),
                         Text(
                           lang.tr(
-                            'No patients match the selected filters.',
-                            '선택한 필터에 맞는 환자가 없습니다.',
+                            'There are visits on ${_formatStoredDateWithWeekday(_selectedDate)}, but the current status filter "${_statusFilterLabel(_selectedStatusFilter)}" is hiding them.',
+                            '${_formatStoredDateWithWeekday(_selectedDate)}에 일정은 있지만 현재 상태 필터 "${_statusFilterLabel(_selectedStatusFilter)}" 때문에 숨겨져 있습니다.',
                           ),
-                          style: theme.textTheme.titleMedium,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.ink.withValues(alpha: 0.66),
+                          ),
                         ),
-                        if (_selectedDateRange == null &&
-                            _store.visitsForDate(_selectedDate).isNotEmpty &&
-                            _selectedStatusFilter != 'All') ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            lang.tr(
-                              'There are visits on ${_formatStoredDateWithWeekday(_selectedDate)}, but the current status filter "${_statusFilterLabel(_selectedStatusFilter)}" is hiding them.',
-                              '${_formatStoredDateWithWeekday(_selectedDate)}에 일정은 있지만 현재 상태 필터 "${_statusFilterLabel(_selectedStatusFilter)}" 때문에 숨겨져 있습니다.',
-                            ),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.ink.withValues(alpha: 0.66),
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
+                    ],
                   ),
-                if (_subView == _DashboardSubView.main)
-                  ...filteredVisits.map(
-                    (scheduledVisit) =>
-                        _buildPatientCard(context, scheduledVisit),
-                  ),
-              ],
-            ),
+                ),
+              if (_subView == _DashboardSubView.main)
+                ...filteredVisits.map(
+                  (scheduledVisit) =>
+                      _buildPatientCard(context, scheduledVisit),
+                ),
+            ],
+          ),
         );
       },
     );
@@ -569,17 +683,22 @@ class _PractitionerDashboardScreenState
       return !parsed.isBefore(selectionStart) && !parsed.isAfter(selectionEnd);
     }
 
-    final selectionSlots = _store.slots.where(
+    final selectionSlots = _store.slotsForClinic(_currentClinicId).where(
       (slot) => isInSelection(slot.date),
     );
     var bookedSlots = 0;
     var pendingSlotRequests = 0;
     var openSlots = 0;
     for (final slot in selectionSlots) {
-      final scheduledVisit = _store.scheduledVisitForSlot(slot.date, slot.time);
+      final scheduledVisit = _store.scheduledVisitForSlot(
+        slot.date,
+        slot.time,
+        clinicId: _currentClinicId,
+      );
       final latestRequest = _store.latestActiveRequestForSlot(
         slot.date,
         slot.time,
+        clinicId: _currentClinicId,
       );
       if (scheduledVisit != null) {
         bookedSlots++;
@@ -980,9 +1099,11 @@ class _PractitionerDashboardScreenState
     );
   }
 
-  Widget _buildInsightPanel(_VisitWindowSummary summary) {
+  Widget _buildInsightPanel(
+    _VisitWindowSummary summary,
+    List<ScheduledVisit> visibleVisits,
+  ) {
     final lang = AppLanguageController.instance;
-    final visibleVisits = _visibleVisits();
     final visibleProfiles = {
       for (final scheduledVisit in visibleVisits)
         scheduledVisit.profile.id: scheduledVisit.profile,
@@ -1292,11 +1413,9 @@ class _PractitionerDashboardScreenState
   Future<void> _pickDateRange() async {
     final lang = AppLanguageController.instance;
     final now = DateTime.now();
-    final initial = _selectedDateRange ??
-        DateTimeRange(
-          start: now.subtract(const Duration(days: 6)),
-          end: now,
-        );
+    final initial =
+        _selectedDateRange ??
+        DateTimeRange(start: now.subtract(const Duration(days: 6)), end: now);
     final picked = await showDateRangePicker(
       context: context,
       initialDateRange: initial,
@@ -1319,10 +1438,7 @@ class _PractitionerDashboardScreenState
     final lang = AppLanguageController.instance;
     final theme = Theme.of(context);
     final rangeLabel = _selectedDateRange == null
-        ? lang.tr(
-            'Last $_selectedRangeDays days',
-            '최근 $_selectedRangeDays일',
-          )
+        ? lang.tr('Last $_selectedRangeDays days', '최근 $_selectedRangeDays일')
         : '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)}';
 
     return AppPanel(
@@ -1355,10 +1471,7 @@ class _PractitionerDashboardScreenState
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  rangeLabel,
-                  style: theme.textTheme.titleMedium,
-                ),
+                Text(rangeLabel, style: theme.textTheme.titleMedium),
               ],
             ),
           ),
@@ -1385,8 +1498,9 @@ class _PractitionerDashboardScreenState
     );
   }
 
+  // ignore: unused_element
   Widget _buildLegacyDateSelectorPanelDeprecated() {
-    final dates = _store.allDates;
+    final dates = _store.allDatesForClinic(_currentClinicId);
     final selectedDate = _parseDate(_selectedDate) ?? DateTime.now();
     final theme = Theme.of(context);
     return AppPanel(
@@ -1443,7 +1557,8 @@ class _PractitionerDashboardScreenState
             spacing: 8,
             runSpacing: 8,
             children: dates.map((date) {
-              final count = _store.visitsForDate(date).length;
+              final count =
+                  _store.visitsForDate(date, clinicId: _currentClinicId).length;
               final isSelected =
                   _selectedDate == date && _selectedDateRange == null;
               return ChoiceChip(
@@ -1576,6 +1691,15 @@ class _PractitionerDashboardScreenState
             '문진 미제출 - 세션 전 직접 확인 필요',
           )
         : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
+    final currentInputLabel = visit.qaList.isEmpty
+        ? AppLanguageController.instance.tr(
+            'Current visit status for this selected booking date',
+            '선택한 예약 날짜 기준 현재 방문 상태',
+          )
+        : AppLanguageController.instance.tr(
+            'Current visit intake submitted from the patient portal',
+            '환자 포털에서 제출한 이번 방문 문진',
+          );
     final canSendRequest = profile.hasRequiredAlertInfo;
 
     return Card(
@@ -1600,6 +1724,15 @@ class _PractitionerDashboardScreenState
                         ),
                       ),
                       const SizedBox(height: 6),
+                      Text(
+                        currentInputLabel,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Text(firstQa),
                       const SizedBox(height: 6),
                       Text(
@@ -1667,7 +1800,10 @@ class _PractitionerDashboardScreenState
                       PatientBriefScreen.routeName,
                       arguments: PatientHistoryArgs(
                         current: scheduledVisit,
-                        history: _store.historyForPatient(profile.id),
+                        history: _store.historyForPatient(
+                          profile.id,
+                          clinicId: _currentClinicId,
+                        ),
                       ),
                     );
                   },
@@ -1689,32 +1825,363 @@ class _PractitionerDashboardScreenState
               ),
             ],
             const SizedBox(height: 12),
-            _PatientRealtimeActivity(patientId: profile.id),
+            _PatientRealtimeActivity(
+              patientId: profile.id,
+              clinicId: visit.clinicId,
+            ),
           ],
         ),
       ),
     );
   }
 
-  List<ScheduledVisit> _visibleVisits() {
-    if (_selectedDateRange != null) {
-      return _store.visitsInRange(
-        _selectedDateRange!.start,
-        _selectedDateRange!.end,
-      );
+  bool _storedDateMatchesSelectedWindow(String storedDate) {
+    if (_selectedDateRange == null) {
+      return storedDate == _selectedDate;
     }
-    if (_selectedDate.isEmpty) {
+    final parsed = _parseDate(storedDate);
+    if (parsed == null) {
+      return false;
+    }
+    final normalized = DateTime(parsed.year, parsed.month, parsed.day);
+    final start = DateTime(
+      _selectedDateRange!.start.year,
+      _selectedDateRange!.start.month,
+      _selectedDateRange!.start.day,
+    );
+    final end = DateTime(
+      _selectedDateRange!.end.year,
+      _selectedDateRange!.end.month,
+      _selectedDateRange!.end.day,
+    );
+    return !normalized.isBefore(start) && !normalized.isAfter(end);
+  }
+
+  bool _isActiveAppointmentRequest(AppointmentRequest request) {
+    return request.status == AppointmentRequestStatus.pending ||
+        request.status == AppointmentRequestStatus.confirmed;
+  }
+
+  List<AppointmentRequest> _selectedWindowRequests() {
+    if (!_hasClinicContext) {
       return const [];
     }
-    return _store.visitsForDate(_selectedDate);
+    final items = _store
+        .appointmentRequestsForClinic(_currentClinicId)
+        .where(_isActiveAppointmentRequest)
+        .where((request) => _storedDateMatchesSelectedWindow(request.date))
+        .toList()
+      ..sort((a, b) {
+        final dateCompare = a.date.compareTo(b.date);
+        if (dateCompare != 0) {
+          return dateCompare;
+        }
+        final timeCompare = a.time.compareTo(b.time);
+        if (timeCompare != 0) {
+          return timeCompare;
+        }
+        return a.patientId.compareTo(b.patientId);
+    });
+    return items;
+  }
+
+  bool _storedDateMatchesSummaryWindow(String storedDate) {
+    if (_selectedDateRange != null) {
+      return _storedDateMatchesSelectedWindow(storedDate);
+    }
+    final parsed = _parseDate(storedDate);
+    if (parsed == null) {
+      return false;
+    }
+    final selected = _parseDate(_selectedDate) ?? DateTime.now();
+    final end = DateTime(selected.year, selected.month, selected.day);
+    final start = end.subtract(Duration(days: _selectedRangeDays - 1));
+    final normalized = DateTime(parsed.year, parsed.month, parsed.day);
+    return !normalized.isBefore(start) && !normalized.isAfter(end);
+  }
+
+  List<AppointmentRequest> _summaryWindowRequests() {
+    if (!_hasClinicContext) {
+      return const [];
+    }
+    final items = _store
+        .appointmentRequestsForClinic(_currentClinicId)
+        .where(_isActiveAppointmentRequest)
+        .where((request) => _storedDateMatchesSummaryWindow(request.date))
+        .toList()
+      ..sort((a, b) {
+        final dateCompare = a.date.compareTo(b.date);
+        if (dateCompare != 0) {
+          return dateCompare;
+        }
+        final timeCompare = a.time.compareTo(b.time);
+        if (timeCompare != 0) {
+          return timeCompare;
+        }
+        return a.patientId.compareTo(b.patientId);
+      });
+    return items;
+  }
+
+  Set<String> _selectedWindowPatientIds() {
+    return _selectedWindowRequests().map((request) => request.patientId).toSet();
+  }
+
+  Map<String, Map<String, dynamic>> _latestSubmissionByPatient(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> submissionDocs,
+  ) {
+    if (!_hasClinicContext) {
+      return const <String, Map<String, dynamic>>{};
+    }
+    final items = submissionDocs
+        .where((doc) {
+          final source = (doc.data()['source'] ?? '').toString();
+          final clinicId = (doc.data()['clinicId'] ?? '').toString();
+          return (source.isEmpty || source == 'patient_intake_screen') &&
+              clinicId == _currentClinicId;
+        })
+        .toList()
+      ..sort((a, b) {
+        final aTime =
+            (a.data()['submittedAt'] as Timestamp?)?.millisecondsSinceEpoch ??
+            0;
+        final bTime =
+            (b.data()['submittedAt'] as Timestamp?)?.millisecondsSinceEpoch ??
+            0;
+        return bTime.compareTo(aTime);
+      });
+
+    final latestByPatient = <String, Map<String, dynamic>>{};
+    for (final doc in items) {
+      final patientId = (doc.data()['patientId'] ?? '').toString();
+      if (patientId.isEmpty || latestByPatient.containsKey(patientId)) {
+        continue;
+      }
+      latestByPatient[patientId] = doc.data();
+    }
+    return latestByPatient;
+  }
+
+  bool _matchesCurrentClinicDoc(Map<String, dynamic> data) {
+    if (!_hasClinicContext) {
+      return false;
+    }
+    final clinicId = (data['clinicId'] ?? '').toString();
+    return clinicId == _currentClinicId;
+  }
+
+  DateTime? _slotDateTime(String storedDate, String slotTime) {
+    final date = _parseDate(storedDate);
+    if (date == null) {
+      return null;
+    }
+    final match = RegExp(
+      r'^(\d{1,2}):(\d{2})\s*(AM|PM)$',
+      caseSensitive: false,
+    ).firstMatch(slotTime.trim());
+    if (match == null) {
+      return DateTime(date.year, date.month, date.day);
+    }
+    var hour = int.parse(match.group(1)!);
+    final minute = int.parse(match.group(2)!);
+    final meridiem = match.group(3)!.toUpperCase();
+    if (meridiem == 'PM' && hour != 12) {
+      hour += 12;
+    } else if (meridiem == 'AM' && hour == 12) {
+      hour = 0;
+    }
+    return DateTime(date.year, date.month, date.day, hour, minute);
+  }
+
+  ScheduledVisit? _latestHistoryBeforeSlot(
+    String patientId,
+    String storedDate,
+    String slotTime,
+  ) {
+    final targetDateTime = _slotDateTime(storedDate, slotTime);
+    final history = _store.historyForPatient(
+      patientId,
+      clinicId: _currentClinicId,
+    );
+    for (final item in history) {
+      final historyDateTime = _slotDateTime(item.visit.date, item.visit.time);
+      if (historyDateTime == null || targetDateTime == null) {
+        if (item.visit.date != storedDate || item.visit.time != slotTime) {
+          return item;
+        }
+        continue;
+      }
+      if (historyDateTime.isBefore(targetDateTime)) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  String _submissionCategory(String questionText) {
+    final value = questionText.toLowerCase();
+    if (value.contains('sleep') || value.contains('wake')) {
+      return 'Sleep';
+    }
+    if (value.contains('stress') ||
+        value.contains('mood') ||
+        value.contains('emotion')) {
+      return 'Emotion';
+    }
+    if (value.contains('energy') || value.contains('fatigue')) {
+      return 'Energy';
+    }
+    if (value.contains('appetite') ||
+        value.contains('thirst') ||
+        value.contains('drink')) {
+      return 'Appetite/Thirst';
+    }
+    if (value.contains('digest') ||
+        value.contains('bloat') ||
+        value.contains('meal')) {
+      return 'Digestion';
+    }
+    if (value.contains('bowel') || value.contains('stool')) {
+      return 'Stool';
+    }
+    if (value.contains('urine')) {
+      return 'Urine';
+    }
+    if (value.contains('headache') ||
+        value.contains('eye') ||
+        value.contains('sinus') ||
+        value.contains('neck') ||
+        value.contains('shoulder')) {
+      return 'HEENT';
+    }
+    if (value.contains('period') ||
+        value.contains('cycle') ||
+        value.contains('menstrual')) {
+      return 'Menses';
+    }
+    if (value.contains('sweat') ||
+        value.contains('cold') ||
+        value.contains('hot')) {
+      return 'Temperature/Sweat';
+    }
+    return 'Patient Intake';
+  }
+
+  List<QaItem> _qaListFromSubmission(Map<String, dynamic>? data) {
+    if (data == null) {
+      return const [];
+    }
+    final answers = (data['answers'] as List<dynamic>? ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .map((answer) {
+          final questionText = (answer['questionText'] ?? '').toString().trim();
+          final answerText = (answer['answerText'] ?? '').toString().trim();
+          if (questionText.isEmpty || answerText.isEmpty) {
+            return null;
+          }
+          return QaItem(
+            category: _submissionCategory(questionText),
+            question: questionText,
+            answer: answerText,
+          );
+        })
+        .whereType<QaItem>()
+        .toList();
+    return answers;
+  }
+
+  List<ScheduledVisit> _buildVisitsFromRequests(
+    List<AppointmentRequest> requests,
+  ) {
+    final visits = <ScheduledVisit>[];
+
+    for (final request in requests) {
+      final profile = _store.profileById(request.patientId);
+      if (profile == null) {
+        continue;
+      }
+      final latestHistory = _latestHistoryBeforeSlot(
+        request.patientId,
+        request.date,
+        request.time,
+      );
+      final targetDate = _parseDate(request.date);
+      final latestHistoryDate = latestHistory == null
+          ? null
+          : _parseDate(latestHistory.visit.date);
+      final daysAgo =
+          targetDate == null || latestHistoryDate == null
+          ? 0
+          : targetDate.difference(latestHistoryDate).inDays;
+      final submission = _latestPatientIntakeByPatient[request.patientId];
+      final qaList = _qaListFromSubmission(submission);
+
+      visits.add(
+        ScheduledVisit(
+          profile: profile,
+          visit: PatientVisit(
+            id: 'dashboard_${request.id}',
+            patientId: profile.id,
+            clinicId: request.clinicId,
+            date: request.date,
+            time: request.time,
+            lastVisitDate: latestHistory?.visit.date ?? request.date,
+            daysAgo: daysAgo < 0 ? 0 : daysAgo,
+            scheduledSinceLast: latestHistory == null ? 0 : 1,
+            noShowSinceLast: 0,
+            intakeStatus: qaList.isEmpty
+                ? IntakeStatus.notStarted
+                : IntakeStatus.completed,
+            previousTreatmentArea:
+                latestHistory?.visit.previousTreatmentArea ??
+                AppLanguageController.instance.tr(
+                  'No prior treatment area saved yet',
+                  '이전 치료 부위 기록 없음',
+                ),
+            previousSessionNote:
+                latestHistory?.visit.previousSessionNote ??
+                AppLanguageController.instance.tr(
+                  'This visit was booked from the patient portal.',
+                  '이번 방문은 환자 포털에서 예약되었습니다.',
+                ),
+            qaList: qaList,
+          ),
+        ),
+      );
+    }
+
+    visits.sort((a, b) {
+      final dateCompare = a.visit.date.compareTo(b.visit.date);
+      if (dateCompare != 0) {
+        return dateCompare;
+      }
+      final timeCompare = a.visit.time.compareTo(b.visit.time);
+      if (timeCompare != 0) {
+        return timeCompare;
+      }
+      return a.profile.name.compareTo(b.profile.name);
+    });
+    return visits;
+  }
+
+  List<ScheduledVisit> _visibleVisits() {
+    return _buildVisitsFromRequests(_selectedWindowRequests());
+  }
+
+  List<ScheduledVisit> _summaryWindowVisits() {
+    return _buildVisitsFromRequests(_summaryWindowRequests());
   }
 
   Widget _buildPatientInboxBoard() {
     final lang = AppLanguageController.instance;
+    final selectedPatientIds = _selectedWindowPatientIds();
     final requests =
-        _store.appointmentRequests
+        _store
+            .appointmentRequestsForClinic(_currentClinicId)
             .where(
-              (request) => request.status == AppointmentRequestStatus.pending,
+              (request) =>
+                  request.status == AppointmentRequestStatus.pending &&
+                  _storedDateMatchesSelectedWindow(request.date),
             )
             .toList()
           ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
@@ -1754,14 +2221,22 @@ class _PractitionerDashboardScreenState
                           final feedbackText =
                               (data['feedbackText'] as String? ?? '').trim();
                           return feedbackText.isNotEmpty &&
+                              _matchesCurrentClinicDoc(data) &&
+                              _storedDateMatchesSelectedWindow(
+                                (data['visitDate'] ?? '').toString(),
+                              ) &&
                               (data['status'] ?? 'pending') != 'reviewed';
                         }).length;
                     final recentSubmissionCount =
                         [...?submissionSnapshot.data?.docs].where((doc) {
                           final source = (doc.data()['source'] ?? '')
                               .toString();
-                          return source.isEmpty ||
-                              source == 'patient_intake_screen';
+                          final patientId =
+                              (doc.data()['patientId'] ?? '').toString();
+                          return (source.isEmpty ||
+                                  source == 'patient_intake_screen') &&
+                              _matchesCurrentClinicDoc(doc.data()) &&
+                              selectedPatientIds.contains(patientId);
                         }).length;
 
                     return Wrap(
@@ -1913,6 +2388,10 @@ class _PractitionerDashboardScreenState
                   final feedbackText = (data['feedbackText'] as String? ?? '')
                       .trim();
                   return feedbackText.isNotEmpty &&
+                      _matchesCurrentClinicDoc(data) &&
+                      _storedDateMatchesSelectedWindow(
+                        (data['visitDate'] ?? '').toString(),
+                      ) &&
                       (data['status'] ?? 'pending') != 'reviewed';
                 }).toList();
 
@@ -2094,8 +2573,12 @@ class _PractitionerDashboardScreenState
                 final patientSubmissions = recentSubmissionDocs
                     .where((doc) {
                       final source = (doc.data()['source'] ?? '').toString();
-                      return source.isEmpty ||
-                          source == 'patient_intake_screen';
+                      final patientId =
+                          (doc.data()['patientId'] ?? '').toString();
+                      return (source.isEmpty ||
+                              source == 'patient_intake_screen') &&
+                          _matchesCurrentClinicDoc(doc.data()) &&
+                          selectedPatientIds.contains(patientId);
                     })
                     .take(4)
                     .toList();
@@ -2245,7 +2728,7 @@ class _PractitionerDashboardScreenState
       return !parsed.isBefore(start) && !parsed.isAfter(end);
     }
 
-    for (final slot in _store.slots) {
+    for (final slot in _store.slotsForClinic(_currentClinicId)) {
       if (!slotInRange(slot.date)) continue;
       grouped.putIfAbsent(slot.date, () => <AppointmentSlot>[]).add(slot);
     }
@@ -2290,7 +2773,8 @@ class _PractitionerDashboardScreenState
             ...dates.map((date) {
               final slots = grouped[date]!
                 ..sort((a, b) => a.time.compareTo(b.time));
-              final patientCount = _store.visitsForDate(date).length;
+              final patientCount =
+                  _store.visitsForDate(date, clinicId: _currentClinicId).length;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Column(
@@ -2391,19 +2875,17 @@ class _PractitionerDashboardScreenState
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: reserved
-            ? (isConfirmed
-                ? const Color(0xFFE3F3EF)
-                : const Color(0xFFF6E7D7))
+            ? (isConfirmed ? const Color(0xFFE3F3EF) : const Color(0xFFF6E7D7))
             : (slot.isOpen ? const Color(0xFFEFEFEF) : Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: reserved
               ? (isConfirmed
-                  ? const Color(0xFFCFE6DE)
-                  : const Color(0xFFE2C6A6))
+                    ? const Color(0xFFCFE6DE)
+                    : const Color(0xFFE2C6A6))
               : (slot.isOpen
-                  ? const Color(0xFFCCCCCC)
-                  : const Color(0xFFE0E0E0)),
+                    ? const Color(0xFFCCCCCC)
+                    : const Color(0xFFE0E0E0)),
         ),
       ),
       child: Column(
@@ -2443,7 +2925,10 @@ class _PractitionerDashboardScreenState
             Text(
               slot.isOpen
                   ? lang.tr('Open · patients can book', '열림 · 환자가 예약 가능')
-                  : lang.tr('Hidden · not visible to patients', '숨김 · 환자에게 보이지 않음'),
+                  : lang.tr(
+                      'Hidden · not visible to patients',
+                      '숨김 · 환자에게 보이지 않음',
+                    ),
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.black.withValues(alpha: 0.58),
@@ -2469,7 +2954,12 @@ class _PractitionerDashboardScreenState
 
   Future<void> _openAvailabilityDateCountsSheet() async {
     final lang = AppLanguageController.instance;
-    final dates = _store.allDates..sort();
+    final dates = _store
+        .slotsForClinic(_currentClinicId)
+        .map((slot) => slot.date)
+        .toSet()
+        .toList()
+      ..sort();
 
     await showModalBottomSheet<void>(
       context: context,
@@ -2497,7 +2987,10 @@ class _PractitionerDashboardScreenState
                 ),
                 const SizedBox(height: 14),
                 ...dates.map((date) {
-                  final patientCount = _store.visitsForDate(date).length;
+                  final patientCount =
+                      _store
+                          .visitsForDate(date, clinicId: _currentClinicId)
+                          .length;
                   return Container(
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 10),
@@ -2546,7 +3039,11 @@ class _PractitionerDashboardScreenState
   }
 
   _SlotOccupancy? _slotOccupancyFor(AppointmentSlot slot) {
-    final scheduledVisit = _store.scheduledVisitForSlot(slot.date, slot.time);
+    final scheduledVisit = _store.scheduledVisitForSlot(
+      slot.date,
+      slot.time,
+      clinicId: _currentClinicId,
+    );
     if (scheduledVisit != null) {
       return _SlotOccupancy(
         profile: scheduledVisit.profile,
@@ -2554,7 +3051,11 @@ class _PractitionerDashboardScreenState
       );
     }
 
-    final request = _store.latestActiveRequestForSlot(slot.date, slot.time);
+    final request = _store.latestActiveRequestForSlot(
+      slot.date,
+      slot.time,
+      clinicId: _currentClinicId,
+    );
     if (request == null) {
       return null;
     }
@@ -2572,7 +3073,10 @@ class _PractitionerDashboardScreenState
     _SlotOccupancy occupancy,
   ) async {
     final lang = AppLanguageController.instance;
-    final history = _store.historyForPatient(occupancy.profile.id);
+    final history = _store.historyForPatient(
+      occupancy.profile.id,
+      clinicId: _currentClinicId,
+    );
     final latestHistory = history.isNotEmpty ? history.first.visit : null;
     final scheduledVisit = occupancy.scheduledVisit;
     final request = occupancy.appointmentRequest;
@@ -2678,7 +3182,10 @@ class _PractitionerDashboardScreenState
                     PatientBriefScreen.routeName,
                     arguments: PatientHistoryArgs(
                       current: scheduledVisit,
-                      history: _store.historyForPatient(occupancy.profile.id),
+                      history: _store.historyForPatient(
+                        occupancy.profile.id,
+                        clinicId: _currentClinicId,
+                      ),
                     ),
                   );
                 },
@@ -2691,36 +3198,30 @@ class _PractitionerDashboardScreenState
     );
   }
 
-  _VisitWindowSummary _visitWindowSummary() {
+  _VisitWindowSummary _visitWindowSummary(List<ScheduledVisit> visibleVisits) {
     if (_selectedDateRange != null) {
-      final visits = _store.visitsInRange(
-        _selectedDateRange!.start,
-        _selectedDateRange!.end,
-      );
       return _VisitWindowSummary(
         days: _selectedDateRange!.duration.inDays + 1,
-        totalVisits: visits.length,
+        totalVisits: visibleVisits.length,
         fromDate: _formatDate(_selectedDateRange!.start),
         toDate: _formatDate(_selectedDateRange!.end),
         periodLabel: AppLanguageController.instance.tr(
-          '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} ${visits.length}',
-          '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} ${visits.length}명',
+          '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} ${visibleVisits.length}',
+          '${_formatDateWithWeekday(_selectedDateRange!.start)} ~ ${_formatDateWithWeekday(_selectedDateRange!.end)} ${visibleVisits.length}명',
         ),
       );
     }
 
     final selected = _parseDate(_selectedDate) ?? DateTime.now();
     final start = selected.subtract(Duration(days: _selectedRangeDays - 1));
-    final visits = _store.visitsInRange(start, selected);
-
     return _VisitWindowSummary(
       days: _selectedRangeDays,
-      totalVisits: visits.length,
+      totalVisits: visibleVisits.length,
       fromDate: _formatDate(start),
       toDate: _formatDate(selected),
       periodLabel: AppLanguageController.instance.tr(
-        '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visits.length}',
-        '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visits.length}명',
+        '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visibleVisits.length}',
+        '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visibleVisits.length}명',
       ),
     );
   }
@@ -3114,6 +3615,7 @@ class _PractitionerDashboardScreenState
                         final docId =
                             await AppFirestoreService.sendAnswerRequest(
                               patientId: profile.id,
+                              clinicId: visit.clinicId,
                               patientName: profile.name,
                               patientPhone: profile.phone,
                               patientEmail: profile.email,
@@ -3281,6 +3783,7 @@ class _PractitionerDashboardScreenState
                 try {
                   final docId = await AppFirestoreService.sendPractitionerNote(
                     patientId: profile.id,
+                    clinicId: visit.clinicId,
                     patientName: profile.name,
                     patientPhone: profile.phone,
                     patientEmail: profile.email,
@@ -3535,21 +4038,41 @@ class _PractitionerDashboardScreenState
 
   int _bookedPatientCountForDate(String date) {
     final patientIds = <String>{
-      ..._store.visitsForDate(date).map((visit) => visit.profile.id),
-      ..._store.appointmentRequests
+      ..._store
+          .appointmentRequestsForClinic(_currentClinicId)
           .where(
             (request) =>
                 request.date == date &&
-                (request.status == AppointmentRequestStatus.pending ||
-                    request.status == AppointmentRequestStatus.confirmed),
+                _isActiveAppointmentRequest(request),
           )
           .map((request) => request.patientId),
     };
     return patientIds.length;
   }
 
+  List<DateTime> _dashboardDates() {
+    final dates = <DateTime>{
+      for (final slot in _store.slotsForClinic(_currentClinicId))
+        if (_parseDate(slot.date) != null)
+          DateTime(
+            _parseDate(slot.date)!.year,
+            _parseDate(slot.date)!.month,
+            _parseDate(slot.date)!.day,
+          ),
+      for (final request in _store.appointmentRequestsForClinic(_currentClinicId))
+        if (_isActiveAppointmentRequest(request) && _parseDate(request.date) != null)
+          DateTime(
+            _parseDate(request.date)!.year,
+            _parseDate(request.date)!.month,
+            _parseDate(request.date)!.day,
+          ),
+    }.toList()
+      ..sort();
+    return dates;
+  }
+
   int _actualVisitCountForDate(String date) {
-    return _store.visitsForDate(date).length;
+    return _store.visitsForDate(date, clinicId: _currentClinicId).length;
   }
 
   void _applySelectedDate(DateTime picked) {
@@ -3566,13 +4089,7 @@ class _PractitionerDashboardScreenState
     final lang = AppLanguageController.instance;
     final today = DateTime.now();
     final normalizedToday = DateTime(today.year, today.month, today.day);
-    final dates =
-        _store.allDates
-            .map(_parseDate)
-            .whereType<DateTime>()
-            .map((date) => DateTime(date.year, date.month, date.day))
-            .toList()
-          ..sort();
+    final dates = _dashboardDates();
 
     DateTime targetDate = normalizedToday;
     String? message;
@@ -3733,7 +4250,8 @@ class _PractitionerDashboardScreenState
   }
 
   int _pendingAppointmentRequestCount() {
-    return _store.appointmentRequests
+    return _store
+        .appointmentRequestsForClinic(_currentClinicId)
         .where((request) => request.status == AppointmentRequestStatus.pending)
         .length;
   }
@@ -3952,7 +4470,10 @@ class _PractitionerDashboardScreenState
 
   Future<void> _openLatestPatientBriefForProfile(PatientProfile profile) async {
     final lang = AppLanguageController.instance;
-    final history = _store.historyForPatient(profile.id);
+    final history = _store.historyForPatient(
+      profile.id,
+      clinicId: _currentClinicId,
+    );
     if (history.isEmpty) {
       if (!mounted) {
         return;
@@ -4032,6 +4553,7 @@ class _PractitionerDashboardScreenState
     return '${_formatDateWithWeekday(_selectedDateRange!.start)} - ${_formatDateWithWeekday(_selectedDateRange!.end)}';
   }
 
+  // ignore: unused_element
   Widget _buildTopInboxAction(int count) {
     final lang = AppLanguageController.instance;
     return Padding(
@@ -4143,6 +4665,7 @@ class _PractitionerDashboardScreenState
     );
   }
 
+  // ignore: unused_element
   Widget _buildTopDateAction() {
     return Padding(
       padding: const EdgeInsets.only(right: 10),
@@ -4208,9 +4731,13 @@ class _PractitionerDashboardScreenState
 }
 
 class _PatientRealtimeActivity extends StatelessWidget {
-  const _PatientRealtimeActivity({required this.patientId});
+  const _PatientRealtimeActivity({
+    required this.patientId,
+    required this.clinicId,
+  });
 
   final String patientId;
+  final String? clinicId;
 
   @override
   Widget build(BuildContext context) {
@@ -4254,6 +4781,12 @@ class _PatientRealtimeActivity extends StatelessWidget {
                 }
 
                 final submissionDocs = [...submissionSnapshot.data!.docs]
+                  ..removeWhere((doc) {
+                    final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+                    return clinicId == null ||
+                        clinicId!.isEmpty ||
+                        docClinicId != clinicId;
+                  })
                   ..sort((a, b) {
                     final aDate = (a.data()['submittedAt'] as Timestamp?)
                         ?.toDate();
@@ -4265,6 +4798,12 @@ class _PatientRealtimeActivity extends StatelessWidget {
                   });
 
                 final requestDocs = [...requestSnapshot.data!.docs]
+                  ..removeWhere((doc) {
+                    final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+                    return clinicId == null ||
+                        clinicId!.isEmpty ||
+                        docClinicId != clinicId;
+                  })
                   ..sort((a, b) {
                     final aDate = (a.data()['requestedAt'] as Timestamp?)
                         ?.toDate();
@@ -4276,6 +4815,12 @@ class _PatientRealtimeActivity extends StatelessWidget {
                   });
 
                 final feedbackDocs = [...feedbackSnapshot.data!.docs]
+                  ..removeWhere((doc) {
+                    final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+                    return clinicId == null ||
+                        clinicId!.isEmpty ||
+                        docClinicId != clinicId;
+                  })
                   ..sort((a, b) {
                     final aDate = (a.data()['updatedAt'] as Timestamp?)
                         ?.toDate();
@@ -4938,114 +5483,115 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
       children: [
         SizedBox(
           width: 280,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FilledButton.icon(
-                    onPressed: () {
-                      final newProfile = PatientProfile(
-                        id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
-                        name: 'New Patient',
-                        phone: '',
-                        email: '',
-                        birthYear: 1990,
-                        sex: 'Female',
-                        ethnicity: 'Unknown',
-                        memo: '',
-                      );
-                      _store.saveProfile(newProfile);
-                      setState(() => _selectedProfileId = newProfile.id);
-                    },
-                    icon: const Icon(Icons.person_add_alt_1),
-                    label: Text(
-                      AppLanguageController.instance.tr('Add Patient', '환자 추가'),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: profiles.length,
-                      itemBuilder: (context, index) {
-                        final profile = profiles[index];
-                        final isSelected = selected?.id == profile.id;
-                        final missingFields = <String>[
-                          if (profile.phone.trim().isEmpty) '전화번호',
-                          if (profile.email.trim().isEmpty) '이메일',
-                        ];
-                        return Card(
-                          color: isSelected ? const Color(0xFFF4FBFA) : null,
-                          child: ListTile(
-                            title: Row(
-                              children: [
-                                Expanded(child: Text(profile.name)),
-                                if (missingFields.isNotEmpty)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFFE2E2),
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      AppLanguageController.instance.tr(
-                                        'Missing Required Info',
-                                        '필수 정보 부족',
-                                      ),
-                                      style: TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            subtitle: Text(
-                              missingFields.isEmpty
-                                  ? '${profile.phone} · ${profile.email}'
-                                  : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {
-                                _store.deleteProfile(profile.id);
-                                setState(() {
-                                  if (_selectedProfileId == profile.id) {
-                                    _selectedProfileId = null;
-                                  }
-                                });
-                              },
-                              icon: const Icon(Icons.delete_outline),
-                            ),
-                            onTap: () =>
-                                setState(() => _selectedProfileId = profile.id),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FilledButton.icon(
+                onPressed: () {
+                  final newProfile = PatientProfile(
+                    id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
+                    name: 'New Patient',
+                    phone: '',
+                    email: '',
+                    birthYear: 1990,
+                    sex: 'Female',
+                    ethnicity: 'Unknown',
+                    memo: '',
+                  );
+                  _store.saveProfile(newProfile);
+                  setState(() => _selectedProfileId = newProfile.id);
+                },
+                icon: const Icon(Icons.person_add_alt_1),
+                label: Text(
+                  AppLanguageController.instance.tr('Add Patient', '환자 추가'),
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: selected == null
-                  ? Center(
-                      child: Text(
-                        AppLanguageController.instance.tr(
-                          'Select a patient to manage.',
-                          '관리할 환자를 선택하세요.',
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: profiles.length,
+                  itemBuilder: (context, index) {
+                    final profile = profiles[index];
+                    final isSelected = selected?.id == profile.id;
+                    final missingFields = <String>[
+                      if (profile.phone.trim().isEmpty) '전화번호',
+                      if (profile.email.trim().isEmpty) '이메일',
+                    ];
+                    return Card(
+                      color: isSelected ? const Color(0xFFF4FBFA) : null,
+                      child: ListTile(
+                        title: Row(
+                          children: [
+                            Expanded(child: Text(profile.name)),
+                            if (missingFields.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFE2E2),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  AppLanguageController.instance.tr(
+                                    'Missing Required Info',
+                                    '필수 정보 부족',
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
+                        subtitle: Text(
+                          missingFields.isEmpty
+                              ? '${profile.phone} · ${profile.email}'
+                              : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            _store.deleteProfile(profile.id);
+                            setState(() {
+                              if (_selectedProfileId == profile.id) {
+                                _selectedProfileId = null;
+                              }
+                            });
+                          },
+                          icon: const Icon(Icons.delete_outline),
+                        ),
+                        onTap: () =>
+                            setState(() => _selectedProfileId = profile.id),
                       ),
-                    )
-                  : _PatientProfileEditor(
-                      profile: selected,
-                      onSave: (updated) {
-                        _store.saveProfile(updated);
-                        setState(() => _selectedProfileId = updated.id);
-                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: selected == null
+              ? Center(
+                  child: Text(
+                    AppLanguageController.instance.tr(
+                      'Select a patient to manage.',
+                      '관리할 환자를 선택하세요.',
                     ),
+                  ),
+                )
+              : _PatientProfileEditor(
+                  profile: selected,
+                  clinicId: PractitionerSessionService.currentSession?.clinicId,
+                  onSave: (updated) {
+                    _store.saveProfile(updated);
+                    setState(() => _selectedProfileId = updated.id);
+                  },
+                ),
         ),
       ],
     );
@@ -5070,10 +5616,15 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
 }
 
 class _PatientProfileEditor extends StatefulWidget {
-  const _PatientProfileEditor({required this.profile, required this.onSave});
+  const _PatientProfileEditor({
+    required this.profile,
+    required this.onSave,
+    this.clinicId,
+  });
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
+  final String? clinicId;
 
   @override
   State<_PatientProfileEditor> createState() => _PatientProfileEditorState();
@@ -5137,6 +5688,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
   Widget build(BuildContext context) {
     return PatientRecordWorkspace(
       profile: widget.profile,
+      clinicId: widget.clinicId,
       onSave: widget.onSave,
     );
     /*
@@ -5387,4 +5939,5 @@ enum _DashboardSubView {
   visitInsights,
   schedule,
   patientManagement,
+  clinicProfile,
 }

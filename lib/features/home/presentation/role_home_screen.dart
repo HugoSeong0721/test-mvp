@@ -42,10 +42,7 @@ class RoleHomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      lang.tr(
-                        'Choose where you are heading.',
-                        '진입할 곳을 선택하세요.',
-                      ),
+                      lang.tr('Choose where you are heading.', '진입할 곳을 선택하세요.'),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: AppTheme.ink.withValues(alpha: 0.68),
                       ),
@@ -77,6 +74,18 @@ class RoleHomeScreen extends StatelessWidget {
                               'loginMode': 'default',
                             },
                           ),
+                          secondaryButtonLabel: lang.tr(
+                            'Create Practitioner Account',
+                            '침술사 회원가입',
+                          ),
+                          onSecondaryPressed: () => Navigator.pushNamed(
+                            context,
+                            LoginScreen.routeName,
+                            arguments: const {
+                              'role': 'practitioner',
+                              'loginMode': 'register',
+                            },
+                          ),
                         );
                         final patientCard = _RoleCard(
                           accent: AppTheme.copper,
@@ -88,10 +97,7 @@ class RoleHomeScreen extends StatelessWidget {
                             'Sign up or log in to complete your intake and see visit history.',
                             '회원가입 또는 로그인 후 문진을 작성하고 방문 기록을 확인합니다.',
                           ),
-                          buttonLabel: lang.tr(
-                            'Continue as Patient',
-                            '환자로 시작',
-                          ),
+                          buttonLabel: lang.tr('Continue as Patient', '환자로 시작'),
                           onPressed: () => Navigator.pushNamed(
                             context,
                             PatientBetaAuthScreen.routeName,
@@ -109,7 +115,7 @@ class RoleHomeScreen extends StatelessWidget {
                         }
 
                         return Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(child: practitionerCard),
                             const SizedBox(width: 18),
@@ -139,6 +145,8 @@ class _RoleCard extends StatelessWidget {
     required this.description,
     required this.buttonLabel,
     required this.onPressed,
+    this.secondaryButtonLabel,
+    this.onSecondaryPressed,
   });
 
   final Color accent;
@@ -149,6 +157,8 @@ class _RoleCard extends StatelessWidget {
   final String description;
   final String buttonLabel;
   final VoidCallback onPressed;
+  final String? secondaryButtonLabel;
+  final VoidCallback? onSecondaryPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -183,9 +193,9 @@ class _RoleCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
           Text(
@@ -195,6 +205,16 @@ class _RoleCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
+          if (secondaryButtonLabel != null && onSecondaryPressed != null) ...[
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: onSecondaryPressed,
+                child: Text(secondaryButtonLabel!),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
           SizedBox(
             width: double.infinity,
             child: FilledButton(

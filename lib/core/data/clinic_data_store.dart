@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum IntakeStatus { notStarted, inProgress, completed }
 
@@ -88,6 +91,7 @@ class PatientVisit {
   const PatientVisit({
     required this.id,
     required this.patientId,
+    required this.clinicId,
     required this.date,
     required this.time,
     required this.lastVisitDate,
@@ -102,6 +106,7 @@ class PatientVisit {
 
   final String id;
   final String patientId;
+  final String clinicId;
   final String date;
   final String time;
   final String lastVisitDate;
@@ -145,17 +150,25 @@ extension AppointmentRequestStatusLabel on AppointmentRequestStatus {
 
 class AppointmentSlot {
   const AppointmentSlot({
+    required this.clinicId,
     required this.date,
     required this.time,
     required this.isOpen,
   });
 
+  final String clinicId;
   final String date;
   final String time;
   final bool isOpen;
 
-  AppointmentSlot copyWith({String? date, String? time, bool? isOpen}) {
+  AppointmentSlot copyWith({
+    String? clinicId,
+    String? date,
+    String? time,
+    bool? isOpen,
+  }) {
     return AppointmentSlot(
+      clinicId: clinicId ?? this.clinicId,
       date: date ?? this.date,
       time: time ?? this.time,
       isOpen: isOpen ?? this.isOpen,
@@ -167,6 +180,7 @@ class AppointmentRequest {
   const AppointmentRequest({
     required this.id,
     required this.patientId,
+    required this.clinicId,
     required this.date,
     required this.time,
     required this.requestedAt,
@@ -177,6 +191,7 @@ class AppointmentRequest {
 
   final String id;
   final String patientId;
+  final String clinicId;
   final String date;
   final String time;
   final DateTime requestedAt;
@@ -187,6 +202,7 @@ class AppointmentRequest {
   AppointmentRequest copyWith({
     String? id,
     String? patientId,
+    String? clinicId,
     String? date,
     String? time,
     DateTime? requestedAt,
@@ -197,6 +213,7 @@ class AppointmentRequest {
     return AppointmentRequest(
       id: id ?? this.id,
       patientId: patientId ?? this.patientId,
+      clinicId: clinicId ?? this.clinicId,
       date: date ?? this.date,
       time: time ?? this.time,
       requestedAt: requestedAt ?? this.requestedAt,
@@ -214,10 +231,126 @@ class PatientHistoryArgs {
   final List<ScheduledVisit> history;
 }
 
+class ClinicCenter {
+  const ClinicCenter({
+    required this.id,
+    required this.name,
+    required this.practitionerName,
+    required this.location,
+    required this.patientNote,
+    required this.searchKeywords,
+  });
+
+  final String id;
+  final String name;
+  final String practitionerName;
+  final String location;
+  final String patientNote;
+  final String searchKeywords;
+
+  ClinicCenter copyWith({
+    String? id,
+    String? name,
+    String? practitionerName,
+    String? location,
+    String? patientNote,
+    String? searchKeywords,
+  }) {
+    return ClinicCenter(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      practitionerName: practitionerName ?? this.practitionerName,
+      location: location ?? this.location,
+      patientNote: patientNote ?? this.patientNote,
+      searchKeywords: searchKeywords ?? this.searchKeywords,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'practitionerName': practitionerName,
+      'location': location,
+      'patientNote': patientNote,
+      'searchKeywords': searchKeywords,
+    };
+  }
+
+  factory ClinicCenter.fromMap(Map<String, dynamic> data) {
+    return ClinicCenter(
+      id: (data['id'] ?? '').toString(),
+      name: (data['name'] ?? '').toString(),
+      practitionerName: (data['practitionerName'] ?? '').toString(),
+      location: (data['location'] ?? '').toString(),
+      patientNote: (data['patientNote'] ?? '').toString(),
+      searchKeywords: (data['searchKeywords'] ?? '').toString(),
+    );
+  }
+}
+
 class ClinicDataStore extends ChangeNotifier {
-  ClinicDataStore._();
+  ClinicDataStore._() {
+    _restoreClinicState();
+  }
 
   static final ClinicDataStore instance = ClinicDataStore._();
+  static const String _clinicCentersKey = 'clinic_centers_v1';
+  static const String _patientSelectedClinicsKey =
+      'patient_selected_clinics_v1';
+  static const String _patientDefaultClinicsKey =
+      'patient_default_clinics_v1';
+  static const String _practitionerClinicIdsKey =
+      'practitioner_clinic_ids_v1';
+
+  static String _storedDate(DateTime date) {
+    final normalized = DateTime(date.year, date.month, date.day);
+    final month = normalized.month.toString().padLeft(2, '0');
+    final day = normalized.day.toString().padLeft(2, '0');
+    return '${normalized.year}-$month-$day';
+  }
+
+  static const List<String> _defaultClinicIds = <String>[
+    'seong_acupuncture_center',
+    'midtown_balance_clinic',
+    'elm_wellness_acupuncture',
+  ];
+
+  static List<AppointmentSlot> _buildSlotsForClinic(String clinicId) {
+    final today = DateTime.now();
+    final anchor = DateTime(today.year, today.month, today.day);
+    final dates = <DateTime>[
+      anchor.add(const Duration(days: 1)),
+      anchor.add(const Duration(days: 4)),
+      anchor.add(const Duration(days: 8)),
+    ];
+
+    const timeTemplates = <({String time, bool isOpen})>[
+      (time: '9:00 AM', isOpen: true),
+      (time: '10:30 AM', isOpen: true),
+      (time: '1:30 PM', isOpen: false),
+      (time: '3:00 PM', isOpen: true),
+      (time: '4:30 PM', isOpen: true),
+    ];
+
+    return [
+      for (final date in dates)
+        for (final slot in timeTemplates)
+          AppointmentSlot(
+            clinicId: clinicId,
+            date: _storedDate(date),
+            time: slot.time,
+            isOpen: slot.isOpen,
+          ),
+    ];
+  }
+
+  static List<AppointmentSlot> _buildInitialSlots() {
+    return [
+      for (final clinicId in _defaultClinicIds) ..._buildSlotsForClinic(clinicId),
+    ];
+  }
+
   String _currentPatientId = 'jane_kim';
 
   final List<PatientProfile> _profiles = [
@@ -297,6 +430,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_000',
       patientId: 'hugo_demo',
+      clinicId: 'seong_acupuncture_center',
       date: '2026-04-15',
       time: '2:30 PM',
       lastVisitDate: '2026-04-05',
@@ -323,6 +457,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_001',
       patientId: 'daniel_cho',
+      clinicId: 'midtown_balance_clinic',
       date: '2026-04-01',
       time: '4:00 PM',
       lastVisitDate: '2026-03-18',
@@ -348,6 +483,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_002',
       patientId: 'min_park',
+      clinicId: 'elm_wellness_acupuncture',
       date: '2026-04-01',
       time: '5:30 PM',
       lastVisitDate: '2026-03-15',
@@ -362,6 +498,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_003',
       patientId: 'jane_kim',
+      clinicId: 'midtown_balance_clinic',
       date: '2026-04-08',
       time: '3:30 PM',
       lastVisitDate: '2026-04-01',
@@ -389,6 +526,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_004',
       patientId: 'hana_yoo',
+      clinicId: 'midtown_balance_clinic',
       date: '2026-04-12',
       time: '5:30 PM',
       lastVisitDate: '2026-04-08',
@@ -409,6 +547,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_005',
       patientId: 'jane_kim',
+      clinicId: 'midtown_balance_clinic',
       date: '2026-04-15',
       time: '3:30 PM',
       lastVisitDate: '2026-04-08',
@@ -441,6 +580,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_006',
       patientId: 'min_park',
+      clinicId: 'elm_wellness_acupuncture',
       date: '2026-04-15',
       time: '4:00 PM',
       lastVisitDate: '2026-03-31',
@@ -455,6 +595,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_007',
       patientId: 'eunji_lee',
+      clinicId: 'elm_wellness_acupuncture',
       date: '2026-04-15',
       time: '4:30 PM',
       lastVisitDate: '2026-04-10',
@@ -475,6 +616,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_008',
       patientId: 'daniel_cho',
+      clinicId: 'midtown_balance_clinic',
       date: '2026-04-15',
       time: '5:00 PM',
       lastVisitDate: '2026-04-01',
@@ -500,6 +642,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_009',
       patientId: 'hana_yoo',
+      clinicId: 'midtown_balance_clinic',
       date: '2026-04-15',
       time: '5:30 PM',
       lastVisitDate: '2026-04-12',
@@ -520,6 +663,7 @@ class ClinicDataStore extends ChangeNotifier {
     PatientVisit(
       id: 'visit_010',
       patientId: 'chris_jung',
+      clinicId: 'elm_wellness_acupuncture',
       date: '2026-04-15',
       time: '6:00 PM',
       lastVisitDate: '2026-03-20',
@@ -533,34 +677,62 @@ class ClinicDataStore extends ChangeNotifier {
     ),
   ];
 
-  final List<AppointmentSlot> _slots = [
-    const AppointmentSlot(date: '2026-04-22', time: '9:00 AM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-22', time: '10:30 AM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-22', time: '1:30 PM', isOpen: false),
-    const AppointmentSlot(date: '2026-04-22', time: '3:00 PM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-22', time: '4:30 PM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-25', time: '9:00 AM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-25', time: '10:30 AM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-25', time: '1:30 PM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-25', time: '3:00 PM', isOpen: false),
-    const AppointmentSlot(date: '2026-04-25', time: '4:30 PM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-29', time: '9:00 AM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-29', time: '10:30 AM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-29', time: '1:30 PM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-29', time: '3:00 PM', isOpen: true),
-    const AppointmentSlot(date: '2026-04-29', time: '4:30 PM', isOpen: true),
-  ];
+  final List<AppointmentSlot> _slots = _buildInitialSlots();
 
-  final List<AppointmentRequest> _appointmentRequests = [
-    AppointmentRequest(
-      id: 'appointment_request_hugo_1',
-      patientId: 'hugo_demo',
-      date: '2026-04-22',
-      time: '10:30 AM',
-      requestedAt: DateTime(2026, 4, 21, 9, 10),
-      status: AppointmentRequestStatus.pending,
+  final List<AppointmentRequest> _appointmentRequests = [];
+
+  final List<ClinicCenter> _clinicCenters = [
+    const ClinicCenter(
+      id: 'seong_acupuncture_center',
+      name: 'Seong Acupuncture Center',
+      practitionerName: 'Dr. Hugo Seong',
+      location: 'Fort Lee, NJ',
+      patientNote:
+          'Patients see this note in search and after login. Share what to prepare before the visit and how to request a slot.',
+      searchKeywords: 'fort lee sleep shoulder pain korean english',
+    ),
+    const ClinicCenter(
+      id: 'midtown_balance_clinic',
+      name: 'Midtown Balance Clinic',
+      practitionerName: 'Dr. Jane Kim',
+      location: 'Midtown Manhattan, NY',
+      patientNote:
+          'This clinic focuses on sleep, stress, and shoulder tension follow-up.',
+      searchKeywords: 'manhattan stress sleep neck shoulder intake',
+    ),
+    const ClinicCenter(
+      id: 'elm_wellness_acupuncture',
+      name: 'Elm Wellness Acupuncture',
+      practitionerName: 'Dr. Min Park',
+      location: 'Palisades Park, NJ',
+      patientNote:
+          'Use this clinic card when you want a patient to land in your portal first and pick up intake from there.',
+      searchKeywords: 'new jersey digestion fatigue follow up portal',
     ),
   ];
+  final Map<String, String> _patientSelectedClinicIds = <String, String>{
+    'hugo_demo': 'seong_acupuncture_center',
+    'jane_kim': 'midtown_balance_clinic',
+    'min_park': 'elm_wellness_acupuncture',
+    'eunji_lee': 'elm_wellness_acupuncture',
+    'daniel_cho': 'midtown_balance_clinic',
+    'hana_yoo': 'midtown_balance_clinic',
+    'chris_jung': 'elm_wellness_acupuncture',
+  };
+  final Map<String, String> _patientDefaultClinicIds = <String, String>{
+    'hugo_demo': 'seong_acupuncture_center',
+    'jane_kim': 'midtown_balance_clinic',
+    'min_park': 'elm_wellness_acupuncture',
+    'eunji_lee': 'elm_wellness_acupuncture',
+    'daniel_cho': 'midtown_balance_clinic',
+    'hana_yoo': 'midtown_balance_clinic',
+    'chris_jung': 'elm_wellness_acupuncture',
+  };
+  final Map<String, String> _practitionerClinicIds = <String, String>{
+    'demo_practitioner': 'seong_acupuncture_center',
+  };
+  SharedPreferences? _prefs;
+  bool _clinicStateReady = false;
 
   List<PatientProfile> get profiles => List.unmodifiable(_profiles);
 
@@ -570,9 +742,59 @@ class ClinicDataStore extends ChangeNotifier {
   List<AppointmentSlot> get slots => List.unmodifiable(_slots);
   List<AppointmentRequest> get appointmentRequests =>
       List.unmodifiable(_appointmentRequests);
+  List<ClinicCenter> get clinicCenters {
+    final items = [..._clinicCenters];
+    items.sort((a, b) => a.name.compareTo(b.name));
+    return List.unmodifiable(items);
+  }
+  bool get clinicStateReady => _clinicStateReady;
 
   List<String> get allDates {
     final dates = _visits.map((visit) => visit.date).toSet().toList()..sort();
+    return dates;
+  }
+
+  List<AppointmentSlot> slotsForClinic(String? clinicId) {
+    final normalizedClinicId = clinicId?.trim();
+    if (normalizedClinicId == null || normalizedClinicId.isEmpty) {
+      return const [];
+    }
+    final items = _slots.where((slot) => slot.clinicId == normalizedClinicId);
+    return items.toList()
+      ..sort((a, b) {
+        final dateCompare = a.date.compareTo(b.date);
+        if (dateCompare != 0) {
+          return dateCompare;
+        }
+        return a.time.compareTo(b.time);
+      });
+  }
+
+  List<AppointmentRequest> appointmentRequestsForClinic(String? clinicId) {
+    final normalizedClinicId = clinicId?.trim();
+    if (normalizedClinicId == null || normalizedClinicId.isEmpty) {
+      return const [];
+    }
+    final items = _appointmentRequests.where(
+      (request) => request.clinicId == normalizedClinicId,
+    );
+    return items.toList()
+      ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+  }
+
+  List<String> allDatesForClinic(String? clinicId) {
+    final dates = <String>{
+      ...slotsForClinic(clinicId).map((slot) => slot.date),
+      ..._visits
+          .where(
+            (visit) =>
+                clinicId == null ||
+                clinicId.trim().isEmpty ||
+                visit.clinicId == clinicId,
+          )
+          .map((visit) => visit.date),
+    }.toList()
+      ..sort();
     return dates;
   }
 
@@ -593,9 +815,15 @@ class ClinicDataStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<ScheduledVisit> visitsForDate(String date) {
+  List<ScheduledVisit> visitsForDate(String date, {String? clinicId}) {
     return _visits
-        .where((visit) => visit.date == date)
+        .where(
+          (visit) =>
+              visit.date == date &&
+              (clinicId == null ||
+                  clinicId.trim().isEmpty ||
+                  visit.clinicId == clinicId),
+        )
         .map((visit) {
           final profile = profileById(visit.patientId);
           if (profile == null) {
@@ -607,11 +835,18 @@ class ClinicDataStore extends ChangeNotifier {
         .toList();
   }
 
-  List<ScheduledVisit> visitsInRange(DateTime start, DateTime end) {
+  List<ScheduledVisit> visitsInRange(
+    DateTime start,
+    DateTime end, {
+    String? clinicId,
+  }) {
     return _visits
         .where((visit) {
           final date = DateTime.parse(visit.date);
-          return !date.isBefore(DateTime(start.year, start.month, start.day)) &&
+          return (clinicId == null ||
+                  clinicId.trim().isEmpty ||
+                  visit.clinicId == clinicId) &&
+              !date.isBefore(DateTime(start.year, start.month, start.day)) &&
               !date.isAfter(DateTime(end.year, end.month, end.day));
         })
         .map((visit) {
@@ -625,9 +860,15 @@ class ClinicDataStore extends ChangeNotifier {
         .toList();
   }
 
-  List<ScheduledVisit> historyForPatient(String patientId) {
+  List<ScheduledVisit> historyForPatient(String patientId, {String? clinicId}) {
     return _visits
-        .where((visit) => visit.patientId == patientId)
+        .where(
+          (visit) =>
+              visit.patientId == patientId &&
+              (clinicId == null ||
+                  clinicId.trim().isEmpty ||
+                  visit.clinicId == clinicId),
+        )
         .map((visit) {
           final profile = profileById(visit.patientId);
           if (profile == null) {
@@ -640,10 +881,16 @@ class ClinicDataStore extends ChangeNotifier {
       ..sort((a, b) => b.visit.date.compareTo(a.visit.date));
   }
 
-  List<ScheduledVisit> upcomingVisits(DateTime fromDate) {
+  List<ScheduledVisit> upcomingVisits(DateTime fromDate, {String? clinicId}) {
     final from = DateTime(fromDate.year, fromDate.month, fromDate.day);
     return _visits
-        .where((visit) => DateTime.parse(visit.date).isAfter(from))
+        .where(
+          (visit) =>
+              DateTime.parse(visit.date).isAfter(from) &&
+              (clinicId == null ||
+                  clinicId.trim().isEmpty ||
+                  visit.clinicId == clinicId),
+        )
         .map((visit) {
           final profile = profileById(visit.patientId);
           if (profile == null) {
@@ -662,8 +909,19 @@ class ClinicDataStore extends ChangeNotifier {
       });
   }
 
-  List<AppointmentSlot> availableSlotsForPatient(String patientId) {
-    final reservedSlots = _appointmentRequests
+  List<AppointmentSlot> availableSlotsForPatient(
+    String patientId, {
+    String? clinicId,
+  }) {
+    final effectiveClinicId =
+        clinicId ??
+        activeClinicForPatient(patientId)?.id ??
+        _patientDefaultClinicIds[patientId];
+    if (effectiveClinicId == null || effectiveClinicId.trim().isEmpty) {
+      return const [];
+    }
+
+    final reservedSlots = appointmentRequestsForClinic(effectiveClinicId)
         .where(
           (request) =>
               request.status == AppointmentRequestStatus.pending ||
@@ -673,10 +931,11 @@ class ClinicDataStore extends ChangeNotifier {
         .toSet();
 
     final confirmedVisits = _visits
+        .where((visit) => visit.clinicId == effectiveClinicId)
         .map((visit) => '${visit.date}|${visit.time}')
         .toSet();
 
-    return _slots
+    return slotsForClinic(effectiveClinicId)
         .where((slot) => slot.isOpen)
         .where((slot) => !reservedSlots.contains('${slot.date}|${slot.time}'))
         .where((slot) => !confirmedVisits.contains('${slot.date}|${slot.time}'))
@@ -690,19 +949,24 @@ class ClinicDataStore extends ChangeNotifier {
       });
   }
 
-  List<AppointmentRequest> requestsForPatient(String patientId) {
+  List<AppointmentRequest> requestsForPatient(String patientId, {String? clinicId}) {
     final items =
-        _appointmentRequests
+        appointmentRequestsForClinic(clinicId)
             .where((request) => request.patientId == patientId)
             .toList()
           ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
     return items;
   }
 
-  ScheduledVisit? scheduledVisitForSlot(String date, String time) {
+  ScheduledVisit? scheduledVisitForSlot(String date, String time, {String? clinicId}) {
     try {
       final visit = _visits.firstWhere(
-        (item) => item.date == date && item.time == time,
+        (item) =>
+            item.date == date &&
+            item.time == time &&
+            (clinicId == null ||
+                clinicId.trim().isEmpty ||
+                item.clinicId == clinicId),
       );
       final profile = profileById(visit.patientId);
       if (profile == null) {
@@ -714,9 +978,13 @@ class ClinicDataStore extends ChangeNotifier {
     }
   }
 
-  AppointmentRequest? latestActiveRequestForSlot(String date, String time) {
+  AppointmentRequest? latestActiveRequestForSlot(
+    String date,
+    String time, {
+    String? clinicId,
+  }) {
     final activeRequests =
-        _appointmentRequests
+        appointmentRequestsForClinic(clinicId)
             .where(
               (request) =>
                   request.date == date &&
@@ -735,11 +1003,17 @@ class ClinicDataStore extends ChangeNotifier {
 
   void requestAppointment({
     required String patientId,
+    required String clinicId,
     required String date,
     required String time,
   }) {
+    _ensureSlotsForClinic(clinicId);
     final slot = _slots.where(
-      (slot) => slot.date == date && slot.time == time && slot.isOpen,
+      (slot) =>
+          slot.clinicId == clinicId &&
+          slot.date == date &&
+          slot.time == time &&
+          slot.isOpen,
     );
     if (slot.isEmpty) {
       return;
@@ -748,12 +1022,18 @@ class ClinicDataStore extends ChangeNotifier {
     final alreadyReserved =
         _appointmentRequests.any(
           (request) =>
+              request.clinicId == clinicId &&
               request.date == date &&
               request.time == time &&
               (request.status == AppointmentRequestStatus.pending ||
                   request.status == AppointmentRequestStatus.confirmed),
         ) ||
-        _visits.any((visit) => visit.date == date && visit.time == time);
+        _visits.any(
+          (visit) =>
+              visit.clinicId == clinicId &&
+              visit.date == date &&
+              visit.time == time,
+        );
 
     if (alreadyReserved) {
       return;
@@ -762,6 +1042,7 @@ class ClinicDataStore extends ChangeNotifier {
     final alreadyRequestedByPatient = _appointmentRequests.any(
       (request) =>
           request.patientId == patientId &&
+          request.clinicId == clinicId &&
           request.date == date &&
           request.time == time &&
           (request.status == AppointmentRequestStatus.pending ||
@@ -775,6 +1056,7 @@ class ClinicDataStore extends ChangeNotifier {
       AppointmentRequest(
         id: 'appointment_request_${DateTime.now().millisecondsSinceEpoch}',
         patientId: patientId,
+        clinicId: clinicId,
         date: date,
         time: time,
         requestedAt: DateTime.now(),
@@ -816,6 +1098,7 @@ class ClinicDataStore extends ChangeNotifier {
     );
     addAppointment(
       patientId: request.patientId,
+      clinicId: request.clinicId,
       date: request.date,
       time: request.time,
     );
@@ -891,13 +1174,15 @@ class ClinicDataStore extends ChangeNotifier {
 
   void addAppointment({
     required String patientId,
+    required String clinicId,
     required String date,
     required String time,
   }) {
+    _ensureSlotsForClinic(clinicId);
     final existingCount = _visits
         .where((visit) => visit.patientId == patientId)
         .length;
-    final history = historyForPatient(patientId);
+    final history = historyForPatient(patientId, clinicId: clinicId);
     final latestVisit = history.isNotEmpty ? history.first.visit : null;
 
     final selectedDate = DateTime.parse(date);
@@ -908,6 +1193,7 @@ class ClinicDataStore extends ChangeNotifier {
     final visit = PatientVisit(
       id: 'visit_${DateTime.now().millisecondsSinceEpoch}_$existingCount',
       patientId: patientId,
+      clinicId: clinicId,
       date: date,
       time: time,
       lastVisitDate: latestVisit?.date ?? date,
@@ -934,5 +1220,321 @@ class ClinicDataStore extends ChangeNotifier {
       return a.time.compareTo(b.time);
     });
     notifyListeners();
+  }
+
+  ClinicCenter? clinicById(String clinicId) {
+    try {
+      return _clinicCenters.firstWhere((clinic) => clinic.id == clinicId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? selectedClinicIdForPatient(String patientId) {
+    final clinicId = _patientSelectedClinicIds[patientId];
+    return clinicById(clinicId ?? '') == null ? null : clinicId;
+  }
+
+  String? defaultClinicIdForPatient(String patientId) {
+    final clinicId = _patientDefaultClinicIds[patientId];
+    return clinicById(clinicId ?? '') == null ? null : clinicId;
+  }
+
+  ClinicCenter? activeClinicForPatient(String patientId) {
+    final selectedClinicId = selectedClinicIdForPatient(patientId);
+    if (selectedClinicId != null) {
+      return clinicById(selectedClinicId);
+    }
+    final defaultClinicId = defaultClinicIdForPatient(patientId);
+    if (defaultClinicId != null) {
+      return clinicById(defaultClinicId);
+    }
+    return null;
+  }
+
+  String? clinicIdForPractitioner(String practitionerId) {
+    final clinicId = _practitionerClinicIds[practitionerId];
+    return clinicById(clinicId ?? '') == null ? null : clinicId;
+  }
+
+  ClinicCenter? clinicForPractitioner(String practitionerId) {
+    final clinicId = clinicIdForPractitioner(practitionerId);
+    if (clinicId == null) {
+      return null;
+    }
+    return clinicById(clinicId);
+  }
+
+  List<ClinicCenter> searchClinics(String query) {
+    final normalized = query.trim().toLowerCase();
+    final items = clinicCenters;
+    if (normalized.isEmpty) {
+      return items;
+    }
+    return items.where((clinic) {
+      final haystack = [
+        clinic.name,
+        clinic.practitionerName,
+        clinic.location,
+        clinic.patientNote,
+        clinic.searchKeywords,
+      ].join(' ').toLowerCase();
+      return haystack.contains(normalized);
+    }).toList();
+  }
+
+  Future<void> selectClinicForPatient({
+    required String patientId,
+    required String clinicId,
+  }) async {
+    if (clinicById(clinicId) == null) {
+      return;
+    }
+    _patientSelectedClinicIds[patientId] = clinicId;
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  Future<void> setDefaultClinicForPatient({
+    required String patientId,
+    required String clinicId,
+  }) async {
+    if (clinicById(clinicId) == null) {
+      return;
+    }
+    _patientDefaultClinicIds[patientId] = clinicId;
+    _patientSelectedClinicIds[patientId] = clinicId;
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  Future<void> clearDefaultClinicForPatient(String patientId) async {
+    _patientDefaultClinicIds.remove(patientId);
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  Future<void> applyPreferredClinicForPatient({
+    required String patientId,
+    String? linkedClinicId,
+  }) async {
+    if (linkedClinicId != null && clinicById(linkedClinicId) != null) {
+      if (_patientSelectedClinicIds[patientId] != linkedClinicId) {
+        _patientSelectedClinicIds[patientId] = linkedClinicId;
+        notifyListeners();
+        await _persistClinicState();
+      }
+      return;
+    }
+
+    final selectedClinicId = selectedClinicIdForPatient(patientId);
+    if (selectedClinicId != null) {
+      return;
+    }
+
+    final defaultClinicId = defaultClinicIdForPatient(patientId);
+    if (defaultClinicId != null) {
+      _patientSelectedClinicIds[patientId] = defaultClinicId;
+      notifyListeners();
+      await _persistClinicState();
+    }
+  }
+
+  Future<void> saveClinicCenter(ClinicCenter clinic) async {
+    final index = _clinicCenters.indexWhere((item) => item.id == clinic.id);
+    if (index >= 0) {
+      _clinicCenters[index] = clinic;
+    } else {
+      _clinicCenters.add(clinic);
+    }
+    _ensureSlotsForClinic(clinic.id);
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  Future<void> setClinicForPractitioner({
+    required String practitionerId,
+    required String clinicId,
+  }) async {
+    if (practitionerId.trim().isEmpty || clinicById(clinicId) == null) {
+      return;
+    }
+    _practitionerClinicIds[practitionerId] = clinicId;
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  String suggestClinicId(String rawName) {
+    final normalized = rawName
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '');
+    final seed = normalized.isEmpty ? 'clinic' : normalized;
+    var candidate = seed;
+    var suffix = 2;
+    while (_clinicCenters.any((clinic) => clinic.id == candidate)) {
+      candidate = '${seed}_$suffix';
+      suffix += 1;
+    }
+    return candidate;
+  }
+
+  String buildPatientPortalRoute(String clinicId) {
+    final encodedId = Uri.encodeQueryComponent(clinicId);
+    return '/patient?clinic=$encodedId';
+  }
+
+  String buildPatientPortalShareLink(
+    String clinicId, {
+    String? currentUrl,
+  }) {
+    final route = '#${buildPatientPortalRoute(clinicId)}';
+    if (currentUrl == null || currentUrl.trim().isEmpty) {
+      return route;
+    }
+
+    final base = Uri.tryParse(currentUrl);
+    if (base == null || !base.hasScheme) {
+      return route;
+    }
+
+    final portLabel = base.hasPort ? ':${base.port}' : '';
+    final path = base.path.endsWith('/') ? base.path : '${base.path}/';
+    return '${base.scheme}://${base.host}$portLabel$path$route';
+  }
+
+  Future<void> _restoreClinicState() async {
+    _prefs = await SharedPreferences.getInstance();
+
+    final savedClinics = _prefs?.getString(_clinicCentersKey);
+    if (savedClinics != null && savedClinics.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(savedClinics);
+        if (decoded is List) {
+          final restored = decoded
+              .whereType<Map>()
+              .map(
+                (item) => ClinicCenter.fromMap(
+                  item.map((key, value) => MapEntry(key.toString(), value)),
+                ),
+              )
+              .where((clinic) => clinic.id.trim().isNotEmpty)
+              .toList();
+          if (restored.isNotEmpty) {
+            _clinicCenters
+              ..clear()
+              ..addAll(restored);
+          }
+        }
+      } catch (_) {}
+    }
+
+    _patientSelectedClinicIds
+      ..clear()
+      ..addAll(_readPersistedMap(_patientSelectedClinicsKey));
+    _patientDefaultClinicIds
+      ..clear()
+      ..addAll(_readPersistedMap(_patientDefaultClinicsKey));
+    _practitionerClinicIds
+      ..clear()
+      ..addAll(_readPersistedMap(_practitionerClinicIdsKey));
+
+    _applySeedClinicAssignments();
+    _ensureSlotsForExistingClinics();
+
+    _clinicStateReady = true;
+    notifyListeners();
+  }
+
+  void _applySeedClinicAssignments() {
+    _patientSelectedClinicIds.putIfAbsent(
+      'hugo_demo',
+      () => 'seong_acupuncture_center',
+    );
+    _patientSelectedClinicIds.putIfAbsent(
+      'jane_kim',
+      () => 'midtown_balance_clinic',
+    );
+    _patientSelectedClinicIds.putIfAbsent(
+      'min_park',
+      () => 'elm_wellness_acupuncture',
+    );
+    _patientSelectedClinicIds.putIfAbsent(
+      'eunji_lee',
+      () => 'elm_wellness_acupuncture',
+    );
+    _patientSelectedClinicIds.putIfAbsent(
+      'daniel_cho',
+      () => 'midtown_balance_clinic',
+    );
+    _patientSelectedClinicIds.putIfAbsent(
+      'hana_yoo',
+      () => 'midtown_balance_clinic',
+    );
+    _patientSelectedClinicIds.putIfAbsent(
+      'chris_jung',
+      () => 'elm_wellness_acupuncture',
+    );
+
+    for (final entry in _patientSelectedClinicIds.entries) {
+      _patientDefaultClinicIds.putIfAbsent(entry.key, () => entry.value);
+    }
+    _practitionerClinicIds.putIfAbsent(
+      'demo_practitioner',
+      () => 'seong_acupuncture_center',
+    );
+  }
+
+  void _ensureSlotsForExistingClinics() {
+    for (final clinic in _clinicCenters) {
+      _ensureSlotsForClinic(clinic.id);
+    }
+  }
+
+  void _ensureSlotsForClinic(String clinicId) {
+    final existing = _slots.where((slot) => slot.clinicId == clinicId);
+    if (existing.isNotEmpty) {
+      return;
+    }
+    _slots.addAll(_buildSlotsForClinic(clinicId));
+  }
+
+  Map<String, String> _readPersistedMap(String key) {
+    final raw = _prefs?.getString(key);
+    if (raw == null || raw.trim().isEmpty) {
+      return <String, String>{};
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) {
+        return <String, String>{};
+      }
+      return decoded.map(
+        (key, value) => MapEntry(key.toString(), value.toString()),
+      );
+    } catch (_) {
+      return <String, String>{};
+    }
+  }
+
+  Future<void> _persistClinicState() async {
+    final prefs = _prefs ??= await SharedPreferences.getInstance();
+    await prefs.setString(
+      _clinicCentersKey,
+      jsonEncode(_clinicCenters.map((clinic) => clinic.toMap()).toList()),
+    );
+    await prefs.setString(
+      _patientSelectedClinicsKey,
+      jsonEncode(_patientSelectedClinicIds),
+    );
+    await prefs.setString(
+      _patientDefaultClinicsKey,
+      jsonEncode(_patientDefaultClinicIds),
+    );
+    await prefs.setString(
+      _practitionerClinicIdsKey,
+      jsonEncode(_practitionerClinicIds),
+    );
   }
 }

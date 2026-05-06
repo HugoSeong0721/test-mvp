@@ -34,7 +34,12 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
       _sessionBackedProfile ?? _store.currentPatientProfile;
 
   List<ScheduledVisit> get _history =>
-      _store.historyForPatient(_currentProfile.id);
+      _store.activeClinicForPatient(_currentProfile.id) == null
+      ? const []
+      : _store.historyForPatient(
+          _currentProfile.id,
+          clinicId: _store.activeClinicForPatient(_currentProfile.id)!.id,
+        );
 
   @override
   void initState() {
@@ -157,6 +162,9 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
     try {
       await AppFirestoreService.submitVisitRecordFeedback(
         patientId: scheduledVisit.profile.id,
+        clinicId:
+            _store.activeClinicForPatient(scheduledVisit.profile.id)?.id ??
+            scheduledVisit.visit.clinicId,
         patientName: scheduledVisit.profile.name,
         visitId: scheduledVisit.visit.id,
         visitDate: scheduledVisit.visit.date,

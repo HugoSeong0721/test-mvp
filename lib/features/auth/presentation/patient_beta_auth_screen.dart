@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/services/tester_flow_service.dart';
@@ -23,6 +24,7 @@ class PatientBetaAuthScreen extends StatefulWidget {
 }
 
 class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
+  final ClinicDataStore _store = ClinicDataStore.instance;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -30,7 +32,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _isRegisterMode = true;
   bool _showPassword = false;
   bool _loading = false;
+  bool _loadedRouteArgs = false;
   String? _formError;
+  String? _linkedClinicId;
 
   void _setFormError(String? message) {
     if (!mounted) {
@@ -53,11 +57,33 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_loadedRouteArgs) {
+      return;
+    }
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Map) {
+      final clinicId = args['clinicId']?.toString().trim();
+      if (clinicId != null && clinicId.isNotEmpty) {
+        _linkedClinicId = clinicId;
+      }
+    }
+    _loadedRouteArgs = true;
+  }
+
   void _continueToPatientHome() {
     if (!mounted) {
       return;
     }
-    Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
+    Navigator.pushReplacementNamed(
+      context,
+      PatientHomeScreen.routeName,
+      arguments: {
+        if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+      },
+    );
   }
 
   Future<void> _signOutTester() async {
@@ -84,10 +110,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       );
     } catch (error) {
       _showMessage(
-        lang.tr(
-          'Could not sign out right now.',
-          '지금 로그아웃하지 못했습니다.',
-        ),
+        lang.tr('Could not sign out right now.', '지금 로그아웃하지 못했습니다.'),
       );
     } finally {
       if (mounted) {
@@ -104,10 +127,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         patientId: session.id,
       ).timeout(_authTimeout);
       _showMessage(
-        lang.tr(
-          'Tester flow data was reset.',
-          '테스터 흐름 데이터가 초기화되었습니다.',
-        ),
+        lang.tr('Tester flow data was reset.', '테스터 흐름 데이터가 초기화되었습니다.'),
       );
     } on TimeoutException {
       _showMessage(
@@ -117,10 +137,40 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         ),
       );
     } catch (error) {
+      _showMessage(lang.tr('Could not reset right now.', '지금 초기화할 수 없습니다.'));
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  Future<void> _reloadTesterPortalData(PatientSession session) async {
+    final lang = AppLanguageController.instance;
+    setState(() => _loading = true);
+    try {
+      final profile = await _loadTesterProfile(session).timeout(_authTimeout);
+      await TesterFlowService.resetAndSeedPortalData(
+        profile: profile,
+      ).timeout(_authTimeout);
       _showMessage(
         lang.tr(
-          'Could not reset right now.',
-          '지금 초기화할 수 없습니다.',
+          'Tester sample data was reloaded.',
+          '테스터 샘플 데이터가 다시 채워졌습니다.',
+        ),
+      );
+    } on TimeoutException {
+      _showMessage(
+        lang.tr(
+          'Reload is slow — Firebase may be blocked. Try again with VPN off.',
+          '재적용이 느립니다. VPN을 끄고 다시 시도해주세요.',
+        ),
+      );
+    } catch (error) {
+      _showMessage(
+        lang.tr(
+          'Could not reload sample data right now.',
+          '지금 샘플 데이터를 다시 채울 수 없습니다.',
         ),
       );
     } finally {
@@ -128,6 +178,34 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         setState(() => _loading = false);
       }
     }
+  }
+
+  Future<PatientProfile> _loadTesterProfile(PatientSession session) async {
+    final localProfile = await PatientProfileService.loadLocalProfile(session.id);
+    if (localProfile != null) {
+      return localProfile;
+    }
+
+    final remoteProfile = await PatientProfileService
+        .watchProfileForSession(session)
+        .firstWhere((profile) => profile != null)
+        .timeout(const Duration(seconds: 3));
+    if (remoteProfile != null) {
+      return remoteProfile;
+    }
+
+    return PatientProfile(
+      id: session.id,
+      name: session.displayName.trim().isEmpty
+          ? 'New Patient'
+          : session.displayName.trim(),
+      phone: '',
+      email: session.email,
+      birthYear: 1990,
+      sex: 'Not entered',
+      ethnicity: 'Not entered',
+      memo: 'Profile created from beta sign-in fallback',
+    );
   }
 
   Future<void> _submit() async {
@@ -145,15 +223,11 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       return;
     }
     if (email.isEmpty) {
-      _setFormError(
-        lang.tr('Please enter your email.', '이메일을 입력해주세요.'),
-      );
+      _setFormError(lang.tr('Please enter your email.', '이메일을 입력해주세요.'));
       return;
     }
     if (password.isEmpty) {
-      _setFormError(
-        lang.tr('Please enter your password.', '비밀번호를 입력해주세요.'),
-      );
+      _setFormError(lang.tr('Please enter your password.', '비밀번호를 입력해주세요.'));
       return;
     }
     if (_isRegisterMode && password.length < 6) {
@@ -176,16 +250,63 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
 
     try {
       if (_isRegisterMode) {
-        await _registerTester(name: name, email: email, password: password);
+        try {
+          final localSession = await BetaSessionService.signUpLocally(
+            name: name,
+            email: email,
+            password: password,
+          );
+          try {
+            await PatientProfileService.ensureProfileForSession(
+              localSession,
+              nameHint: name,
+            ).timeout(_authTimeout);
+          } catch (_) {
+            // best-effort
+          }
+        } on LocalBetaAuthException catch (error) {
+          if (error.code == 'email-already-in-use' ||
+              error.code == 'invalid-email' ||
+              error.code == 'weak-password') {
+            rethrow;
+          }
+          await _registerTester(
+            name: name,
+            email: email,
+            password: password,
+          ).timeout(_authTimeout);
+        }
       } else {
-        await _logInTester(email: email, password: password);
+        try {
+          final localSession = await BetaSessionService.logInLocally(
+            email: email,
+            password: password,
+          );
+          try {
+            await PatientProfileService.ensureProfileForSession(
+              localSession,
+            ).timeout(_authTimeout);
+          } catch (_) {
+            // best-effort
+          }
+        } on LocalBetaAuthException {
+          await _logInTester(email: email, password: password).timeout(
+            _authTimeout,
+          );
+        }
       }
 
       if (!mounted) {
         return;
       }
 
-      Navigator.pushReplacementNamed(context, PatientHomeScreen.routeName);
+      Navigator.pushReplacementNamed(
+        context,
+        PatientHomeScreen.routeName,
+        arguments: {
+          if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+        },
+      );
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));
     } on FirebaseAuthException catch (error) {
@@ -310,8 +431,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       password: password,
     );
     try {
-      await PatientProfileService.ensureProfileForSession(session)
-          .timeout(_authTimeout);
+      await PatientProfileService.ensureProfileForSession(
+        session,
+      ).timeout(_authTimeout);
     } catch (_) {
       // best-effort
     }
@@ -362,6 +484,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
   }
 
+  // ignore: unused_element
   bool _shouldTryLocalLogin(FirebaseAuthException error) {
     return error.code == 'operation-not-allowed' ||
         error.code == 'user-not-found' ||
@@ -415,6 +538,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           builder: (context, _) {
             final lang = AppLanguageController.instance;
             final activeSession = sessionSnapshot.data;
+            final linkedClinic = _linkedClinicId == null
+                ? null
+                : _store.clinicById(_linkedClinicId!);
 
             return Scaffold(
               extendBodyBehindAppBar: true,
@@ -432,6 +558,14 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            if (linkedClinic != null) ...[
+                              _buildLinkedClinicCard(
+                                context,
+                                lang: lang,
+                                clinic: linkedClinic,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
                             if (activeSession != null) ...[
                               _buildActiveSessionCard(
                                 context,
@@ -486,9 +620,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 18),
           SegmentedButton<bool>(
@@ -553,9 +687,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                   : null,
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
-                onPressed: () => setState(
-                  () => _showPassword = !_showPassword,
-                ),
+                onPressed: () => setState(() => _showPassword = !_showPassword),
                 icon: Icon(
                   _showPassword ? Icons.visibility_off : Icons.visibility,
                 ),
@@ -567,14 +699,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             onPressed: _loading ? null : _submit,
             style: FilledButton.styleFrom(backgroundColor: AppTheme.copper),
             icon: Icon(
-              _isRegisterMode
-                  ? Icons.arrow_circle_right_outlined
-                  : Icons.login,
+              _isRegisterMode ? Icons.arrow_circle_right_outlined : Icons.login,
             ),
             label: Text(
-              _loading
-                  ? lang.tr('Working...', '처리 중...')
-                  : submitLabel,
+              _loading ? lang.tr('Working...', '처리 중...') : submitLabel,
             ),
           ),
           const SizedBox(height: 10),
@@ -602,10 +730,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Colors.white,
-          AppTheme.mint.withValues(alpha: 0.45),
-        ],
+        colors: [Colors.white, AppTheme.mint.withValues(alpha: 0.45)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,8 +745,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             session.email.isNotEmpty
                 ? session.email
                 : (session.displayName.isNotEmpty
-                    ? session.displayName
-                    : session.id),
+                      ? session.displayName
+                      : session.id),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppTheme.ink.withValues(alpha: 0.7),
             ),
@@ -647,6 +772,13 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                     : () => _resetTesterPortalData(session),
                 icon: const Icon(Icons.restart_alt),
                 label: Text(lang.tr('Reset data', '데이터 초기화')),
+              ),
+              OutlinedButton.icon(
+                onPressed: _loading
+                    ? null
+                    : () => _reloadTesterPortalData(session),
+                icon: const Icon(Icons.refresh),
+                label: Text(lang.tr('Reload sample', '샘플 다시 채우기')),
               ),
             ],
           ),
@@ -683,5 +815,64 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       ),
     );
   }
-}
 
+  Widget _buildLinkedClinicCard(
+    BuildContext context, {
+    required AppLanguageController lang,
+    required ClinicCenter clinic,
+  }) {
+    return AppPanel(
+      padding: const EdgeInsets.all(20),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Colors.white, AppTheme.mint.withValues(alpha: 0.4)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            lang.tr(
+              'Clinic link received',
+              '한의원 링크로 들어왔습니다',
+            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            clinic.name,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '${clinic.practitionerName}${clinic.location.isEmpty ? '' : ' · ${clinic.location}'}',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.72),
+            ),
+          ),
+          if (clinic.patientNote.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              clinic.patientNote,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                height: 1.5,
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Text(
+            lang.tr(
+              'After sign up or login, this clinic will already be selected in the patient portal.',
+              '로그인 후에는 이 한의원이 환자 포털에 미리 선택된 상태로 열립니다.',
+            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.68),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

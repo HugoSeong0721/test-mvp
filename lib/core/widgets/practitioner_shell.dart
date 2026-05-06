@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/practitioner_session_service.dart';
 import '../settings/app_language_controller.dart';
 import '../theme/app_theme.dart';
 import 'app_shell.dart';
@@ -395,6 +396,8 @@ class _ToolTile extends StatelessWidget {
 }
 
 class _SignOutTile extends StatelessWidget {
+  const _SignOutTile();
+
   @override
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
@@ -404,7 +407,11 @@ class _SignOutTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: () {
+        onTap: () async {
+          await PractitionerSessionService.signOut();
+          if (!context.mounted) {
+            return;
+          }
           Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
         },
         child: Padding(

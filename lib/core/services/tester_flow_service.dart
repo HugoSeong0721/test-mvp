@@ -35,7 +35,15 @@ class TesterFlowService {
   }) async {
     await resetPortalData(patientId: profile.id);
 
-    final availableSlots = _store.availableSlotsForPatient(profile.id);
+    final clinicId =
+        _store.activeClinicForPatient(profile.id)?.id ??
+        _store.defaultClinicIdForPatient(profile.id) ??
+        'seong_acupuncture_center';
+
+    final availableSlots = _store.availableSlotsForPatient(
+      profile.id,
+      clinicId: clinicId,
+    );
     final sampleSlot = _pickSampleSlot(availableSlots);
     final seededFollowUpDate = sampleSlot == null
         ? DateTime.now().subtract(const Duration(days: 7))
@@ -50,6 +58,7 @@ class TesterFlowService {
     final baselineVisit = PatientVisit(
       id: 'beta_seed_visit_baseline_${profile.id}',
       patientId: profile.id,
+      clinicId: clinicId,
       date: _formatDate(seededBaselineDate),
       time: '4:00 PM',
       lastVisitDate: _formatDate(seededEarlierDate),
@@ -77,6 +86,7 @@ class TesterFlowService {
     final followUpVisit = PatientVisit(
       id: 'beta_seed_visit_follow_up_${profile.id}',
       patientId: profile.id,
+      clinicId: clinicId,
       date: _formatDate(seededFollowUpDate),
       time: '3:30 PM',
       lastVisitDate: baselineVisit.date,
@@ -120,6 +130,7 @@ class TesterFlowService {
     if (sampleSlot != null) {
       _store.requestAppointment(
         patientId: profile.id,
+        clinicId: clinicId,
         date: sampleSlot.date,
         time: sampleSlot.time,
       );
@@ -128,6 +139,7 @@ class TesterFlowService {
     final now = DateTime.now();
     await _db.collection('answer_requests').add({
       'patientId': profile.id,
+      'clinicId': clinicId,
       'patientName': profile.name,
       'patientPhone': profile.phone,
       'patientEmail': profile.email,
@@ -153,6 +165,7 @@ class TesterFlowService {
 
     await _db.collection('intake_submissions').add({
       'patientId': profile.id,
+      'clinicId': clinicId,
       'patientName': profile.name,
       'visitType': 'follow_up',
       'answers': const [
@@ -206,6 +219,7 @@ class TesterFlowService {
         )
         .set({
           'patientId': profile.id,
+          'clinicId': clinicId,
           'patientName': profile.name,
           'visitId': followUpVisit.id,
           'visitDate': followUpVisit.date,

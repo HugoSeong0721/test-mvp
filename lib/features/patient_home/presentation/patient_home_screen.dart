@@ -36,7 +36,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   bool _sessionResolved = false;
   bool _showStartGuide = true;
   bool _loadTimedOut = false;
+  bool _loadedRouteArgs = false;
   Object? _loadError;
+  String? _linkedClinicId;
+  String? _lastClinicSyncKey;
+  String? _lastAutoPromptedClinicPatientId;
 
   PatientProfile get _currentProfile {
     if (_sessionBackedProfile != null) {
@@ -66,19 +70,33 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   }
 
   List<ScheduledVisit> get _history =>
-      _store.historyForPatient(_currentProfile.id);
+      _store.activeClinicForPatient(_currentProfile.id) == null
+      ? const []
+      : _store.historyForPatient(
+          _currentProfile.id,
+          clinicId: _store.activeClinicForPatient(_currentProfile.id)!.id,
+        );
 
   bool get _waitingForRealProfile {
-    // Only block on the very first session resolve. After that, the
-    // synthesized profile from _currentProfile keeps the screen usable
-    // even if Firestore is slow or blocked, so we never freeze.
-    return !_sessionResolved;
+    // As soon as we have either a resolved session, a cached profile, or a
+    // pre-seeded active session, render the screen immediately and let the
+    // background sync keep filling in details.
+    return !_sessionResolved &&
+        _activeSession == null &&
+        _sessionBackedProfile == null;
   }
 
   @override
   void initState() {
     super.initState();
     _startLoadTimer();
+    final seededSession = BetaSessionService.currentSession;
+    if (seededSession != null) {
+      _activeSession = seededSession;
+      _sessionResolved = true;
+      _loadTimeoutTimer?.cancel();
+      unawaited(_primeImmediateProfile(seededSession));
+    }
     _sessionSubscription = BetaSessionService.watchSession().listen((
       session,
     ) async {
@@ -127,6 +145,38 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     });
   }
 
+  Future<void> _primeImmediateProfile(PatientSession session) async {
+    try {
+      final profile = await PatientProfileService.loadLocalProfile(session.id);
+      if (!mounted || profile == null) {
+        return;
+      }
+      setState(() {
+        _sessionBackedProfile = profile;
+        _loadError = null;
+        _loadTimedOut = false;
+      });
+    } catch (_) {
+      // Best-effort only. The synthesized profile still keeps the UI usable.
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_loadedRouteArgs) {
+      return;
+    }
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Map) {
+      final clinicId = args['clinicId']?.toString().trim();
+      if (clinicId != null && clinicId.isNotEmpty) {
+        _linkedClinicId = clinicId;
+      }
+    }
+    _loadedRouteArgs = true;
+  }
+
   void _startLoadTimer() {
     _loadTimeoutTimer?.cancel();
     _loadTimeoutTimer = Timer(_profileLoadTimeout, () {
@@ -169,6 +219,40 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         }
       });
     }
+  }
+
+  Future<void> _syncClinicContextForProfile(PatientProfile profile) async {
+    await _store.applyPreferredClinicForPatient(
+      patientId: profile.id,
+      linkedClinicId: _linkedClinicId,
+    );
+    _linkedClinicId = null;
+
+    if (!_store.clinicStateReady) {
+      return;
+    }
+
+    if (_store.activeClinicForPatient(profile.id) == null &&
+        _lastAutoPromptedClinicPatientId != profile.id &&
+        mounted) {
+      _lastAutoPromptedClinicPatientId = profile.id;
+      await _openClinicPicker(autoPrompt: true);
+    }
+  }
+
+  void _ensureClinicContext(PatientProfile profile) {
+    final syncKey =
+        '${profile.id}|${_linkedClinicId ?? ''}|${_store.clinicStateReady}';
+    if (_lastClinicSyncKey == syncKey) {
+      return;
+    }
+    _lastClinicSyncKey = syncKey;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      unawaited(_syncClinicContextForProfile(profile));
+    });
   }
 
   @override
@@ -312,6 +396,444 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     memoController.dispose();
   }
 
+  Future<void> _openClinicPicker({bool autoPrompt = false}) async {
+    final lang = AppLanguageController.instance;
+    final patientId = _currentProfile.id;
+    final searchController = TextEditingController();
+    String query = '';
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final currentClinic = _store.activeClinicForPatient(patientId);
+            final defaultClinicId = _store.defaultClinicIdForPatient(patientId);
+            final results = _store.searchClinics(query);
+
+            return AlertDialog(
+              title: Text(
+                lang.tr(
+                  'Choose your acupuncture center',
+                  '한의원을 선택해주세요',
+                ),
+              ),
+              content: SizedBox(
+                width: 720,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lang.tr(
+                        'Search by clinic name, practitioner, location, or keyword. Your default clinic can open automatically after future logins.',
+                        '한의원 이름, 침술사, 위치, 키워드로 검색할 수 있습니다. 기본 한의원으로 저장하면 다음 로그인부터 바로 연결됩니다.',
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        labelText: lang.tr(
+                          'Search clinic',
+                          '한의원 검색',
+                        ),
+                      ),
+                      onChanged: (value) =>
+                          setDialogState(() => query = value.trim()),
+                    ),
+                    const SizedBox(height: 14),
+                    SizedBox(
+                      height: 420,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: results.map((clinic) {
+                            final isCurrent = currentClinic?.id == clinic.id;
+                            final isDefault = defaultClinicId == clinic.id;
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isCurrent
+                                    ? AppTheme.mint.withValues(alpha: 0.2)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: isCurrent
+                                      ? AppTheme.copper.withValues(alpha: 0.52)
+                                      : AppTheme.border.withValues(alpha: 0.45),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          clinic.name,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      if (isCurrent)
+                                        _buildClinicStatusChip(
+                                          context,
+                                          lang.tr(
+                                            'Current',
+                                            '현재 선택',
+                                          ),
+                                        ),
+                                      if (isDefault) ...[
+                                        const SizedBox(width: 8),
+                                        _buildClinicStatusChip(
+                                          context,
+                                          lang.tr(
+                                            'Default',
+                                            '기본 한의원',
+                                          ),
+                                          accent: AppTheme.copper,
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${clinic.practitionerName}${clinic.location.isEmpty ? '' : ' · ${clinic.location}'}',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge?.copyWith(
+                                      color: AppTheme.ink.withValues(alpha: 0.72),
+                                    ),
+                                  ),
+                                  if (clinic.patientNote.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      clinic.patientNote,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.copyWith(
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      FilledButton.tonalIcon(
+                                        onPressed: isCurrent
+                                            ? null
+                                            : () async {
+                                                await _store.selectClinicForPatient(
+                                                  patientId: patientId,
+                                                  clinicId: clinic.id,
+                                                );
+                                                if (!context.mounted) {
+                                                  return;
+                                                }
+                                                Navigator.pop(context);
+                                                if (!mounted) {
+                                                  return;
+                                                }
+                                                ScaffoldMessenger.of(
+                                                  this.context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      lang.tr(
+                                                        '${clinic.name} is now your current clinic.',
+                                                        '${clinic.name} 이(가) 현재 한의원으로 선택되었습니다.',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                        icon: const Icon(
+                                          Icons.local_hospital_outlined,
+                                        ),
+                                        label: Text(
+                                          lang.tr(
+                                            'Choose clinic',
+                                            '이 한의원 선택',
+                                          ),
+                                        ),
+                                      ),
+                                      OutlinedButton.icon(
+                                        onPressed: isDefault
+                                            ? null
+                                            : () async {
+                                                await _store.setDefaultClinicForPatient(
+                                                  patientId: patientId,
+                                                  clinicId: clinic.id,
+                                                );
+                                                if (!mounted) {
+                                                  return;
+                                                }
+                                                setDialogState(() {});
+                                                ScaffoldMessenger.of(
+                                                  this.context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      lang.tr(
+                                                        '${clinic.name} will open by default after login.',
+                                                        '${clinic.name} 이(가) 다음 로그인부터 기본 한의원으로 열립니다.',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                        icon: const Icon(Icons.push_pin_outlined),
+                                        label: Text(
+                                          lang.tr(
+                                            'Set as default',
+                                            '기본 한의원으로 저장',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    autoPrompt
+                        ? lang.tr('Choose later', '나중에 선택')
+                        : lang.tr('Close', '닫기'),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    searchController.dispose();
+  }
+
+  Widget _buildClinicStatusChip(
+    BuildContext context,
+    String label, {
+    Color accent = AppTheme.pine,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: accent,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClinicSelectionPanel(
+    BuildContext context, {
+    required PatientProfile profile,
+  }) {
+    final lang = AppLanguageController.instance;
+    final activeClinic = _store.activeClinicForPatient(profile.id);
+    final defaultClinic = _store.defaultClinicIdForPatient(profile.id) == null
+        ? null
+        : _store.clinicById(_store.defaultClinicIdForPatient(profile.id)!);
+
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.94),
+          AppTheme.mint.withValues(alpha: 0.36),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lang.tr(
+                        'Connected acupuncture center',
+                        '연결된 한의원',
+                      ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      activeClinic == null
+                          ? lang.tr(
+                              'Choose the clinic you want to use in this portal. You can also save one clinic as the default for future logins.',
+                              '이 포털에서 사용할 한의원을 먼저 선택해주세요. 나중에 자동으로 열리도록 기본 한의원으로 저장할 수도 있습니다.',
+                            )
+                          : lang.tr(
+                              'This clinic stays attached to the patient-side workflow so requests, intake, and portal entry all start from the same center.',
+                              '요청함, 문진, 포털 진입이 모두 이 한의원 기준으로 이어지도록 연결됩니다.',
+                            ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.72),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FilledButton.tonalIcon(
+                    onPressed: () => _openClinicPicker(),
+                    icon: const Icon(Icons.search),
+                    label: Text(
+                      activeClinic == null
+                          ? lang.tr('Search clinic', '한의원 검색')
+                          : lang.tr('Change clinic', '한의원 변경'),
+                    ),
+                  ),
+                  if (activeClinic != null)
+                    OutlinedButton.icon(
+                      onPressed: defaultClinic?.id == activeClinic.id
+                          ? null
+                          : () async {
+                              await _store.setDefaultClinicForPatient(
+                                patientId: profile.id,
+                                clinicId: activeClinic.id,
+                              );
+                              if (!context.mounted) {
+                                return;
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    lang.tr(
+                                      '${activeClinic.name} is now your default clinic.',
+                                      '${activeClinic.name} 이(가) 기본 한의원으로 저장되었습니다.',
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                      icon: const Icon(Icons.push_pin_outlined),
+                      label: Text(
+                        defaultClinic?.id == activeClinic.id
+                            ? lang.tr('Default saved', '기본 저장됨')
+                            : lang.tr('Set as default', '기본 한의원 저장'),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (activeClinic == null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.orange.withValues(alpha: 0.28),
+                ),
+              ),
+              child: Text(
+                lang.tr(
+                  'No clinic has been selected yet. Open the search and choose the acupuncture center you want this patient portal to follow.',
+                  '아직 선택된 한의원이 없습니다. 검색을 열고 이 환자 포털이 따라갈 한의원을 선택해주세요.',
+                ),
+              ),
+            )
+          else
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.84),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: AppTheme.border.withValues(alpha: 0.52),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    activeClinic.name,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${activeClinic.practitionerName}${activeClinic.location.isEmpty ? '' : ' · ${activeClinic.location}'}',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppTheme.ink.withValues(alpha: 0.72),
+                    ),
+                  ),
+                  if (activeClinic.patientNote.trim().isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      activeClinic.patientNote,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                  if (defaultClinic != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      defaultClinic.id == activeClinic.id
+                          ? lang.tr(
+                              'This clinic is already set as your default after login.',
+                              '이 한의원은 로그인 후 자동으로 열리는 기본 한의원입니다.',
+                            )
+                          : lang.tr(
+                              'Default clinic on future login: ${defaultClinic.name}',
+                              '다음 로그인 기본 한의원: ${defaultClinic.name}',
+                            ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.copper,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   String _formatDate(DateTime date) {
     final y = date.year.toString().padLeft(4, '0');
     final m = date.month.toString().padLeft(2, '0');
@@ -375,7 +897,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   Future<void> _openAppointmentDialog() async {
     final lang = AppLanguageController.instance;
-    final availableSlots = _store.availableSlotsForPatient(_currentProfile.id);
+    final activeClinic = _store.activeClinicForPatient(_currentProfile.id);
+    if (activeClinic == null) {
+      await _openClinicPicker();
+      return;
+    }
+    final availableSlots = _store.availableSlotsForPatient(
+      _currentProfile.id,
+      clinicId: activeClinic.id,
+    );
     if (availableSlots.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -482,6 +1012,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   onPressed: () {
                     _store.requestAppointment(
                       patientId: _currentProfile.id,
+                      clinicId: activeClinic.id,
                       date: selectedDate,
                       time: selectedTime,
                     );
@@ -510,7 +1041,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: AppLanguageController.instance,
+      animation: Listenable.merge([AppLanguageController.instance, _store]),
       builder: (context, _) {
         final lang = AppLanguageController.instance;
 
@@ -524,11 +1055,28 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         }
 
         final profile = _currentProfile;
+        _ensureClinicContext(profile);
         final history = _history;
         final latestVisit = history.isNotEmpty ? history.first.visit : null;
-        final upcomingVisits = _store.upcomingVisits(DateTime.now())
-          ..retainWhere((visit) => visit.profile.id == profile.id);
-        final appointmentRequests = _store.requestsForPatient(profile.id);
+        final activeClinic = _store.activeClinicForPatient(profile.id);
+        final activeClinicId = activeClinic?.id;
+        bool matchesActiveClinic(Map<String, dynamic> data) {
+          if (activeClinicId == null || activeClinicId.isEmpty) {
+            return false;
+          }
+          final docClinicId = (data['clinicId'] ?? '').toString();
+          return docClinicId == activeClinicId;
+        }
+
+        final upcomingVisits = activeClinicId == null
+            ? <ScheduledVisit>[]
+            : (_store.upcomingVisits(
+                DateTime.now(),
+                clinicId: activeClinicId,
+              )..retainWhere((visit) => visit.profile.id == profile.id));
+        final appointmentRequests = activeClinicId == null
+            ? const <AppointmentRequest>[]
+            : _store.requestsForPatient(profile.id, clinicId: activeClinicId);
         final pendingAppointmentRequests = appointmentRequests
             .where(
               (request) => request.status == AppointmentRequestStatus.pending,
@@ -541,7 +1089,18 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return PatientShell(
           currentItem: PatientNavItem.home,
           title: lang.tr('Patient Home', '환자 홈'),
+          subtitle: activeClinic == null
+              ? lang.tr(
+                  'Search and choose your acupuncture center after login.',
+                  '로그인 후 사용할 한의원을 검색하고 선택해주세요.',
+                )
+              : '${activeClinic.name}${activeClinic.location.isEmpty ? '' : ' · ${activeClinic.location}'}',
           actions: [
+            IconButton(
+              tooltip: lang.tr('Search clinic', '한의원 검색'),
+              onPressed: () => _openClinicPicker(),
+              icon: const Icon(Icons.local_hospital_outlined),
+            ),
             IconButton(
               tooltip: lang.tr('Edit profile', '프로필 수정'),
               onPressed: _openProfileDialog,
@@ -567,14 +1126,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     0;
                 return bTime.compareTo(aTime);
               });
+              final scopedRequestDocs = requestDocs
+                  .where((doc) => matchesActiveClinic(doc.data()))
+                  .toList();
 
-              final pendingRequests = requestDocs
+              final pendingRequests = scopedRequestDocs
                   .where(
                     (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
                   )
                   .toList();
-              final latestRequest = requestDocs.isNotEmpty
-                  ? requestDocs.first.data()
+              final latestRequest = scopedRequestDocs.isNotEmpty
+                  ? scopedRequestDocs.first.data()
                   : null;
 
               return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -595,9 +1157,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         0;
                     return bTime.compareTo(aTime);
                   });
+                  final scopedSubmissionDocs = submissionDocs
+                      .where((doc) => matchesActiveClinic(doc.data()))
+                      .toList();
 
-                  final latestSubmission = submissionDocs.isNotEmpty
-                      ? submissionDocs.first.data()
+                  final latestSubmission = scopedSubmissionDocs.isNotEmpty
+                      ? scopedSubmissionDocs.first.data()
                       : null;
                   final pendingItemCount =
                       pendingRequests.length +
@@ -649,6 +1214,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   return ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
+                      _buildClinicSelectionPanel(context, profile: profile),
+                      const SizedBox(height: 16),
                       AppPanel(
                         padding: const EdgeInsets.all(24),
                         gradient: const LinearGradient(

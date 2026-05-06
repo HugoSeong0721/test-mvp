@@ -163,6 +163,9 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   PatientProfile get _currentProfile =>
       _sessionBackedProfile ?? _store.currentPatientProfile;
 
+  String? get _activeClinicId =>
+      _store.activeClinicForPatient(_currentProfile.id)?.id;
+
   @override
   void initState() {
     super.initState();
@@ -281,8 +284,14 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     setState(() => _isSubmitting = true);
 
     try {
+      final clinicId = _activeClinicId;
+      if (clinicId == null || clinicId.isEmpty) {
+        throw StateError('missing-clinic-selection');
+      }
+
       final docId = await AppFirestoreService.submitPatientIntake(
         patientId: _currentProfile.id,
+        clinicId: clinicId,
         patientName: _currentProfile.name,
         visitType: _isFirstVisitPreview ? 'initial' : 'follow_up',
         answers: answers,
@@ -300,6 +309,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
 
       await AppFirestoreService.markPendingRequestsCompleted(
         patientId: _currentProfile.id,
+        clinicId: clinicId,
         submissionId: docId,
       );
 
@@ -470,7 +480,21 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   }
 
   List<ScheduledVisit> get _history =>
-      _store.historyForPatient(_currentProfile.id);
+      _activeClinicId == null
+      ? const []
+      : _store.historyForPatient(
+          _currentProfile.id,
+          clinicId: _activeClinicId,
+        );
+
+  bool _matchesActiveClinicDoc(Map<String, dynamic> data) {
+    final activeClinicId = _activeClinicId;
+    if (activeClinicId == null || activeClinicId.isEmpty) {
+      return false;
+    }
+    final clinicId = (data['clinicId'] ?? '').toString();
+    return clinicId == activeClinicId;
+  }
 
   String _formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) {
@@ -1250,6 +1274,9 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       0;
                   return bTime.compareTo(aTime);
                 });
+                requestDocs.removeWhere(
+                  (doc) => !_matchesActiveClinicDoc(doc.data()),
+                );
 
                 return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                   stream: FirebaseFirestore.instance
@@ -1269,6 +1296,9 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           0;
                       return bTime.compareTo(aTime);
                     });
+                    submissionDocs.removeWhere(
+                      (doc) => !_matchesActiveClinicDoc(doc.data()),
+                    );
 
                     final latestSubmission = submissionDocs.isNotEmpty
                         ? submissionDocs.first.data()

@@ -3,6 +3,7 @@ import 'package:iottie_automation/features/patient_requests/presentation/patient
 import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
 
 import 'core/navigation/current_route_tracker.dart';
+import 'core/services/practitioner_session_service.dart';
 import 'core/settings/app_language_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/tester_feedback_launcher.dart';
@@ -51,10 +52,15 @@ class TestMvpApp extends StatelessWidget {
                 const PatientRequestsScreen(),
             VisitHistoryScreen.routeName: (_) => const VisitHistoryScreen(),
             PractitionerDashboardScreen.routeName: (_) =>
-                const PractitionerDashboardScreen(),
+                const _PractitionerRouteGuard(
+                  child: PractitionerDashboardScreen(),
+                ),
             PractitionerInsightsScreen.routeName: (_) =>
-                const PractitionerInsightsScreen(),
-            SymptomTrendScreen.routeName: (_) => const SymptomTrendScreen(),
+                const _PractitionerRouteGuard(
+                  child: PractitionerInsightsScreen(),
+                ),
+            SymptomTrendScreen.routeName: (_) =>
+                const _PractitionerRouteGuard(child: SymptomTrendScreen()),
             PatientBriefScreen.routeName: (_) => const PatientBriefScreen(),
             TesterFeedbackInboxScreen.routeName: (_) =>
                 const TesterFeedbackInboxScreen(),
@@ -63,21 +69,38 @@ class TestMvpApp extends StatelessWidget {
             // Shareable shortcut URLs that go straight to a single role.
             // /clinic  -> practitioner login
             // /patient -> patient sign-up / login (absorbs the old beta flow)
-            switch (settings.name) {
+            final rawName = settings.name;
+            if (rawName == null || rawName.trim().isEmpty) {
+              return null;
+            }
+            final uri = Uri.tryParse(rawName);
+            final path = uri?.path ?? rawName;
+            final existingArgs = settings.arguments is Map
+                ? Map<String, dynamic>.from(settings.arguments! as Map)
+                : null;
+            final linkedClinicArg = uri?.queryParameters['clinic'];
+            final routeArgs = <String, dynamic>{
+              ...?existingArgs,
+              ...?linkedClinicArg == null
+                  ? null
+                  : <String, dynamic>{'clinicId': linkedClinicArg},
+            };
+            switch (path) {
               case '/clinic':
                 return MaterialPageRoute<void>(
-                  settings: const RouteSettings(
+                  settings: RouteSettings(
                     name: '/clinic',
                     arguments: {
                       'role': 'practitioner',
                       'loginMode': 'default',
+                      ...routeArgs,
                     },
                   ),
                   builder: (_) => const LoginScreen(),
                 );
               case '/patient':
                 return MaterialPageRoute<void>(
-                  settings: const RouteSettings(name: '/patient'),
+                  settings: RouteSettings(name: '/patient', arguments: routeArgs),
                   builder: (_) => const PatientBetaAuthScreen(),
                 );
             }
@@ -85,6 +108,81 @@ class TestMvpApp extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class _PractitionerRouteGuard extends StatefulWidget {
+  const _PractitionerRouteGuard({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_PractitionerRouteGuard> createState() => _PractitionerRouteGuardState();
+}
+
+class _PractitionerRouteGuardState extends State<_PractitionerRouteGuard> {
+  bool _initialized = false;
+  bool _redirecting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeGuard();
+  }
+
+  Future<void> _initializeGuard() async {
+    await PractitionerSessionService.initialize();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _initialized = true);
+  }
+
+  void _redirectToPractitionerLogin() {
+    if (_redirecting || !mounted) {
+      return;
+    }
+    _redirecting = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).pushReplacementNamed(
+        LoginScreen.routeName,
+        arguments: const {'role': 'practitioner', 'loginMode': 'default'},
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const _GuardLoadingScreen();
+    }
+
+    if (PractitionerSessionService.currentSession == null) {
+      _redirectToPractitionerLogin();
+      return const _GuardLoadingScreen();
+    }
+
+    return widget.child;
+  }
+}
+
+class _GuardLoadingScreen extends StatelessWidget {
+  const _GuardLoadingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: CircularProgressIndicator(strokeWidth: 2.6),
+        ),
+      ),
     );
   }
 }

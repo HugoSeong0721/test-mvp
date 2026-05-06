@@ -11,10 +11,12 @@ class PatientRecordWorkspace extends StatefulWidget {
     super.key,
     required this.profile,
     required this.onSave,
+    this.clinicId,
   });
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
+  final String? clinicId;
 
   @override
   State<PatientRecordWorkspace> createState() => _PatientRecordWorkspaceState();
@@ -80,10 +82,20 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
     final profile = widget.profile;
-    final history = _store.historyForPatient(profile.id);
+    final history = widget.clinicId == null || widget.clinicId!.isEmpty
+        ? const <ScheduledVisit>[]
+        : _store.historyForPatient(profile.id, clinicId: widget.clinicId);
     final completedVisits = history
         .where((item) => item.visit.intakeStatus == IntakeStatus.completed)
         .length;
+    bool matchesClinic(Map<String, dynamic> data) {
+      final clinicId = widget.clinicId;
+      if (clinicId == null || clinicId.isEmpty) {
+        return false;
+      }
+      final docClinicId = (data['clinicId'] ?? '').toString();
+      return docClinicId == clinicId;
+    }
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: FirebaseFirestore.instance
@@ -106,15 +118,15 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                 final requestDocs = _sortDocsByTimestamp(
                   requestSnapshot.data?.docs ?? const [],
                   'requestedAt',
-                );
+                ).where((doc) => matchesClinic(doc.data())).toList();
                 final submissionDocs = _sortDocsByTimestamp(
                   submissionSnapshot.data?.docs ?? const [],
                   'submittedAt',
-                );
+                ).where((doc) => matchesClinic(doc.data())).toList();
                 final feedbackDocs = _sortDocsByTimestamp(
                   feedbackSnapshot.data?.docs ?? const [],
                   'updatedAt',
-                );
+                ).where((doc) => matchesClinic(doc.data())).toList();
                 final pendingFeedbackCount = feedbackDocs
                     .where(
                       (doc) =>

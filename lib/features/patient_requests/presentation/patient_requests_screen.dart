@@ -37,6 +37,18 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   PatientProfile get _currentProfile =>
       _sessionBackedProfile ?? _store.currentPatientProfile;
 
+  String? get _activeClinicId =>
+      _store.activeClinicForPatient(_currentProfile.id)?.id;
+
+  bool _matchesActiveClinicDoc(Map<String, dynamic> data) {
+    final activeClinicId = _activeClinicId;
+    if (activeClinicId == null || activeClinicId.isEmpty) {
+      return false;
+    }
+    final clinicId = (data['clinicId'] ?? '').toString();
+    return clinicId == activeClinicId;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -445,6 +457,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                     0;
                 return bTime.compareTo(aTime);
               });
+              docs.removeWhere((doc) => !_matchesActiveClinicDoc(doc.data()));
 
               final openCount = _docsForFolder(
                 docs,

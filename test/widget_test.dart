@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:iottie_automation/app.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
+
   testWidgets('unlocks the web entry screen with the shared password', (
     WidgetTester tester,
   ) async {
@@ -13,16 +18,22 @@ void main() {
 
     await tester.pumpWidget(const TestMvpApp());
 
-    expect(find.text('Preview Login'), findsOneWidget);
+    expect(find.text('Choose where you are heading.'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField), 'Daisy');
-    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Login'));
-    await tester.tap(find.widgetWithText(FilledButton, 'Login'));
+    await tester.ensureVisible(
+      find.widgetWithText(FilledButton, 'Continue as Practitioner'),
+    );
+    await tester.tap(
+      find.widgetWithText(FilledButton, 'Continue as Practitioner'),
+    );
     await tester.pumpAndSettle();
 
-    expect(find.text('Choose the right portal route'), findsOneWidget);
     expect(find.text('Practitioner Login'), findsWidgets);
-    expect(find.text('Patient Test Login'), findsWidgets);
-    expect(find.text('Friend Beta Sign Up / Login'), findsWidgets);
+    expect(
+      find.text(
+        'Demo account: 123 / 123 or log in with a practitioner account created in this browser.',
+      ),
+      findsOneWidget,
+    );
   });
 }

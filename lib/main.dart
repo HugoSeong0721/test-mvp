@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import 'app.dart';
+import 'core/services/beta_session_service.dart';
+import 'core/services/practitioner_session_service.dart';
 import 'core/settings/app_language_controller.dart';
 import 'firebase_options.dart';
 
@@ -19,6 +21,8 @@ Future<void> main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
+    await BetaSessionService.initialize();
+    await PractitionerSessionService.initialize();
     runApp(const TestMvpApp());
   } catch (error, stackTrace) {
     runApp(_BootstrapErrorApp(error: error, stackTrace: stackTrace));
