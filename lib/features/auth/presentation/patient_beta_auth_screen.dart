@@ -94,11 +94,16 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       setState(() => _loading = false);
       return;
     }
-    Navigator.of(context).pushReplacementNamed(
-      PatientHomeScreen.routeName,
-      arguments: {
-        if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-      },
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        settings: RouteSettings(
+          name: PatientHomeScreen.routeName,
+          arguments: {
+            if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+          },
+        ),
+        builder: (_) => const PatientHomeScreen(),
+      ),
     );
   }
 
@@ -538,12 +543,16 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         return;
       }
 
-      Navigator.pushReplacementNamed(
-        context,
-        PatientHomeScreen.routeName,
-        arguments: {
-          if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-        },
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          settings: RouteSettings(
+            name: PatientHomeScreen.routeName,
+            arguments: {
+              if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+            },
+          ),
+          builder: (_) => const PatientHomeScreen(),
+        ),
       );
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));

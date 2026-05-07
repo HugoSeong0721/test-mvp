@@ -34,11 +34,14 @@ class TestMvpApp extends StatelessWidget {
           theme: AppTheme.light(),
           navigatorObservers: [CurrentRouteTracker.instance],
           builder: (context, child) {
-            return Stack(
-              children: [
-                child ?? const SizedBox.shrink(),
-                const TesterFeedbackLauncher(),
-              ],
+            return MouseRegion(
+              cursor: SystemMouseCursors.basic,
+              child: Stack(
+                children: [
+                  child ?? const SizedBox.shrink(),
+                  const TesterFeedbackLauncher(),
+                ],
+              ),
             );
           },
           initialRoute: RoleHomeScreen.routeName,
@@ -47,9 +50,7 @@ class TestMvpApp extends StatelessWidget {
             LoginScreen.routeName: (_) => const LoginScreen(),
             PatientBetaAuthScreen.routeName: (_) =>
                 const PatientBetaAuthScreen(),
-            PatientHomeScreen.routeName: (_) => const _PatientRouteGuard(
-              child: PatientHomeScreen(),
-            ),
+            PatientHomeScreen.routeName: (_) => const PatientHomeScreen(),
             PatientIntakeScreen.routeName: (_) => const _PatientRouteGuard(
               child: PatientIntakeScreen(),
             ),
