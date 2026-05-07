@@ -38,6 +38,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _sessionReady = false;
   bool _loadedRouteArgs = false;
   bool _showAuthFormEvenWithSession = false;
+  bool _didAutoOpenSavedPortal = false;
   String? _formError;
   String? _linkedClinicId;
   PatientSession? _activeSession;
@@ -91,6 +92,49 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         _activeSession = session;
         _sessionReady = true;
       });
+      if (session != null &&
+          !_showAuthFormEvenWithSession &&
+          _requestedPatientHomeUrl()) {
+        _openSavedPortalOnce();
+      }
+    });
+  }
+
+  bool _requestedPatientHomeUrl() {
+    final fragment = Uri.base.fragment;
+    if (fragment.isEmpty) {
+      return false;
+    }
+    final path = fragment.split('?').first.trim();
+    return path == PatientHomeScreen.routeName;
+  }
+
+  void _openSavedPortalOnce() {
+    if (_didAutoOpenSavedPortal || !mounted) {
+      return;
+    }
+    _didAutoOpenSavedPortal = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final session = _activeSession;
+      if (session == null) {
+        _didAutoOpenSavedPortal = false;
+        return;
+      }
+      unawaited(_preparePatientPortalContext(session));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          settings: RouteSettings(
+            name: PatientHomeScreen.routeName,
+            arguments: {
+              if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+            },
+          ),
+          builder: (_) => const PatientHomeScreen(),
+        ),
+      );
     });
   }
 
@@ -123,12 +167,16 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
 
     unawaited(_preparePatientPortalContext(session));
-    Navigator.pushReplacementNamed(
-      context,
-      PatientHomeScreen.routeName,
-      arguments: {
-        if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-      },
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        settings: RouteSettings(
+          name: PatientHomeScreen.routeName,
+          arguments: {
+            if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+          },
+        ),
+        builder: (_) => const PatientHomeScreen(),
+      ),
     );
   }
 
@@ -173,6 +221,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       }
       setState(() {
         _showAuthFormEvenWithSession = true;
+        _didAutoOpenSavedPortal = false;
       });
       _showMessage(
         lang.tr(
@@ -312,12 +361,16 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         return;
       }
 
-      Navigator.pushReplacementNamed(
-        context,
-        PatientHomeScreen.routeName,
-        arguments: {
-          if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-        },
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          settings: RouteSettings(
+            name: PatientHomeScreen.routeName,
+            arguments: {
+              if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+            },
+          ),
+          builder: (_) => const PatientHomeScreen(),
+        ),
       );
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));
