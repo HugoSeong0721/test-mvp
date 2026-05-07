@@ -20,6 +20,20 @@ class PractitionerSession {
   final String? clinicId;
 }
 
+class LocalPractitionerAccountSummary {
+  const LocalPractitionerAccountSummary({
+    required this.loginId,
+    required this.displayName,
+    required this.clinicId,
+    required this.lastLoginAtIso,
+  });
+
+  final String loginId;
+  final String displayName;
+  final String? clinicId;
+  final String lastLoginAtIso;
+}
+
 class LocalPractitionerAuthException implements Exception {
   const LocalPractitionerAuthException(this.code);
 
@@ -209,6 +223,53 @@ class PractitionerSessionService {
     _emitSession();
   }
 
+  static Future<List<LocalPractitionerAccountSummary>>
+  localAccountSummaries() async {
+    await _ensureInitialized();
+    final accounts = _readLocalAccounts()
+      ..sort((a, b) => b.lastLoginAtIso.compareTo(a.lastLoginAtIso));
+    return accounts
+        .map(
+          (account) => LocalPractitionerAccountSummary(
+            loginId: account.loginId,
+            displayName: account.displayName,
+            clinicId: account.clinicId,
+            lastLoginAtIso: account.lastLoginAtIso,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  static Future<void> resetLocalPassword({
+    required String loginId,
+    required String newPassword,
+  }) async {
+    await _ensureInitialized();
+    final normalizedLoginId = _normalizeLoginId(loginId);
+    final trimmedPassword = newPassword.trim();
+    if (!_looksLikeLoginId(normalizedLoginId)) {
+      throw const LocalPractitionerAuthException('invalid-login-id');
+    }
+    if (trimmedPassword.length < 4) {
+      throw const LocalPractitionerAuthException('weak-password');
+    }
+
+    final accounts = _readLocalAccounts();
+    final index = accounts.indexWhere(
+      (account) => account.loginId == normalizedLoginId,
+    );
+    if (index < 0) {
+      throw const LocalPractitionerAuthException('user-not-found');
+    }
+
+    final updated = accounts[index].copyWith(
+      passwordHash: _passwordHash(trimmedPassword),
+      lastLoginAtIso: DateTime.now().toIso8601String(),
+    );
+    accounts[index] = updated;
+    await _saveLocalAccounts(accounts);
+  }
+
   static Future<void> _ensureInitialized() {
     return _initialization ??= _initializeInternal();
   }
@@ -350,12 +411,13 @@ class _LocalPractitionerAccount {
   _LocalPractitionerAccount copyWith({
     String? displayName,
     String? clinicId,
+    String? passwordHash,
     String? lastLoginAtIso,
   }) {
     return _LocalPractitionerAccount(
       id: id,
       loginId: loginId,
-      passwordHash: passwordHash,
+      passwordHash: passwordHash ?? this.passwordHash,
       displayName: displayName ?? this.displayName,
       clinicId: clinicId ?? this.clinicId,
       createdAtIso: createdAtIso,

@@ -71,6 +71,153 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _showSavedPractitionerAccounts() async {
+    final lang = AppLanguageController.instance;
+    final accounts = await PractitionerSessionService.localAccountSummaries();
+    if (!mounted) {
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(lang.tr('Saved practitioner IDs', '저장된 침술사 아이디')),
+        content: SizedBox(
+          width: 420,
+          child: accounts.isEmpty
+              ? Text(
+                  lang.tr(
+                    'No practitioner account has been saved in this browser yet.',
+                    '이 브라우저에 저장된 침술사 계정이 아직 없습니다.',
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: accounts.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final account = accounts[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(account.loginId),
+                      subtitle: Text(
+                        '${account.displayName}${account.clinicId == null ? '' : ' · ${account.clinicId}'}',
+                      ),
+                      onTap: () {
+                        _idController.text = account.loginId;
+                        Navigator.pop(context);
+                        setState(() => _isPractitionerRegisterMode = false);
+                      },
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(lang.tr('Close', '닫기')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPractitionerPasswordResetDialog() async {
+    final lang = AppLanguageController.instance;
+    final idController = TextEditingController(text: _idController.text.trim());
+    final passwordController = TextEditingController();
+    String? error;
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: Text(
+                lang.tr('Reset practitioner password', '침술사 비밀번호 재설정'),
+              ),
+              content: SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: idController,
+                      decoration: InputDecoration(
+                        labelText: lang.tr('Login ID', '로그인 아이디'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: lang.tr('New password', '새 비밀번호'),
+                        helperText: lang.tr(
+                          'Local browser accounts only',
+                          '이 브라우저 로컬 계정만 가능',
+                        ),
+                      ),
+                    ),
+                    if (error != null) ...[
+                      const SizedBox(height: 12),
+                      _buildErrorBanner(context, error!),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(lang.tr('Cancel', '취소')),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    try {
+                      await PractitionerSessionService.resetLocalPassword(
+                        loginId: idController.text.trim(),
+                        newPassword: passwordController.text.trim(),
+                      );
+                      if (!context.mounted) {
+                        return;
+                      }
+                      _idController.text = idController.text.trim();
+                      _passwordController.clear();
+                      Navigator.pop(context);
+                      _showMessage(
+                        lang.tr(
+                          'Local practitioner password was reset.',
+                          '로컬 침술사 비밀번호를 재설정했습니다.',
+                        ),
+                      );
+                      setState(() => _isPractitionerRegisterMode = false);
+                    } on LocalPractitionerAuthException catch (e) {
+                      setDialogState(
+                        () => error = _friendlyPractitionerAuthMessage(e),
+                      );
+                    }
+                  },
+                  child: Text(lang.tr('Reset', '재설정')),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } finally {
+      idController.dispose();
+      passwordController.dispose();
+    }
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Future<void> _submit(String role) async {
     final lang = AppLanguageController.instance;
     final id = _idController.text.trim();
@@ -387,6 +534,34 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      if (isPractitioner)
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          runSpacing: 8,
+                          children: [
+                            TextButton(
+                              onPressed: _isSubmitting
+                                  ? null
+                                  : _showSavedPractitionerAccounts,
+                              child: Text(
+                                lang.tr('Find ID', '아이디 찾기'),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: _isSubmitting
+                                  ? null
+                                  : _showPractitionerPasswordResetDialog,
+                              child: Text(
+                                lang.tr(
+                                  'Reset password',
+                                  '비밀번호 찾기/재설정',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      if (isPractitioner) const SizedBox(height: 4),
                       TextButton.icon(
                         onPressed: () => Navigator.pushReplacementNamed(
                           context,

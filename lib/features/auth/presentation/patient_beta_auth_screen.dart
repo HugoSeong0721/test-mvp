@@ -36,6 +36,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _autoResumeTriggered = false;
   String? _formError;
   String? _linkedClinicId;
+  bool _showAuthFormEvenWithSession = false;
 
   void _setFormError(String? message) {
     if (!mounted) {
@@ -163,7 +164,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       if (!mounted) {
         return;
       }
-      setState(() {});
+      setState(() {
+        _showAuthFormEvenWithSession = true;
+      });
       _showMessage(
         lang.tr(
           'Signed out from the current tester session.',
@@ -185,6 +188,173 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       if (mounted) {
         setState(() => _loading = false);
       }
+    }
+  }
+
+  Future<void> _showSavedPatientAccounts() async {
+    final lang = AppLanguageController.instance;
+    final accounts = await BetaSessionService.localAccountSummaries();
+    if (!mounted) {
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(lang.tr('Saved patient emails', '저장된 환자 이메일')),
+        content: SizedBox(
+          width: 420,
+          child: accounts.isEmpty
+              ? Text(
+                  lang.tr(
+                    'No patient account has been saved in this browser yet.',
+                    '이 브라우저에 저장된 환자 계정이 아직 없습니다.',
+                  ),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lang.tr(
+                        'These accounts were created or used in this browser.',
+                        '이 브라우저에서 만들었거나 사용한 계정 목록입니다.',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: accounts.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final account = accounts[index];
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(account.email),
+                            subtitle: Text(
+                              account.displayName.trim().isEmpty
+                                  ? lang.tr('No saved name', '저장된 이름 없음')
+                                  : account.displayName,
+                            ),
+                            onTap: () {
+                              _emailController.text = account.email;
+                              Navigator.pop(context);
+                              setState(() {
+                                _isRegisterMode = false;
+                                _showAuthFormEvenWithSession = true;
+                                _formError = null;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(lang.tr('Close', '닫기')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPatientPasswordResetDialog() async {
+    final lang = AppLanguageController.instance;
+    final emailController = TextEditingController(
+      text: _emailController.text.trim(),
+    );
+    final passwordController = TextEditingController();
+    String? error;
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: Text(
+                lang.tr('Reset patient password', '환자 비밀번호 재설정'),
+              ),
+              content: SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: lang.tr('Email', '이메일'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: lang.tr(
+                          'New password',
+                          '새 비밀번호',
+                        ),
+                        helperText: lang.tr(
+                          'Local browser accounts only',
+                          '이 브라우저 로컬 계정만 가능',
+                        ),
+                      ),
+                    ),
+                    if (error != null) ...[
+                      const SizedBox(height: 12),
+                      _buildErrorBanner(context, error!),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(lang.tr('Cancel', '취소')),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    try {
+                      await BetaSessionService.resetLocalPassword(
+                        email: emailController.text.trim(),
+                        newPassword: passwordController.text.trim(),
+                      );
+                      if (!context.mounted) {
+                        return;
+                      }
+                      _emailController.text = emailController.text.trim();
+                      _passwordController.clear();
+                      Navigator.pop(context);
+                      _showMessage(
+                        lang.tr(
+                          'Local password was reset. You can log in now.',
+                          '로컬 비밀번호를 재설정했습니다. 이제 로그인할 수 있습니다.',
+                        ),
+                      );
+                      setState(() {
+                        _isRegisterMode = false;
+                        _showAuthFormEvenWithSession = true;
+                      });
+                    } on LocalBetaAuthException catch (e) {
+                      setDialogState(
+                        () => error = _friendlyLocalAuthMessage(e),
+                      );
+                    }
+                  },
+                  child: Text(lang.tr('Reset', '재설정')),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } finally {
+      emailController.dispose();
+      passwordController.dispose();
     }
   }
 
@@ -649,7 +819,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                               _buildSignedInHintCard(context, lang),
                               const SizedBox(height: 16),
                             ],
-                            if (activeSession == null)
+                            if (activeSession == null ||
+                                _showAuthFormEvenWithSession)
                               _buildAuthCard(context, lang),
                             const SizedBox(height: 12),
                             TextButton.icon(
@@ -800,6 +971,26 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             ),
           ),
           const SizedBox(height: 10),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              TextButton(
+                onPressed: _loading ? null : _showSavedPatientAccounts,
+                child: Text(
+                  lang.tr('Find saved email', '저장된 이메일 찾기'),
+                ),
+              ),
+              TextButton(
+                onPressed: _loading ? null : _showPatientPasswordResetDialog,
+                child: Text(
+                  lang.tr('Reset password', '비밀번호 찾기/재설정'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
           TextButton(
             onPressed: _loading
                 ? null
@@ -859,6 +1050,15 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                 onPressed: _loading ? null : _signOutTester,
                 icon: const Icon(Icons.logout),
                 label: Text(lang.tr('Sign out', '로그아웃')),
+              ),
+              OutlinedButton.icon(
+                onPressed: _loading
+                    ? null
+                    : () => setState(() => _showAuthFormEvenWithSession = true),
+                icon: const Icon(Icons.switch_account_outlined),
+                label: Text(
+                  lang.tr('Use another account', '다른 계정 사용'),
+                ),
               ),
               OutlinedButton.icon(
                 onPressed: _loading

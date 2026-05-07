@@ -21,6 +21,18 @@ class PatientSession {
   final bool usesFirebaseAuth;
 }
 
+class LocalPatientAccountSummary {
+  const LocalPatientAccountSummary({
+    required this.email,
+    required this.displayName,
+    required this.lastLoginAtIso,
+  });
+
+  final String email;
+  final String displayName;
+  final String lastLoginAtIso;
+}
+
 class LocalBetaAuthException implements Exception {
   const LocalBetaAuthException(this.code);
 
@@ -167,6 +179,51 @@ class BetaSessionService {
       _localSession = updated.toSession();
       _emitSession();
     }
+  }
+
+  static Future<List<LocalPatientAccountSummary>> localAccountSummaries() async {
+    await _ensureInitialized();
+    final accounts = _readLocalAccounts()
+      ..sort((a, b) => b.lastLoginAtIso.compareTo(a.lastLoginAtIso));
+    return accounts
+        .map(
+          (account) => LocalPatientAccountSummary(
+            email: account.email,
+            displayName: account.name,
+            lastLoginAtIso: account.lastLoginAtIso,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  static Future<void> resetLocalPassword({
+    required String email,
+    required String newPassword,
+  }) async {
+    await _ensureInitialized();
+    final normalizedEmail = _normalizeEmail(email);
+    final trimmedPassword = newPassword.trim();
+    if (!_looksLikeEmail(normalizedEmail)) {
+      throw const LocalBetaAuthException('invalid-email');
+    }
+    if (trimmedPassword.length < 6) {
+      throw const LocalBetaAuthException('weak-password');
+    }
+
+    final accounts = _readLocalAccounts();
+    final index = accounts.indexWhere(
+      (account) => account.email == normalizedEmail,
+    );
+    if (index < 0) {
+      throw const LocalBetaAuthException('user-not-found');
+    }
+
+    final updated = accounts[index].copyWith(
+      passwordHash: _passwordHash(trimmedPassword),
+      lastLoginAtIso: DateTime.now().toIso8601String(),
+    );
+    accounts[index] = updated;
+    await _saveLocalAccounts(accounts);
   }
 
   static Future<void> _ensureInitialized() {
@@ -317,11 +374,15 @@ class _LocalBetaAccount {
     };
   }
 
-  _LocalBetaAccount copyWith({String? name, String? lastLoginAtIso}) {
+  _LocalBetaAccount copyWith({
+    String? name,
+    String? passwordHash,
+    String? lastLoginAtIso,
+  }) {
     return _LocalBetaAccount(
       id: id,
       email: email,
-      passwordHash: passwordHash,
+      passwordHash: passwordHash ?? this.passwordHash,
       name: name ?? this.name,
       createdAtIso: createdAtIso,
       lastLoginAtIso: lastLoginAtIso ?? this.lastLoginAtIso,
