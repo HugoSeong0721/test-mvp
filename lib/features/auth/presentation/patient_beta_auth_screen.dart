@@ -34,6 +34,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _loading = false;
   bool _loadedRouteArgs = false;
   bool _autoResumeTriggered = false;
+  bool _openSavedPortalDirectly = false;
   String? _formError;
   String? _linkedClinicId;
   bool _showAuthFormEvenWithSession = false;
@@ -94,17 +95,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       setState(() => _loading = false);
       return;
     }
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(
-        settings: RouteSettings(
-          name: PatientHomeScreen.routeName,
-          arguments: {
-            if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-          },
-        ),
-        builder: (_) => const PatientHomeScreen(),
-      ),
-    );
+    setState(() {
+      _openSavedPortalDirectly = true;
+      _loading = false;
+    });
   }
 
   Future<void> _preparePatientPortalContext(PatientSession session) async {
@@ -156,6 +150,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       if (!mounted) {
         return;
       }
+      setState(() => _openSavedPortalDirectly = true);
       unawaited(_continueToPatientHome());
     });
   }
@@ -170,6 +165,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       }
       setState(() {
         _showAuthFormEvenWithSession = true;
+        _openSavedPortalDirectly = false;
       });
       _showMessage(
         lang.tr(
@@ -543,17 +539,9 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         return;
       }
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(
-          settings: RouteSettings(
-            name: PatientHomeScreen.routeName,
-            arguments: {
-              if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-            },
-          ),
-          builder: (_) => const PatientHomeScreen(),
-        ),
-      );
+      setState(() {
+        _openSavedPortalDirectly = true;
+      });
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));
     } on FirebaseAuthException catch (error) {
@@ -788,6 +776,12 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             final linkedClinic = _linkedClinicId == null
                 ? null
                 : _store.clinicById(_linkedClinicId!);
+
+            if (activeSession != null &&
+                _openSavedPortalDirectly &&
+                !_showAuthFormEvenWithSession) {
+              return const PatientHomeScreen();
+            }
 
             if (activeSession != null) {
               _maybeAutoResumePatientHome();
