@@ -38,8 +38,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   final TextEditingController _answerController = TextEditingController();
   final TextEditingController _extraMemoController = TextEditingController();
 
-  StreamSubscription<PatientSession?>? _sessionSubscription;
-  StreamSubscription<PatientProfile?>? _profileSubscription;
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
 
@@ -170,38 +168,59 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   void initState() {
     super.initState();
     _answerController.text = _activeAnswers[_currentQuestionIndex] ?? '';
-    _sessionSubscription = BetaSessionService.watchSession().listen((
-      session,
-    ) async {
-      _activeSession = session;
-      await _profileSubscription?.cancel();
-      if (session == null) {
-        if (mounted) {
-          setState(() => _sessionBackedProfile = null);
-        }
-        return;
-      }
-
-      await PatientProfileService.ensureProfileForSession(session);
-      _profileSubscription =
-          PatientProfileService.watchProfileForSession(session).listen((
-            profile,
-          ) {
-            if (!mounted || profile == null) {
-              return;
-            }
-            setState(() => _sessionBackedProfile = profile);
-          });
-    });
+    unawaited(_initializeProfile());
   }
 
   @override
   void dispose() {
-    _sessionSubscription?.cancel();
-    _profileSubscription?.cancel();
     _answerController.dispose();
     _extraMemoController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initializeProfile() async {
+    final session =
+        BetaSessionService.currentSession ??
+        await BetaSessionService.currentSessionAsync();
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _activeSession = session;
+    });
+
+    if (session == null) {
+      setState(() => _sessionBackedProfile = null);
+      return;
+    }
+
+    try {
+      final localProfile = await PatientProfileService.loadLocalProfile(
+        session.id,
+      );
+      if (mounted && localProfile != null) {
+        setState(() {
+          _sessionBackedProfile = localProfile;
+        });
+      }
+    } catch (_) {}
+
+    unawaited(
+      PatientProfileService.ensureProfileForSession(session)
+          .then((_) async {
+            final refreshed = await PatientProfileService.loadLocalProfile(
+              session.id,
+            );
+            if (!mounted || refreshed == null) {
+              return;
+            }
+            setState(() {
+              _sessionBackedProfile = refreshed;
+            });
+          })
+          .catchError((_) {}),
+    );
   }
 
   void _saveCurrentAnswer() {

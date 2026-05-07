@@ -8,7 +8,6 @@ Web-first MVP for an acupuncture clinic portal and patient workflow.
 |---|---|
 | Practitioner portal | https://hugoseong0721.github.io/test-mvp/#/clinic |
 | Patient / beta portal | https://hugoseong0721.github.io/test-mvp/#/patient |
-| Entry hub | https://hugoseong0721.github.io/test-mvp/ |
 
 ## Current Login Flow
 
@@ -26,14 +25,21 @@ Web-first MVP for an acupuncture clinic portal and patient workflow.
 
 ## Patient-Visible Clinic List
 
-- In this demo, patients only see clinics that were explicitly saved by a practitioner in `Clinic Profile`.
-- There is no shared global public clinic directory baked into the patient search anymore.
+- Patients only see clinics that were explicitly saved by a practitioner in `Clinic Profile`.
 - If a clinic is not connected to a practitioner account yet, it will not appear in the patient clinic picker.
-- Because this demo stores practitioner-created clinic profiles in local browser storage, the visible clinic list can differ by browser/device.
+- This demo stores practitioner-created clinic profiles in browser-local storage, so the visible list can differ by browser/device.
 
-Current default public list in the repo:
+Bundled clinic templates that practitioners can register:
 
-- None. A clinic becomes patient-visible only after a practitioner signs in and saves it through `Clinic Profile`.
+- Seong Acupuncture Center — Dr. Hugo Seong — Fort Lee, NJ
+- Midtown Balance Clinic — Dr. Jane Kim — Midtown Manhattan, NY
+- Elm Wellness Acupuncture — Dr. Min Park — Palisades Park, NJ
+
+Important note:
+
+- These clinic names do not automatically appear to patients on GitHub Pages.
+- A practitioner must sign in first and save/link the clinic in `Clinic Profile`.
+- After that, patients using the same browser context can see and choose that clinic.
 
 ## Repository
 
