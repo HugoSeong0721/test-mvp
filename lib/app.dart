@@ -50,7 +50,7 @@ class TestMvpApp extends StatelessWidget {
             LoginScreen.routeName: (_) => const LoginScreen(),
             PatientBetaAuthScreen.routeName: (_) =>
                 const PatientBetaAuthScreen(),
-            PatientHomeScreen.routeName: (_) => const PatientHomeScreen(),
+            PatientHomeScreen.routeName: (_) => const _PatientHomeEntry(),
             PatientIntakeScreen.routeName: (_) => const _PatientRouteGuard(
               child: PatientIntakeScreen(),
             ),
@@ -175,6 +175,44 @@ class _PatientRouteGuardState extends State<_PatientRouteGuard> {
     }
 
     return widget.child;
+  }
+}
+
+class _PatientHomeEntry extends StatefulWidget {
+  const _PatientHomeEntry();
+
+  @override
+  State<_PatientHomeEntry> createState() => _PatientHomeEntryState();
+}
+
+class _PatientHomeEntryState extends State<_PatientHomeEntry> {
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await BetaSessionService.initialize();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _initialized = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const _GuardLoadingScreen();
+    }
+
+    if (BetaSessionService.currentSession == null) {
+      return const PatientBetaAuthScreen();
+    }
+
+    return const PatientHomeScreen();
   }
 }
 

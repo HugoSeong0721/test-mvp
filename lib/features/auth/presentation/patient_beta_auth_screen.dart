@@ -33,8 +33,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
   bool _showPassword = false;
   bool _loading = false;
   bool _loadedRouteArgs = false;
-  bool _autoResumeTriggered = false;
-  bool _openSavedPortalDirectly = false;
   String? _formError;
   String? _linkedClinicId;
   bool _showAuthFormEvenWithSession = false;
@@ -95,10 +93,12 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       setState(() => _loading = false);
       return;
     }
-    setState(() {
-      _openSavedPortalDirectly = true;
-      _loading = false;
-    });
+    Navigator.of(context).pushReplacementNamed(
+      PatientHomeScreen.routeName,
+      arguments: {
+        if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+      },
+    );
   }
 
   Future<void> _preparePatientPortalContext(PatientSession session) async {
@@ -132,29 +132,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
   }
 
-  bool _arrivedViaPatientHomeUrl() {
-    final fragment = Uri.base.fragment;
-    if (fragment.isEmpty) {
-      return false;
-    }
-    final path = fragment.split('?').first.trim();
-    return path == PatientHomeScreen.routeName;
-  }
-
-  void _maybeAutoResumePatientHome() {
-    if (_autoResumeTriggered || !_arrivedViaPatientHomeUrl()) {
-      return;
-    }
-    _autoResumeTriggered = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _openSavedPortalDirectly = true);
-      unawaited(_continueToPatientHome());
-    });
-  }
-
   Future<void> _signOutTester() async {
     final lang = AppLanguageController.instance;
     setState(() => _loading = true);
@@ -165,7 +142,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       }
       setState(() {
         _showAuthFormEvenWithSession = true;
-        _openSavedPortalDirectly = false;
       });
       _showMessage(
         lang.tr(
@@ -539,9 +515,13 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         return;
       }
 
-      setState(() {
-        _openSavedPortalDirectly = true;
-      });
+      Navigator.pushReplacementNamed(
+        context,
+        PatientHomeScreen.routeName,
+        arguments: {
+          if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+        },
+      );
     } on LocalBetaAuthException catch (error) {
       _setFormError(_friendlyLocalAuthMessage(error));
     } on FirebaseAuthException catch (error) {
@@ -776,16 +756,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             final linkedClinic = _linkedClinicId == null
                 ? null
                 : _store.clinicById(_linkedClinicId!);
-
-            if (activeSession != null &&
-                _openSavedPortalDirectly &&
-                !_showAuthFormEvenWithSession) {
-              return const PatientHomeScreen();
-            }
-
-            if (activeSession != null) {
-              _maybeAutoResumePatientHome();
-            }
 
             return Scaffold(
               extendBodyBehindAppBar: true,
@@ -1087,7 +1057,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     BuildContext context,
     AppLanguageController lang,
   ) {
-    final isAutoOpening = _loading && _arrivedViaPatientHomeUrl();
+    const isAutoOpening = false;
     return AppPanel(
       padding: const EdgeInsets.all(18),
       child: Column(
