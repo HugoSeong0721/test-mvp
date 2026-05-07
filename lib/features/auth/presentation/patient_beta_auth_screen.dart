@@ -81,25 +81,24 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
 
     setState(() => _loading = true);
-    final session = await BetaSessionService.currentSessionAsync();
-    if (session != null) {
-      await _preparePatientPortalContext(session);
-    }
+    final session =
+        BetaSessionService.currentSession ??
+        await BetaSessionService.currentSessionAsync();
 
     if (!mounted) {
       return;
     }
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute<void>(
-        settings: RouteSettings(
-          name: PatientHomeScreen.routeName,
-          arguments: {
-            if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
-          },
-        ),
-        builder: (_) => const PatientHomeScreen(),
-      ),
-      (_) => false,
+    if (session != null) {
+      unawaited(_preparePatientPortalContext(session));
+    } else {
+      setState(() => _loading = false);
+      return;
+    }
+    Navigator.of(context).pushReplacementNamed(
+      PatientHomeScreen.routeName,
+      arguments: {
+        if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+      },
     );
   }
 
