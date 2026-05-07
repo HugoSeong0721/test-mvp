@@ -425,6 +425,14 @@ class ClinicDataStore extends ChangeNotifier {
     items.sort((a, b) => a.name.compareTo(b.name));
     return List.unmodifiable(items);
   }
+  List<ClinicCenter> get patientVisibleClinicCenters {
+    final visibleIds = _practitionerClinicIds.values.toSet();
+    final items = _clinicCenters
+        .where((clinic) => visibleIds.contains(clinic.id))
+        .toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+    return List.unmodifiable(items);
+  }
   bool get clinicStateReady => _clinicStateReady;
 
   List<String> get allDates {
@@ -1002,7 +1010,7 @@ class ClinicDataStore extends ChangeNotifier {
 
   List<ClinicCenter> searchClinics(String query) {
     final normalized = query.trim().toLowerCase();
-    final items = clinicCenters;
+    final items = patientVisibleClinicCenters;
     if (normalized.isEmpty) {
       return items;
     }

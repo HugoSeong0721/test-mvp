@@ -24,6 +24,17 @@ Web-first MVP for an acupuncture clinic portal and patient workflow.
 4. Open the Intake tab, complete the form, and submit it.
 5. Use the green `Feedback` button in the lower-right corner if anything is broken or confusing.
 
+## Patient-Visible Clinic List
+
+- In this demo, patients only see clinics that were explicitly saved by a practitioner in `Clinic Profile`.
+- There is no shared global public clinic directory baked into the patient search anymore.
+- If a clinic is not connected to a practitioner account yet, it will not appear in the patient clinic picker.
+- Because this demo stores practitioner-created clinic profiles in local browser storage, the visible clinic list can differ by browser/device.
+
+Current default public list in the repo:
+
+- None. A clinic becomes patient-visible only after a practitioner signs in and saves it through `Clinic Profile`.
+
 ## Repository
 
 - GitHub: `https://github.com/HugoSeong0721/test-mvp.git`
