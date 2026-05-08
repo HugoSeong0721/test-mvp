@@ -236,12 +236,6 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
             children: [
               AppPanel(
                 padding: const EdgeInsets.all(22),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppTheme.pine, AppTheme.jade, Color(0xFF2E7A66)],
-                ),
-                borderColor: Colors.white24,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -249,7 +243,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                       profile.name,
                       style: Theme.of(
                         context,
-                      ).textTheme.headlineMedium?.copyWith(color: Colors.white),
+                      ).textTheme.headlineMedium?.copyWith(color: AppTheme.ink),
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -258,7 +252,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                         '이 화면은 세션 메모 확인, 기억과 비교, 필요한 경우 수정 요청 전송 순서로 보면 가장 쉽습니다.',
                       ),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.82),
+                        color: AppTheme.ink.withValues(alpha: 0.72),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -269,21 +263,21 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                         _HistorySummaryChip(
                           label: lang.tr('Total Visits', '총 방문'),
                           value: '${history.length}',
-                          dark: true,
+                          dark: false,
                         ),
                         _HistorySummaryChip(
                           label: lang.tr('Last Visit', '최근 방문'),
                           value: lastVisit == null
                               ? '-'
                               : _formatStoredDateWithWeekday(lastVisit.date),
-                          dark: true,
+                          dark: false,
                         ),
                         _HistorySummaryChip(
                           label: lang.tr('Most Recent Status', '최근 상태'),
                           value: lastVisit == null
                               ? '-'
                               : lastVisit.intakeStatus.label,
-                          dark: true,
+                          dark: false,
                         ),
                       ],
                     ),
@@ -293,7 +287,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                       runSpacing: 12,
                       children: [
                         AppGuideStep(
-                          dark: true,
+                          dark: false,
                           step: '1',
                           title: lang.tr('Read the visit note', '방문 메모 읽기'),
                           description: lang.tr(
@@ -302,7 +296,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                           ),
                         ),
                         AppGuideStep(
-                          dark: true,
+                          dark: false,
                           step: '2',
                           title: lang.tr('Check Q&A snapshot', '질문/답변 보기'),
                           description: lang.tr(
@@ -311,7 +305,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                           ),
                         ),
                         AppGuideStep(
-                          dark: true,
+                          dark: false,
                           step: '3',
                           title: lang.tr(
                             'Send an update if needed',
