@@ -224,6 +224,79 @@ class AppointmentRequest {
   }
 }
 
+class ClinicOpenRequest {
+  const ClinicOpenRequest({
+    required this.id,
+    required this.patientId,
+    required this.patientName,
+    required this.patientEmail,
+    required this.clinicName,
+    required this.practitionerName,
+    required this.location,
+    required this.note,
+    required this.requestedAt,
+    this.status = 'requested',
+  });
+
+  final String id;
+  final String patientId;
+  final String patientName;
+  final String patientEmail;
+  final String clinicName;
+  final String practitionerName;
+  final String location;
+  final String note;
+  final DateTime requestedAt;
+  final String status;
+
+  ClinicOpenRequest copyWith({String? status}) {
+    return ClinicOpenRequest(
+      id: id,
+      patientId: patientId,
+      patientName: patientName,
+      patientEmail: patientEmail,
+      clinicName: clinicName,
+      practitionerName: practitionerName,
+      location: location,
+      note: note,
+      requestedAt: requestedAt,
+      status: status ?? this.status,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'patientId': patientId,
+      'patientName': patientName,
+      'patientEmail': patientEmail,
+      'clinicName': clinicName,
+      'practitionerName': practitionerName,
+      'location': location,
+      'note': note,
+      'requestedAt': requestedAt.toIso8601String(),
+      'status': status,
+    };
+  }
+
+  factory ClinicOpenRequest.fromMap(Map<String, dynamic> data) {
+    return ClinicOpenRequest(
+      id: (data['id'] ?? '').toString(),
+      patientId: (data['patientId'] ?? '').toString(),
+      patientName: (data['patientName'] ?? '').toString(),
+      patientEmail: (data['patientEmail'] ?? '').toString(),
+      clinicName: (data['clinicName'] ?? '').toString(),
+      practitionerName: (data['practitionerName'] ?? '').toString(),
+      location: (data['location'] ?? '').toString(),
+      note: (data['note'] ?? '').toString(),
+      requestedAt:
+          DateTime.tryParse((data['requestedAt'] ?? '').toString()) ??
+          DateTime.now(),
+      status: (data['status'] ?? 'requested').toString(),
+    );
+  }
+}
+
 class PatientHistoryArgs {
   const PatientHistoryArgs({required this.current, required this.history});
 
@@ -298,12 +371,11 @@ class ClinicDataStore extends ChangeNotifier {
   static const String _clinicCentersKey = 'clinic_centers_v1';
   static const String _patientSelectedClinicsKey =
       'patient_selected_clinics_v1';
-  static const String _patientDefaultClinicsKey =
-      'patient_default_clinics_v1';
-  static const String _practitionerClinicIdsKey =
-      'practitioner_clinic_ids_v1';
+  static const String _patientDefaultClinicsKey = 'patient_default_clinics_v1';
+  static const String _practitionerClinicIdsKey = 'practitioner_clinic_ids_v1';
   static const String _patientPortalRegisteredIdsKey =
       'patient_portal_registered_ids_v1';
+  static const String _clinicOpenRequestsKey = 'clinic_open_requests_v1';
 
   static String _storedDate(DateTime date) {
     final normalized = DateTime(date.year, date.month, date.day);
@@ -349,7 +421,8 @@ class ClinicDataStore extends ChangeNotifier {
 
   static List<AppointmentSlot> _buildInitialSlots() {
     return [
-      for (final clinicId in _defaultClinicIds) ..._buildSlotsForClinic(clinicId),
+      for (final clinicId in _defaultClinicIds)
+        ..._buildSlotsForClinic(clinicId),
     ];
   }
 
@@ -373,6 +446,7 @@ class ClinicDataStore extends ChangeNotifier {
   final List<AppointmentSlot> _slots = _buildInitialSlots();
 
   final List<AppointmentRequest> _appointmentRequests = [];
+  final List<ClinicOpenRequest> _clinicOpenRequests = [];
 
   final List<ClinicCenter> _clinicCenters = [
     const ClinicCenter(
@@ -406,8 +480,7 @@ class ClinicDataStore extends ChangeNotifier {
   final Map<String, String> _patientSelectedClinicIds = <String, String>{};
   final Map<String, String> _patientDefaultClinicIds = <String, String>{};
   final Set<String> _patientPortalRegisteredIds = <String>{};
-  final Map<String, String> _practitionerClinicIds = <String, String>{
-  };
+  final Map<String, String> _practitionerClinicIds = <String, String>{};
   SharedPreferences? _prefs;
   bool _clinicStateReady = false;
 
@@ -420,19 +493,37 @@ class ClinicDataStore extends ChangeNotifier {
   List<AppointmentSlot> get slots => List.unmodifiable(_slots);
   List<AppointmentRequest> get appointmentRequests =>
       List.unmodifiable(_appointmentRequests);
+  List<ClinicOpenRequest> get clinicOpenRequests {
+    final items = [..._clinicOpenRequests]
+      ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+    return List.unmodifiable(items);
+  }
+
+  List<ClinicOpenRequest> get pendingClinicOpenRequests {
+    final items =
+        _clinicOpenRequests
+            .where((request) => request.status == 'requested')
+            .toList()
+          ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+    return List.unmodifiable(items);
+  }
+
   List<ClinicCenter> get clinicCenters {
     final items = [..._clinicCenters];
     items.sort((a, b) => a.name.compareTo(b.name));
     return List.unmodifiable(items);
   }
+
   List<ClinicCenter> get patientVisibleClinicCenters {
     final visibleIds = _practitionerClinicIds.values.toSet();
-    final items = _clinicCenters
-        .where((clinic) => visibleIds.contains(clinic.id))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final items =
+        _clinicCenters
+            .where((clinic) => visibleIds.contains(clinic.id))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
     return List.unmodifiable(items);
   }
+
   bool get clinicStateReady => _clinicStateReady;
 
   List<String> get allDates {
@@ -446,14 +537,13 @@ class ClinicDataStore extends ChangeNotifier {
       return const [];
     }
     final items = _slots.where((slot) => slot.clinicId == normalizedClinicId);
-    return items.toList()
-      ..sort((a, b) {
-        final dateCompare = a.date.compareTo(b.date);
-        if (dateCompare != 0) {
-          return dateCompare;
-        }
-        return a.time.compareTo(b.time);
-      });
+    return items.toList()..sort((a, b) {
+      final dateCompare = a.date.compareTo(b.date);
+      if (dateCompare != 0) {
+        return dateCompare;
+      }
+      return a.time.compareTo(b.time);
+    });
   }
 
   List<AppointmentRequest> appointmentRequestsForClinic(String? clinicId) {
@@ -479,8 +569,7 @@ class ClinicDataStore extends ChangeNotifier {
                 visit.clinicId == clinicId,
           )
           .map((visit) => visit.date),
-    }.toList()
-      ..sort();
+    }.toList()..sort();
     return dates;
   }
 
@@ -635,16 +724,23 @@ class ClinicDataStore extends ChangeNotifier {
       });
   }
 
-  List<AppointmentRequest> requestsForPatient(String patientId, {String? clinicId}) {
+  List<AppointmentRequest> requestsForPatient(
+    String patientId, {
+    String? clinicId,
+  }) {
     final items =
-        appointmentRequestsForClinic(clinicId)
-            .where((request) => request.patientId == patientId)
-            .toList()
+        appointmentRequestsForClinic(
+            clinicId,
+          ).where((request) => request.patientId == patientId).toList()
           ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
     return items;
   }
 
-  ScheduledVisit? scheduledVisitForSlot(String date, String time, {String? clinicId}) {
+  ScheduledVisit? scheduledVisitForSlot(
+    String date,
+    String time, {
+    String? clinicId,
+  }) {
     try {
       final visit = _visits.firstWhere(
         (item) =>
@@ -828,7 +924,9 @@ class ClinicDataStore extends ChangeNotifier {
 
   void deleteProfile(String profileId) {
     _profiles.removeWhere((profile) => profile.id == profileId);
-    _appointmentRequests.removeWhere((request) => request.patientId == profileId);
+    _appointmentRequests.removeWhere(
+      (request) => request.patientId == profileId,
+    );
     _visits.removeWhere((visit) => visit.patientId == profileId);
     _patientSelectedClinicIds.remove(profileId);
     _patientDefaultClinicIds.remove(profileId);
@@ -976,7 +1074,8 @@ class ClinicDataStore extends ChangeNotifier {
       final defaultClinicId = defaultClinicIdForPatient(profile.id);
       final hasVisit = _visits.any(
         (visit) =>
-            visit.patientId == profile.id && visit.clinicId == normalizedClinicId,
+            visit.patientId == profile.id &&
+            visit.clinicId == normalizedClinicId,
       );
       final hasRequest = _appointmentRequests.any(
         (request) =>
@@ -1004,6 +1103,59 @@ class ClinicDataStore extends ChangeNotifier {
       return;
     }
     _patientPortalRegisteredIds.add(normalizedPatientId);
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  Future<void> requestClinicOpen({
+    required PatientProfile patient,
+    required String clinicName,
+    required String practitionerName,
+    required String location,
+    required String note,
+  }) async {
+    final normalizedName = clinicName.trim();
+    if (normalizedName.isEmpty) {
+      return;
+    }
+    final normalizedPractitioner = practitionerName.trim();
+    final normalizedLocation = location.trim();
+    final alreadyRequested = _clinicOpenRequests.any((request) {
+      return request.status == 'requested' &&
+          request.patientId == patient.id &&
+          request.clinicName.toLowerCase() == normalizedName.toLowerCase();
+    });
+    if (alreadyRequested) {
+      return;
+    }
+
+    _clinicOpenRequests.add(
+      ClinicOpenRequest(
+        id: 'clinic_open_request_${DateTime.now().millisecondsSinceEpoch}',
+        patientId: patient.id,
+        patientName: patient.name,
+        patientEmail: patient.email,
+        clinicName: normalizedName,
+        practitionerName: normalizedPractitioner,
+        location: normalizedLocation,
+        note: note.trim(),
+        requestedAt: DateTime.now(),
+      ),
+    );
+    notifyListeners();
+    await _persistClinicState();
+  }
+
+  Future<void> markClinicOpenRequestReviewed(String requestId) async {
+    final index = _clinicOpenRequests.indexWhere(
+      (request) => request.id == requestId,
+    );
+    if (index < 0) {
+      return;
+    }
+    _clinicOpenRequests[index] = _clinicOpenRequests[index].copyWith(
+      status: 'reviewed',
+    );
     notifyListeners();
     await _persistClinicState();
   }
@@ -1128,10 +1280,7 @@ class ClinicDataStore extends ChangeNotifier {
     return '/patient?clinic=$encodedId';
   }
 
-  String buildPatientPortalShareLink(
-    String clinicId, {
-    String? currentUrl,
-  }) {
+  String buildPatientPortalShareLink(String clinicId, {String? currentUrl}) {
     final route = '#${buildPatientPortalRoute(clinicId)}';
     if (currentUrl == null || currentUrl.trim().isEmpty) {
       return route;
@@ -1187,6 +1336,23 @@ class ClinicDataStore extends ChangeNotifier {
     _practitionerClinicIds
       ..clear()
       ..addAll(_readPersistedMap(_practitionerClinicIdsKey));
+    final savedOpenRequests = _prefs?.getString(_clinicOpenRequestsKey);
+    if (savedOpenRequests != null && savedOpenRequests.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(savedOpenRequests);
+        if (decoded is List) {
+          _clinicOpenRequests
+            ..clear()
+            ..addAll(
+              decoded.whereType<Map>().map(
+                (item) => ClinicOpenRequest.fromMap(
+                  item.map((key, value) => MapEntry(key.toString(), value)),
+                ),
+              ),
+            );
+        }
+      } catch (_) {}
+    }
 
     _applySeedClinicAssignments();
     _ensureSlotsForExistingClinics();
@@ -1250,6 +1416,12 @@ class ClinicDataStore extends ChangeNotifier {
     await prefs.setStringList(
       _patientPortalRegisteredIdsKey,
       _patientPortalRegisteredIds.toList()..sort(),
+    );
+    await prefs.setString(
+      _clinicOpenRequestsKey,
+      jsonEncode(
+        _clinicOpenRequests.map((request) => request.toMap()).toList(),
+      ),
     );
   }
 }

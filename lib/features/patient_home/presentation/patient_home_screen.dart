@@ -54,8 +54,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         name: session.displayName.isNotEmpty
             ? session.displayName
             : (session.email.isNotEmpty
-                ? session.email.split('@').first
-                : 'New Patient'),
+                  ? session.email.split('@').first
+                  : 'New Patient'),
         phone: '',
         email: session.email,
         birthYear: 1990,
@@ -108,7 +108,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     }
 
     try {
-      final localProfile = await PatientProfileService.loadLocalProfile(session.id);
+      final localProfile = await PatientProfileService.loadLocalProfile(
+        session.id,
+      );
       if (mounted && localProfile != null) {
         setState(() {
           _sessionBackedProfile = localProfile;
@@ -130,7 +132,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               _sessionBackedProfile = refreshed;
               _loadError = null;
             });
-          }).catchError((error) {
+          })
+          .catchError((error) {
             if (!mounted) {
               return;
             }
@@ -351,6 +354,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     final lang = AppLanguageController.instance;
     final patientId = _currentProfile.id;
     final searchController = TextEditingController();
+    final requestClinicNameController = TextEditingController();
+    final requestPractitionerController = TextEditingController();
+    final requestLocationController = TextEditingController();
+    final requestNoteController = TextEditingController();
     String query = '';
 
     await showDialog<void>(
@@ -361,13 +368,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             final currentClinic = _store.activeClinicForPatient(patientId);
             final defaultClinicId = _store.defaultClinicIdForPatient(patientId);
             final results = _store.searchClinics(query);
+            if (requestClinicNameController.text.trim().isEmpty &&
+                query.trim().isNotEmpty) {
+              requestClinicNameController.text = query.trim();
+            }
 
             return AlertDialog(
               title: Text(
-                lang.tr(
-                  'Choose your acupuncture center',
-                  '한의원을 선택해주세요',
-                ),
+                lang.tr('Choose your acupuncture center', '한의원을 선택해주세요'),
               ),
               content: SizedBox(
                 width: 720,
@@ -386,10 +394,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       controller: searchController,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        labelText: lang.tr(
-                          'Search clinic',
-                          '한의원 검색',
-                        ),
+                        labelText: lang.tr('Search clinic', '한의원 검색'),
                       ),
                       onChanged: (value) =>
                           setDialogState(() => query = value.trim()),
@@ -399,161 +404,290 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       height: 420,
                       child: SingleChildScrollView(
                         child: Column(
-                          children: results.map((clinic) {
-                            final isCurrent = currentClinic?.id == clinic.id;
-                            final isDefault = defaultClinicId == clinic.id;
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: isCurrent
-                                    ? AppTheme.mint.withValues(alpha: 0.2)
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: isCurrent
-                                      ? AppTheme.copper.withValues(alpha: 0.52)
-                                      : AppTheme.border.withValues(alpha: 0.45),
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                          children:
+                              results.map((clinic) {
+                                final isCurrent =
+                                    currentClinic?.id == clinic.id;
+                                final isDefault = defaultClinicId == clinic.id;
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: isCurrent
+                                        ? AppTheme.mint.withValues(alpha: 0.2)
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: isCurrent
+                                          ? AppTheme.copper.withValues(
+                                              alpha: 0.52,
+                                            )
+                                          : AppTheme.border.withValues(
+                                              alpha: 0.45,
+                                            ),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          clinic.name,
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.titleLarge?.copyWith(
-                                            fontWeight: FontWeight.w700,
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              clinic.name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                            ),
                                           ),
-                                        ),
+                                          if (isCurrent)
+                                            _buildClinicStatusChip(
+                                              context,
+                                              lang.tr('Current', '현재 선택'),
+                                            ),
+                                          if (isDefault) ...[
+                                            const SizedBox(width: 8),
+                                            _buildClinicStatusChip(
+                                              context,
+                                              lang.tr('Default', '기본 한의원'),
+                                              accent: AppTheme.copper,
+                                            ),
+                                          ],
+                                        ],
                                       ),
-                                      if (isCurrent)
-                                        _buildClinicStatusChip(
-                                          context,
-                                          lang.tr(
-                                            'Current',
-                                            '현재 선택',
-                                          ),
-                                        ),
-                                      if (isDefault) ...[
-                                        const SizedBox(width: 8),
-                                        _buildClinicStatusChip(
-                                          context,
-                                          lang.tr(
-                                            'Default',
-                                            '기본 한의원',
-                                          ),
-                                          accent: AppTheme.copper,
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        '${clinic.practitionerName}${clinic.location.isEmpty ? '' : ' · ${clinic.location}'}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.copyWith(
+                                              color: AppTheme.ink.withValues(
+                                                alpha: 0.72,
+                                              ),
+                                            ),
+                                      ),
+                                      if (clinic.patientNote
+                                          .trim()
+                                          .isNotEmpty) ...[
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          clinic.patientNote,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(height: 1.5),
                                         ),
                                       ],
+                                      const SizedBox(height: 12),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: [
+                                          FilledButton.tonalIcon(
+                                            onPressed: isCurrent
+                                                ? null
+                                                : () async {
+                                                    await _store
+                                                        .selectClinicForPatient(
+                                                          patientId: patientId,
+                                                          clinicId: clinic.id,
+                                                        );
+                                                    if (!context.mounted) {
+                                                      return;
+                                                    }
+                                                    Navigator.pop(context);
+                                                    if (!mounted) {
+                                                      return;
+                                                    }
+                                                    ScaffoldMessenger.of(
+                                                      this.context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          lang.tr(
+                                                            '${clinic.name} is now your current clinic.',
+                                                            '${clinic.name} 이(가) 현재 한의원으로 선택되었습니다.',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                            icon: const Icon(
+                                              Icons.local_hospital_outlined,
+                                            ),
+                                            label: Text(
+                                              lang.tr(
+                                                'Choose clinic',
+                                                '이 한의원 선택',
+                                              ),
+                                            ),
+                                          ),
+                                          OutlinedButton.icon(
+                                            onPressed: isDefault
+                                                ? null
+                                                : () async {
+                                                    await _store
+                                                        .setDefaultClinicForPatient(
+                                                          patientId: patientId,
+                                                          clinicId: clinic.id,
+                                                        );
+                                                    if (!mounted) {
+                                                      return;
+                                                    }
+                                                    setDialogState(() {});
+                                                    ScaffoldMessenger.of(
+                                                      this.context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          lang.tr(
+                                                            '${clinic.name} will open by default after login.',
+                                                            '${clinic.name} 이(가) 다음 로그인부터 기본 한의원으로 열립니다.',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                            icon: const Icon(
+                                              Icons.push_pin_outlined,
+                                            ),
+                                            label: Text(
+                                              lang.tr(
+                                                'Set as default',
+                                                '기본 한의원으로 저장',
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    '${clinic.practitionerName}${clinic.location.isEmpty ? '' : ' · ${clinic.location}'}',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyLarge?.copyWith(
-                                      color: AppTheme.ink.withValues(alpha: 0.72),
+                                );
+                              }).toList()..add(
+                                Container(
+                                  width: double.infinity,
+                                  margin: const EdgeInsets.only(top: 4),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.blush.withValues(
+                                      alpha: 0.2,
                                     ),
-                                  ),
-                                  if (clinic.patientNote.trim().isNotEmpty) ...[
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      clinic.patientNote,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium?.copyWith(
-                                        height: 1.5,
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: AppTheme.copper.withValues(
+                                        alpha: 0.32,
                                       ),
                                     ),
-                                  ],
-                                  const SizedBox(height: 12),
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      FilledButton.tonalIcon(
-                                        onPressed: isCurrent
-                                            ? null
-                                            : () async {
-                                                await _store.selectClinicForPatient(
-                                                  patientId: patientId,
-                                                  clinicId: clinic.id,
-                                                );
-                                                if (!context.mounted) {
-                                                  return;
-                                                }
-                                                Navigator.pop(context);
-                                                if (!mounted) {
-                                                  return;
-                                                }
-                                                ScaffoldMessenger.of(
-                                                  this.context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      lang.tr(
-                                                        '${clinic.name} is now your current clinic.',
-                                                        '${clinic.name} 이(가) 현재 한의원으로 선택되었습니다.',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                        icon: const Icon(
-                                          Icons.local_hospital_outlined,
+                                      Text(
+                                        lang.tr(
+                                          'Can’t find your clinic?',
+                                          '찾는 한의원이 없나요?',
                                         ),
-                                        label: Text(
-                                          lang.tr(
-                                            'Choose clinic',
-                                            '이 한의원 선택',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        lang.tr(
+                                          'Request to open it. We will show practitioners that patients are asking to connect this clinic.',
+                                          '열어달라고 요청해보세요. 환자들이 이 한의원 연결을 원한다고 침술사 화면에 보여줍니다.',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      TextField(
+                                        controller: requestClinicNameController,
+                                        decoration: InputDecoration(
+                                          labelText: lang.tr(
+                                            'Clinic name',
+                                            '한의원 이름',
                                           ),
                                         ),
                                       ),
-                                      OutlinedButton.icon(
-                                        onPressed: isDefault
-                                            ? null
-                                            : () async {
-                                                await _store.setDefaultClinicForPatient(
-                                                  patientId: patientId,
-                                                  clinicId: clinic.id,
-                                                );
-                                                if (!mounted) {
-                                                  return;
-                                                }
-                                                setDialogState(() {});
-                                                ScaffoldMessenger.of(
-                                                  this.context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      lang.tr(
-                                                        '${clinic.name} will open by default after login.',
-                                                        '${clinic.name} 이(가) 다음 로그인부터 기본 한의원으로 열립니다.',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                        icon: const Icon(Icons.push_pin_outlined),
+                                      const SizedBox(height: 8),
+                                      TextField(
+                                        controller:
+                                            requestPractitionerController,
+                                        decoration: InputDecoration(
+                                          labelText: lang.tr(
+                                            'Practitioner name',
+                                            '침술사 이름',
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      TextField(
+                                        controller: requestLocationController,
+                                        decoration: InputDecoration(
+                                          labelText: lang.tr('Location', '위치'),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      TextField(
+                                        controller: requestNoteController,
+                                        minLines: 1,
+                                        maxLines: 3,
+                                        decoration: InputDecoration(
+                                          labelText: lang.tr(
+                                            'Optional note',
+                                            '추가 메모',
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      FilledButton.icon(
+                                        onPressed: () async {
+                                          await _store.requestClinicOpen(
+                                            patient: _currentProfile,
+                                            clinicName:
+                                                requestClinicNameController
+                                                    .text,
+                                            practitionerName:
+                                                requestPractitionerController
+                                                    .text,
+                                            location:
+                                                requestLocationController.text,
+                                            note: requestNoteController.text,
+                                          );
+                                          if (!mounted) {
+                                            return;
+                                          }
+                                          ScaffoldMessenger.of(
+                                            this.context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                lang.tr(
+                                                  'Request sent. We will keep it visible for clinic onboarding.',
+                                                  '요청을 보냈습니다. 한의원 온보딩 요청으로 표시됩니다.',
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                          requestNoteController.clear();
+                                        },
+                                        icon: const Icon(Icons.outgoing_mail),
                                         label: Text(
                                           lang.tr(
-                                            'Set as default',
-                                            '기본 한의원으로 저장',
+                                            'Request to open',
+                                            '열어달라고 요청하기',
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
-                            );
-                          }).toList(),
                         ),
                       ),
                     ),
@@ -577,6 +711,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     );
 
     searchController.dispose();
+    requestClinicNameController.dispose();
+    requestPractitionerController.dispose();
+    requestLocationController.dispose();
+    requestNoteController.dispose();
   }
 
   Widget _buildClinicStatusChip(
@@ -630,10 +768,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lang.tr(
-                        'Connected acupuncture center',
-                        '연결된 한의원',
-                      ),
+                      lang.tr('Connected acupuncture center', '연결된 한의원'),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -754,9 +889,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     const SizedBox(height: 10),
                     Text(
                       activeClinic.patientNote,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        height: 1.5,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(height: 1.5),
                     ),
                   ],
                   if (defaultClinic != null) ...[
@@ -1021,10 +1156,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
         final upcomingVisits = activeClinicId == null
             ? <ScheduledVisit>[]
-            : (_store.upcomingVisits(
-                DateTime.now(),
-                clinicId: activeClinicId,
-              )..retainWhere((visit) => visit.profile.id == profile.id));
+            : (_store.upcomingVisits(DateTime.now(), clinicId: activeClinicId)
+                ..retainWhere((visit) => visit.profile.id == profile.id));
         final appointmentRequests = activeClinicId == null
             ? const <AppointmentRequest>[]
             : _store.requestsForPatient(profile.id, clinicId: activeClinicId);
@@ -1192,8 +1325,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       '대기 중인 요청이 ${pendingRequests.length}건 있습니다. 먼저 요청함을 열고, 그 안에서 문진을 다시 하라고 하면 그때 이어서 진행하면 됩니다.',
                     );
                     nextStepButton = lang.tr('Open Requests', '요청함 열기');
-                    nextStepAction = () =>
-                        Navigator.pushNamed(context, PatientRequestsScreen.routeName);
+                    nextStepAction = () => Navigator.pushNamed(
+                      context,
+                      PatientRequestsScreen.routeName,
+                    );
                     secondStepTitle = lang.tr(
                       'Then update intake if needed',
                       '그다음 필요하면 문진 업데이트',
@@ -1231,8 +1366,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       '한 번에 다 할 필요는 없습니다. 먼저 Intake에서 오늘 상태만 보내면 됩니다.',
                     );
                     nextStepButton = lang.tr('Continue Intake', '문진 이어쓰기');
-                    nextStepAction = () =>
-                        Navigator.pushNamed(context, PatientIntakeScreen.routeName);
+                    nextStepAction = () => Navigator.pushNamed(
+                      context,
+                      PatientIntakeScreen.routeName,
+                    );
                     secondStepTitle = lang.tr(
                       'Then check for any replies',
                       '그다음 답변/요청 확인',
@@ -1270,8 +1407,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       '급한 작업은 없습니다. 몸 상태가 달라졌을 때만 문진을 다시 열고, 아니면 방문 기록만 가볍게 확인하면 됩니다.',
                     );
                     nextStepButton = lang.tr('Visit History', '방문 기록');
-                    nextStepAction = () =>
-                        Navigator.pushNamed(context, VisitHistoryScreen.routeName);
+                    nextStepAction = () => Navigator.pushNamed(
+                      context,
+                      VisitHistoryScreen.routeName,
+                    );
                     secondStepTitle = lang.tr(
                       'Check requests only if a new message arrives',
                       '새 메시지가 오면 요청함 확인',
@@ -1409,22 +1548,33 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       ),
                                       if (_showStartGuide)
                                         IconButton(
-                                          tooltip: lang.tr('Hide guide', '가이드 숨기기'),
+                                          tooltip: lang.tr(
+                                            'Hide guide',
+                                            '가이드 숨기기',
+                                          ),
                                           onPressed: () {
-                                            setState(() => _showStartGuide = false);
+                                            setState(
+                                              () => _showStartGuide = false,
+                                            );
                                           },
                                           icon: const Icon(Icons.close),
-                                          color: Colors.white.withValues(alpha: 0.9),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.9,
+                                          ),
                                           visualDensity: VisualDensity.compact,
                                         )
                                       else
                                         TextButton(
                                           onPressed: () {
-                                            setState(() => _showStartGuide = true);
+                                            setState(
+                                              () => _showStartGuide = true,
+                                            );
                                           },
                                           child: Text(
                                             lang.tr('Show guide', '가이드 보기'),
-                                            style: const TextStyle(color: Colors.white),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                     ],
@@ -1443,10 +1593,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     nextStepBody,
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.84),
-                                      height: 1.5,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodyLarge
+                                        ?.copyWith(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.84,
+                                          ),
+                                          height: 1.5,
+                                        ),
                                   ),
                                   const SizedBox(height: 14),
                                   Wrap(
@@ -1463,13 +1616,19 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           context,
                                           PatientRequestsScreen.routeName,
                                         ),
-                                        icon: const Icon(Icons.mark_email_unread_outlined),
+                                        icon: const Icon(
+                                          Icons.mark_email_unread_outlined,
+                                        ),
                                         label: Text(
                                           lang.tr('Requests', '요청함'),
-                                          style: const TextStyle(color: Colors.white),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: Colors.white38),
+                                          side: const BorderSide(
+                                            color: Colors.white38,
+                                          ),
                                           foregroundColor: Colors.white,
                                         ),
                                       ),
@@ -1481,22 +1640,32 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         icon: const Icon(Icons.edit_note),
                                         label: Text(
                                           lang.tr('Intake', '문진'),
-                                          style: const TextStyle(color: Colors.white),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: Colors.white38),
+                                          side: const BorderSide(
+                                            color: Colors.white38,
+                                          ),
                                           foregroundColor: Colors.white,
                                         ),
                                       ),
                                       OutlinedButton.icon(
                                         onPressed: _openAppointmentDialog,
-                                        icon: const Icon(Icons.event_available_outlined),
+                                        icon: const Icon(
+                                          Icons.event_available_outlined,
+                                        ),
                                         label: Text(
                                           lang.tr('Book', '예약'),
-                                          style: const TextStyle(color: Colors.white),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: Colors.white38),
+                                          side: const BorderSide(
+                                            color: Colors.white38,
+                                          ),
                                           foregroundColor: Colors.white,
                                         ),
                                       ),
@@ -1507,11 +1676,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(14),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.08),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.08,
+                                      ),
                                       borderRadius: BorderRadius.circular(18),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           lang.tr('Simple order', '간단한 순서'),
@@ -1523,24 +1695,37 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         const SizedBox(height: 8),
                                         Text(
                                           '1. $nextStepTitle',
-                                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700,
+                                              ),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
                                           '2. $secondStepTitle',
-                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                            color: Colors.white.withValues(alpha: 0.84),
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.84,
+                                                ),
+                                              ),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
                                           '3. $thirdStepTitle',
-                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                            color: Colors.white.withValues(alpha: 0.84),
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.84,
+                                                ),
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -1837,95 +2022,96 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         ),
                       ),
                       if (showLegacySummary) const SizedBox(height: 16),
-                      if (showLegacySummary) LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isNarrow = constraints.maxWidth < 860;
-                          final cards = [
-                            _SummaryCard(
-                              title: lang.tr('Pending Items', '대기 중 항목'),
-                              value:
-                                  '${pendingRequests.length + pendingAppointmentRequests.length}',
-                              subtitle:
-                                  pendingRequests.isEmpty &&
-                                      pendingAppointmentRequests.isEmpty
-                                  ? lang.tr(
-                                      'No pending items right now',
-                                      '지금 확인할 요청이 없습니다',
-                                    )
-                                  : lang.tr(
-                                      'Includes answer requests and appointment confirmations',
-                                      '답변 요청과 예약 확인 대기를 함께 보여줍니다',
-                                    ),
-                              icon: Icons.notifications_active_outlined,
-                            ),
-                            _SummaryCard(
-                              title: lang.tr('Next Visit', '다음 방문'),
-                              value: nextVisit != null
-                                  ? _formatVisitSlot(
-                                      nextVisit.date,
-                                      nextVisit.time,
-                                    )
-                                  : '-',
-                              subtitle: nextVisit != null
-                                  ? lang.tr(
-                                      'Your next scheduled session',
-                                      '다음으로 예정된 세션입니다',
-                                    )
-                                  : pendingAppointmentRequests.isNotEmpty
-                                  ? lang.tr(
-                                      'You have a pending appointment request waiting for confirmation',
-                                      '확정 대기 중인 예약 신청이 있습니다',
-                                    )
-                                  : lang.tr(
-                                      'No future visit is listed yet',
-                                      '아직 예정된 방문이 없습니다',
-                                    ),
-                              icon: Icons.event_available_outlined,
-                            ),
-                            _SummaryCard(
-                              title: lang.tr('Profile Ready', '프로필 준비 상태'),
-                              value: profile.hasRequiredAlertInfo
-                                  ? lang.tr('Ready', '준비됨')
-                                  : lang.tr('Needs Update', '업데이트 필요'),
-                              subtitle: profile.hasRequiredAlertInfo
-                                  ? lang.tr(
-                                      'Phone and email are both saved',
-                                      '전화번호와 이메일이 모두 저장되어 있습니다',
-                                    )
-                                  : lang.tr(
-                                      'Please add both phone and email',
-                                      '전화번호와 이메일을 모두 입력해주세요',
-                                    ),
-                              icon: Icons.verified_user_outlined,
-                            ),
-                          ];
-
-                          if (isNarrow) {
-                            return Column(
-                              children: cards
-                                  .map(
-                                    (card) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 12,
+                      if (showLegacySummary)
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isNarrow = constraints.maxWidth < 860;
+                            final cards = [
+                              _SummaryCard(
+                                title: lang.tr('Pending Items', '대기 중 항목'),
+                                value:
+                                    '${pendingRequests.length + pendingAppointmentRequests.length}',
+                                subtitle:
+                                    pendingRequests.isEmpty &&
+                                        pendingAppointmentRequests.isEmpty
+                                    ? lang.tr(
+                                        'No pending items right now',
+                                        '지금 확인할 요청이 없습니다',
+                                      )
+                                    : lang.tr(
+                                        'Includes answer requests and appointment confirmations',
+                                        '답변 요청과 예약 확인 대기를 함께 보여줍니다',
                                       ),
-                                      child: card,
-                                    ),
-                                  )
-                                  .toList(),
-                            );
-                          }
+                                icon: Icons.notifications_active_outlined,
+                              ),
+                              _SummaryCard(
+                                title: lang.tr('Next Visit', '다음 방문'),
+                                value: nextVisit != null
+                                    ? _formatVisitSlot(
+                                        nextVisit.date,
+                                        nextVisit.time,
+                                      )
+                                    : '-',
+                                subtitle: nextVisit != null
+                                    ? lang.tr(
+                                        'Your next scheduled session',
+                                        '다음으로 예정된 세션입니다',
+                                      )
+                                    : pendingAppointmentRequests.isNotEmpty
+                                    ? lang.tr(
+                                        'You have a pending appointment request waiting for confirmation',
+                                        '확정 대기 중인 예약 신청이 있습니다',
+                                      )
+                                    : lang.tr(
+                                        'No future visit is listed yet',
+                                        '아직 예정된 방문이 없습니다',
+                                      ),
+                                icon: Icons.event_available_outlined,
+                              ),
+                              _SummaryCard(
+                                title: lang.tr('Profile Ready', '프로필 준비 상태'),
+                                value: profile.hasRequiredAlertInfo
+                                    ? lang.tr('Ready', '준비됨')
+                                    : lang.tr('Needs Update', '업데이트 필요'),
+                                subtitle: profile.hasRequiredAlertInfo
+                                    ? lang.tr(
+                                        'Phone and email are both saved',
+                                        '전화번호와 이메일이 모두 저장되어 있습니다',
+                                      )
+                                    : lang.tr(
+                                        'Please add both phone and email',
+                                        '전화번호와 이메일을 모두 입력해주세요',
+                                      ),
+                                icon: Icons.verified_user_outlined,
+                              ),
+                            ];
 
-                          return Row(
-                            children: [
-                              for (var i = 0; i < cards.length; i++) ...[
-                                Expanded(child: cards[i]),
-                                if (i != cards.length - 1)
-                                  const SizedBox(width: 12),
+                            if (isNarrow) {
+                              return Column(
+                                children: cards
+                                    .map(
+                                      (card) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 12,
+                                        ),
+                                        child: card,
+                                      ),
+                                    )
+                                    .toList(),
+                              );
+                            }
+
+                            return Row(
+                              children: [
+                                for (var i = 0; i < cards.length; i++) ...[
+                                  Expanded(child: cards[i]),
+                                  if (i != cards.length - 1)
+                                    const SizedBox(width: 12),
+                                ],
                               ],
-                            ],
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
                       if (showLegacySummary) const SizedBox(height: 16),
                       Card(
                         child: Padding(
@@ -2500,10 +2686,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  lang.tr(
-                    'Could not load your profile.',
-                    '프로필을 불러오지 못했습니다.',
-                  ),
+                  lang.tr('Could not load your profile.', '프로필을 불러오지 못했습니다.'),
                   style: Theme.of(context).textTheme.titleLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -2513,9 +2696,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     'This usually means your network or VPN is blocking Firebase. Please turn off VPN, check your connection, then retry.',
                     '네트워크 또는 VPN이 Firebase 호출을 막고 있는 경우가 많습니다. VPN을 끄고 연결을 확인한 뒤 다시 시도해주세요.',
                   ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.black54,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 18),

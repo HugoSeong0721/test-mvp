@@ -82,7 +82,7 @@ class _PractitionerDashboardScreenState
   final GlobalKey _recordUpdatesSectionKey = GlobalKey();
   final GlobalKey _recentSubmissionsSectionKey = GlobalKey();
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-      _intakeSubmissionSubscription;
+  _intakeSubmissionSubscription;
   Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
       <String, Map<String, dynamic>>{};
 
@@ -255,10 +255,7 @@ class _PractitionerDashboardScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang.tr(
-                          'Set your clinic first',
-                          '먼저 한의원 정보를 설정해주세요',
-                        ),
+                        lang.tr('Set your clinic first', '먼저 한의원 정보를 설정해주세요'),
                         style: theme.textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
@@ -277,10 +274,7 @@ class _PractitionerDashboardScreenState
                             _selectSubView(_DashboardSubView.clinicProfile),
                         icon: const Icon(Icons.domain_add_outlined),
                         label: Text(
-                          lang.tr(
-                            'Open clinic profile',
-                            '한의원 정보 설정 열기',
-                          ),
+                          lang.tr('Open clinic profile', '한의원 정보 설정 열기'),
                         ),
                       ),
                     ],
@@ -307,6 +301,8 @@ class _PractitionerDashboardScreenState
                 ),
               if (_subView == _DashboardSubView.inbox) ...[
                 const SizedBox(height: 4),
+                _buildClinicOpenRequestsPanel(),
+                const SizedBox(height: 12),
                 KeyedSubtree(
                   key: _appointmentInboxKey,
                   child: _buildPatientInboxBoard(),
@@ -331,10 +327,7 @@ class _PractitionerDashboardScreenState
               ],
               if (_subView == _DashboardSubView.clinicProfile) ...[
                 const SizedBox(height: 4),
-                const SizedBox(
-                  height: 760,
-                  child: ClinicProfileWorkspace(),
-                ),
+                const SizedBox(height: 760, child: ClinicProfileWorkspace()),
               ],
               const SizedBox(height: 16),
               if (_subView == _DashboardSubView.main)
@@ -682,9 +675,9 @@ class _PractitionerDashboardScreenState
       return !parsed.isBefore(selectionStart) && !parsed.isAfter(selectionEnd);
     }
 
-    final selectionSlots = _store.slotsForClinic(_currentClinicId).where(
-      (slot) => isInSelection(slot.date),
-    );
+    final selectionSlots = _store
+        .slotsForClinic(_currentClinicId)
+        .where((slot) => isInSelection(slot.date));
     var bookedSlots = 0;
     var pendingSlotRequests = 0;
     var openSlots = 0;
@@ -824,7 +817,8 @@ class _PractitionerDashboardScreenState
               const SizedBox(height: 10),
               Text(
                 AppLanguageController.instance.tr(
-                  'See today''s patients, requests, and intake status in one place.',
+                  'See today'
+                      's patients, requests, and intake status in one place.',
                   '환자 흐름, 문진 진행도, 후속 대응 리스크를 한 화면에서 관리합니다.',
                 ),
                 style: theme.textTheme.headlineLarge?.copyWith(
@@ -1557,8 +1551,9 @@ class _PractitionerDashboardScreenState
             spacing: 8,
             runSpacing: 8,
             children: dates.map((date) {
-              final count =
-                  _store.visitsForDate(date, clinicId: _currentClinicId).length;
+              final count = _store
+                  .visitsForDate(date, clinicId: _currentClinicId)
+                  .length;
               final isSelected =
                   _selectedDate == date && _selectedDateRange == null;
               return ChoiceChip(
@@ -1866,22 +1861,23 @@ class _PractitionerDashboardScreenState
     if (!_hasClinicContext) {
       return const [];
     }
-    final items = _store
-        .appointmentRequestsForClinic(_currentClinicId)
-        .where(_isActiveAppointmentRequest)
-        .where((request) => _storedDateMatchesSelectedWindow(request.date))
-        .toList()
-      ..sort((a, b) {
-        final dateCompare = a.date.compareTo(b.date);
-        if (dateCompare != 0) {
-          return dateCompare;
-        }
-        final timeCompare = a.time.compareTo(b.time);
-        if (timeCompare != 0) {
-          return timeCompare;
-        }
-        return a.patientId.compareTo(b.patientId);
-    });
+    final items =
+        _store
+            .appointmentRequestsForClinic(_currentClinicId)
+            .where(_isActiveAppointmentRequest)
+            .where((request) => _storedDateMatchesSelectedWindow(request.date))
+            .toList()
+          ..sort((a, b) {
+            final dateCompare = a.date.compareTo(b.date);
+            if (dateCompare != 0) {
+              return dateCompare;
+            }
+            final timeCompare = a.time.compareTo(b.time);
+            if (timeCompare != 0) {
+              return timeCompare;
+            }
+            return a.patientId.compareTo(b.patientId);
+          });
     return items;
   }
 
@@ -1904,27 +1900,30 @@ class _PractitionerDashboardScreenState
     if (!_hasClinicContext) {
       return const [];
     }
-    final items = _store
-        .appointmentRequestsForClinic(_currentClinicId)
-        .where(_isActiveAppointmentRequest)
-        .where((request) => _storedDateMatchesSummaryWindow(request.date))
-        .toList()
-      ..sort((a, b) {
-        final dateCompare = a.date.compareTo(b.date);
-        if (dateCompare != 0) {
-          return dateCompare;
-        }
-        final timeCompare = a.time.compareTo(b.time);
-        if (timeCompare != 0) {
-          return timeCompare;
-        }
-        return a.patientId.compareTo(b.patientId);
-      });
+    final items =
+        _store
+            .appointmentRequestsForClinic(_currentClinicId)
+            .where(_isActiveAppointmentRequest)
+            .where((request) => _storedDateMatchesSummaryWindow(request.date))
+            .toList()
+          ..sort((a, b) {
+            final dateCompare = a.date.compareTo(b.date);
+            if (dateCompare != 0) {
+              return dateCompare;
+            }
+            final timeCompare = a.time.compareTo(b.time);
+            if (timeCompare != 0) {
+              return timeCompare;
+            }
+            return a.patientId.compareTo(b.patientId);
+          });
     return items;
   }
 
   Set<String> _selectedWindowPatientIds() {
-    return _selectedWindowRequests().map((request) => request.patientId).toSet();
+    return _selectedWindowRequests()
+        .map((request) => request.patientId)
+        .toSet();
   }
 
   Map<String, Map<String, dynamic>> _latestSubmissionByPatient(
@@ -1933,23 +1932,21 @@ class _PractitionerDashboardScreenState
     if (!_hasClinicContext) {
       return const <String, Map<String, dynamic>>{};
     }
-    final items = submissionDocs
-        .where((doc) {
+    final items =
+        submissionDocs.where((doc) {
           final source = (doc.data()['source'] ?? '').toString();
           final clinicId = (doc.data()['clinicId'] ?? '').toString();
           return (source.isEmpty || source == 'patient_intake_screen') &&
               clinicId == _currentClinicId;
-        })
-        .toList()
-      ..sort((a, b) {
-        final aTime =
-            (a.data()['submittedAt'] as Timestamp?)?.millisecondsSinceEpoch ??
-            0;
-        final bTime =
-            (b.data()['submittedAt'] as Timestamp?)?.millisecondsSinceEpoch ??
-            0;
-        return bTime.compareTo(aTime);
-      });
+        }).toList()..sort((a, b) {
+          final aTime =
+              (a.data()['submittedAt'] as Timestamp?)?.millisecondsSinceEpoch ??
+              0;
+          final bTime =
+              (b.data()['submittedAt'] as Timestamp?)?.millisecondsSinceEpoch ??
+              0;
+          return bTime.compareTo(aTime);
+        });
 
     final latestByPatient = <String, Map<String, dynamic>>{};
     for (final doc in items) {
@@ -2109,8 +2106,7 @@ class _PractitionerDashboardScreenState
       final latestHistoryDate = latestHistory == null
           ? null
           : _parseDate(latestHistory.visit.date);
-      final daysAgo =
-          targetDate == null || latestHistoryDate == null
+      final daysAgo = targetDate == null || latestHistoryDate == null
           ? 0
           : targetDate.difference(latestHistoryDate).inDays;
       final submission = _latestPatientIntakeByPatient[request.patientId];
@@ -2231,8 +2227,8 @@ class _PractitionerDashboardScreenState
                         [...?submissionSnapshot.data?.docs].where((doc) {
                           final source = (doc.data()['source'] ?? '')
                               .toString();
-                          final patientId =
-                              (doc.data()['patientId'] ?? '').toString();
+                          final patientId = (doc.data()['patientId'] ?? '')
+                              .toString();
                           return (source.isEmpty ||
                                   source == 'patient_intake_screen') &&
                               _matchesCurrentClinicDoc(doc.data()) &&
@@ -2573,8 +2569,8 @@ class _PractitionerDashboardScreenState
                 final patientSubmissions = recentSubmissionDocs
                     .where((doc) {
                       final source = (doc.data()['source'] ?? '').toString();
-                      final patientId =
-                          (doc.data()['patientId'] ?? '').toString();
+                      final patientId = (doc.data()['patientId'] ?? '')
+                          .toString();
                       return (source.isEmpty ||
                               source == 'patient_intake_screen') &&
                           _matchesCurrentClinicDoc(doc.data()) &&
@@ -2773,8 +2769,9 @@ class _PractitionerDashboardScreenState
             ...dates.map((date) {
               final slots = grouped[date]!
                 ..sort((a, b) => a.time.compareTo(b.time));
-              final patientCount =
-                  _store.visitsForDate(date, clinicId: _currentClinicId).length;
+              final patientCount = _store
+                  .visitsForDate(date, clinicId: _currentClinicId)
+                  .length;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Column(
@@ -2954,12 +2951,13 @@ class _PractitionerDashboardScreenState
 
   Future<void> _openAvailabilityDateCountsSheet() async {
     final lang = AppLanguageController.instance;
-    final dates = _store
-        .slotsForClinic(_currentClinicId)
-        .map((slot) => slot.date)
-        .toSet()
-        .toList()
-      ..sort();
+    final dates =
+        _store
+            .slotsForClinic(_currentClinicId)
+            .map((slot) => slot.date)
+            .toSet()
+            .toList()
+          ..sort();
 
     await showModalBottomSheet<void>(
       context: context,
@@ -2987,10 +2985,9 @@ class _PractitionerDashboardScreenState
                 ),
                 const SizedBox(height: 14),
                 ...dates.map((date) {
-                  final patientCount =
-                      _store
-                          .visitsForDate(date, clinicId: _currentClinicId)
-                          .length;
+                  final patientCount = _store
+                      .visitsForDate(date, clinicId: _currentClinicId)
+                      .length;
                   return Container(
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 10),
@@ -4042,8 +4039,7 @@ class _PractitionerDashboardScreenState
           .appointmentRequestsForClinic(_currentClinicId)
           .where(
             (request) =>
-                request.date == date &&
-                _isActiveAppointmentRequest(request),
+                request.date == date && _isActiveAppointmentRequest(request),
           )
           .map((request) => request.patientId),
     };
@@ -4059,15 +4055,17 @@ class _PractitionerDashboardScreenState
             _parseDate(slot.date)!.month,
             _parseDate(slot.date)!.day,
           ),
-      for (final request in _store.appointmentRequestsForClinic(_currentClinicId))
-        if (_isActiveAppointmentRequest(request) && _parseDate(request.date) != null)
+      for (final request in _store.appointmentRequestsForClinic(
+        _currentClinicId,
+      ))
+        if (_isActiveAppointmentRequest(request) &&
+            _parseDate(request.date) != null)
           DateTime(
             _parseDate(request.date)!.year,
             _parseDate(request.date)!.month,
             _parseDate(request.date)!.day,
           ),
-    }.toList()
-      ..sort();
+    }.toList()..sort();
     return dates;
   }
 
@@ -4318,6 +4316,107 @@ class _PractitionerDashboardScreenState
       duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
       alignment: 0.04,
+    );
+  }
+
+  Widget _buildClinicOpenRequestsPanel() {
+    final lang = AppLanguageController.instance;
+    final requests = _store.pendingClinicOpenRequests;
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            lang.tr('Patient clinic open requests', '환자 한의원 등록 요청'),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            lang.tr(
+              'Patients can ask to connect the acupuncture center they already visit. Use this as early demand before inviting a clinic.',
+              '환자가 현재 다니는 한의원을 연결하고 싶다고 요청할 수 있습니다. 한의원을 초대하기 전 초기 수요로 확인하세요.',
+            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.68),
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (requests.isEmpty)
+            Text(lang.tr('No clinic open requests yet.', '아직 한의원 등록 요청이 없습니다.'))
+          else
+            ...requests.map((request) {
+              final detail = [
+                if (request.practitionerName.trim().isNotEmpty)
+                  request.practitionerName,
+                if (request.location.trim().isNotEmpty) request.location,
+              ].join(' · ');
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.mint.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppTheme.border.withValues(alpha: 0.72),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      request.clinicName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if (detail.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(detail),
+                    ],
+                    const SizedBox(height: 4),
+                    Text(
+                      lang.tr(
+                        '${request.patientName} wants this clinic opened for patient portal access.',
+                        '${request.patientName} 님이 이 한의원을 환자 포털에서 열어달라고 요청했습니다.',
+                      ),
+                    ),
+                    if (request.patientEmail.trim().isNotEmpty)
+                      Text(
+                        '${lang.tr('Email', '이메일')}: ${request.patientEmail}',
+                      ),
+                    if (request.note.trim().isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        '${lang.tr('Patient note', '환자 메모')}: ${request.note}',
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        FilledButton.icon(
+                          onPressed: () =>
+                              _selectSubView(_DashboardSubView.clinicProfile),
+                          icon: const Icon(Icons.domain_add_outlined),
+                          label: Text(
+                            lang.tr('Open Clinic Profile', '한의원 정보 열기'),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              _store.markClinicOpenRequestReviewed(request.id),
+                          icon: const Icon(Icons.done_outline),
+                          label: Text(lang.tr('Mark reviewed', '확인 완료')),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+        ],
+      ),
     );
   }
 
@@ -4782,7 +4881,8 @@ class _PatientRealtimeActivity extends StatelessWidget {
 
                 final submissionDocs = [...submissionSnapshot.data!.docs]
                   ..removeWhere((doc) {
-                    final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+                    final docClinicId = (doc.data()['clinicId'] ?? '')
+                        .toString();
                     return clinicId == null ||
                         clinicId!.isEmpty ||
                         docClinicId != clinicId;
@@ -4799,7 +4899,8 @@ class _PatientRealtimeActivity extends StatelessWidget {
 
                 final requestDocs = [...requestSnapshot.data!.docs]
                   ..removeWhere((doc) {
-                    final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+                    final docClinicId = (doc.data()['clinicId'] ?? '')
+                        .toString();
                     return clinicId == null ||
                         clinicId!.isEmpty ||
                         docClinicId != clinicId;
@@ -4816,7 +4917,8 @@ class _PatientRealtimeActivity extends StatelessWidget {
 
                 final feedbackDocs = [...feedbackSnapshot.data!.docs]
                   ..removeWhere((doc) {
-                    final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+                    final docClinicId = (doc.data()['clinicId'] ?? '')
+                        .toString();
                     return clinicId == null ||
                         clinicId!.isEmpty ||
                         docClinicId != clinicId;
@@ -5500,33 +5602,33 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
             children: [
               if (_showManualPatientCreation)
                 FilledButton.icon(
-                onPressed: () async {
-                  final newProfile = PatientProfile(
-                    id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
-                    name: 'New Patient',
-                    phone: '',
-                    email: '',
-                    birthYear: 1990,
-                    sex: 'Female',
-                    ethnicity: 'Unknown',
-                    memo: '',
-                  );
-                  _store.saveProfile(newProfile);
-                  if (activeClinicId != null && activeClinicId.isNotEmpty) {
-                    await _store.setDefaultClinicForPatient(
-                      patientId: newProfile.id,
-                      clinicId: activeClinicId,
+                  onPressed: () async {
+                    final newProfile = PatientProfile(
+                      id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
+                      name: 'New Patient',
+                      phone: '',
+                      email: '',
+                      birthYear: 1990,
+                      sex: 'Female',
+                      ethnicity: 'Unknown',
+                      memo: '',
                     );
-                  }
-                  if (!mounted) {
-                    return;
-                  }
-                  setState(() => _selectedProfileId = newProfile.id);
-                },
-                icon: const Icon(Icons.person_add_alt_1),
-                label: Text(
-                  AppLanguageController.instance.tr('Add Patient', '환자 추가'),
-                ),
+                    _store.saveProfile(newProfile);
+                    if (activeClinicId != null && activeClinicId.isNotEmpty) {
+                      await _store.setDefaultClinicForPatient(
+                        patientId: newProfile.id,
+                        clinicId: activeClinicId,
+                      );
+                    }
+                    if (!mounted) {
+                      return;
+                    }
+                    setState(() => _selectedProfileId = newProfile.id);
+                  },
+                  icon: const Icon(Icons.person_add_alt_1),
+                  label: Text(
+                    AppLanguageController.instance.tr('Add Patient', '환자 추가'),
+                  ),
                 ),
               Container(
                 width: double.infinity,
@@ -5570,66 +5672,69 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                         ),
                       )
                     : ListView.builder(
-                  itemCount: profiles.length,
-                  itemBuilder: (context, index) {
-                    final profile = profiles[index];
-                    final isSelected = selected?.id == profile.id;
-                    final missingFields = <String>[
-                      if (profile.phone.trim().isEmpty) '전화번호',
-                      if (profile.email.trim().isEmpty) '이메일',
-                    ];
-                    return Card(
-                      color: isSelected ? const Color(0xFFF4FBFA) : null,
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            Expanded(child: Text(profile.name)),
-                            if (missingFields.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFE2E2),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  AppLanguageController.instance.tr(
-                                    'Missing Required Info',
-                                    '필수 정보 부족',
-                                  ),
-                                  style: TextStyle(
-                                    color: Colors.redAccent,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                        itemCount: profiles.length,
+                        itemBuilder: (context, index) {
+                          final profile = profiles[index];
+                          final isSelected = selected?.id == profile.id;
+                          final missingFields = <String>[
+                            if (profile.phone.trim().isEmpty) '전화번호',
+                            if (profile.email.trim().isEmpty) '이메일',
+                          ];
+                          return Card(
+                            color: isSelected ? const Color(0xFFF4FBFA) : null,
+                            child: ListTile(
+                              title: Row(
+                                children: [
+                                  Expanded(child: Text(profile.name)),
+                                  if (missingFields.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFE2E2),
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        AppLanguageController.instance.tr(
+                                          'Missing Required Info',
+                                          '필수 정보 부족',
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.redAccent,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          missingFields.isEmpty
-                              ? '${profile.phone} · ${profile.email}'
-                              : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
-                        ),
-                        trailing: IconButton(
-                          onPressed: () {
-                            _store.deleteProfile(profile.id);
-                            setState(() {
-                              if (_selectedProfileId == profile.id) {
-                                _selectedProfileId = null;
-                              }
-                            });
-                          },
-                          icon: const Icon(Icons.delete_outline),
-                        ),
-                        onTap: () =>
-                            setState(() => _selectedProfileId = profile.id),
+                              subtitle: Text(
+                                missingFields.isEmpty
+                                    ? '${profile.phone} · ${profile.email}'
+                                    : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
+                              ),
+                              trailing: IconButton(
+                                onPressed: () {
+                                  _store.deleteProfile(profile.id);
+                                  setState(() {
+                                    if (_selectedProfileId == profile.id) {
+                                      _selectedProfileId = null;
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.delete_outline),
+                              ),
+                              onTap: () => setState(
+                                () => _selectedProfileId = profile.id,
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
