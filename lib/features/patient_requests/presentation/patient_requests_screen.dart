@@ -280,12 +280,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   }) {
     return AppPanel(
       padding: const EdgeInsets.all(22),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [AppTheme.pine, AppTheme.jade, Color(0xFF2B7A66)],
-      ),
-      borderColor: Colors.white24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -297,7 +291,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   lang.tr('Requests inbox', '답변 요청함'),
                   style: Theme.of(
                     context,
-                  ).textTheme.headlineMedium?.copyWith(color: Colors.white),
+                  ).textTheme.headlineMedium?.copyWith(color: AppTheme.ink),
                 ),
               ),
               if (_showGuide)
@@ -305,7 +299,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   tooltip: lang.tr('Hide guide', '가이드 숨기기'),
                   onPressed: () => setState(() => _showGuide = false),
                   visualDensity: VisualDensity.compact,
-                  color: Colors.white.withValues(alpha: 0.92),
+                  color: AppTheme.ink.withValues(alpha: 0.72),
                   icon: const Icon(Icons.close),
                 )
               else
@@ -314,7 +308,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   icon: const Icon(Icons.visibility_outlined, size: 18),
                   label: Text(lang.tr('Show guide', '가이드 다시 보기')),
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppTheme.pine,
                     textStyle: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -327,7 +321,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
               '이 화면은 가벼운 메시지 센터처럼 작동합니다. 최신 침술사 후속 요청을 읽고, 같은 방문 맥락으로 문진 화면에서 이어서 답하면 됩니다.',
             ),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white.withValues(alpha: 0.82),
+              color: AppTheme.ink.withValues(alpha: 0.72),
             ),
           ),
           const SizedBox(height: 16),
@@ -343,10 +337,10 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   'Practitioner messages still waiting for your answer.',
                   '아직 환자 답변이 필요한 침술사 요청입니다.',
                 ),
-                helperColor: Colors.white.withValues(alpha: 0.72),
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                helperColor: AppTheme.ink.withValues(alpha: 0.62),
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
               ),
               AppMetricChip(
                 icon: Icons.done_all_outlined,
@@ -356,10 +350,10 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   'Requests already answered or closed.',
                   '이미 답변했거나 닫힌 요청입니다.',
                 ),
-                helperColor: Colors.white.withValues(alpha: 0.72),
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                helperColor: AppTheme.ink.withValues(alpha: 0.62),
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
               ),
               AppMetricChip(
                 icon: Icons.forum_outlined,
@@ -369,10 +363,10 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   'All request conversations in this inbox.',
                   '이 요청함에 있는 전체 대화 묶음입니다.',
                 ),
-                helperColor: Colors.white.withValues(alpha: 0.72),
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                helperColor: AppTheme.ink.withValues(alpha: 0.62),
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
               ),
             ],
           ),
@@ -383,7 +377,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
               runSpacing: 12,
               children: [
                 AppGuideStep(
-                  dark: true,
+                  dark: false,
                   step: '1',
                   title: lang.tr('Read the newest request', '가장 최신 요청 읽기'),
                   description: lang.tr(
@@ -392,7 +386,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   ),
                 ),
                 AppGuideStep(
-                  dark: true,
+                  dark: false,
                   step: '2',
                   title: lang.tr('Continue in intake', '문진 화면에서 이어가기'),
                   description: lang.tr(
@@ -401,7 +395,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   ),
                 ),
                 AppGuideStep(
-                  dark: true,
+                  dark: false,
                   step: '3',
                   title: lang.tr('Come back and review status', '다시 돌아와 상태 확인'),
                   description: lang.tr(
@@ -419,7 +413,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 '1-2-3 가이드는 숨겨졌습니다. 다시 보고 싶으면 위 버튼을 눌러주세요.',
               ),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.76),
+                color: AppTheme.ink.withValues(alpha: 0.66),
               ),
             ),
           ],
