@@ -106,6 +106,8 @@ class AppMetricChip extends StatelessWidget {
     this.backgroundColor,
     this.labelColor,
     this.valueColor,
+    this.helper,
+    this.helperColor,
     this.onTap,
   });
 
@@ -115,6 +117,8 @@ class AppMetricChip extends StatelessWidget {
   final Color? backgroundColor;
   final Color? labelColor;
   final Color? valueColor;
+  final String? helper;
+  final Color? helperColor;
   final VoidCallback? onTap;
 
   @override
@@ -152,6 +156,21 @@ class AppMetricChip extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              if (helper != null && helper!.trim().isNotEmpty) ...[
+                const SizedBox(height: 5),
+                SizedBox(
+                  width: 104,
+                  child: Text(
+                    helper!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color:
+                          helperColor ??
+                          (labelColor ?? AppTheme.ink.withValues(alpha: 0.62)),
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
