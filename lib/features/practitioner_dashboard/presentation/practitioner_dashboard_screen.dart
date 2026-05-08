@@ -708,12 +708,6 @@ class _PractitionerDashboardScreenState
 
     return AppPanel(
       padding: const EdgeInsets.all(24),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [AppTheme.pine, AppTheme.jade, Color(0xFF2F7A67)],
-      ),
-      borderColor: Colors.white24,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final theme = Theme.of(context);
@@ -738,11 +732,9 @@ class _PractitionerDashboardScreenState
                   child: Ink(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
+                      color: AppTheme.surface,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.18),
-                      ),
+                      border: Border.all(color: AppTheme.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -757,14 +749,14 @@ class _PractitionerDashboardScreenState
                                 color: accent.withValues(alpha: 0.22),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(icon, color: Colors.white, size: 18),
+                              child: Icon(icon, color: AppTheme.pine, size: 18),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 step,
                                 style: theme.textTheme.labelMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.74),
+                                  color: AppTheme.ink.withValues(alpha: 0.58),
                                 ),
                               ),
                             ),
@@ -774,7 +766,7 @@ class _PractitionerDashboardScreenState
                         Text(
                           title,
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
+                            color: AppTheme.ink,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -782,14 +774,14 @@ class _PractitionerDashboardScreenState
                         Text(
                           value,
                           style: theme.textTheme.headlineSmall?.copyWith(
-                            color: Colors.white,
+                            color: AppTheme.ink,
                           ),
                         ),
                         if (wide) const Spacer() else const SizedBox(height: 4),
                         Text(
                           detail,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.76),
+                            color: AppTheme.ink.withValues(alpha: 0.66),
                           ),
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
@@ -811,7 +803,7 @@ class _PractitionerDashboardScreenState
                   '클리닉 운영 허브',
                 ),
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.74),
+                  color: AppTheme.ink.withValues(alpha: 0.58),
                 ),
               ),
               const SizedBox(height: 10),
@@ -822,7 +814,7 @@ class _PractitionerDashboardScreenState
                   '환자 흐름, 문진 진행도, 후속 대응 리스크를 한 화면에서 관리합니다.',
                 ),
                 style: theme.textTheme.headlineLarge?.copyWith(
-                  color: Colors.white,
+                  color: AppTheme.ink,
                 ),
               ),
               Text(
@@ -831,7 +823,7 @@ class _PractitionerDashboardScreenState
                   '집계 기간: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)} | 현재 표시 환자 카드: $filteredCount',
                 ),
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.82),
+                  color: AppTheme.ink.withValues(alpha: 0.72),
                 ),
               ),
             ],
@@ -845,9 +837,9 @@ class _PractitionerDashboardScreenState
                 icon: Icons.calendar_today_outlined,
                 label: visitsMetricLabel,
                 value: '${summary.totalVisits}',
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
                 onTap: _scrollToDateSelectorPanel,
               ),
               AppMetricChip(
@@ -857,9 +849,9 @@ class _PractitionerDashboardScreenState
                   '알림 가능',
                 ),
                 value: '$readyAlerts',
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
                 onTap: () => _focusPatientCards(statusFilter: 'Alert Ready'),
               ),
               AppMetricChip(
@@ -869,18 +861,18 @@ class _PractitionerDashboardScreenState
                   '진행중 문진',
                 ),
                 value: '$inProgressIntakes',
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
                 onTap: () => _focusPatientCards(statusFilter: 'In Progress'),
               ),
               AppMetricChip(
                 icon: Icons.mark_email_unread_outlined,
                 label: AppLanguageController.instance.tr('No response', '미응답'),
                 value: '$noResponse',
-                backgroundColor: Colors.white.withValues(alpha: 0.14),
-                labelColor: Colors.white.withValues(alpha: 0.72),
-                valueColor: Colors.white,
+                backgroundColor: AppTheme.surface,
+                labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                valueColor: AppTheme.ink,
                 onTap: () => _focusPatientCards(statusFilter: 'No Response'),
               ),
             ],
@@ -895,7 +887,7 @@ class _PractitionerDashboardScreenState
                   '이 선택에서 먼저 볼 것',
                 ),
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
+                  color: AppTheme.ink,
                 ),
               ),
               const SizedBox(height: 10),
@@ -976,7 +968,7 @@ class _PractitionerDashboardScreenState
             runSpacing: 12,
             children: [
               AppGuideStep(
-                dark: true,
+                dark: false,
                 step: '1',
                 title: AppLanguageController.instance.tr(
                   'Choose a date window',
@@ -988,7 +980,7 @@ class _PractitionerDashboardScreenState
                 ),
               ),
               AppGuideStep(
-                dark: true,
+                dark: false,
                 step: '2',
                 title: AppLanguageController.instance.tr(
                   'Filter the patient list',
@@ -1000,7 +992,7 @@ class _PractitionerDashboardScreenState
                 ),
               ),
               AppGuideStep(
-                dark: true,
+                dark: false,
                 step: '3',
                 title: AppLanguageController.instance.tr(
                   'Open a patient card',
@@ -1026,7 +1018,7 @@ class _PractitionerDashboardScreenState
                             '빠른 사용 가이드',
                           ),
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
+                            color: AppTheme.ink,
                           ),
                         ),
                         const Spacer(),
@@ -1039,7 +1031,7 @@ class _PractitionerDashboardScreenState
                             setState(() => _showDashboardGuide = false);
                           },
                           icon: const Icon(Icons.close),
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: AppTheme.ink.withValues(alpha: 0.72),
                           visualDensity: VisualDensity.compact,
                         ),
                       ],
