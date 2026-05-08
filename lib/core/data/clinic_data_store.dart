@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/app_firestore_service.dart';
+
 enum IntakeStatus { notStarted, inProgress, completed }
 
 extension IntakeStatusLabel on IntakeStatus {
@@ -280,6 +282,12 @@ class ClinicOpenRequest {
   }
 
   factory ClinicOpenRequest.fromMap(Map<String, dynamic> data) {
+    final rawRequestedAt = data['requestedAt'];
+    final requestedAt = rawRequestedAt is String
+        ? DateTime.tryParse(rawRequestedAt)
+        : rawRequestedAt is DateTime
+        ? rawRequestedAt
+        : null;
     return ClinicOpenRequest(
       id: (data['id'] ?? '').toString(),
       patientId: (data['patientId'] ?? '').toString(),
@@ -289,9 +297,7 @@ class ClinicOpenRequest {
       practitionerName: (data['practitionerName'] ?? '').toString(),
       location: (data['location'] ?? '').toString(),
       note: (data['note'] ?? '').toString(),
-      requestedAt:
-          DateTime.tryParse((data['requestedAt'] ?? '').toString()) ??
-          DateTime.now(),
+      requestedAt: requestedAt ?? DateTime.now(),
       status: (data['status'] ?? 'requested').toString(),
     );
   }
@@ -386,6 +392,7 @@ class ClinicDataStore extends ChangeNotifier {
 
   static const List<String> _defaultClinicIds = <String>[
     'seong_acupuncture_center',
+    'isaw_acu',
     'midtown_balance_clinic',
     'elm_wellness_acupuncture',
   ];
@@ -457,6 +464,15 @@ class ClinicDataStore extends ChangeNotifier {
       patientNote:
           'Patients see this note in search and after login. Share what to prepare before the visit and how to request a slot.',
       searchKeywords: 'fort lee sleep shoulder pain korean english',
+    ),
+    const ClinicCenter(
+      id: 'isaw_acu',
+      name: 'iSaw Acu',
+      practitionerName: 'Hugo Seong',
+      location: '',
+      patientNote:
+          'Patients who log in through this clinic can choose it as their center and continue intake here.',
+      searchKeywords: 'isaw acu hugo seong beta acupuncture',
     ),
     const ClinicCenter(
       id: 'midtown_balance_clinic',
@@ -1144,6 +1160,11 @@ class ClinicDataStore extends ChangeNotifier {
     );
     notifyListeners();
     await _persistClinicState();
+    try {
+      await AppFirestoreService.saveClinicOpenRequest(
+        _clinicOpenRequests.last.toMap(),
+      );
+    } catch (_) {}
     return true;
   }
 
@@ -1159,6 +1180,9 @@ class ClinicDataStore extends ChangeNotifier {
     );
     notifyListeners();
     await _persistClinicState();
+    try {
+      await AppFirestoreService.markClinicOpenRequestReviewed(requestId);
+    } catch (_) {}
   }
 
   List<ClinicCenter> searchClinics(String query) {
@@ -1189,6 +1213,12 @@ class ClinicDataStore extends ChangeNotifier {
     _patientSelectedClinicIds[patientId] = clinicId;
     notifyListeners();
     await _persistClinicState();
+    try {
+      await AppFirestoreService.savePatientClinicLink(
+        patientId: patientId,
+        selectedClinicId: clinicId,
+      );
+    } catch (_) {}
   }
 
   Future<void> setDefaultClinicForPatient({
@@ -1202,6 +1232,13 @@ class ClinicDataStore extends ChangeNotifier {
     _patientSelectedClinicIds[patientId] = clinicId;
     notifyListeners();
     await _persistClinicState();
+    try {
+      await AppFirestoreService.savePatientClinicLink(
+        patientId: patientId,
+        selectedClinicId: clinicId,
+        defaultClinicId: clinicId,
+      );
+    } catch (_) {}
   }
 
   Future<void> clearDefaultClinicForPatient(String patientId) async {
@@ -1246,6 +1283,9 @@ class ClinicDataStore extends ChangeNotifier {
     _ensureSlotsForClinic(clinic.id);
     notifyListeners();
     await _persistClinicState();
+    try {
+      await AppFirestoreService.saveClinicCenter(clinic.toMap());
+    } catch (_) {}
   }
 
   Future<void> setClinicForPractitioner({
@@ -1258,6 +1298,12 @@ class ClinicDataStore extends ChangeNotifier {
     _practitionerClinicIds[practitionerId] = clinicId;
     notifyListeners();
     await _persistClinicState();
+    try {
+      await AppFirestoreService.savePractitionerClinicLink(
+        practitionerId: practitionerId,
+        clinicId: clinicId,
+      );
+    } catch (_) {}
   }
 
   String suggestClinicId(String rawName) {
@@ -1355,14 +1401,99 @@ class ClinicDataStore extends ChangeNotifier {
       } catch (_) {}
     }
 
+    await _restoreRemoteClinicState();
+
     _applySeedClinicAssignments();
     _ensureSlotsForExistingClinics();
+    await _syncSeedOpenClinicsToFirestore();
 
     _clinicStateReady = true;
     notifyListeners();
   }
 
-  void _applySeedClinicAssignments() {}
+  Future<void> _restoreRemoteClinicState() async {
+    try {
+      final remoteClinics = await AppFirestoreService.fetchClinicCenters();
+      for (final data in remoteClinics) {
+        final clinic = ClinicCenter.fromMap(data);
+        if (clinic.id.trim().isEmpty) {
+          continue;
+        }
+        final index = _clinicCenters.indexWhere((item) => item.id == clinic.id);
+        if (index >= 0) {
+          _clinicCenters[index] = clinic;
+        } else {
+          _clinicCenters.add(clinic);
+        }
+      }
+
+      final remotePractitionerLinks =
+          await AppFirestoreService.fetchPractitionerClinicLinks();
+      _practitionerClinicIds.addAll(remotePractitionerLinks);
+
+      final remotePatientLinks =
+          await AppFirestoreService.fetchPatientClinicLinks();
+      for (final entry in remotePatientLinks.entries) {
+        final patientId = entry.key;
+        final selectedClinicId = (entry.value['selectedClinicId'] ?? '')
+            .toString();
+        final defaultClinicId = (entry.value['defaultClinicId'] ?? '')
+            .toString();
+        if (selectedClinicId.trim().isNotEmpty) {
+          _patientSelectedClinicIds[patientId] = selectedClinicId;
+        }
+        if (defaultClinicId.trim().isNotEmpty) {
+          _patientDefaultClinicIds[patientId] = defaultClinicId;
+        }
+      }
+
+      final remoteOpenRequests =
+          await AppFirestoreService.fetchClinicOpenRequests();
+      for (final data in remoteOpenRequests) {
+        final request = ClinicOpenRequest.fromMap(data);
+        if (request.id.trim().isEmpty) {
+          continue;
+        }
+        final index = _clinicOpenRequests.indexWhere(
+          (item) => item.id == request.id,
+        );
+        if (index >= 0) {
+          _clinicOpenRequests[index] = request;
+        } else {
+          _clinicOpenRequests.add(request);
+        }
+      }
+    } catch (_) {
+      // Keep the demo usable offline or when Firestore rules are still being tuned.
+    }
+  }
+
+  void _applySeedClinicAssignments() {
+    _practitionerClinicIds.putIfAbsent(
+      'beta_seong_acupuncture_center',
+      () => 'seong_acupuncture_center',
+    );
+    _practitionerClinicIds.putIfAbsent('beta_isaw_acu', () => 'isaw_acu');
+  }
+
+  Future<void> _syncSeedOpenClinicsToFirestore() async {
+    try {
+      for (final clinicId in const ['seong_acupuncture_center', 'isaw_acu']) {
+        final clinic = clinicById(clinicId);
+        if (clinic != null) {
+          await AppFirestoreService.saveClinicCenter(clinic.toMap());
+        }
+      }
+      await AppFirestoreService.savePractitionerClinicLink(
+        practitionerId: 'beta_seong_acupuncture_center',
+        clinicId: 'seong_acupuncture_center',
+      );
+      await AppFirestoreService.savePractitionerClinicLink(
+        practitionerId: 'beta_isaw_acu',
+        clinicId: 'isaw_acu',
+      );
+    } catch (_) {}
+  }
 
   void _ensureSlotsForExistingClinics() {
     for (final clinic in _clinicCenters) {

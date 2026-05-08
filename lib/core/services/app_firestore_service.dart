@@ -5,6 +5,106 @@ class AppFirestoreService {
 
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static Future<List<Map<String, dynamic>>> fetchClinicCenters() async {
+    final snapshot = await _db.collection('clinic_centers').get();
+    return snapshot.docs.map((doc) {
+      return {'id': doc.id, ...doc.data()};
+    }).toList();
+  }
+
+  static Future<Map<String, String>> fetchPractitionerClinicLinks() async {
+    final snapshot = await _db.collection('practitioner_clinic_links').get();
+    return {
+      for (final doc in snapshot.docs)
+        doc.id: (doc.data()['clinicId'] ?? '').toString(),
+    }..removeWhere((_, clinicId) => clinicId.trim().isEmpty);
+  }
+
+  static Future<Map<String, Map<String, dynamic>>>
+  fetchPatientClinicLinks() async {
+    final snapshot = await _db.collection('patient_clinic_links').get();
+    return {for (final doc in snapshot.docs) doc.id: doc.data()};
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchClinicOpenRequests() async {
+    final snapshot = await _db.collection('clinic_open_requests').get();
+    return snapshot.docs.map((doc) {
+      return {'id': doc.id, ...doc.data()};
+    }).toList();
+  }
+
+  static Future<void> saveClinicCenter(Map<String, dynamic> clinic) async {
+    final id = (clinic['id'] ?? '').toString().trim();
+    if (id.isEmpty) {
+      return;
+    }
+    await _db.collection('clinic_centers').doc(id).set({
+      ...clinic,
+      'id': id,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> savePractitionerClinicLink({
+    required String practitionerId,
+    required String clinicId,
+  }) async {
+    if (practitionerId.trim().isEmpty || clinicId.trim().isEmpty) {
+      return;
+    }
+    await _db.collection('practitioner_clinic_links').doc(practitionerId).set({
+      'practitionerId': practitionerId,
+      'clinicId': clinicId,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> savePatientClinicLink({
+    required String patientId,
+    required String selectedClinicId,
+    String? defaultClinicId,
+  }) async {
+    if (patientId.trim().isEmpty || selectedClinicId.trim().isEmpty) {
+      return;
+    }
+    final payload = <String, dynamic>{
+      'patientId': patientId,
+      'selectedClinicId': selectedClinicId,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    if (defaultClinicId != null) {
+      payload['defaultClinicId'] = defaultClinicId;
+    }
+    await _db
+        .collection('patient_clinic_links')
+        .doc(patientId)
+        .set(payload, SetOptions(merge: true));
+  }
+
+  static Future<void> saveClinicOpenRequest(
+    Map<String, dynamic> request,
+  ) async {
+    final id = (request['id'] ?? '').toString().trim();
+    if (id.isEmpty) {
+      return;
+    }
+    await _db.collection('clinic_open_requests').doc(id).set({
+      ...request,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> markClinicOpenRequestReviewed(String requestId) async {
+    if (requestId.trim().isEmpty) {
+      return;
+    }
+    await _db.collection('clinic_open_requests').doc(requestId).set({
+      'status': 'reviewed',
+      'reviewedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   static String visitFeedbackDocumentId({
     required String patientId,
     required String visitId,
