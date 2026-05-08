@@ -696,10 +696,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
 
                 if (_activeSession != null) {
                   await PatientProfileService.saveProfile(updated);
+                  if (mounted) {
+                    setState(() {
+                      _sessionBackedProfile = updated;
+                    });
+                  }
                 } else {
                   _store.saveProfile(updated);
                   _store.setCurrentPatientProfile(updated.id);
-                  setState(() {});
+                  if (mounted) {
+                    setState(() {});
+                  }
                 }
 
                 if (!context.mounted) {
