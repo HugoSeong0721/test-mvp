@@ -32,7 +32,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
   bool _sessionResolved = false;
-  bool _showStartGuide = true;
+  bool _showStartGuide = false;
   bool _loadTimedOut = false;
   bool _loadedRouteArgs = false;
   Object? _loadError;
@@ -1201,7 +1201,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             const SizedBox(height: 10),
                             Text(
                               lang.tr(
-                                'This page is for checking requests, continuing your intake, and keeping your next visit organized. Start from the steps below and move downward.',
+                                'Keep requests, intake, and your next visit in one simple place.',
                                 '이 화면은 답변 요청 확인, 문진 이어쓰기, 다음 방문 정리를 위한 곳입니다. 아래 순서대로 위에서부터 보면 됩니다.',
                               ),
                               style: Theme.of(context).textTheme.bodyLarge
@@ -2466,7 +2466,7 @@ class _ActionHubCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(22),
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
             border: Border.all(color: AppTheme.border),
@@ -2483,15 +2483,15 @@ class _ActionHubCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: AppTheme.pine.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: AppTheme.pine),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Text(
                 eyebrow,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -2500,14 +2500,16 @@ class _ActionHubCard extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 body,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppTheme.ink.withValues(alpha: 0.72),
                 ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Text(

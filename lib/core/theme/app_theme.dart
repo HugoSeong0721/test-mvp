@@ -161,7 +161,7 @@ class AppTheme {
           backgroundColor: const WidgetStatePropertyAll(pine),
           foregroundColor: const WidgetStatePropertyAll(Colors.white),
           padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
@@ -176,7 +176,7 @@ class AppTheme {
           foregroundColor: const WidgetStatePropertyAll(ink),
           side: const WidgetStatePropertyAll(BorderSide(color: border)),
           padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+            EdgeInsets.symmetric(horizontal: 18, vertical: 15),
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(

@@ -736,14 +736,14 @@ class _PractitionerDashboardScreenState
           }) {
             return SizedBox(
               width: wide ? 260 : double.infinity,
-              height: wide ? 252 : null,
+              height: wide ? 220 : null,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: onTap,
                   borderRadius: BorderRadius.circular(24),
                   child: Ink(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(24),
@@ -777,7 +777,7 @@ class _PractitionerDashboardScreenState
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         Text(
                           title,
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -785,19 +785,21 @@ class _PractitionerDashboardScreenState
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         Text(
                           value,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             color: Colors.white,
                           ),
                         ),
-                        if (wide) const Spacer() else const SizedBox(height: 6),
+                        if (wide) const Spacer() else const SizedBox(height: 4),
                         Text(
                           detail,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.white.withValues(alpha: 0.76),
                           ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -822,7 +824,7 @@ class _PractitionerDashboardScreenState
               const SizedBox(height: 10),
               Text(
                 AppLanguageController.instance.tr(
-                  'Track patient movement, intake momentum, and follow-up risk in one place.',
+                  'See today''s patients, requests, and intake status in one place.',
                   '환자 흐름, 문진 진행도, 후속 대응 리스크를 한 화면에서 관리합니다.',
                 ),
                 style: theme.textTheme.headlineLarge?.copyWith(
@@ -895,7 +897,7 @@ class _PractitionerDashboardScreenState
             children: [
               Text(
                 AppLanguageController.instance.tr(
-                  'What to check first in this selection',
+                  'Today first',
                   '이 선택에서 먼저 볼 것',
                 ),
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -921,7 +923,7 @@ class _PractitionerDashboardScreenState
                       '$pendingSlotRequests건 대기',
                     ),
                     detail: AppLanguageController.instance.tr(
-                      'Open the inbox to confirm or decline appointment requests.',
+                      'Confirm or decline incoming appointment requests.',
                       '먼저 예약 신청을 확인하고 확정/거절 처리하세요.',
                     ),
                     icon: Icons.mail_outline,
@@ -942,7 +944,7 @@ class _PractitionerDashboardScreenState
                       '$bookedSlots건 예약 · $openSlots개 열림',
                     ),
                     detail: AppLanguageController.instance.tr(
-                      'Check which times are already booked and which slots patients can still request.',
+                      'See booked times and which slots are still open.',
                       '이미 예약된 시간과 아직 열려 있는 슬롯을 바로 확인하세요.',
                     ),
                     icon: Icons.calendar_month_outlined,
@@ -963,7 +965,7 @@ class _PractitionerDashboardScreenState
                       '$inProgressIntakes명 진행중 · $noResponse명 미응답',
                     ),
                     detail: AppLanguageController.instance.tr(
-                      'After inbox and schedule, review the patient cards that still need intake or follow-up attention.',
+                      'Review patients who still need intake or follow-up.',
                       '예약과 신청을 본 뒤에는 문진 미완료 환자 카드를 확인하면 됩니다.',
                     ),
                     icon: Icons.assignment_late_outlined,

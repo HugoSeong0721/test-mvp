@@ -55,9 +55,9 @@ class AppPanel extends StatelessWidget {
   const AppPanel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(24),
+    this.padding = const EdgeInsets.all(22),
     this.gradient,
-    this.radius = 32,
+    this.radius = 28,
     this.borderColor,
   });
 
@@ -86,9 +86,9 @@ class AppPanel extends StatelessWidget {
         border: Border.all(color: borderColor ?? AppTheme.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 30,
-            offset: const Offset(0, 18),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -121,8 +121,8 @@ class AppMetricChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final content = Container(
-      constraints: const BoxConstraints(minWidth: 160),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      constraints: const BoxConstraints(minWidth: 136),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.white.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(22),
@@ -147,8 +147,9 @@ class AppMetricChip extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleSmall?.copyWith(
                   color: valueColor ?? AppTheme.ink,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -203,8 +204,8 @@ class AppGuideStep extends StatelessWidget {
         : AppTheme.ink.withValues(alpha: 0.72);
 
     return Container(
-      constraints: const BoxConstraints(minWidth: 220),
-      padding: const EdgeInsets.all(16),
+      constraints: const BoxConstraints(minWidth: 210),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(22),
