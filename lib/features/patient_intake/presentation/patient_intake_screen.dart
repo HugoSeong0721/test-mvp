@@ -2203,18 +2203,22 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         spacing: 10,
                         runSpacing: 10,
                         children: [
-                          AppMetricChip(
-                            icon: Icons.person_outline,
-                            label: lang.tr('Profile', '프로필'),
-                            value: profile.hasRequiredAlertInfo
-                                ? lang.tr('Ready', '준비됨')
-                                : lang.tr('Incomplete', '미완성'),
-                            backgroundColor: AppTheme.surfaceSoft.withValues(
-                              alpha: 0.7,
+                          InkWell(
+                            onTap: _openProfileDialog,
+                            borderRadius: BorderRadius.circular(18),
+                            child: AppMetricChip(
+                              icon: Icons.person_outline,
+                              label: lang.tr('Profile', '프로필'),
+                              value: profile.hasRequiredAlertInfo
+                                  ? lang.tr('Ready', '준비됨')
+                                  : lang.tr('Incomplete', '미완성'),
+                              backgroundColor: AppTheme.surfaceSoft.withValues(
+                                alpha: 0.7,
+                              ),
+                              valueColor: profile.hasRequiredAlertInfo
+                                  ? AppTheme.pine
+                                  : AppTheme.copper,
                             ),
-                            valueColor: profile.hasRequiredAlertInfo
-                                ? AppTheme.pine
-                                : AppTheme.copper,
                           ),
                           AppMetricChip(
                             icon: Icons.assignment_turned_in_outlined,
