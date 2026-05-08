@@ -6,6 +6,8 @@ import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 
+enum _PatientRecordTab { overview, visits, requests, intake, feedback }
+
 class PatientRecordWorkspace extends StatefulWidget {
   const PatientRecordWorkspace({
     super.key,
@@ -32,6 +34,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
   late TextEditingController _sexController;
   late TextEditingController _ethnicityController;
   late TextEditingController _memoController;
+  _PatientRecordTab _selectedTab = _PatientRecordTab.overview;
 
   @override
   void initState() {
@@ -275,7 +278,73 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox.shrink(),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          ChoiceChip(
+                            label: Text(
+                              lang.tr('Overview', '기본 정보'),
+                            ),
+                            selected:
+                                _selectedTab == _PatientRecordTab.overview,
+                            onSelected: (_) {
+                              setState(
+                                () => _selectedTab = _PatientRecordTab.overview,
+                              );
+                            },
+                          ),
+                          ChoiceChip(
+                            label: Text(
+                              lang.tr('Visits', '방문 기록'),
+                            ),
+                            selected: _selectedTab == _PatientRecordTab.visits,
+                            onSelected: (_) {
+                              setState(
+                                () => _selectedTab = _PatientRecordTab.visits,
+                              );
+                            },
+                          ),
+                          ChoiceChip(
+                            label: Text(
+                              lang.tr('My Requests', '내 요청'),
+                            ),
+                            selected:
+                                _selectedTab == _PatientRecordTab.requests,
+                            onSelected: (_) {
+                              setState(
+                                () => _selectedTab = _PatientRecordTab.requests,
+                              );
+                            },
+                          ),
+                          ChoiceChip(
+                            label: Text(
+                              lang.tr('Patient Intake', '환자 문진'),
+                            ),
+                            selected: _selectedTab == _PatientRecordTab.intake,
+                            onSelected: (_) {
+                              setState(
+                                () => _selectedTab = _PatientRecordTab.intake,
+                              );
+                            },
+                          ),
+                          ChoiceChip(
+                            label: Text(
+                              lang.tr('Feedback', '피드백'),
+                            ),
+                            selected:
+                                _selectedTab == _PatientRecordTab.feedback,
+                            onSelected: (_) {
+                              setState(
+                                () => _selectedTab = _PatientRecordTab.feedback,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox.shrink(),
+                      if (_selectedTab == _PatientRecordTab.overview) ...[
                       AppPanel(
                         padding: const EdgeInsets.all(18),
                         child: Column(
@@ -389,7 +458,9 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      ],
+                      const SizedBox.shrink(),
+                      if (_selectedTab == _PatientRecordTab.visits) ...[
                       AppPanel(
                         padding: const EdgeInsets.all(18),
                         child: Column(
@@ -583,7 +654,9 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      ],
+                      const SizedBox.shrink(),
+                      if (_selectedTab == _PatientRecordTab.requests) ...[
                       AppPanel(
                         padding: const EdgeInsets.all(18),
                         child: Column(
@@ -716,7 +789,9 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
+                      ],
                       const SizedBox(height: 16),
+                      if (_selectedTab == _PatientRecordTab.intake) ...[
                       AppPanel(
                         padding: const EdgeInsets.all(18),
                         child: Column(
@@ -886,7 +961,9 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
+                      ],
                       const SizedBox(height: 16),
+                      if (_selectedTab == _PatientRecordTab.feedback) ...[
                       AppPanel(
                         padding: const EdgeInsets.all(18),
                         child: Column(
@@ -980,6 +1057,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
+                      ],
                     ],
                   ),
                 );

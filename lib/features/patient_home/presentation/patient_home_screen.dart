@@ -1162,6 +1162,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           '이 beta를 제대로 테스트하려면 전화번호와 이메일을 모두 넣어주세요.',
                         );
 
+                  final showLegacySummary =
+                      Theme.of(context).platform == TargetPlatform.fuchsia &&
+                      pendingItemCount < 0;
+
                   return ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
@@ -1544,7 +1548,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             const SizedBox(height: 8),
                             Text(
                               lang.tr(
-                                'These four markers match what strong client portals keep near the top: what is waiting, what was already sent, what is scheduled, and whether your account is ready.',
+                                '',
                                 '좋은 client portal들이 상단에 두는 네 가지를 그대로 모았습니다. 지금 대기 중인 것, 이미 보낸 것, 예정된 것, 그리고 계정 준비 상태입니다.',
                               ),
                               style: Theme.of(context).textTheme.bodyMedium
@@ -1678,8 +1682,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      LayoutBuilder(
+                      if (showLegacySummary) const SizedBox(height: 16),
+                      if (showLegacySummary) LayoutBuilder(
                         builder: (context, constraints) {
                           final isNarrow = constraints.maxWidth < 860;
                           final cards = [
@@ -1768,7 +1772,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           );
                         },
                       ),
-                      const SizedBox(height: 16),
+                      if (showLegacySummary) const SizedBox(height: 16),
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
