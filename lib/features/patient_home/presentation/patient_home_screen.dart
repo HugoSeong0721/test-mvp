@@ -1502,17 +1502,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       _buildClinicSelectionPanel(context, profile: profile),
                       const SizedBox(height: 16),
                       AppPanel(
-                        padding: const EdgeInsets.all(24),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppTheme.pine,
-                            AppTheme.jade,
-                            Color(0xFF2A7A66),
-                          ],
-                        ),
-                        borderColor: Colors.white24,
+                        padding: const EdgeInsets.all(22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1520,7 +1510,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               lang.tr('Patient command center', '환자 시작 허브'),
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.72),
+                                    color: AppTheme.ink.withValues(alpha: 0.58),
                                   ),
                             ),
                             const SizedBox(height: 10),
@@ -1530,7 +1520,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 '${profile.name}님, 다시 오셨네요',
                               ),
                               style: Theme.of(context).textTheme.headlineLarge
-                                  ?.copyWith(color: Colors.white),
+                                  ?.copyWith(color: AppTheme.ink),
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -1540,7 +1530,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               ),
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.82),
+                                    color: AppTheme.ink.withValues(alpha: 0.7),
                                   ),
                             ),
                             const SizedBox(height: 18),
@@ -1553,13 +1543,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   label: lang.tr('Pending items', '대기 항목'),
                                   value:
                                       '${pendingRequests.length + pendingAppointmentRequests.length}',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.event_available_outlined,
@@ -1570,13 +1558,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           nextVisit.time,
                                         )
                                       : lang.tr('Not booked', '미예약'),
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.verified_user_outlined,
@@ -1584,13 +1570,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   value: profile.hasRequiredAlertInfo
                                       ? lang.tr('Ready', '준비됨')
                                       : lang.tr('Needs update', '업데이트 필요'),
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                               ],
                             ),
@@ -1599,9 +1583,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(18),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(22),
-                                border: Border.all(color: Colors.white24),
+                                color: AppTheme.mint.withValues(alpha: 0.34),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: AppTheme.border.withValues(alpha: 0.7),
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1614,7 +1600,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge
-                                              ?.copyWith(color: Colors.white),
+                                              ?.copyWith(color: AppTheme.ink),
                                         ),
                                       ),
                                       if (_showStartGuide)
@@ -1629,7 +1615,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             );
                                           },
                                           icon: const Icon(Icons.close),
-                                          color: Colors.white.withValues(
+                                          color: AppTheme.ink.withValues(
                                             alpha: 0.9,
                                           ),
                                           visualDensity: VisualDensity.compact,
@@ -1644,7 +1630,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           child: Text(
                                             lang.tr('Show guide', '가이드 보기'),
                                             style: const TextStyle(
-                                              color: Colors.white,
+                                              color: AppTheme.pine,
                                             ),
                                           ),
                                         ),
@@ -1657,7 +1643,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         .textTheme
                                         .headlineSmall
                                         ?.copyWith(
-                                          color: Colors.white,
+                                          color: AppTheme.ink,
                                           fontWeight: FontWeight.w700,
                                         ),
                                   ),
@@ -1666,7 +1652,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     nextStepBody,
                                     style: Theme.of(context).textTheme.bodyLarge
                                         ?.copyWith(
-                                          color: Colors.white.withValues(
+                                          color: AppTheme.ink.withValues(
                                             alpha: 0.84,
                                           ),
                                           height: 1.5,
@@ -1693,14 +1679,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         label: Text(
                                           lang.tr('Requests', '요청함'),
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: AppTheme.ink,
                                           ),
                                         ),
                                         style: OutlinedButton.styleFrom(
                                           side: const BorderSide(
-                                            color: Colors.white38,
+                                            color: AppTheme.border,
                                           ),
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: AppTheme.ink,
                                         ),
                                       ),
                                       OutlinedButton.icon(
@@ -1712,14 +1698,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         label: Text(
                                           lang.tr('Intake', '문진'),
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: AppTheme.ink,
                                           ),
                                         ),
                                         style: OutlinedButton.styleFrom(
                                           side: const BorderSide(
-                                            color: Colors.white38,
+                                            color: AppTheme.border,
                                           ),
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: AppTheme.ink,
                                         ),
                                       ),
                                       OutlinedButton.icon(
@@ -1730,14 +1716,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         label: Text(
                                           lang.tr('Book', '예약'),
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: AppTheme.ink,
                                           ),
                                         ),
                                         style: OutlinedButton.styleFrom(
                                           side: const BorderSide(
-                                            color: Colors.white38,
+                                            color: AppTheme.border,
                                           ),
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: AppTheme.ink,
                                         ),
                                       ),
                                     ],
@@ -1747,10 +1733,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(14),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.08,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.72,
                                       ),
-                                      borderRadius: BorderRadius.circular(18),
+                                      borderRadius: BorderRadius.circular(14),
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
@@ -1761,7 +1747,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium
-                                              ?.copyWith(color: Colors.white),
+                                              ?.copyWith(color: AppTheme.ink),
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
@@ -1770,7 +1756,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               .textTheme
                                               .bodyLarge
                                               ?.copyWith(
-                                                color: Colors.white,
+                                                color: AppTheme.ink,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                         ),
@@ -1781,7 +1767,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               .textTheme
                                               .bodyMedium
                                               ?.copyWith(
-                                                color: Colors.white.withValues(
+                                                color: AppTheme.ink.withValues(
                                                   alpha: 0.84,
                                                 ),
                                               ),
@@ -1793,7 +1779,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               .textTheme
                                               .bodyMedium
                                               ?.copyWith(
-                                                color: Colors.white.withValues(
+                                                color: AppTheme.ink.withValues(
                                                   alpha: 0.84,
                                                 ),
                                               ),
