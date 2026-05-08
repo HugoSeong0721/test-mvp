@@ -106107,7 +106107,7 @@ r=s.i("dl<1,eQ<k>>")
 h=A.U(new A.dl(new A.Y(h,new A.aFh(k),s.i("Y<1>")),new A.aFi(),r),r.i("o.E"))
 j=A.Dz(i,j,h,new A.aFj(k,b),f)
 i=t.p
-j=A.c5(A.a_(A.b([l,B.Q,n,B.G,j,B.G,A.e(o.a===B.c?"This only sends a request. Your practitioner will confirm it later, and you can only choose open slots.":"\uc774 \ub2e8\uacc4\ub294 \uc608\uc57d \uc2e0\uccad\ub9cc \ubcf4\ub0b4\ub294 \uac83\uc785\ub2c8\ub2e4. \uc2e4\uc81c \ud655\uc815\uc740 \uce68\uc220\uc0ac\uac00 \ud655\uc778\ud55c \ub4a4\uc5d0 \uc774\ub904\uc9c0\uba70, \uc5f4\ub824 \uc788\ub294 \uc2ac\ub86f\ub9cc \uc120\ud0dd\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",p,p,p,B.dO,p,p,p)],i),B.l,B.h,B.X),p,460)
+j=A.c5(A.a_(A.b([l,B.Q,n,B.G,j,B.G,A.e(o.a===B.c?"This sends an appointment request. After your practitioner reviews it, you may receive an intake form to complete before the visit.":"\uc774 \ub2e8\uacc4\ub294 \uc608\uc57d \uc2e0\uccad\uc744 \ubcf4\ub0b4\ub294 \uac83\uc785\ub2c8\ub2e4. \uce68\uc220\uc0ac\uac00 \ud655\uc778\ud55c \ub4a4 \ubc29\ubb38 \uc804 \uc791\uc131\ud560 \ubb38\uc9c4 \ud3fc\uc744 \ubc1b\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",p,p,p,B.dO,p,p,p)],i),B.l,B.h,B.X),p,460)
 n=o.a===B.c
 l=A.dN(A.e(n?"Cancel":"\ucde8\uc18c",p,p,p,p,p,p,p),p,p,new A.aFk(a),p,p)
 return A.iP(A.b([l,A.ph(A.e(n?"Request Appointment":"\uc608\uc57d \uc2e0\uccad",p,p,p,p,p,p,p),new A.aFl(k,g,q.f,a,o),p)],i),j,m)},
@@ -106151,10 +106151,10 @@ A.b_(q.d,!1).cO(p)
 n=o.c.a_(t.J).f
 s=m.a
 r=m.b
-r="Appointment request sent for "+(o.mx(s)+" \xb7 "+r)+". You will see confirmation after your practitioner reviews it."
+r="Appointment request sent for "+(o.mx(s)+" \xb7 "+r)+". If your practitioner needs more context, an intake form will appear in your portal."
 s=m.a
 m=m.b
-m=o.mx(s)+" \xb7 "+m+" \uc608\uc57d \uc2e0\uccad\uc744 \ubcf4\ub0c8\uc2b5\ub2c8\ub2e4. \uce68\uc220\uc0ac\uac00 \ud655\uc778\ud558\uba74 \uc0c1\ud0dc\uac00 \uc5c5\ub370\uc774\ud2b8\ub429\ub2c8\ub2e4."
+m=o.mx(s)+" \xb7 "+m+" \uc608\uc57d \uc2e0\uccad\uc744 \ubcf4\ub0c8\uc2b5\ub2c8\ub2e4. \uce68\uc220\uc0ac\uac00 \ucd94\uac00 \uc815\ubcf4\uac00 \ud544\uc694\ud558\uba74 \ubb38\uc9c4 \ud3fc\uc774 \ud3ec\ud138\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4."
 n.cZ(A.dg(p,p,p,p,p,B.B,p,A.e(q.e.a===B.c?r:m,p,p,p,p,p,p,p),p,B.an,p,p,p,p,p,p,p,p,p,p))},
 $S:0}
 A.aGd.prototype={

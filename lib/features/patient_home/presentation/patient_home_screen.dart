@@ -946,8 +946,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     const SizedBox(height: 12),
                     Text(
                       lang.tr(
-                        'This only sends a request. Your practitioner will confirm it later, and you can only choose open slots.',
-                        '이 단계는 예약 신청만 보내는 것입니다. 실제 확정은 침술사가 확인한 뒤에 이뤄지며, 열려 있는 슬롯만 선택할 수 있습니다.',
+                        'This sends an appointment request. After your practitioner reviews it, you may receive an intake form to complete before the visit.',
+                        '이 단계는 예약 신청을 보내는 것입니다. 침술사가 확인한 뒤 방문 전 작성할 문진 폼을 받을 수 있습니다.',
                       ),
                       style: const TextStyle(color: Colors.black54),
                     ),
@@ -972,8 +972,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       SnackBar(
                         content: Text(
                           lang.tr(
-                            'Appointment request sent for ${_formatVisitSlot(selectedDate, selectedTime)}. You will see confirmation after your practitioner reviews it.',
-                            '${_formatVisitSlot(selectedDate, selectedTime)} 예약 신청을 보냈습니다. 침술사가 확인하면 상태가 업데이트됩니다.',
+                            'Appointment request sent for ${_formatVisitSlot(selectedDate, selectedTime)}. If your practitioner needs more context, an intake form will appear in your portal.',
+                            '${_formatVisitSlot(selectedDate, selectedTime)} 예약 신청을 보냈습니다. 침술사가 추가 정보가 필요하면 문진 폼이 포털에 표시됩니다.',
                           ),
                         ),
                       ),
