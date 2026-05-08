@@ -25,9 +25,24 @@ Web-first MVP for an acupuncture clinic portal and patient workflow.
 
 ## Patient-Visible Clinic List
 
-- Patients only see clinics that were explicitly saved by a practitioner in `Clinic Profile`.
-- If a clinic is not connected to a practitioner account yet, it will not appear in the patient clinic picker.
-- This demo stores practitioner-created clinic profiles in browser-local storage, so the visible list can differ by browser/device.
+## Currently Open Clinics
+
+These are the clinics currently treated as open for beta testing and patient selection:
+
+| Clinic | Practitioner | Location | Status |
+|---|---|---|---|
+| Seong Acupuncture Center | Dr. Hugo Seong | Fort Lee, NJ | Open for beta |
+| iSaw Acu | Hugo Seong | Not entered yet | Open for beta |
+
+Notes:
+
+- Patients use `Patient Home` -> `Change clinic` / `Search clinic` to choose one of these clinics.
+- The live app currently stores clinic visibility in browser-local demo storage, so the exact picker list can still differ by browser/device until the backend clinic registry is connected.
+- If a patient cannot find their clinic, they can use `Request to open`; those requests appear in the practitioner `Appointment Inbox`.
+
+## Bundled Clinic Templates
+
+Patients only see clinics that were explicitly saved by a practitioner in `Clinic Profile`. If a clinic is not connected to a practitioner account yet, it will not appear in the patient clinic picker.
 
 Bundled clinic templates that practitioners can register:
 
