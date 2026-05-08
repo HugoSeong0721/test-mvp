@@ -28,8 +28,6 @@ class PatientRequestsScreen extends StatefulWidget {
 
 class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
-  StreamSubscription<PatientSession?>? _sessionSubscription;
-  StreamSubscription<PatientProfile?>? _profileSubscription;
   PatientProfile? _sessionBackedProfile;
   _RequestFolder _selectedFolder = _RequestFolder.needsReply;
   bool _showGuide = true;
@@ -52,35 +50,53 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   @override
   void initState() {
     super.initState();
-    _sessionSubscription = BetaSessionService.watchSession().listen((
-      session,
-    ) async {
-      await _profileSubscription?.cancel();
-      if (session == null) {
-        if (mounted) {
-          setState(() => _sessionBackedProfile = null);
-        }
-        return;
-      }
-
-      await PatientProfileService.ensureProfileForSession(session);
-      _profileSubscription =
-          PatientProfileService.watchProfileForSession(session).listen((
-            profile,
-          ) {
-            if (!mounted || profile == null) {
-              return;
-            }
-            setState(() => _sessionBackedProfile = profile);
-          });
-    });
+    unawaited(_initializeProfile());
   }
 
   @override
   void dispose() {
-    _sessionSubscription?.cancel();
-    _profileSubscription?.cancel();
     super.dispose();
+  }
+
+  Future<void> _initializeProfile() async {
+    final session =
+        BetaSessionService.currentSession ??
+        await BetaSessionService.currentSessionAsync();
+    if (!mounted) {
+      return;
+    }
+
+    if (session == null) {
+      setState(() => _sessionBackedProfile = null);
+      return;
+    }
+
+    try {
+      final localProfile = await PatientProfileService.loadLocalProfile(
+        session.id,
+      );
+      if (mounted && localProfile != null) {
+        setState(() {
+          _sessionBackedProfile = localProfile;
+        });
+      }
+    } catch (_) {}
+
+    unawaited(
+      PatientProfileService.ensureProfileForSession(session)
+          .then((_) async {
+            final refreshed = await PatientProfileService.loadLocalProfile(
+              session.id,
+            );
+            if (!mounted || refreshed == null) {
+              return;
+            }
+            setState(() {
+              _sessionBackedProfile = refreshed;
+            });
+          })
+          .catchError((_) {}),
+    );
   }
 
   String _formatDate(DateTime date) {
