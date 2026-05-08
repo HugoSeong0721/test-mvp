@@ -977,7 +977,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppTheme.ink,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(color: AppTheme.border),
                           ),
@@ -1707,19 +1707,13 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
 
                 final hero = AppPanel(
                   padding: const EdgeInsets.all(24),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppTheme.pine, AppTheme.jade, Color(0xFF2A7A66)],
-                  ),
-                  borderColor: Colors.white24,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         lang.tr('Patient intake workspace', '환자 문진 작업 화면'),
                         style: theme.textTheme.labelLarge?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.72),
+                          color: AppTheme.ink.withValues(alpha: 0.58),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -1729,7 +1723,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           '방문 전 현재 상태 변화를 바로 전달하세요',
                         ),
                         style: theme.textTheme.headlineLarge?.copyWith(
-                          color: Colors.white,
+                          color: AppTheme.ink,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -1739,7 +1733,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           '이 화면은 한 흐름 안에서 문진을 끝내기 위한 곳입니다. 아래 순서부터 확인한 뒤, 메인 패널에서 현재 질문에 답하면 됩니다.',
                         ),
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.82),
+                          color: AppTheme.ink.withValues(alpha: 0.72),
                         ),
                       ),
                       if (_showStartGuide) const SizedBox(height: 18),
@@ -1751,32 +1745,26 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             icon: Icons.assignment_outlined,
                             label: lang.tr('Mode', '모드'),
                             value: modeLabel,
-                            backgroundColor: Colors.white.withValues(
-                              alpha: 0.14,
-                            ),
-                            labelColor: Colors.white.withValues(alpha: 0.72),
-                            valueColor: Colors.white,
+                            backgroundColor: AppTheme.surface,
+                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                            valueColor: AppTheme.ink,
                           ),
                           AppMetricChip(
                             icon: Icons.stacked_line_chart_outlined,
                             label: lang.tr('Progress', '진행도'),
                             value:
                                 '$answeredCount / ${_activeQuestions.length}',
-                            backgroundColor: Colors.white.withValues(
-                              alpha: 0.14,
-                            ),
-                            labelColor: Colors.white.withValues(alpha: 0.72),
-                            valueColor: Colors.white,
+                            backgroundColor: AppTheme.surface,
+                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                            valueColor: AppTheme.ink,
                           ),
                           AppMetricChip(
                             icon: Icons.mark_email_unread_outlined,
                             label: lang.tr('Pending requests', '대기 요청'),
                             value: '${requestDocs.length}',
-                            backgroundColor: Colors.white.withValues(
-                              alpha: 0.14,
-                            ),
-                            labelColor: Colors.white.withValues(alpha: 0.72),
-                            valueColor: Colors.white,
+                            backgroundColor: AppTheme.surface,
+                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                            valueColor: AppTheme.ink,
                           ),
                           AppMetricChip(
                             icon: Icons.verified_user_outlined,
@@ -1784,11 +1772,9 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             value: profile.hasRequiredAlertInfo
                                 ? lang.tr('Ready', '준비됨')
                                 : lang.tr('Needs update', '업데이트 필요'),
-                            backgroundColor: Colors.white.withValues(
-                              alpha: 0.14,
-                            ),
-                            labelColor: Colors.white.withValues(alpha: 0.72),
-                            valueColor: Colors.white,
+                            backgroundColor: AppTheme.surface,
+                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
+                            valueColor: AppTheme.ink,
                           ),
                         ],
                       ),
@@ -1809,7 +1795,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               setState(() => _showStartGuide = false);
                             },
                             icon: const Icon(Icons.close),
-                            color: Colors.white.withValues(alpha: 0.92),
+                            color: AppTheme.ink.withValues(alpha: 0.72),
                             visualDensity: VisualDensity.compact,
                           ),
                         ),
@@ -1820,7 +1806,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           runSpacing: 12,
                           children: [
                             AppGuideStep(
-                              dark: true,
+                              dark: false,
                               step: '1',
                               title: lang.tr(
                                 'Review requests first',
@@ -1837,7 +1823,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                     ),
                             ),
                             AppGuideStep(
-                              dark: true,
+                              dark: false,
                               step: '2',
                               title: lang.tr(
                                 'Answer the current question',
@@ -1849,7 +1835,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               ),
                             ),
                             AppGuideStep(
-                              dark: true,
+                              dark: false,
                               step: '3',
                               title: lang.tr('Submit when ready', '준비되면 제출'),
                               description: profile.hasRequiredAlertInfo
@@ -1898,11 +1884,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
 
                 final formPanel = AppPanel(
                   padding: const EdgeInsets.all(24),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFFFDFCFA), Color(0xFFEEE4D6)],
-                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
