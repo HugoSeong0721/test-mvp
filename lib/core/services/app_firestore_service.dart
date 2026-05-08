@@ -305,6 +305,58 @@ Email: <strong>$emailLine</strong>
     }, SetOptions(merge: true));
   }
 
+  static Future<void> queueChecklistReminder({
+    required String patientId,
+    required String clinicId,
+    required String patientName,
+    required String patientEmail,
+    required String dateLabel,
+    required List<String> missingItems,
+  }) async {
+    if (patientEmail.trim().isEmpty || missingItems.isEmpty) {
+      return;
+    }
+
+    final textItems = missingItems.map((item) => '- $item').join('\n');
+    final htmlItems = missingItems.map((item) => '<li>$item</li>').join();
+    const appLink = 'https://hugoseong0721.github.io/test-mvp/#/intake';
+
+    await _db.collection('mail').add({
+      'to': [patientEmail.trim()],
+      'message': {
+        'subject': '[Test MVP] Today checklist reminder',
+        'text':
+            '''
+Hello $patientName,
+
+Today is $dateLabel. Please check your visit prep items for today:
+
+$textItems
+
+Open your intake checklist:
+$appLink
+''',
+        'html':
+            '''
+<p>Hello <strong>$patientName</strong>,</p>
+<p>Today is <strong>$dateLabel</strong>. Please check your visit prep items for today:</p>
+<ul>$htmlItems</ul>
+<p><a href="$appLink">Open your intake checklist</a></p>
+''',
+      },
+      'meta': {
+        'type': 'daily_checklist_reminder',
+        'patientId': patientId,
+        'clinicId': clinicId,
+        'patientName': patientName,
+        'dateLabel': dateLabel,
+        'missingItems': missingItems,
+        'queuedBy': 'patient_intake_screen',
+      },
+      'queuedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   static Future<void> _queuePortalEmail({
     required String patientName,
     required String patientEmail,

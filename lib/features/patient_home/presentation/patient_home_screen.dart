@@ -1162,6 +1162,126 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           '이 beta를 제대로 테스트하려면 전화번호와 이메일을 모두 넣어주세요.',
                         );
 
+                  assert(() {
+                    intakeStatusBody;
+                    nextVisitBody;
+                    profileStatusLabel;
+                    profileStatusBody;
+                    return true;
+                  }());
+                  final needsRequestsFirst = pendingRequests.isNotEmpty;
+                  final needsProfileFirst = !profile.hasRequiredAlertInfo;
+                  final needsIntakeFirst = latestSubmission == null;
+                  final needsAppointmentFirst =
+                      nextVisit == null && pendingAppointmentRequests.isEmpty;
+
+                  late final String nextStepTitle;
+                  late final String nextStepBody;
+                  late final String nextStepButton;
+                  late final VoidCallback nextStepAction;
+                  late final String secondStepTitle;
+                  late final String thirdStepTitle;
+
+                  if (needsRequestsFirst) {
+                    nextStepTitle = lang.tr(
+                      'Reply to your practitioner request first',
+                      '먼저 침술사 요청에 답하기',
+                    );
+                    nextStepBody = lang.tr(
+                      'You have ${pendingRequests.length} request(s) waiting. Open Requests first, then continue intake only if the request asks for it.',
+                      '대기 중인 요청이 ${pendingRequests.length}건 있습니다. 먼저 요청함을 열고, 그 안에서 문진을 다시 하라고 하면 그때 이어서 진행하면 됩니다.',
+                    );
+                    nextStepButton = lang.tr('Open Requests', '요청함 열기');
+                    nextStepAction = () =>
+                        Navigator.pushNamed(context, PatientRequestsScreen.routeName);
+                    secondStepTitle = lang.tr(
+                      'Then update intake if needed',
+                      '그다음 필요하면 문진 업데이트',
+                    );
+                    thirdStepTitle = lang.tr(
+                      'Check visit date later',
+                      '마지막으로 방문 일정 확인',
+                    );
+                  } else if (needsProfileFirst) {
+                    nextStepTitle = lang.tr(
+                      'Add your contact info first',
+                      '먼저 연락처 입력하기',
+                    );
+                    nextStepBody = lang.tr(
+                      'Before you do anything else, save your phone and email so your clinic can follow up correctly.',
+                      '다른 작업보다 먼저 전화번호와 이메일을 저장해두면 한의원 쪽 후속 안내가 훨씬 정확해집니다.',
+                    );
+                    nextStepButton = lang.tr('Edit Profile', '프로필 수정');
+                    nextStepAction = _openProfileDialog;
+                    secondStepTitle = lang.tr(
+                      'Then continue intake',
+                      '그다음 문진 이어서 작성',
+                    );
+                    thirdStepTitle = lang.tr(
+                      'Request your next visit when ready',
+                      '준비되면 다음 예약 신청',
+                    );
+                  } else if (needsIntakeFirst) {
+                    nextStepTitle = lang.tr(
+                      'Send today\'s intake update',
+                      '오늘 상태 문진 보내기',
+                    );
+                    nextStepBody = lang.tr(
+                      'You do not need to do everything at once. Start by sending your current condition through Intake.',
+                      '한 번에 다 할 필요는 없습니다. 먼저 Intake에서 오늘 상태만 보내면 됩니다.',
+                    );
+                    nextStepButton = lang.tr('Continue Intake', '문진 이어쓰기');
+                    nextStepAction = () =>
+                        Navigator.pushNamed(context, PatientIntakeScreen.routeName);
+                    secondStepTitle = lang.tr(
+                      'Then check for any replies',
+                      '그다음 답변/요청 확인',
+                    );
+                    thirdStepTitle = lang.tr(
+                      'Look at schedule and history later',
+                      '일정과 기록은 나중에 확인',
+                    );
+                  } else if (needsAppointmentFirst) {
+                    nextStepTitle = lang.tr(
+                      'Request your next appointment',
+                      '다음 예약 신청하기',
+                    );
+                    nextStepBody = lang.tr(
+                      'Your latest intake is already saved, so the next useful step is to request a visit slot.',
+                      '최신 문진은 이미 저장되어 있으니, 지금 가장 도움이 되는 다음 단계는 예약 시간을 신청하는 것입니다.',
+                    );
+                    nextStepButton = lang.tr('Book Appointment', '예약하기');
+                    nextStepAction = _openAppointmentDialog;
+                    secondStepTitle = lang.tr(
+                      'Then wait for confirmation',
+                      '그다음 확정 알림 기다리기',
+                    );
+                    thirdStepTitle = lang.tr(
+                      'Open history only if you need past notes',
+                      '예전 메모가 필요할 때만 기록 보기',
+                    );
+                  } else {
+                    nextStepTitle = lang.tr(
+                      'You are caught up for now',
+                      '지금은 할 일을 거의 마쳤어요',
+                    );
+                    nextStepBody = lang.tr(
+                      'Nothing urgent is waiting. You can review your visit history or update intake only if your condition changed.',
+                      '급한 작업은 없습니다. 몸 상태가 달라졌을 때만 문진을 다시 열고, 아니면 방문 기록만 가볍게 확인하면 됩니다.',
+                    );
+                    nextStepButton = lang.tr('Visit History', '방문 기록');
+                    nextStepAction = () =>
+                        Navigator.pushNamed(context, VisitHistoryScreen.routeName);
+                    secondStepTitle = lang.tr(
+                      'Check requests only if a new message arrives',
+                      '새 메시지가 오면 요청함 확인',
+                    );
+                    thirdStepTitle = lang.tr(
+                      'Update intake only when your condition changes',
+                      '상태가 바뀔 때만 문진 업데이트',
+                    );
+                  }
+
                   final showLegacySummary =
                       Theme.of(context).platform == TargetPlatform.fuchsia &&
                       pendingItemCount < 0;
@@ -1264,131 +1384,169 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 ),
                               ],
                             ),
-                            if (_showStartGuide) ...[
-                              const SizedBox(height: 20),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      lang.tr('Start here', '여기부터 시작'),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(color: Colors.white),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    tooltip: lang.tr('Hide guide', '가이드 숨기기'),
-                                    onPressed: () {
-                                      setState(() => _showStartGuide = false);
-                                    },
-                                    icon: const Icon(Icons.close),
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    visualDensity: VisualDensity.compact,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Wrap(
-                                spacing: 12,
-                                runSpacing: 12,
-                                children: [
-                                  AppGuideStep(
-                                    dark: true,
-                                    step: '1',
-                                    title: lang.tr(
-                                      'Check requests first',
-                                      '먼저 요청 확인',
-                                    ),
-                                    description: pendingRequests.isEmpty
-                                        ? lang.tr(
-                                            'No urgent practitioner questions are waiting right now.',
-                                            '지금 바로 확인할 침술사 요청은 없습니다.',
-                                          )
-                                        : lang.tr(
-                                            '${pendingRequests.length} practitioner request(s) need your attention.',
-                                            '확인할 침술사 요청이 ${pendingRequests.length}건 있습니다.',
-                                          ),
-                                  ),
-                                  AppGuideStep(
-                                    dark: true,
-                                    step: '2',
-                                    title: lang.tr(
-                                      'Continue or update intake',
-                                      '문진 이어서 작성',
-                                    ),
-                                    description: latestSubmission == null
-                                        ? lang.tr(
-                                            'Open the intake form to submit your latest condition.',
-                                            '문진 화면을 열어 현재 상태를 먼저 제출해보세요.',
-                                          )
-                                        : lang.tr(
-                                            'You can reopen the intake form whenever your condition changed.',
-                                            '몸 상태가 달라졌다면 언제든 문진을 다시 열어 업데이트할 수 있습니다.',
-                                          ),
-                                  ),
-                                  AppGuideStep(
-                                    dark: true,
-                                    step: '3',
-                                    title: lang.tr(
-                                      'Review schedule and history',
-                                      '일정과 기록 확인',
-                                    ),
-                                    description: lang.tr(
-                                      'After requests and intake, check appointments and your recent visit notes.',
-                                      '요청과 문진을 본 뒤에는 예약 상태와 최근 방문 기록을 확인하세요.',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
                             const SizedBox(height: 18),
-                            Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
-                              children: [
-                                FilledButton.icon(
-                                  onPressed: () => Navigator.pushNamed(
-                                    context,
-                                    PatientRequestsScreen.routeName,
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(color: Colors.white24),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          lang.tr('Do this first', '지금 먼저 할 것'),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(color: Colors.white),
+                                        ),
+                                      ),
+                                      if (_showStartGuide)
+                                        IconButton(
+                                          tooltip: lang.tr('Hide guide', '가이드 숨기기'),
+                                          onPressed: () {
+                                            setState(() => _showStartGuide = false);
+                                          },
+                                          icon: const Icon(Icons.close),
+                                          color: Colors.white.withValues(alpha: 0.9),
+                                          visualDensity: VisualDensity.compact,
+                                        )
+                                      else
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() => _showStartGuide = true);
+                                          },
+                                          child: Text(
+                                            lang.tr('Show guide', '가이드 보기'),
+                                            style: const TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                    ],
                                   ),
-                                  icon: const Icon(
-                                    Icons.mark_email_unread_outlined,
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    nextStepTitle,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                   ),
-                                  label: Text(
-                                    lang.tr('Open Requests', '답변 요청 보기'),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    nextStepBody,
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.84),
+                                      height: 1.5,
+                                    ),
                                   ),
-                                ),
-                                FilledButton.icon(
-                                  onPressed: () => Navigator.pushNamed(
-                                    context,
-                                    PatientIntakeScreen.routeName,
+                                  const SizedBox(height: 14),
+                                  Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children: [
+                                      FilledButton.icon(
+                                        onPressed: nextStepAction,
+                                        icon: const Icon(Icons.arrow_forward),
+                                        label: Text(nextStepButton),
+                                      ),
+                                      OutlinedButton.icon(
+                                        onPressed: () => Navigator.pushNamed(
+                                          context,
+                                          PatientRequestsScreen.routeName,
+                                        ),
+                                        icon: const Icon(Icons.mark_email_unread_outlined),
+                                        label: Text(
+                                          lang.tr('Requests', '요청함'),
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(color: Colors.white38),
+                                          foregroundColor: Colors.white,
+                                        ),
+                                      ),
+                                      OutlinedButton.icon(
+                                        onPressed: () => Navigator.pushNamed(
+                                          context,
+                                          PatientIntakeScreen.routeName,
+                                        ),
+                                        icon: const Icon(Icons.edit_note),
+                                        label: Text(
+                                          lang.tr('Intake', '문진'),
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(color: Colors.white38),
+                                          foregroundColor: Colors.white,
+                                        ),
+                                      ),
+                                      OutlinedButton.icon(
+                                        onPressed: _openAppointmentDialog,
+                                        icon: const Icon(Icons.event_available_outlined),
+                                        label: Text(
+                                          lang.tr('Book', '예약'),
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(color: Colors.white38),
+                                          foregroundColor: Colors.white,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  icon: const Icon(Icons.edit_note),
-                                  label: Text(
-                                    lang.tr('Continue Intake', '문진 이어서 작성'),
+                                  const SizedBox(height: 16),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          lang.tr('Simple order', '간단한 순서'),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(color: Colors.white),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '1. $nextStepTitle',
+                                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          '2. $secondStepTitle',
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: Colors.white.withValues(alpha: 0.84),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          '3. $thirdStepTitle',
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: Colors.white.withValues(alpha: 0.84),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                OutlinedButton.icon(
-                                  onPressed: _openAppointmentDialog,
-                                  icon: const Icon(
-                                    Icons.event_available_outlined,
-                                  ),
-                                  label: Text(
-                                    lang.tr('Book Appointment', '예약하기'),
-                                  ),
-                                ),
-                                OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(
-                                    context,
-                                    VisitHistoryScreen.routeName,
-                                  ),
-                                  icon: const Icon(Icons.history),
-                                  label: Text(
-                                    lang.tr('Visit History', '방문 기록'),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -1400,14 +1558,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr('What needs attention now', '지금 먼저 볼 것'),
+                              lang.tr('Quick status', '빠른 상태 확인'),
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               lang.tr(
-                                'Like Practice Better and athena-style portals, the first actions stay above history so you can move without hunting through menus.',
-                                'Practice Better나 athena 계열 포털처럼, 먼저 해야 할 작업을 기록보다 위에 두어 메뉴를 헤매지 않게 했습니다.',
+                                'Use this only as a quick readout. If you are unsure what to do, follow the single next-step card above first.',
+                                '여기는 상태만 빠르게 보는 곳입니다. 무엇을 해야 할지 헷갈리면 위의 `지금 먼저 할 것` 카드만 먼저 따라가면 됩니다.',
                               ),
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
@@ -1421,28 +1579,25 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 final cards = [
                                   _ActionHubCard(
                                     icon: Icons.mark_email_unread_outlined,
-                                    eyebrow: lang.tr('Requests first', '요청 먼저'),
+                                    eyebrow: lang.tr('Requests', '요청함'),
                                     title: lang.tr(
                                       pendingRequests.isEmpty
-                                          ? 'Inbox is clear'
+                                          ? 'No message waiting'
                                           : '${pendingRequests.length} request(s) waiting',
                                       pendingRequests.isEmpty
-                                          ? '요청함 비어 있음'
+                                          ? '새 메시지 없음'
                                           : '${pendingRequests.length}건 대기 중',
                                     ),
                                     body: pendingRequests.isEmpty
                                         ? lang.tr(
-                                            'No practitioner follow-up is waiting right now, but this is still the first place to check.',
-                                            '지금은 대기 중인 침술사 요청이 없지만, 가장 먼저 확인할 곳은 여전히 여기입니다.',
+                                            'Nothing urgent here right now.',
+                                            '지금은 급한 요청이 없습니다.',
                                           )
                                         : lang.tr(
-                                            'Open your inbox, read the newest follow-up request, and continue from the linked intake form.',
-                                            '요청함을 열어 최신 후속 질문을 읽고, 연결된 문진으로 바로 이어가세요.',
+                                            'Reply here before doing anything else.',
+                                            '다른 작업보다 먼저 여기서 답하면 됩니다.',
                                           ),
-                                    actionLabel: lang.tr(
-                                      'Open requests',
-                                      '요청함 열기',
-                                    ),
+                                    actionLabel: lang.tr('Open', '열기'),
                                     onTap: () => Navigator.pushNamed(
                                       context,
                                       PatientRequestsScreen.routeName,
@@ -1450,13 +1605,18 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   ),
                                   _ActionHubCard(
                                     icon: Icons.assignment_turned_in_outlined,
-                                    eyebrow: lang.tr('Intake next', '문진 다음'),
+                                    eyebrow: lang.tr('Intake', '문진'),
                                     title: intakeStatusLabel,
-                                    body: intakeStatusBody,
-                                    actionLabel: lang.tr(
-                                      'Continue intake',
-                                      '문진 이어쓰기',
-                                    ),
+                                    body: latestSubmission == null
+                                        ? lang.tr(
+                                            'No intake sent yet.',
+                                            '아직 보낸 문진이 없습니다.',
+                                          )
+                                        : lang.tr(
+                                            'You can update this only when your condition changed.',
+                                            '몸 상태가 바뀌었을 때만 다시 업데이트하면 됩니다.',
+                                          ),
+                                    actionLabel: lang.tr('Open', '열기'),
                                     onTap: () => Navigator.pushNamed(
                                       context,
                                       PatientIntakeScreen.routeName,
@@ -1464,32 +1624,26 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   ),
                                   _ActionHubCard(
                                     icon: Icons.event_available_outlined,
-                                    eyebrow: lang.tr('Visit context', '방문 맥락'),
+                                    eyebrow: lang.tr('Visit', '방문'),
                                     title: nextVisitLabel,
-                                    body: nextVisitBody,
-                                    actionLabel: nextVisit != null
-                                        ? lang.tr('Review history', '기록 보기')
+                                    body: nextVisit != null
+                                        ? lang.tr(
+                                            'Your next confirmed visit is already set.',
+                                            '다음 방문 일정이 이미 잡혀 있습니다.',
+                                          )
                                         : lang.tr(
-                                            'Request appointment',
-                                            '예약 신청',
+                                            'No confirmed visit is showing yet.',
+                                            '아직 확정된 방문 일정이 보이지 않습니다.',
                                           ),
+                                    actionLabel: nextVisit != null
+                                        ? lang.tr('History', '기록')
+                                        : lang.tr('Book', '예약'),
                                     onTap: nextVisit != null
                                         ? () => Navigator.pushNamed(
                                             context,
                                             VisitHistoryScreen.routeName,
                                           )
                                         : _openAppointmentDialog,
-                                  ),
-                                  _ActionHubCard(
-                                    icon: Icons.verified_user_outlined,
-                                    eyebrow: lang.tr('Profile check', '프로필 점검'),
-                                    title: profileStatusLabel,
-                                    body: profileStatusBody,
-                                    actionLabel: lang.tr(
-                                      'Edit profile',
-                                      '프로필 수정',
-                                    ),
-                                    onTap: _openProfileDialog,
                                   ),
                                 ];
 
