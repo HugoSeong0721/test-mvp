@@ -152,16 +152,6 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                     children: [
                       AppPanel(
                         padding: const EdgeInsets.all(22),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppTheme.pine,
-                            AppTheme.jade,
-                            Color(0xFF2A7A66),
-                          ],
-                        ),
-                        borderColor: Colors.white24,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -169,14 +159,14 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               lang.tr('Unified patient chart', '통합 환자 차트'),
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.74),
+                                    color: AppTheme.ink.withValues(alpha: 0.58),
                                   ),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               profile.name,
                               style: Theme.of(context).textTheme.headlineMedium
-                                  ?.copyWith(color: Colors.white),
+                                  ?.copyWith(color: AppTheme.ink),
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -186,7 +176,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               ),
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.84),
+                                    color: AppTheme.ink.withValues(alpha: 0.72),
                                   ),
                             ),
                             const SizedBox(height: 14),
@@ -199,49 +189,41 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                   label: lang.tr('Basic profile', '기본 프로필'),
                                   value:
                                       '${profile.sex} · ${profile.ageRange} · ${profile.ethnicity}',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.74,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.history_outlined,
                                   label: lang.tr('Visits', '방문 수'),
                                   value: '${history.length}',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.74,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.assignment_turned_in_outlined,
                                   label: lang.tr('Completed intakes', '완료 문진'),
                                   value: '$completedVisits',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.74,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.mark_email_unread_outlined,
                                   label: lang.tr('Pending feedback', '미확인 피드백'),
                                   value: '$pendingFeedbackCount',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.14,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.74,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                               ],
                             ),
@@ -250,11 +232,9 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.12),
+                                color: AppTheme.surface,
                                 borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.16),
-                                ),
+                                border: Border.all(color: AppTheme.border),
                               ),
                               child: Wrap(
                                 spacing: 16,
@@ -262,15 +242,27 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 children: [
                                   Text(
                                     '${lang.tr('Phone', '전화번호')}: ${profile.phone.isEmpty ? lang.tr('Missing', '미입력') : profile.phone}',
-                                    style: const TextStyle(color: Colors.white),
+                                    style: TextStyle(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.78,
+                                      ),
+                                    ),
                                   ),
                                   Text(
                                     '${lang.tr('Email', '이메일')}: ${profile.email.isEmpty ? lang.tr('Missing', '미입력') : profile.email}',
-                                    style: const TextStyle(color: Colors.white),
+                                    style: TextStyle(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.78,
+                                      ),
+                                    ),
                                   ),
                                   Text(
                                     '${lang.tr('Internal note', '내 메모')}: ${profile.memo.trim().isEmpty ? lang.tr('No internal note yet', '아직 메모 없음') : profile.memo.trim()}',
-                                    style: const TextStyle(color: Colors.white),
+                                    style: TextStyle(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.78,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -284,9 +276,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                         runSpacing: 10,
                         children: [
                           ChoiceChip(
-                            label: Text(
-                              lang.tr('Overview', '기본 정보'),
-                            ),
+                            label: Text(lang.tr('Overview', '기본 정보')),
                             selected:
                                 _selectedTab == _PatientRecordTab.overview,
                             onSelected: (_) {
@@ -296,9 +286,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             },
                           ),
                           ChoiceChip(
-                            label: Text(
-                              lang.tr('Visits', '방문 기록'),
-                            ),
+                            label: Text(lang.tr('Visits', '방문 기록')),
                             selected: _selectedTab == _PatientRecordTab.visits,
                             onSelected: (_) {
                               setState(
@@ -307,9 +295,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             },
                           ),
                           ChoiceChip(
-                            label: Text(
-                              lang.tr('My Requests', '내 요청'),
-                            ),
+                            label: Text(lang.tr('My Requests', '내 요청')),
                             selected:
                                 _selectedTab == _PatientRecordTab.requests,
                             onSelected: (_) {
@@ -319,9 +305,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             },
                           ),
                           ChoiceChip(
-                            label: Text(
-                              lang.tr('Patient Intake', '환자 문진'),
-                            ),
+                            label: Text(lang.tr('Patient Intake', '환자 문진')),
                             selected: _selectedTab == _PatientRecordTab.intake,
                             onSelected: (_) {
                               setState(
@@ -330,9 +314,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             },
                           ),
                           ChoiceChip(
-                            label: Text(
-                              lang.tr('Feedback', '피드백'),
-                            ),
+                            label: Text(lang.tr('Feedback', '피드백')),
                             selected:
                                 _selectedTab == _PatientRecordTab.feedback,
                             onSelected: (_) {
@@ -345,290 +327,715 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                       ),
                       const SizedBox.shrink(),
                       if (_selectedTab == _PatientRecordTab.overview) ...[
-                      AppPanel(
-                        padding: const EdgeInsets.all(18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              lang.tr(
-                                '1. Basic profile and my note',
-                                '1. 기본 정보와 내 메모',
+                        AppPanel(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.tr(
+                                  '1. Basic profile and my note',
+                                  '1. 기본 정보와 내 메모',
+                                ),
+                                style: Theme.of(context).textTheme.titleLarge,
                               ),
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              lang.tr(
-                                'Keep demographics, contact information, and your standing note about this patient in sync here.',
-                                '환자 기본 정보, 연락처, 그리고 이 환자에 대한 상시 메모를 여기서 함께 관리합니다.',
+                              const SizedBox(height: 6),
+                              Text(
+                                lang.tr(
+                                  'Keep demographics, contact information, and your standing note about this patient in sync here.',
+                                  '환자 기본 정보, 연락처, 그리고 이 환자에 대한 상시 메모를 여기서 함께 관리합니다.',
+                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.66,
+                                      ),
+                                    ),
                               ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.66),
-                                  ),
-                            ),
-                            const SizedBox(height: 14),
-                            TextField(
-                              controller: _nameController,
-                              decoration: InputDecoration(
-                                labelText: lang.tr('Name', '이름'),
-                                border: const OutlineInputBorder(),
+                              const SizedBox(height: 14),
+                              TextField(
+                                controller: _nameController,
+                                decoration: InputDecoration(
+                                  labelText: lang.tr('Name', '이름'),
+                                  border: const OutlineInputBorder(),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _phoneController,
-                                    decoration: InputDecoration(
-                                      labelText: lang.tr('Phone', '전화번호'),
-                                      border: const OutlineInputBorder(),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _phoneController,
+                                      decoration: InputDecoration(
+                                        labelText: lang.tr('Phone', '전화번호'),
+                                        border: const OutlineInputBorder(),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _emailController,
-                                    decoration: InputDecoration(
-                                      labelText: lang.tr('Email', '이메일'),
-                                      border: const OutlineInputBorder(),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _emailController,
+                                      decoration: InputDecoration(
+                                        labelText: lang.tr('Email', '이메일'),
+                                        border: const OutlineInputBorder(),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _birthYearController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      labelText: lang.tr('Birth Year', '출생연도'),
-                                      border: const OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _sexController,
-                                    decoration: InputDecoration(
-                                      labelText: lang.tr('Sex / Gender', '성별'),
-                                      border: const OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _ethnicityController,
-                                    decoration: InputDecoration(
-                                      labelText: lang.tr('Ethnicity', '인종/민족'),
-                                      border: const OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            TextField(
-                              controller: _memoController,
-                              maxLines: 3,
-                              decoration: InputDecoration(
-                                labelText: lang.tr(
-                                  'My standing note about this patient',
-                                  '이 환자에 대한 내 메모',
-                                ),
-                                border: const OutlineInputBorder(),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 14),
-                            FilledButton.icon(
-                              onPressed: _saveProfile,
-                              icon: const Icon(Icons.save_outlined),
-                              label: Text(
-                                lang.tr('Save patient profile', '환자 정보 저장'),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _birthYearController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        labelText: lang.tr(
+                                          'Birth Year',
+                                          '출생연도',
+                                        ),
+                                        border: const OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _sexController,
+                                      decoration: InputDecoration(
+                                        labelText: lang.tr(
+                                          'Sex / Gender',
+                                          '성별',
+                                        ),
+                                        border: const OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _ethnicityController,
+                                      decoration: InputDecoration(
+                                        labelText: lang.tr(
+                                          'Ethnicity',
+                                          '인종/민족',
+                                        ),
+                                        border: const OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 10),
+                              TextField(
+                                controller: _memoController,
+                                maxLines: 3,
+                                decoration: InputDecoration(
+                                  labelText: lang.tr(
+                                    'My standing note about this patient',
+                                    '이 환자에 대한 내 메모',
+                                  ),
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              FilledButton.icon(
+                                onPressed: _saveProfile,
+                                icon: const Icon(Icons.save_outlined),
+                                label: Text(
+                                  lang.tr('Save patient profile', '환자 정보 저장'),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
                       ],
                       const SizedBox.shrink(),
                       if (_selectedTab == _PatientRecordTab.visits) ...[
-                      AppPanel(
-                        padding: const EdgeInsets.all(18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              lang.tr(
-                                '2. Visit-by-visit record timeline',
-                                '2. 방문별 전체 기록',
-                              ),
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              lang.tr(
-                                'Review why the patient came in, what you focused on, what you documented, and whether the patient later sent a correction or follow-up message.',
-                                '환자가 어떤 이유로 왔는지, 어떤 치료 포인트를 봤는지, 내가 무엇을 남겼는지, 이후 환자 피드백이 있었는지를 방문별로 확인합니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.66),
-                                  ),
-                            ),
-                            const SizedBox(height: 14),
-                            if (history.isEmpty)
-                              _EmptyRecordState(
-                                message: lang.tr(
-                                  'No visit history is saved for this patient yet.',
-                                  '이 환자에게는 아직 저장된 방문 기록이 없습니다.',
+                        AppPanel(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.tr(
+                                  '2. Visit-by-visit record timeline',
+                                  '2. 방문별 전체 기록',
                                 ),
-                              )
-                            else
-                              ...history.map((item) {
-                                final visit = item.visit;
-                                final feedback = feedbackByVisitId[visit.id];
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.surfaceSoft.withValues(
-                                        alpha: 0.56,
-                                      ),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: AppTheme.border,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                lang.tr(
+                                  'Review why the patient came in, what you focused on, what you documented, and whether the patient later sent a correction or follow-up message.',
+                                  '환자가 어떤 이유로 왔는지, 어떤 치료 포인트를 봤는지, 내가 무엇을 남겼는지, 이후 환자 피드백이 있었는지를 방문별로 확인합니다.',
+                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.66,
                                       ),
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                '${_formatStoredDateWithWeekday(visit.date)} ${visit.time}',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ),
-                                            Chip(
-                                              label: Text(
-                                                visit.intakeStatus.label,
-                                              ),
-                                            ),
-                                          ],
+                              ),
+                              const SizedBox(height: 14),
+                              if (history.isEmpty)
+                                _EmptyRecordState(
+                                  message: lang.tr(
+                                    'No visit history is saved for this patient yet.',
+                                    '이 환자에게는 아직 저장된 방문 기록이 없습니다.',
+                                  ),
+                                )
+                              else
+                                ...history.map((item) {
+                                  final visit = item.visit;
+                                  final feedback = feedbackByVisitId[visit.id];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.surfaceSoft.withValues(
+                                          alpha: 0.56,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          '${lang.tr('Visit reason / treatment focus', '내원 이유 / 치료 포인트')}: ${visit.previousTreatmentArea}',
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: AppTheme.border,
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${lang.tr('What I documented', '내가 남긴 기록')}: ${visit.previousSessionNote}',
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          lang.tr(
-                                            'Since the last visit: ${visit.scheduledSinceLast} scheduled, ${visit.noShowSinceLast} no-show',
-                                            '이전 방문 이후 예약 ${visit.scheduledSinceLast}건, 노쇼 ${visit.noShowSinceLast}건',
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          lang.tr(
-                                            'Pre-visit intake answers',
-                                            '사전문진 답변',
-                                          ),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        if (visit.qaList.isEmpty)
-                                          Text(
-                                            lang.tr(
-                                              'No intake answers were saved for this visit.',
-                                              '이 방문에는 저장된 사전문진 답변이 없습니다.',
-                                            ),
-                                          )
-                                        else ...[
-                                          ...visit.qaList
-                                              .take(3)
-                                              .map(
-                                                (qa) => Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                        bottom: 6,
-                                                      ),
-                                                  child: Text(
-                                                    '- [${qa.category}] ${qa.question} / ${qa.answer}',
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  '${_formatStoredDateWithWeekday(visit.date)} ${visit.time}',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 16,
                                                   ),
                                                 ),
                                               ),
-                                          if (visit.qaList.length > 3)
-                                            Text(
-                                              lang.tr(
-                                                '+ ${visit.qaList.length - 3} more answers',
-                                                '+ ${visit.qaList.length - 3}개 답변 더 있음',
+                                              Chip(
+                                                label: Text(
+                                                  visit.intakeStatus.label,
+                                                ),
                                               ),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: AppTheme.ink
-                                                        .withValues(
-                                                          alpha: 0.62,
-                                                        ),
-                                                  ),
-                                            ),
-                                        ],
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          lang.tr(
-                                            'Patient feedback about this visit',
-                                            '이 방문에 대한 환자 피드백',
+                                            ],
                                           ),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        if (feedback == null ||
-                                            (feedback['feedbackText'] ?? '')
-                                                .toString()
-                                                .trim()
-                                                .isEmpty)
+                                          const SizedBox(height: 8),
                                           Text(
-                                            lang.tr(
-                                              'No patient correction or follow-up feedback yet.',
-                                              '아직 환자 수정 요청이나 후속 피드백이 없습니다.',
-                                            ),
-                                          )
-                                        else ...[
-                                          Text(
-                                            '${lang.tr('Status', '상태')}: ${_feedbackStatusLabel((feedback['status'] ?? 'pending').toString())}',
+                                            '${lang.tr('Visit reason / treatment focus', '내원 이유 / 치료 포인트')}: ${visit.previousTreatmentArea}',
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${lang.tr('Updated', '수정 시각')}: ${_formatTimestamp(feedback['updatedAt'] as Timestamp?)}',
+                                            '${lang.tr('What I documented', '내가 남긴 기록')}: ${visit.previousSessionNote}',
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            lang.tr(
+                                              'Since the last visit: ${visit.scheduledSinceLast} scheduled, ${visit.noShowSinceLast} no-show',
+                                              '이전 방문 이후 예약 ${visit.scheduledSinceLast}건, 노쇼 ${visit.noShowSinceLast}건',
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            lang.tr(
+                                              'Pre-visit intake answers',
+                                              '사전문진 답변',
+                                            ),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
                                           const SizedBox(height: 6),
+                                          if (visit.qaList.isEmpty)
+                                            Text(
+                                              lang.tr(
+                                                'No intake answers were saved for this visit.',
+                                                '이 방문에는 저장된 사전문진 답변이 없습니다.',
+                                              ),
+                                            )
+                                          else ...[
+                                            ...visit.qaList
+                                                .take(3)
+                                                .map(
+                                                  (qa) => Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          bottom: 6,
+                                                        ),
+                                                    child: Text(
+                                                      '- [${qa.category}] ${qa.question} / ${qa.answer}',
+                                                    ),
+                                                  ),
+                                                ),
+                                            if (visit.qaList.length > 3)
+                                              Text(
+                                                lang.tr(
+                                                  '+ ${visit.qaList.length - 3} more answers',
+                                                  '+ ${visit.qaList.length - 3}개 답변 더 있음',
+                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: AppTheme.ink
+                                                          .withValues(
+                                                            alpha: 0.62,
+                                                          ),
+                                                    ),
+                                              ),
+                                          ],
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            lang.tr(
+                                              'Patient feedback about this visit',
+                                              '이 방문에 대한 환자 피드백',
+                                            ),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          if (feedback == null ||
+                                              (feedback['feedbackText'] ?? '')
+                                                  .toString()
+                                                  .trim()
+                                                  .isEmpty)
+                                            Text(
+                                              lang.tr(
+                                                'No patient correction or follow-up feedback yet.',
+                                                '아직 환자 수정 요청이나 후속 피드백이 없습니다.',
+                                              ),
+                                            )
+                                          else ...[
+                                            Text(
+                                              '${lang.tr('Status', '상태')}: ${_feedbackStatusLabel((feedback['status'] ?? 'pending').toString())}',
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${lang.tr('Updated', '수정 시각')}: ${_formatTimestamp(feedback['updatedAt'] as Timestamp?)}',
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Container(
+                                              width: double.infinity,
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                border: Border.all(
+                                                  color: AppTheme.border,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                (feedback['feedbackText'] ?? '')
+                                                    .toString(),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox.shrink(),
+                      if (_selectedTab == _PatientRecordTab.requests) ...[
+                        AppPanel(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.tr(
+                                  '3. My pre-visit requests and notes',
+                                  '3. 내가 보낸 사전 요청과 메모',
+                                ),
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                lang.tr(
+                                  'See what you asked this patient before the visit and what note or guidance you sent along with the request.',
+                                  '방문 전에 어떤 질문을 요청했는지와 함께 보낸 메모를 한 번에 확인합니다.',
+                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.66,
+                                      ),
+                                    ),
+                              ),
+                              const SizedBox(height: 14),
+                              if (requestSnapshot.hasError)
+                                const _RecordErrorState()
+                              else if (!requestSnapshot.hasData)
+                                const LinearProgressIndicator(minHeight: 4)
+                              else if (requestDocs.isEmpty)
+                                _EmptyRecordState(
+                                  message: lang.tr(
+                                    'No practitioner answer requests were saved for this patient yet.',
+                                    '이 환자에게 보낸 사전 질문 요청이 아직 없습니다.',
+                                  ),
+                                )
+                              else
+                                ...requestDocs.map((doc) {
+                                  final data = doc.data();
+                                  final selectedQuestions = _safeStringList(
+                                    data['selectedQuestions'],
+                                  );
+                                  final customByCategory = _safeQuestionMap(
+                                    data['customQuestionsByCategory'],
+                                  );
+                                  final note = (data['note'] ?? '')
+                                      .toString()
+                                      .trim();
+                                  final questionCount =
+                                      selectedQuestions.length +
+                                      customByCategory.values.fold<int>(
+                                        0,
+                                        (total, item) => total + item.length,
+                                      );
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF8FBFE),
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: const Color(0xFFD5E3EF),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _formatTimestamp(
+                                              data['requestedAt'] as Timestamp?,
+                                            ),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '${lang.tr('Requested for visit time', '대상 방문 시간')}: ${(data['patientTime'] ?? '-').toString()}',
+                                          ),
+                                          Text(
+                                            '${lang.tr('Reference last visit', '기준 이전 방문')}: ${_formatStoredDateWithWeekday((data['lastVisitDate'] ?? '-').toString())}',
+                                          ),
+                                          Text(
+                                            '${lang.tr('Requested questions', '요청 질문 수')}: $questionCount',
+                                          ),
+                                          if (note.isNotEmpty) ...[
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              '${lang.tr('My note to the patient', '환자에게 남긴 메모')}: $note',
+                                            ),
+                                          ],
+                                          if (selectedQuestions.isNotEmpty ||
+                                              customByCategory.isNotEmpty) ...[
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              lang.tr('Question list', '질문 목록'),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            ...selectedQuestions.map(
+                                              (question) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 4,
+                                                ),
+                                                child: Text('- $question'),
+                                              ),
+                                            ),
+                                            ...customByCategory.entries.expand(
+                                              (entry) => entry.value.map(
+                                                (question) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        bottom: 4,
+                                                      ),
+                                                  child: Text(
+                                                    '- [${entry.key}] $question',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      if (_selectedTab == _PatientRecordTab.intake) ...[
+                        AppPanel(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.tr(
+                                  '4. How this patient fills pre-visit intake',
+                                  '4. 이 환자의 사전문진 제출 패턴',
+                                ),
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                lang.tr(
+                                  'Review how often they submit, how many questions they answer, what extra memo they leave, and which answers they mark as important.',
+                                  '문진을 얼마나 자주 제출하는지, 몇 개를 답하는지, 어떤 추가 메모를 남기는지, 어떤 답변을 중요 표시하는지 확인합니다.',
+                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.66,
+                                      ),
+                                    ),
+                              ),
+                              const SizedBox(height: 14),
+                              if (submissionSnapshot.hasError)
+                                const _RecordErrorState()
+                              else if (!submissionSnapshot.hasData)
+                                const LinearProgressIndicator(minHeight: 4)
+                              else if (submissionDocs.isEmpty)
+                                _EmptyRecordState(
+                                  message: lang.tr(
+                                    'No intake submissions were saved for this patient yet.',
+                                    '이 환자의 사전문진 제출 기록이 아직 없습니다.',
+                                  ),
+                                )
+                              else
+                                ...submissionDocs.map((doc) {
+                                  final data = doc.data();
+                                  final answers = _safeAnswerItems(
+                                    data['answers'],
+                                  );
+                                  final adherence = _safeMap(data['adherence']);
+                                  final percent =
+                                      ((adherence['percent'] as num?)
+                                              ?.toDouble() ??
+                                          0) *
+                                      100;
+                                  final extraMemo = (data['extraMemo'] ?? '')
+                                      .toString()
+                                      .trim();
+                                  final markedMainPainCount = answers
+                                      .where(
+                                        (item) =>
+                                            item['markedMainPain'] == true,
+                                      )
+                                      .length;
+                                  final markedRememberCount = answers
+                                      .where(
+                                        (item) =>
+                                            item['markedRemember'] == true,
+                                      )
+                                      .length;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFCFAF6),
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: const Color(0xFFE7DCC7),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _formatTimestamp(
+                                              data['submittedAt'] as Timestamp?,
+                                            ),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '${lang.tr('Visit type', '문진 유형')}: ${_visitTypeLabel((data['visitType'] ?? 'follow_up').toString())}',
+                                          ),
+                                          Text(
+                                            '${lang.tr('Answered questions', '답변한 질문 수')}: ${answers.length}',
+                                          ),
+                                          Text(
+                                            '${lang.tr('Completion snapshot', '완료율')}: ${percent.round()}%',
+                                          ),
+                                          Text(
+                                            '${lang.tr('Marked as main concern', '중요 통증 표시')}: $markedMainPainCount · ${lang.tr('Marked to remember', '기억할 내용 표시')}: $markedRememberCount',
+                                          ),
+                                          if (extraMemo.isNotEmpty) ...[
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              '${lang.tr('Extra memo from patient', '환자 추가 메모')}: $extraMemo',
+                                            ),
+                                          ],
+                                          if (answers.isNotEmpty) ...[
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              lang.tr(
+                                                'Latest saved answers',
+                                                '저장된 답변',
+                                              ),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            ...answers.take(3).map((item) {
+                                              final question =
+                                                  (item['questionText'] ?? '')
+                                                      .toString();
+                                              final answer =
+                                                  (item['answerText'] ?? '')
+                                                      .toString();
+                                              final flags = <String>[
+                                                if (item['markedMainPain'] ==
+                                                    true)
+                                                  lang.tr(
+                                                    'Main concern',
+                                                    '중요 통증',
+                                                  ),
+                                                if (item['markedRemember'] ==
+                                                    true)
+                                                  lang.tr('Remember', '기억할 것'),
+                                              ];
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 6,
+                                                ),
+                                                child: Text(
+                                                  flags.isEmpty
+                                                      ? '- $question / $answer'
+                                                      : '- $question / $answer (${flags.join(', ')})',
+                                                ),
+                                              );
+                                            }),
+                                            if (answers.length > 3)
+                                              Text(
+                                                lang.tr(
+                                                  '+ ${answers.length - 3} more answers',
+                                                  '+ ${answers.length - 3}개 답변 더 있음',
+                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: AppTheme.ink
+                                                          .withValues(
+                                                            alpha: 0.62,
+                                                          ),
+                                                    ),
+                                              ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      if (_selectedTab == _PatientRecordTab.feedback) ...[
+                        AppPanel(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.tr(
+                                  '5. Patient corrections and follow-up feedback',
+                                  '5. 환자 수정 요청과 후속 피드백',
+                                ),
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                lang.tr(
+                                  'This section keeps what the patient later said about the visit record so you can compare your note with the patient response.',
+                                  '환자가 나중에 방문 기록에 대해 남긴 내용을 모아 보여주므로, 내 기록과 환자 반응을 바로 비교할 수 있습니다.',
+                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.66,
+                                      ),
+                                    ),
+                              ),
+                              const SizedBox(height: 14),
+                              if (feedbackSnapshot.hasError)
+                                const _RecordErrorState()
+                              else if (!feedbackSnapshot.hasData)
+                                const LinearProgressIndicator(minHeight: 4)
+                              else if (feedbackDocs.isEmpty)
+                                _EmptyRecordState(
+                                  message: lang.tr(
+                                    'No patient feedback has been submitted yet.',
+                                    '아직 제출된 환자 피드백이 없습니다.',
+                                  ),
+                                )
+                              else
+                                ...feedbackDocs.map((doc) {
+                                  final data = doc.data();
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF7FBFA),
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: AppTheme.border,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${_formatStoredDateWithWeekday((data['visitDate'] ?? '-').toString())} ${(data['visitTime'] ?? '').toString()}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '${lang.tr('Status', '상태')}: ${_feedbackStatusLabel((data['status'] ?? 'pending').toString())}',
+                                          ),
+                                          Text(
+                                            '${lang.tr('Updated', '수정 시각')}: ${_formatTimestamp(data['updatedAt'] as Timestamp?)}',
+                                          ),
+                                          const SizedBox(height: 8),
                                           Container(
                                             width: double.infinity,
                                             padding: const EdgeInsets.all(12),
@@ -641,422 +1048,18 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                               ),
                                             ),
                                             child: Text(
-                                              (feedback['feedbackText'] ?? '')
+                                              (data['feedbackText'] ?? '')
                                                   .toString(),
                                             ),
                                           ),
                                         ],
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                          ],
-                        ),
-                      ),
-                      ],
-                      const SizedBox.shrink(),
-                      if (_selectedTab == _PatientRecordTab.requests) ...[
-                      AppPanel(
-                        padding: const EdgeInsets.all(18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              lang.tr(
-                                '3. My pre-visit requests and notes',
-                                '3. 내가 보낸 사전 요청과 메모',
-                              ),
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              lang.tr(
-                                'See what you asked this patient before the visit and what note or guidance you sent along with the request.',
-                                '방문 전에 어떤 질문을 요청했는지와 함께 보낸 메모를 한 번에 확인합니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.66),
-                                  ),
-                            ),
-                            const SizedBox(height: 14),
-                            if (requestSnapshot.hasError)
-                              const _RecordErrorState()
-                            else if (!requestSnapshot.hasData)
-                              const LinearProgressIndicator(minHeight: 4)
-                            else if (requestDocs.isEmpty)
-                              _EmptyRecordState(
-                                message: lang.tr(
-                                  'No practitioner answer requests were saved for this patient yet.',
-                                  '이 환자에게 보낸 사전 질문 요청이 아직 없습니다.',
-                                ),
-                              )
-                            else
-                              ...requestDocs.map((doc) {
-                                final data = doc.data();
-                                final selectedQuestions = _safeStringList(
-                                  data['selectedQuestions'],
-                                );
-                                final customByCategory = _safeQuestionMap(
-                                  data['customQuestionsByCategory'],
-                                );
-                                final note = (data['note'] ?? '')
-                                    .toString()
-                                    .trim();
-                                final questionCount =
-                                    selectedQuestions.length +
-                                    customByCategory.values.fold<int>(
-                                      0,
-                                      (total, item) => total + item.length,
-                                    );
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF8FBFE),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: const Color(0xFFD5E3EF),
                                       ),
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _formatTimestamp(
-                                            data['requestedAt'] as Timestamp?,
-                                          ),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${lang.tr('Requested for visit time', '대상 방문 시간')}: ${(data['patientTime'] ?? '-').toString()}',
-                                        ),
-                                        Text(
-                                          '${lang.tr('Reference last visit', '기준 이전 방문')}: ${_formatStoredDateWithWeekday((data['lastVisitDate'] ?? '-').toString())}',
-                                        ),
-                                        Text(
-                                          '${lang.tr('Requested questions', '요청 질문 수')}: $questionCount',
-                                        ),
-                                        if (note.isNotEmpty) ...[
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            '${lang.tr('My note to the patient', '환자에게 남긴 메모')}: $note',
-                                          ),
-                                        ],
-                                        if (selectedQuestions.isNotEmpty ||
-                                            customByCategory.isNotEmpty) ...[
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            lang.tr('Question list', '질문 목록'),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          ...selectedQuestions.map(
-                                            (question) => Padding(
-                                              padding: const EdgeInsets.only(
-                                                bottom: 4,
-                                              ),
-                                              child: Text('- $question'),
-                                            ),
-                                          ),
-                                          ...customByCategory.entries.expand(
-                                            (entry) => entry.value.map(
-                                              (question) => Padding(
-                                                padding: const EdgeInsets.only(
-                                                  bottom: 4,
-                                                ),
-                                                child: Text(
-                                                  '- [${entry.key}] $question',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                          ],
+                                  );
+                                }),
+                            ],
+                          ),
                         ),
-                      ),
-                      ],
-                      const SizedBox(height: 16),
-                      if (_selectedTab == _PatientRecordTab.intake) ...[
-                      AppPanel(
-                        padding: const EdgeInsets.all(18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              lang.tr(
-                                '4. How this patient fills pre-visit intake',
-                                '4. 이 환자의 사전문진 제출 패턴',
-                              ),
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              lang.tr(
-                                'Review how often they submit, how many questions they answer, what extra memo they leave, and which answers they mark as important.',
-                                '문진을 얼마나 자주 제출하는지, 몇 개를 답하는지, 어떤 추가 메모를 남기는지, 어떤 답변을 중요 표시하는지 확인합니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.66),
-                                  ),
-                            ),
-                            const SizedBox(height: 14),
-                            if (submissionSnapshot.hasError)
-                              const _RecordErrorState()
-                            else if (!submissionSnapshot.hasData)
-                              const LinearProgressIndicator(minHeight: 4)
-                            else if (submissionDocs.isEmpty)
-                              _EmptyRecordState(
-                                message: lang.tr(
-                                  'No intake submissions were saved for this patient yet.',
-                                  '이 환자의 사전문진 제출 기록이 아직 없습니다.',
-                                ),
-                              )
-                            else
-                              ...submissionDocs.map((doc) {
-                                final data = doc.data();
-                                final answers = _safeAnswerItems(
-                                  data['answers'],
-                                );
-                                final adherence = _safeMap(data['adherence']);
-                                final percent =
-                                    ((adherence['percent'] as num?)
-                                            ?.toDouble() ??
-                                        0) *
-                                    100;
-                                final extraMemo = (data['extraMemo'] ?? '')
-                                    .toString()
-                                    .trim();
-                                final markedMainPainCount = answers
-                                    .where(
-                                      (item) => item['markedMainPain'] == true,
-                                    )
-                                    .length;
-                                final markedRememberCount = answers
-                                    .where(
-                                      (item) => item['markedRemember'] == true,
-                                    )
-                                    .length;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFCFAF6),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: const Color(0xFFE7DCC7),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _formatTimestamp(
-                                            data['submittedAt'] as Timestamp?,
-                                          ),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${lang.tr('Visit type', '문진 유형')}: ${_visitTypeLabel((data['visitType'] ?? 'follow_up').toString())}',
-                                        ),
-                                        Text(
-                                          '${lang.tr('Answered questions', '답변한 질문 수')}: ${answers.length}',
-                                        ),
-                                        Text(
-                                          '${lang.tr('Completion snapshot', '완료율')}: ${percent.round()}%',
-                                        ),
-                                        Text(
-                                          '${lang.tr('Marked as main concern', '중요 통증 표시')}: $markedMainPainCount · ${lang.tr('Marked to remember', '기억할 내용 표시')}: $markedRememberCount',
-                                        ),
-                                        if (extraMemo.isNotEmpty) ...[
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            '${lang.tr('Extra memo from patient', '환자 추가 메모')}: $extraMemo',
-                                          ),
-                                        ],
-                                        if (answers.isNotEmpty) ...[
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            lang.tr(
-                                              'Latest saved answers',
-                                              '저장된 답변',
-                                            ),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          ...answers.take(3).map((item) {
-                                            final question =
-                                                (item['questionText'] ?? '')
-                                                    .toString();
-                                            final answer =
-                                                (item['answerText'] ?? '')
-                                                    .toString();
-                                            final flags = <String>[
-                                              if (item['markedMainPain'] ==
-                                                  true)
-                                                lang.tr(
-                                                  'Main concern',
-                                                  '중요 통증',
-                                                ),
-                                              if (item['markedRemember'] ==
-                                                  true)
-                                                lang.tr('Remember', '기억할 것'),
-                                            ];
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                bottom: 6,
-                                              ),
-                                              child: Text(
-                                                flags.isEmpty
-                                                    ? '- $question / $answer'
-                                                    : '- $question / $answer (${flags.join(', ')})',
-                                              ),
-                                            );
-                                          }),
-                                          if (answers.length > 3)
-                                            Text(
-                                              lang.tr(
-                                                '+ ${answers.length - 3} more answers',
-                                                '+ ${answers.length - 3}개 답변 더 있음',
-                                              ),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: AppTheme.ink
-                                                        .withValues(
-                                                          alpha: 0.62,
-                                                        ),
-                                                  ),
-                                            ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                          ],
-                        ),
-                      ),
-                      ],
-                      const SizedBox(height: 16),
-                      if (_selectedTab == _PatientRecordTab.feedback) ...[
-                      AppPanel(
-                        padding: const EdgeInsets.all(18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              lang.tr(
-                                '5. Patient corrections and follow-up feedback',
-                                '5. 환자 수정 요청과 후속 피드백',
-                              ),
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              lang.tr(
-                                'This section keeps what the patient later said about the visit record so you can compare your note with the patient response.',
-                                '환자가 나중에 방문 기록에 대해 남긴 내용을 모아 보여주므로, 내 기록과 환자 반응을 바로 비교할 수 있습니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.66),
-                                  ),
-                            ),
-                            const SizedBox(height: 14),
-                            if (feedbackSnapshot.hasError)
-                              const _RecordErrorState()
-                            else if (!feedbackSnapshot.hasData)
-                              const LinearProgressIndicator(minHeight: 4)
-                            else if (feedbackDocs.isEmpty)
-                              _EmptyRecordState(
-                                message: lang.tr(
-                                  'No patient feedback has been submitted yet.',
-                                  '아직 제출된 환자 피드백이 없습니다.',
-                                ),
-                              )
-                            else
-                              ...feedbackDocs.map((doc) {
-                                final data = doc.data();
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF7FBFA),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: AppTheme.border,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${_formatStoredDateWithWeekday((data['visitDate'] ?? '-').toString())} ${(data['visitTime'] ?? '').toString()}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${lang.tr('Status', '상태')}: ${_feedbackStatusLabel((data['status'] ?? 'pending').toString())}',
-                                        ),
-                                        Text(
-                                          '${lang.tr('Updated', '수정 시각')}: ${_formatTimestamp(data['updatedAt'] as Timestamp?)}',
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Container(
-                                          width: double.infinity,
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              14,
-                                            ),
-                                            border: Border.all(
-                                              color: AppTheme.border,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            (data['feedbackText'] ?? '')
-                                                .toString(),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                          ],
-                        ),
-                      ),
                       ],
                     ],
                   ),
