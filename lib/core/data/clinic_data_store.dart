@@ -251,17 +251,25 @@ class ClinicOpenRequest {
   final DateTime requestedAt;
   final String status;
 
-  ClinicOpenRequest copyWith({String? status}) {
+  ClinicOpenRequest copyWith({
+    String? patientName,
+    String? patientEmail,
+    String? practitionerName,
+    String? location,
+    String? note,
+    DateTime? requestedAt,
+    String? status,
+  }) {
     return ClinicOpenRequest(
       id: id,
       patientId: patientId,
-      patientName: patientName,
-      patientEmail: patientEmail,
+      patientName: patientName ?? this.patientName,
+      patientEmail: patientEmail ?? this.patientEmail,
       clinicName: clinicName,
-      practitionerName: practitionerName,
-      location: location,
-      note: note,
-      requestedAt: requestedAt,
+      practitionerName: practitionerName ?? this.practitionerName,
+      location: location ?? this.location,
+      note: note ?? this.note,
+      requestedAt: requestedAt ?? this.requestedAt,
       status: status ?? this.status,
     );
   }
@@ -1136,34 +1144,41 @@ class ClinicDataStore extends ChangeNotifier {
     }
     final normalizedPractitioner = practitionerName.trim();
     final normalizedLocation = location.trim();
-    final alreadyRequested = _clinicOpenRequests.any((request) {
-      return request.status == 'requested' &&
-          request.patientId == patient.id &&
+    final existingIndex = _clinicOpenRequests.indexWhere((request) {
+      return request.patientId == patient.id &&
           request.clinicName.toLowerCase() == normalizedName.toLowerCase();
     });
-    if (alreadyRequested) {
-      return false;
-    }
 
-    _clinicOpenRequests.add(
-      ClinicOpenRequest(
-        id: 'clinic_open_request_${DateTime.now().millisecondsSinceEpoch}',
-        patientId: patient.id,
-        patientName: patient.name,
-        patientEmail: patient.email,
-        clinicName: normalizedName,
-        practitionerName: normalizedPractitioner,
-        location: normalizedLocation,
-        note: note.trim(),
-        requestedAt: DateTime.now(),
-      ),
-    );
+    final request = existingIndex >= 0
+        ? _clinicOpenRequests[existingIndex].copyWith(
+            patientName: patient.name,
+            patientEmail: patient.email,
+            practitionerName: normalizedPractitioner,
+            location: normalizedLocation,
+            note: note.trim(),
+            requestedAt: DateTime.now(),
+            status: 'requested',
+          )
+        : ClinicOpenRequest(
+            id: 'clinic_open_request_${DateTime.now().millisecondsSinceEpoch}',
+            patientId: patient.id,
+            patientName: patient.name,
+            patientEmail: patient.email,
+            clinicName: normalizedName,
+            practitionerName: normalizedPractitioner,
+            location: normalizedLocation,
+            note: note.trim(),
+            requestedAt: DateTime.now(),
+          );
+    if (existingIndex >= 0) {
+      _clinicOpenRequests[existingIndex] = request;
+    } else {
+      _clinicOpenRequests.add(request);
+    }
     notifyListeners();
     await _persistClinicState();
     try {
-      await AppFirestoreService.saveClinicOpenRequest(
-        _clinicOpenRequests.last.toMap(),
-      );
+      await AppFirestoreService.saveClinicOpenRequest(request.toMap());
     } catch (_) {}
     return true;
   }

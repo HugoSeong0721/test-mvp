@@ -726,19 +726,29 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       ? requestedName
                                                       : null;
                                                 });
+                                                final message = didSave
+                                                    ? lang.tr(
+                                                        'Request sent. We will keep it visible for clinic onboarding.',
+                                                        'Request sent. We will keep it visible for clinic onboarding.',
+                                                      )
+                                                    : lang.tr(
+                                                        'Enter a clinic name before sending the request.',
+                                                        'Enter a clinic name before sending the request.',
+                                                      );
                                                 ScaffoldMessenger.of(
                                                   this.context,
                                                 ).showSnackBar(
                                                   SnackBar(
-                                                    content: Text(
-                                                      lang.tr(
-                                                        'Request sent. We will keep it visible for clinic onboarding.',
-                                                        '요청을 보냈습니다. 한의원 온보딩 요청으로 표시됩니다.',
-                                                      ),
-                                                    ),
+                                                    content: Text(message),
                                                   ),
                                                 );
                                                 if (didSave) {
+                                                  requestClinicNameController
+                                                      .clear();
+                                                  requestPractitionerController
+                                                      .clear();
+                                                  requestLocationController
+                                                      .clear();
                                                   requestNoteController.clear();
                                                 }
                                               }
