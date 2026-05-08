@@ -41,6 +41,21 @@ Important note:
 - A practitioner must sign in first and save/link the clinic in `Clinic Profile`.
 - After that, patients using the same browser context can see and choose that clinic.
 
+## New Clinic Open Requests
+
+Patients who cannot find their clinic can use `Request to open` in the clinic picker.
+
+Where requests appear:
+
+- Patient side: `Patient Home` -> `Change clinic` / `Search clinic` -> `Request to open`
+- Practitioner side: `Practitioner Dashboard` -> `Appointment Inbox` -> `Patient clinic open requests`
+
+Current demo behavior:
+
+- Requests are saved in browser-local storage for the demo.
+- They show as "new clinic requests" inside the practitioner inbox.
+- The static GitHub README cannot update itself from a browser click without a backend or GitHub write token, so this README documents where the live request list appears in the app.
+
 ## Repository
 
 - GitHub: `https://github.com/HugoSeong0721/test-mvp.git`

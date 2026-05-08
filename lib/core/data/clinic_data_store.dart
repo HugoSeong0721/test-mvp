@@ -1107,7 +1107,7 @@ class ClinicDataStore extends ChangeNotifier {
     await _persistClinicState();
   }
 
-  Future<void> requestClinicOpen({
+  Future<bool> requestClinicOpen({
     required PatientProfile patient,
     required String clinicName,
     required String practitionerName,
@@ -1116,7 +1116,7 @@ class ClinicDataStore extends ChangeNotifier {
   }) async {
     final normalizedName = clinicName.trim();
     if (normalizedName.isEmpty) {
-      return;
+      return false;
     }
     final normalizedPractitioner = practitionerName.trim();
     final normalizedLocation = location.trim();
@@ -1126,7 +1126,7 @@ class ClinicDataStore extends ChangeNotifier {
           request.clinicName.toLowerCase() == normalizedName.toLowerCase();
     });
     if (alreadyRequested) {
-      return;
+      return false;
     }
 
     _clinicOpenRequests.add(
@@ -1144,6 +1144,7 @@ class ClinicDataStore extends ChangeNotifier {
     );
     notifyListeners();
     await _persistClinicState();
+    return true;
   }
 
   Future<void> markClinicOpenRequestReviewed(String requestId) async {

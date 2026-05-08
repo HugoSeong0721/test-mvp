@@ -359,6 +359,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     final requestLocationController = TextEditingController();
     final requestNoteController = TextEditingController();
     String query = '';
+    bool isSendingClinicOpenRequest = false;
+    String? sentClinicOpenRequestName;
 
     await showDialog<void>(
       context: context,
@@ -368,6 +370,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             final currentClinic = _store.activeClinicForPatient(patientId);
             final defaultClinicId = _store.defaultClinicIdForPatient(patientId);
             final results = _store.searchClinics(query);
+            final canRequestClinic =
+                requestClinicNameController.text.trim().isNotEmpty &&
+                !isSendingClinicOpenRequest;
             if (requestClinicNameController.text.trim().isEmpty &&
                 query.trim().isNotEmpty) {
               requestClinicNameController.text = query.trim();
@@ -607,6 +612,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       const SizedBox(height: 12),
                                       TextField(
                                         controller: requestClinicNameController,
+                                        onChanged: (_) => setDialogState(() {}),
                                         decoration: InputDecoration(
                                           labelText: lang.tr(
                                             'Clinic name',
@@ -618,6 +624,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       TextField(
                                         controller:
                                             requestPractitionerController,
+                                        onChanged: (_) => setDialogState(() {}),
                                         decoration: InputDecoration(
                                           labelText: lang.tr(
                                             'Practitioner name',
@@ -628,6 +635,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       const SizedBox(height: 8),
                                       TextField(
                                         controller: requestLocationController,
+                                        onChanged: (_) => setDialogState(() {}),
                                         decoration: InputDecoration(
                                           labelText: lang.tr('Location', '위치'),
                                         ),
@@ -635,6 +643,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       const SizedBox(height: 8),
                                       TextField(
                                         controller: requestNoteController,
+                                        onChanged: (_) => setDialogState(() {}),
                                         minLines: 1,
                                         maxLines: 3,
                                         decoration: InputDecoration(
@@ -644,39 +653,101 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 12),
-                                      FilledButton.icon(
-                                        onPressed: () async {
-                                          await _store.requestClinicOpen(
-                                            patient: _currentProfile,
-                                            clinicName:
-                                                requestClinicNameController
-                                                    .text,
-                                            practitionerName:
-                                                requestPractitionerController
-                                                    .text,
-                                            location:
-                                                requestLocationController.text,
-                                            note: requestNoteController.text,
-                                          );
-                                          if (!mounted) {
-                                            return;
-                                          }
-                                          ScaffoldMessenger.of(
-                                            this.context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                lang.tr(
-                                                  'Request sent. We will keep it visible for clinic onboarding.',
-                                                  '요청을 보냈습니다. 한의원 온보딩 요청으로 표시됩니다.',
-                                                ),
+                                      if (sentClinicOpenRequestName !=
+                                          null) ...[
+                                        const SizedBox(height: 10),
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.mint.withValues(
+                                              alpha: 0.42,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
+                                            border: Border.all(
+                                              color: AppTheme.pine.withValues(
+                                                alpha: 0.28,
                                               ),
                                             ),
-                                          );
-                                          requestNoteController.clear();
-                                        },
-                                        icon: const Icon(Icons.outgoing_mail),
+                                          ),
+                                          child: Text(
+                                            lang.tr(
+                                              '$sentClinicOpenRequestName was added to new clinic requests. Practitioners can review it from Appointment Inbox.',
+                                              '$sentClinicOpenRequestName 요청이 새 클리닉 요청에 추가되었습니다. 침술사 화면의 Appointment Inbox에서 확인할 수 있습니다.',
+                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  color: AppTheme.pine,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: 12),
+                                      FilledButton.icon(
+                                        onPressed: canRequestClinic
+                                            ? () async {
+                                                final requestedName =
+                                                    requestClinicNameController
+                                                        .text
+                                                        .trim();
+                                                setDialogState(() {
+                                                  isSendingClinicOpenRequest =
+                                                      true;
+                                                  sentClinicOpenRequestName =
+                                                      null;
+                                                });
+                                                final didSave = await _store
+                                                    .requestClinicOpen(
+                                                      patient: _currentProfile,
+                                                      clinicName: requestedName,
+                                                      practitionerName:
+                                                          requestPractitionerController
+                                                              .text,
+                                                      location:
+                                                          requestLocationController
+                                                              .text,
+                                                      note:
+                                                          requestNoteController
+                                                              .text,
+                                                    );
+                                                if (!mounted) {
+                                                  return;
+                                                }
+                                                setDialogState(() {
+                                                  isSendingClinicOpenRequest =
+                                                      false;
+                                                  sentClinicOpenRequestName =
+                                                      didSave
+                                                      ? requestedName
+                                                      : null;
+                                                });
+                                                ScaffoldMessenger.of(
+                                                  this.context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      lang.tr(
+                                                        'Request sent. We will keep it visible for clinic onboarding.',
+                                                        '요청을 보냈습니다. 한의원 온보딩 요청으로 표시됩니다.',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                                if (didSave) {
+                                                  requestNoteController.clear();
+                                                }
+                                              }
+                                            : null,
+                                        icon: Icon(
+                                          isSendingClinicOpenRequest
+                                              ? Icons.hourglass_top
+                                              : Icons.outgoing_mail,
+                                        ),
                                         label: Text(
                                           lang.tr(
                                             'Request to open',
