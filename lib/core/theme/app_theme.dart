@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color ink = Color(0xFF18211F);
-  static const Color pine = Color(0xFF17493D);
-  static const Color jade = Color(0xFF1E6D5B);
-  static const Color mint = Color(0xFFD8ECE3);
-  static const Color cream = Color(0xFFF6F1E8);
-  static const Color surface = Color(0xFFFFFBF5);
-  static const Color surfaceSoft = Color(0xFFF1E9DC);
-  static const Color copper = Color(0xFFC07A45);
-  static const Color blush = Color(0xFFE8D6C4);
-  static const Color border = Color(0xFFE0D4C5);
+  static const Color ink = Color(0xFF1F2523);
+  static const Color pine = Color(0xFF145245);
+  static const Color jade = Color(0xFF2F6B5D);
+  static const Color mint = Color(0xFFE6F0EC);
+  static const Color cream = Color(0xFFF7F5F0);
+  static const Color surface = Color(0xFFFFFCF8);
+  static const Color surfaceSoft = Color(0xFFF2EFE8);
+  static const Color copper = Color(0xFF9A6A3F);
+  static const Color blush = Color(0xFFEDE4D8);
+  static const Color border = Color(0xFFDCD6CC);
 
   static ThemeData light() {
     const colorScheme = ColorScheme(
@@ -34,64 +34,64 @@ class AppTheme {
       inversePrimary: mint,
     );
 
-    final baseBody = GoogleFonts.manropeTextTheme();
+    final baseBody = GoogleFonts.ibmPlexSansTextTheme();
     final textTheme = baseBody.copyWith(
-      displayLarge: GoogleFonts.fraunces(
-        fontSize: 56,
-        fontWeight: FontWeight.w600,
-        height: 1.02,
-        color: ink,
-      ),
-      displayMedium: GoogleFonts.fraunces(
-        fontSize: 44,
-        fontWeight: FontWeight.w600,
+      displayLarge: GoogleFonts.ibmPlexSans(
+        fontSize: 48,
+        fontWeight: FontWeight.w700,
         height: 1.05,
         color: ink,
       ),
-      displaySmall: GoogleFonts.fraunces(
-        fontSize: 34,
-        fontWeight: FontWeight.w600,
+      displayMedium: GoogleFonts.ibmPlexSans(
+        fontSize: 38,
+        fontWeight: FontWeight.w700,
         height: 1.08,
         color: ink,
       ),
-      headlineLarge: GoogleFonts.fraunces(
+      displaySmall: GoogleFonts.ibmPlexSans(
         fontSize: 30,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
+        height: 1.12,
         color: ink,
       ),
-      headlineMedium: GoogleFonts.fraunces(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
+      headlineLarge: GoogleFonts.ibmPlexSans(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
         color: ink,
       ),
-      titleLarge: GoogleFonts.manrope(
-        fontSize: 22,
-        fontWeight: FontWeight.w800,
+      headlineMedium: GoogleFonts.ibmPlexSans(
+        fontSize: 23,
+        fontWeight: FontWeight.w700,
         color: ink,
       ),
-      titleMedium: GoogleFonts.manrope(
+      titleLarge: GoogleFonts.ibmPlexSans(
+        fontSize: 21,
+        fontWeight: FontWeight.w700,
+        color: ink,
+      ),
+      titleMedium: GoogleFonts.ibmPlexSans(
         fontSize: 16,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      bodyLarge: GoogleFonts.manrope(
+      bodyLarge: GoogleFonts.ibmPlexSans(
         fontSize: 16,
-        fontWeight: FontWeight.w500,
-        height: 1.55,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
         color: ink,
       ),
-      bodyMedium: GoogleFonts.manrope(
+      bodyMedium: GoogleFonts.ibmPlexSans(
         fontSize: 14,
-        fontWeight: FontWeight.w500,
-        height: 1.55,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
         color: ink,
       ),
-      labelLarge: GoogleFonts.manrope(
+      labelLarge: GoogleFonts.ibmPlexSans(
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      labelMedium: GoogleFonts.manrope(
+      labelMedium: GoogleFonts.ibmPlexSans(
         fontSize: 12,
         fontWeight: FontWeight.w700,
         color: ink,
@@ -99,14 +99,14 @@ class AppTheme {
     );
 
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(18),
       side: const BorderSide(color: border),
     );
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: cream,
+      scaffoldBackgroundColor: const Color(0xFFF6F4EF),
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -115,11 +115,11 @@ class AppTheme {
         scrolledUnderElevation: 0,
         foregroundColor: ink,
         titleTextStyle: textTheme.titleLarge,
-        toolbarHeight: 76,
+        toolbarHeight: 68,
       ),
       cardTheme: CardThemeData(
-        color: surface.withValues(alpha: 0.9),
-        shadowColor: Colors.black.withValues(alpha: 0.05),
+        color: surface,
+        shadowColor: Colors.black.withValues(alpha: 0.03),
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
         elevation: 0,
@@ -134,19 +134,19 @@ class AppTheme {
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.82),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
+          horizontal: 16,
+          vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: pine, width: 1.4),
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(
@@ -164,9 +164,7 @@ class AppTheme {
             EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           ),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
         ),
@@ -179,9 +177,7 @@ class AppTheme {
             EdgeInsets.symmetric(horizontal: 18, vertical: 15),
           ),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
         ),
@@ -197,9 +193,7 @@ class AppTheme {
         selectedColor: pine,
         secondarySelectedColor: pine,
         side: const BorderSide(color: border),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(999),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         labelStyle: textTheme.labelMedium!,
         secondaryLabelStyle: textTheme.labelMedium!.copyWith(
           color: Colors.white,

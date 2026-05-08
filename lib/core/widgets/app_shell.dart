@@ -17,32 +17,8 @@ class AppBackdrop extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppTheme.cream, Color(0xFFE8F1EB), Color(0xFFF7F1E6)],
+              colors: [Color(0xFFF7F5F0), Color(0xFFF1F4EF)],
             ),
-          ),
-        ),
-        Positioned(
-          top: -90,
-          right: -30,
-          child: _GlowOrb(
-            size: 260,
-            colors: const [Color(0x55C07A45), Color(0x00C07A45)],
-          ),
-        ),
-        Positioned(
-          left: -80,
-          top: 120,
-          child: _GlowOrb(
-            size: 240,
-            colors: const [Color(0x5517493D), Color(0x0017493D)],
-          ),
-        ),
-        Positioned(
-          right: 120,
-          bottom: -100,
-          child: _GlowOrb(
-            size: 320,
-            colors: const [Color(0x33268B73), Color(0x00268B73)],
           ),
         ),
         Positioned.fill(child: child),
@@ -57,7 +33,7 @@ class AppPanel extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(22),
     this.gradient,
-    this.radius = 28,
+    this.radius = 18,
     this.borderColor,
   });
 
@@ -72,23 +48,17 @@ class AppPanel extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        gradient:
-            gradient ??
-            LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.88),
-                AppTheme.surfaceSoft.withValues(alpha: 0.78),
-              ],
-            ),
+        gradient: gradient,
+        color: gradient == null ? Colors.white.withValues(alpha: 0.94) : null,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: borderColor ?? AppTheme.border),
+        border: Border.all(
+          color: borderColor ?? AppTheme.border.withValues(alpha: 0.78),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -263,27 +233,6 @@ class AppGuideStep extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _GlowOrb extends StatelessWidget {
-  const _GlowOrb({required this.size, required this.colors});
-
-  final double size;
-  final List<Color> colors;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(colors: colors),
-        ),
       ),
     );
   }
