@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
   final TextEditingController _answerController = TextEditingController();
   final TextEditingController _extraMemoController = TextEditingController();
+  final TextEditingController _stretchingNoteController =
+      TextEditingController();
+  final TextEditingController _caffeineNoteController = TextEditingController();
+  final TextEditingController _sleepNoteController = TextEditingController();
 
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
@@ -178,6 +183,9 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   void dispose() {
     _answerController.dispose();
     _extraMemoController.dispose();
+    _stretchingNoteController.dispose();
+    _caffeineNoteController.dispose();
+    _sleepNoteController.dispose();
     super.dispose();
   }
 
@@ -206,6 +214,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
         setState(() {
           _sessionBackedProfile = localProfile;
         });
+        unawaited(_loadChecklistDraft());
       }
     } catch (_) {}
 
@@ -221,6 +230,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
             setState(() {
               _sessionBackedProfile = refreshed;
             });
+            unawaited(_loadChecklistDraft());
           })
           .catchError((_) {}),
     );
@@ -278,6 +288,11 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     final m = date.month.toString().padLeft(2, '0');
     final d = date.day.toString().padLeft(2, '0');
     return '$y-$m-$d';
+  }
+
+  String _checklistDraftKey() {
+    final clinicId = _activeClinicId ?? 'no_clinic';
+    return 'patient_checklist_draft_v1_${_currentProfile.id}_$clinicId';
   }
 
   String _todayChecklistLabel(AppLanguageController lang) {
@@ -350,6 +365,87 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     );
   }
 
+  Map<String, dynamic> _checklistDraftData() {
+    return {
+      'stretchingWeekdays': List<bool>.from(_stretchingWeek),
+      'caffeineWeekdays': List<bool>.from(_caffeineWeek),
+      'sleepWeekdays': List<bool>.from(_sleepWeek),
+      'dailyNotes': {
+        'date': _dateKey(DateTime.now()),
+        'stretching': _stretchingNoteController.text.trim(),
+        'caffeine': _caffeineNoteController.text.trim(),
+        'sleep': _sleepNoteController.text.trim(),
+      },
+      'savedAt': DateTime.now().toIso8601String(),
+    };
+  }
+
+  Future<void> _loadChecklistDraft() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_checklistDraftKey());
+    if (raw == null || raw.trim().isEmpty) {
+      return;
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) {
+        return;
+      }
+      final data = decoded.map((key, value) => MapEntry(key.toString(), value));
+      final dailyNotes = data['dailyNotes'] is Map
+          ? (data['dailyNotes'] as Map).map(
+              (key, value) => MapEntry(key.toString(), value),
+            )
+          : const <String, dynamic>{};
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _replaceWeekValues(
+          _stretchingWeek,
+          _restoreWeekdayChecks(data['stretchingWeekdays'], fallback: false),
+        );
+        _replaceWeekValues(
+          _caffeineWeek,
+          _restoreWeekdayChecks(data['caffeineWeekdays'], fallback: false),
+        );
+        _replaceWeekValues(
+          _sleepWeek,
+          _restoreWeekdayChecks(data['sleepWeekdays'], fallback: false),
+        );
+        if (dailyNotes['date'] == _dateKey(DateTime.now())) {
+          _stretchingNoteController.text = (dailyNotes['stretching'] ?? '')
+              .toString();
+          _caffeineNoteController.text = (dailyNotes['caffeine'] ?? '')
+              .toString();
+          _sleepNoteController.text = (dailyNotes['sleep'] ?? '').toString();
+        }
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _saveChecklistDraft({bool showMessage = true}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _checklistDraftKey(),
+      jsonEncode(_checklistDraftData()),
+    );
+    if (!mounted || !showMessage) {
+      return;
+    }
+    final lang = AppLanguageController.instance;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          lang.tr(
+            'Checklist saved. You can leave and come back without losing it.',
+            '체크리스트가 저장되었습니다. 다른 화면에 갔다 와도 유지됩니다.',
+          ),
+        ),
+      ),
+    );
+  }
+
   List<bool> _restoreWeekdayChecks(dynamic raw, {required bool fallback}) {
     final restored = List<bool>.filled(_weekdayKeys.length, false);
     if (raw is List) {
@@ -404,6 +500,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     required String labelEn,
     required String labelKo,
     required List<bool> values,
+    required TextEditingController noteController,
   }) {
     final theme = Theme.of(context);
     final todayIndex = _todayChecklistIndex();
@@ -439,7 +536,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
               label: Text(_weekdayLabel(lang, index)),
               selected: values[index],
               onSelected: canEdit
-                  ? (selected) => setState(() => values[index] = selected)
+                  ? (selected) {
+                      setState(() => values[index] = selected);
+                      unawaited(_saveChecklistDraft(showMessage: false));
+                    }
                   : null,
               showCheckmark: true,
               selectedColor: AppTheme.pine.withValues(alpha: 0.14),
@@ -475,6 +575,26 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   );
             return Tooltip(message: message, child: chip);
           }),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: noteController,
+          minLines: 1,
+          maxLines: 3,
+          onChanged: (_) => unawaited(_saveChecklistDraft(showMessage: false)),
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+            labelText: lang.tr('Today note for this item', '오늘 이 항목에 대한 메모'),
+            helperText: _todayChecklistIndex() == null
+                ? lang.tr(
+                    'Notes save with today but weekday checks are locked.',
+                    '메모는 저장되지만 오늘은 요일 체크일이 아닙니다.',
+                  )
+                : lang.tr(
+                    'Example: done after dinner, skipped due to headache, felt easier today.',
+                    '예: 저녁 후 완료, 두통 때문에 못함, 오늘은 더 쉬웠음.',
+                  ),
+          ),
         ),
       ],
     );
@@ -544,6 +664,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           'stretchingWeekdays': List<bool>.from(_stretchingWeek),
           'caffeineWeekdays': List<bool>.from(_caffeineWeek),
           'sleepWeekdays': List<bool>.from(_sleepWeek),
+          'dailyNotes': {
+            'date': _dateKey(DateTime.now()),
+            'stretching': _stretchingNoteController.text.trim(),
+            'caffeine': _caffeineNoteController.text.trim(),
+            'sleep': _sleepNoteController.text.trim(),
+          },
           'percent': _adherencePercent(),
           'patientPhone': _currentProfile.phone,
           'patientEmail': _currentProfile.email,
@@ -998,6 +1124,15 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           fallback: adherence['sleepLogDone'] == true,
         ),
       );
+      final dailyNotes = adherence['dailyNotes'] is Map
+          ? (adherence['dailyNotes'] as Map).map(
+              (key, value) => MapEntry(key.toString(), value),
+            )
+          : const <String, dynamic>{};
+      _stretchingNoteController.text = (dailyNotes['stretching'] ?? '')
+          .toString();
+      _caffeineNoteController.text = (dailyNotes['caffeine'] ?? '').toString();
+      _sleepNoteController.text = (dailyNotes['sleep'] ?? '').toString();
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -2165,6 +2300,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         labelEn: 'Bedtime stretching',
                         labelKo: '취침 전 스트레칭',
                         values: _stretchingWeek,
+                        noteController: _stretchingNoteController,
                       ),
                       const SizedBox(height: 16),
                       _buildWeekdayChecklistRow(
@@ -2173,6 +2309,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         labelEn: 'Reduce caffeine after 2 PM',
                         labelKo: '오후 카페인 조절',
                         values: _caffeineWeek,
+                        noteController: _caffeineNoteController,
                       ),
                       const SizedBox(height: 16),
                       _buildWeekdayChecklistRow(
@@ -2181,6 +2318,29 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         labelEn: 'Track sleep and fatigue',
                         labelKo: '수면/피로 기록',
                         values: _sleepWeek,
+                        noteController: _sleepNoteController,
+                      ),
+                      const SizedBox(height: 18),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          FilledButton.icon(
+                            onPressed: () => _saveChecklistDraft(),
+                            icon: const Icon(Icons.save_outlined),
+                            label: Text(lang.tr('Save checklist', '체크리스트 저장')),
+                          ),
+                          Text(
+                            lang.tr(
+                              'Saved checks and notes stay here when you leave this screen.',
+                              '체크와 메모는 다른 화면에 갔다 와도 유지됩니다.',
+                            ),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.ink.withValues(alpha: 0.62),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
