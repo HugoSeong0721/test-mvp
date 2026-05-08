@@ -156,12 +156,6 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
           if (_showGuide) ...[
             AppPanel(
               padding: const EdgeInsets.all(22),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppTheme.pine, AppTheme.jade, Color(0xFF2A7A66)],
-              ),
-              borderColor: Colors.white24,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -175,7 +169,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                             Text(
                               lang.tr('Patient detail brief', '환자 상세 브리핑'),
                               style: Theme.of(context).textTheme.headlineMedium
-                                  ?.copyWith(color: Colors.white),
+                                  ?.copyWith(color: AppTheme.ink),
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -185,7 +179,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                               ),
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.82),
+                                    color: AppTheme.ink.withValues(alpha: 0.72),
                                   ),
                             ),
                           ],
@@ -195,7 +189,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                         tooltip: lang.tr('Hide guide', '가이드 숨기기'),
                         onPressed: () => setState(() => _showGuide = false),
                         icon: const Icon(Icons.close),
-                        color: Colors.white.withValues(alpha: 0.92),
+                        color: AppTheme.ink.withValues(alpha: 0.72),
                         visualDensity: VisualDensity.compact,
                       ),
                     ],
@@ -206,7 +200,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                     runSpacing: 12,
                     children: [
                       AppGuideStep(
-                        dark: true,
+                        dark: false,
                         step: '1',
                         title: lang.tr('Scan history first', '먼저 이력 보기'),
                         description: lang.tr(
@@ -215,7 +209,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                         ),
                       ),
                       AppGuideStep(
-                        dark: true,
+                        dark: false,
                         step: '2',
                         title: lang.tr(
                           'Review intake by category',
@@ -227,7 +221,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                         ),
                       ),
                       AppGuideStep(
-                        dark: true,
+                        dark: false,
                         step: '3',
                         title: lang.tr('Write practitioner notes', '침술사 메모 작성'),
                         description: lang.tr(
