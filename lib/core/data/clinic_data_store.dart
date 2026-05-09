@@ -1467,11 +1467,13 @@ class ClinicDataStore extends ChangeNotifier {
     String? linkedClinicId,
   }) async {
     if (linkedClinicId != null && clinicById(linkedClinicId) != null) {
-      if (_patientSelectedClinicIds[patientId] != linkedClinicId) {
-        _patientSelectedClinicIds[patientId] = linkedClinicId;
-        notifyListeners();
-        await _persistClinicState();
+      if (_patientSelectedClinicIds[patientId] == linkedClinicId) {
+        return;
       }
+      await selectClinicForPatient(
+        patientId: patientId,
+        clinicId: linkedClinicId,
+      );
       return;
     }
 

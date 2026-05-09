@@ -4311,6 +4311,59 @@ class _PractitionerDashboardScreenState
     );
   }
 
+  Map<String, List<String>> _defaultOnboardingFollowUpTree() {
+    return {
+      for (final entry in _questionLibraryByCategory.entries)
+        entry.key: [
+          if (entry.value.length > 1) entry.value[1],
+          'If yes, when did it start and what makes it better or worse?',
+          'How often does this happen, and how much does it affect daily life?',
+        ],
+    };
+  }
+
+  Future<void> _approveMembershipAndSendQuestionTree(
+    PatientClinicMembershipRequest request,
+  ) async {
+    final profile = _store.profileById(request.patientId);
+    final selectedQuestions = _questionLibraryByCategory.values
+        .where((questions) => questions.isNotEmpty)
+        .map((questions) => questions.first)
+        .toList();
+    final followUpTree = _defaultOnboardingFollowUpTree();
+
+    await _store.approvePatientClinicMembership(request.id);
+    await AppFirestoreService.sendAnswerRequest(
+      patientId: request.patientId,
+      clinicId: request.clinicId,
+      patientName: profile?.name ?? request.patientName,
+      patientPhone: profile?.phone ?? '',
+      patientEmail: profile?.email ?? request.patientEmail,
+      patientTime: 'Membership onboarding',
+      lastVisitDate: 'New patient',
+      intakeStatus: 'initial',
+      selectedQuestions: selectedQuestions,
+      customQuestionsByCategory: followUpTree,
+      note:
+          'Your clinic approved your account. Please start with this intake question tree so the practitioner can understand your baseline before the first visit.',
+      requestType: 'membership_onboarding',
+    );
+
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLanguageController.instance.tr(
+            'Patient approved and the starter question tree was sent.',
+            'Patient approved and the starter question tree was sent.',
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildClinicOpenRequestsPanel() {
     final lang = AppLanguageController.instance;
     final membershipRequests = _store.pendingMembershipRequestsForClinic(
@@ -4381,16 +4434,38 @@ class _PractitionerDashboardScreenState
                         '${lang.tr('Email', 'Email')}: ${request.patientEmail}',
                       ),
                     const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                      child: Text(
+                        lang.tr(
+                          'Approval will also send the starter 10-category intake tree, including follow-up prompts for deeper questions.',
+                          'Approval will also send the starter 10-category intake tree, including follow-up prompts for deeper questions.',
+                        ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppTheme.ink.withValues(alpha: 0.68),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: [
                         FilledButton.icon(
                           onPressed: () =>
-                              _store.approvePatientClinicMembership(request.id),
+                              _approveMembershipAndSendQuestionTree(request),
                           icon: const Icon(Icons.check_circle_outline),
                           label: Text(
-                            lang.tr('Approve patient', 'Approve patient'),
+                            lang.tr(
+                              'Approve + send questions',
+                              'Approve + send questions',
+                            ),
                           ),
                         ),
                         OutlinedButton.icon(
