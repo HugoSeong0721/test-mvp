@@ -857,14 +857,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
     return AppPanel(
       padding: const EdgeInsets.all(18),
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withValues(alpha: 0.94),
-          AppTheme.mint.withValues(alpha: 0.36),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1962,14 +1954,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       const SizedBox(height: 16),
                       AppPanel(
                         padding: const EdgeInsets.all(18),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.92),
-                            AppTheme.mint.withValues(alpha: 0.36),
-                          ],
-                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -2904,14 +2888,7 @@ class _ActionHubCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
             border: Border.all(color: AppTheme.border),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.96),
-                AppTheme.blush.withValues(alpha: 0.22),
-              ],
-            ),
+            color: AppTheme.surface,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

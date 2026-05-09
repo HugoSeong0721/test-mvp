@@ -71,16 +71,6 @@ class _TesterFeedbackInboxScreenState extends State<TesterFeedbackInboxScreen> {
                     children: [
                       AppPanel(
                         padding: const EdgeInsets.all(24),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppTheme.pine,
-                            AppTheme.jade,
-                            Color(0xFF2E7A66),
-                          ],
-                        ),
-                        borderColor: Colors.white24,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -90,7 +80,7 @@ class _TesterFeedbackInboxScreenState extends State<TesterFeedbackInboxScreen> {
                                 '들어오는 테스터 피드백을 한 곳에서 확인',
                               ),
                               style: Theme.of(context).textTheme.headlineMedium
-                                  ?.copyWith(color: Colors.white),
+                                  ?.copyWith(color: AppTheme.ink),
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -100,7 +90,7 @@ class _TesterFeedbackInboxScreenState extends State<TesterFeedbackInboxScreen> {
                               ),
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.82),
+                                    color: AppTheme.ink.withValues(alpha: 0.72),
                                   ),
                             ),
                             const SizedBox(height: 18),
@@ -112,49 +102,41 @@ class _TesterFeedbackInboxScreenState extends State<TesterFeedbackInboxScreen> {
                                   icon: Icons.mark_email_unread_outlined,
                                   label: lang.tr('Open now', '현재 열림'),
                                   value: '$openCount',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.12,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.task_alt_outlined,
                                   label: lang.tr('Reviewed', '확인 완료'),
                                   value: '$reviewedCount',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.12,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.category_outlined,
                                   label: lang.tr('Categories', '카테고리'),
                                   value: '$categories',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.12,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                                 AppMetricChip(
                                   icon: Icons.web_asset_outlined,
                                   label: lang.tr('Screens touched', '화면 수'),
                                   value: '$routeCount',
-                                  backgroundColor: Colors.white.withValues(
-                                    alpha: 0.12,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
                                   ),
-                                  labelColor: Colors.white.withValues(
-                                    alpha: 0.72,
-                                  ),
-                                  valueColor: Colors.white,
+                                  valueColor: AppTheme.ink,
                                 ),
                               ],
                             ),
