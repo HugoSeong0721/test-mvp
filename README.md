@@ -60,6 +60,14 @@ Important note:
 
 Patients who cannot find their clinic can use `Request to open` in the clinic picker.
 
+### Requested Clinic Leads
+
+Use this table as Hugo's mediator/outreach list. When a patient asks to open a clinic, review it in the practitioner inbox and copy the useful lead details here before reaching out to the clinic.
+
+| Requested Clinic | Practitioner | Location | Patient / Contact | Note | Status | Next Action |
+|---|---|---|---|---|---|---|
+| No active README-tracked lead yet | - | - | - | Check the live practitioner inbox for browser/Firebase requests | Waiting | Add the next real request here |
+
 Where requests appear:
 
 - Patient side: `Patient Home` -> `Change clinic` / `Search clinic` -> `Request to open`
@@ -67,9 +75,18 @@ Where requests appear:
 
 Current demo behavior:
 
-- Requests are saved in browser-local storage for the demo.
+- Requests are saved in browser-local storage and Firestore when available.
 - They show as "new clinic requests" inside the practitioner inbox.
-- The static GitHub README cannot update itself from a browser click without a backend or GitHub write token, so this README documents where the live request list appears in the app.
+- The static GitHub README cannot update itself from a browser click without a backend automation or GitHub write token.
+- For now, treat the practitioner inbox as the live source of truth and this README table as the outreach tracker.
+
+Suggested outreach workflow:
+
+1. Open `Practitioner portal`.
+2. Go to `Appointment Inbox`.
+3. Review `Patient clinic open requests`.
+4. Copy real clinic leads into the README table above.
+5. Contact the clinic and update `Status` / `Next Action`.
 
 ## Repository
 
