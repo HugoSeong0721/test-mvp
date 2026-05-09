@@ -414,6 +414,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 final isCurrent =
                                     currentClinic?.id == clinic.id;
                                 final isDefault = defaultClinicId == clinic.id;
+                                final membershipRequest = _store
+                                    .membershipRequestForPatientClinic(
+                                      patientId: patientId,
+                                      clinicId: clinic.id,
+                                    );
+                                final isPendingApproval =
+                                    membershipRequest?.status == 'pending';
+                                final isDeclined =
+                                    membershipRequest?.status == 'declined';
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(16),
@@ -454,6 +463,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               context,
                                               lang.tr('Current', '현재 선택'),
                                             ),
+                                          if (isPendingApproval) ...[
+                                            const SizedBox(width: 8),
+                                            _buildClinicStatusChip(
+                                              context,
+                                              lang.tr(
+                                                'Pending approval',
+                                                '승인 대기',
+                                              ),
+                                              accent: AppTheme.copper,
+                                            ),
+                                          ],
                                           if (isDefault) ...[
                                             const SizedBox(width: 8),
                                             _buildClinicStatusChip(
@@ -494,7 +514,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         runSpacing: 8,
                                         children: [
                                           FilledButton.tonalIcon(
-                                            onPressed: isCurrent
+                                            onPressed:
+                                                isCurrent || isPendingApproval
                                                 ? null
                                                 : () async {
                                                     await _store
@@ -505,35 +526,40 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                     if (!context.mounted) {
                                                       return;
                                                     }
-                                                    Navigator.pop(context);
                                                     if (!mounted) {
                                                       return;
                                                     }
+                                                    setDialogState(() {});
                                                     ScaffoldMessenger.of(
                                                       this.context,
                                                     ).showSnackBar(
                                                       SnackBar(
                                                         content: Text(
                                                           lang.tr(
-                                                            '${clinic.name} is now your current clinic.',
-                                                            '${clinic.name} 이(가) 현재 한의원으로 선택되었습니다.',
+                                                            'Membership request sent to ${clinic.name}. The clinic must approve it before this portal connects.',
+                                                            'Membership request sent to ${clinic.name}. The clinic must approve it before this portal connects.',
                                                           ),
                                                         ),
                                                       ),
                                                     );
                                                   },
                                             icon: const Icon(
-                                              Icons.local_hospital_outlined,
+                                              Icons.outgoing_mail,
                                             ),
                                             label: Text(
-                                              lang.tr(
-                                                'Choose clinic',
-                                                '이 한의원 선택',
-                                              ),
+                                              isDeclined
+                                                  ? lang.tr(
+                                                      'Request again',
+                                                      'Request again',
+                                                    )
+                                                  : lang.tr(
+                                                      'Request to join',
+                                                      'Request to join',
+                                                    ),
                                             ),
                                           ),
                                           OutlinedButton.icon(
-                                            onPressed: isDefault
+                                            onPressed: isDefault || !isCurrent
                                                 ? null
                                                 : () async {
                                                     await _store

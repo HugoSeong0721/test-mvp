@@ -4313,6 +4313,9 @@ class _PractitionerDashboardScreenState
 
   Widget _buildClinicOpenRequestsPanel() {
     final lang = AppLanguageController.instance;
+    final membershipRequests = _store.pendingMembershipRequestsForClinic(
+      _currentClinicId,
+    );
     final requests = _store.pendingClinicOpenRequests;
     return AppPanel(
       padding: const EdgeInsets.all(18),
@@ -4334,6 +4337,80 @@ class _PractitionerDashboardScreenState
             ),
           ),
           const SizedBox(height: 12),
+          Text(
+            lang.tr(
+              'Patient membership requests',
+              'Patient membership requests',
+            ),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          if (membershipRequests.isEmpty)
+            Text(
+              lang.tr(
+                'No patient membership requests are waiting for this clinic.',
+                'No patient membership requests are waiting for this clinic.',
+              ),
+            )
+          else
+            ...membershipRequests.map((request) {
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.mint.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppTheme.border.withValues(alpha: 0.72),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      request.patientName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lang.tr('Clinic', 'Clinic')}: ${request.clinicName}',
+                    ),
+                    if (request.patientEmail.trim().isNotEmpty)
+                      Text(
+                        '${lang.tr('Email', 'Email')}: ${request.patientEmail}',
+                      ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        FilledButton.icon(
+                          onPressed: () =>
+                              _store.approvePatientClinicMembership(request.id),
+                          icon: const Icon(Icons.check_circle_outline),
+                          label: Text(
+                            lang.tr('Approve patient', 'Approve patient'),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              _store.declinePatientClinicMembership(request.id),
+                          icon: const Icon(Icons.cancel_outlined),
+                          label: Text(lang.tr('Decline', 'Decline')),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+          const SizedBox(height: 18),
+          Text(
+            lang.tr('New clinic lead requests', 'New clinic lead requests'),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
           if (requests.isEmpty)
             Text(lang.tr('No clinic open requests yet.', '아직 한의원 등록 요청이 없습니다.'))
           else

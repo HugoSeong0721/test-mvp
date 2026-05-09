@@ -311,6 +311,89 @@ class ClinicOpenRequest {
   }
 }
 
+class PatientClinicMembershipRequest {
+  const PatientClinicMembershipRequest({
+    required this.id,
+    required this.patientId,
+    required this.patientName,
+    required this.patientEmail,
+    required this.clinicId,
+    required this.clinicName,
+    required this.requestedAt,
+    this.status = 'pending',
+    this.reviewedAt,
+  });
+
+  final String id;
+  final String patientId;
+  final String patientName;
+  final String patientEmail;
+  final String clinicId;
+  final String clinicName;
+  final DateTime requestedAt;
+  final String status;
+  final DateTime? reviewedAt;
+
+  PatientClinicMembershipRequest copyWith({
+    String? patientName,
+    String? patientEmail,
+    String? clinicName,
+    DateTime? requestedAt,
+    String? status,
+    DateTime? reviewedAt,
+  }) {
+    return PatientClinicMembershipRequest(
+      id: id,
+      patientId: patientId,
+      patientName: patientName ?? this.patientName,
+      patientEmail: patientEmail ?? this.patientEmail,
+      clinicId: clinicId,
+      clinicName: clinicName ?? this.clinicName,
+      requestedAt: requestedAt ?? this.requestedAt,
+      status: status ?? this.status,
+      reviewedAt: reviewedAt ?? this.reviewedAt,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'patientId': patientId,
+      'patientName': patientName,
+      'patientEmail': patientEmail,
+      'clinicId': clinicId,
+      'clinicName': clinicName,
+      'requestedAt': requestedAt.toIso8601String(),
+      'status': status,
+      if (reviewedAt != null) 'reviewedAt': reviewedAt!.toIso8601String(),
+    };
+  }
+
+  factory PatientClinicMembershipRequest.fromMap(Map<String, dynamic> data) {
+    DateTime? parseDate(dynamic value) {
+      if (value is String) {
+        return DateTime.tryParse(value);
+      }
+      if (value is DateTime) {
+        return value;
+      }
+      return null;
+    }
+
+    return PatientClinicMembershipRequest(
+      id: (data['id'] ?? '').toString(),
+      patientId: (data['patientId'] ?? '').toString(),
+      patientName: (data['patientName'] ?? '').toString(),
+      patientEmail: (data['patientEmail'] ?? '').toString(),
+      clinicId: (data['clinicId'] ?? '').toString(),
+      clinicName: (data['clinicName'] ?? '').toString(),
+      requestedAt: parseDate(data['requestedAt']) ?? DateTime.now(),
+      status: (data['status'] ?? 'pending').toString(),
+      reviewedAt: parseDate(data['reviewedAt']),
+    );
+  }
+}
+
 class PatientHistoryArgs {
   const PatientHistoryArgs({required this.current, required this.history});
 
@@ -390,6 +473,8 @@ class ClinicDataStore extends ChangeNotifier {
   static const String _patientPortalRegisteredIdsKey =
       'patient_portal_registered_ids_v1';
   static const String _clinicOpenRequestsKey = 'clinic_open_requests_v1';
+  static const String _patientClinicMembershipRequestsKey =
+      'patient_clinic_membership_requests_v1';
 
   static String _storedDate(DateTime date) {
     final normalized = DateTime(date.year, date.month, date.day);
@@ -462,6 +547,8 @@ class ClinicDataStore extends ChangeNotifier {
 
   final List<AppointmentRequest> _appointmentRequests = [];
   final List<ClinicOpenRequest> _clinicOpenRequests = [];
+  final List<PatientClinicMembershipRequest> _patientClinicMembershipRequests =
+      [];
 
   final List<ClinicCenter> _clinicCenters = [
     const ClinicCenter(
@@ -530,6 +617,45 @@ class ClinicDataStore extends ChangeNotifier {
             .toList()
           ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
     return List.unmodifiable(items);
+  }
+
+  List<PatientClinicMembershipRequest> get patientClinicMembershipRequests {
+    final items = [..._patientClinicMembershipRequests]
+      ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+    return List.unmodifiable(items);
+  }
+
+  List<PatientClinicMembershipRequest> pendingMembershipRequestsForClinic(
+    String? clinicId,
+  ) {
+    final normalizedClinicId = clinicId?.trim();
+    if (normalizedClinicId == null || normalizedClinicId.isEmpty) {
+      return const [];
+    }
+    final items =
+        _patientClinicMembershipRequests
+            .where(
+              (request) =>
+                  request.clinicId == normalizedClinicId &&
+                  request.status == 'pending',
+            )
+            .toList()
+          ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+    return List.unmodifiable(items);
+  }
+
+  PatientClinicMembershipRequest? membershipRequestForPatientClinic({
+    required String patientId,
+    required String clinicId,
+  }) {
+    try {
+      return _patientClinicMembershipRequests.firstWhere(
+        (request) =>
+            request.patientId == patientId && request.clinicId == clinicId,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   List<ClinicCenter> get clinicCenters {
@@ -1222,16 +1348,42 @@ class ClinicDataStore extends ChangeNotifier {
     required String patientId,
     required String clinicId,
   }) async {
-    if (clinicById(clinicId) == null) {
+    final clinic = clinicById(clinicId);
+    final patient = profileById(patientId);
+    if (clinic == null || patient == null) {
       return;
     }
-    _patientSelectedClinicIds[patientId] = clinicId;
+    final existingIndex = _patientClinicMembershipRequests.indexWhere(
+      (request) =>
+          request.patientId == patientId && request.clinicId == clinicId,
+    );
+    final request = existingIndex >= 0
+        ? _patientClinicMembershipRequests[existingIndex].copyWith(
+            patientName: patient.name,
+            patientEmail: patient.email,
+            clinicName: clinic.name,
+            requestedAt: DateTime.now(),
+            status: 'pending',
+          )
+        : PatientClinicMembershipRequest(
+            id: 'membership_${patientId}_$clinicId',
+            patientId: patientId,
+            patientName: patient.name,
+            patientEmail: patient.email,
+            clinicId: clinicId,
+            clinicName: clinic.name,
+            requestedAt: DateTime.now(),
+          );
+    if (existingIndex >= 0) {
+      _patientClinicMembershipRequests[existingIndex] = request;
+    } else {
+      _patientClinicMembershipRequests.add(request);
+    }
     notifyListeners();
     await _persistClinicState();
     try {
-      await AppFirestoreService.savePatientClinicLink(
-        patientId: patientId,
-        selectedClinicId: clinicId,
+      await AppFirestoreService.savePatientClinicMembershipRequest(
+        request.toMap(),
       );
     } catch (_) {}
   }
@@ -1240,11 +1392,11 @@ class ClinicDataStore extends ChangeNotifier {
     required String patientId,
     required String clinicId,
   }) async {
-    if (clinicById(clinicId) == null) {
+    if (clinicById(clinicId) == null ||
+        selectedClinicIdForPatient(patientId) != clinicId) {
       return;
     }
     _patientDefaultClinicIds[patientId] = clinicId;
-    _patientSelectedClinicIds[patientId] = clinicId;
     notifyListeners();
     await _persistClinicState();
     try {
@@ -1252,6 +1404,54 @@ class ClinicDataStore extends ChangeNotifier {
         patientId: patientId,
         selectedClinicId: clinicId,
         defaultClinicId: clinicId,
+      );
+    } catch (_) {}
+  }
+
+  Future<void> approvePatientClinicMembership(String requestId) async {
+    final index = _patientClinicMembershipRequests.indexWhere(
+      (request) => request.id == requestId,
+    );
+    if (index < 0) {
+      return;
+    }
+    final request = _patientClinicMembershipRequests[index];
+    final reviewedAt = DateTime.now();
+    _patientClinicMembershipRequests[index] = request.copyWith(
+      status: 'approved',
+      reviewedAt: reviewedAt,
+    );
+    _patientSelectedClinicIds[request.patientId] = request.clinicId;
+    notifyListeners();
+    await _persistClinicState();
+    try {
+      await AppFirestoreService.savePatientClinicMembershipRequest(
+        _patientClinicMembershipRequests[index].toMap(),
+      );
+      await AppFirestoreService.savePatientClinicLink(
+        patientId: request.patientId,
+        selectedClinicId: request.clinicId,
+      );
+    } catch (_) {}
+  }
+
+  Future<void> declinePatientClinicMembership(String requestId) async {
+    final index = _patientClinicMembershipRequests.indexWhere(
+      (request) => request.id == requestId,
+    );
+    if (index < 0) {
+      return;
+    }
+    _patientClinicMembershipRequests[index] =
+        _patientClinicMembershipRequests[index].copyWith(
+          status: 'declined',
+          reviewedAt: DateTime.now(),
+        );
+    notifyListeners();
+    await _persistClinicState();
+    try {
+      await AppFirestoreService.savePatientClinicMembershipRequest(
+        _patientClinicMembershipRequests[index].toMap(),
       );
     } catch (_) {}
   }
@@ -1415,6 +1615,26 @@ class ClinicDataStore extends ChangeNotifier {
         }
       } catch (_) {}
     }
+    final savedMembershipRequests = _prefs?.getString(
+      _patientClinicMembershipRequestsKey,
+    );
+    if (savedMembershipRequests != null &&
+        savedMembershipRequests.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(savedMembershipRequests);
+        if (decoded is List) {
+          _patientClinicMembershipRequests
+            ..clear()
+            ..addAll(
+              decoded.whereType<Map>().map(
+                (item) => PatientClinicMembershipRequest.fromMap(
+                  item.map((key, value) => MapEntry(key.toString(), value)),
+                ),
+              ),
+            );
+        }
+      } catch (_) {}
+    }
 
     await _restoreRemoteClinicState();
 
@@ -1476,6 +1696,23 @@ class ClinicDataStore extends ChangeNotifier {
           _clinicOpenRequests[index] = request;
         } else {
           _clinicOpenRequests.add(request);
+        }
+      }
+
+      final remoteMembershipRequests =
+          await AppFirestoreService.fetchPatientClinicMembershipRequests();
+      for (final data in remoteMembershipRequests) {
+        final request = PatientClinicMembershipRequest.fromMap(data);
+        if (request.id.trim().isEmpty) {
+          continue;
+        }
+        final index = _patientClinicMembershipRequests.indexWhere(
+          (item) => item.id == request.id,
+        );
+        if (index >= 0) {
+          _patientClinicMembershipRequests[index] = request;
+        } else {
+          _patientClinicMembershipRequests.add(request);
         }
       }
     } catch (_) {
@@ -1568,6 +1805,14 @@ class ClinicDataStore extends ChangeNotifier {
       _clinicOpenRequestsKey,
       jsonEncode(
         _clinicOpenRequests.map((request) => request.toMap()).toList(),
+      ),
+    );
+    await prefs.setString(
+      _patientClinicMembershipRequestsKey,
+      jsonEncode(
+        _patientClinicMembershipRequests
+            .map((request) => request.toMap())
+            .toList(),
       ),
     );
   }
