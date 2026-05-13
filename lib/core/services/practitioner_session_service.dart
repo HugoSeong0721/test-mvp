@@ -61,15 +61,16 @@ class PractitionerSessionService {
 
   static Stream<PractitionerSession?> watchSession() async* {
     await _ensureInitialized();
-    yield _currentSession;
-    yield* _sessionController.stream;
+    yield currentSession;
+    yield* _sessionController.stream.map(_withResolvedClinic);
   }
 
-  static PractitionerSession? get currentSession => _currentSession;
+  static PractitionerSession? get currentSession =>
+      _withResolvedClinic(_currentSession);
 
   static Future<PractitionerSession?> currentSessionAsync() async {
     await _ensureInitialized();
-    return _currentSession;
+    return currentSession;
   }
 
   static Future<PractitionerSession> signUpLocally({
@@ -288,7 +289,8 @@ class PractitionerSessionService {
     }
 
     final normalizedLoginId = _normalizeLoginId(savedLoginId);
-    final account = _readLocalAccounts().cast<_LocalPractitionerAccount?>()
+    final account = _readLocalAccounts()
+        .cast<_LocalPractitionerAccount?>()
         .firstWhere(
           (item) => item?.loginId == normalizedLoginId,
           orElse: () => null,
@@ -360,8 +362,36 @@ class PractitionerSessionService {
 
   static void _emitSession() {
     if (!_sessionController.isClosed) {
-      _sessionController.add(_currentSession);
+      _sessionController.add(currentSession);
     }
+  }
+
+  static PractitionerSession? _withResolvedClinic(
+    PractitionerSession? session,
+  ) {
+    if (session == null) {
+      return null;
+    }
+    final storedClinicId = _store.clinicIdForPractitioner(session.id);
+    final sessionClinicId = session.clinicId;
+    final resolvedClinicId =
+        storedClinicId ??
+        (sessionClinicId != null && _store.clinicById(sessionClinicId) != null
+            ? sessionClinicId
+            : null);
+    if (resolvedClinicId == session.clinicId) {
+      return session;
+    }
+    final resolved = PractitionerSession(
+      id: session.id,
+      loginId: session.loginId,
+      displayName: session.displayName,
+      clinicId: resolvedClinicId,
+    );
+    if (_currentSession?.id == session.id) {
+      _currentSession = resolved;
+    }
+    return resolved;
   }
 }
 
