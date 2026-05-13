@@ -93,6 +93,11 @@ class _PractitionerDashboardScreenState
   DateTimeRange? _selectedDateRange;
   bool _showDashboardGuide = false;
   _DashboardSubView _subView = _DashboardSubView.main;
+  final Set<String> _selectedTreatmentPointIds = <String>{
+    'gb21',
+    'li11',
+    'st36',
+  };
 
   String? get _currentClinicId =>
       PractitionerSessionService.currentSession?.clinicId;
@@ -299,6 +304,10 @@ class _PractitionerDashboardScreenState
                   key: _dateSelectorKey,
                   child: _buildDateSelectorPanel(),
                 ),
+              if (_subView == _DashboardSubView.main) ...[
+                const SizedBox(height: 12),
+                _buildPremiumTreatmentMapPanel(),
+              ],
               if (_subView == _DashboardSubView.inbox) ...[
                 const SizedBox(height: 4),
                 _buildClinicOpenRequestsPanel(),
@@ -1418,6 +1427,145 @@ class _PractitionerDashboardScreenState
       _selectedDateRange = picked;
       _selectedDate = _formatDate(picked.end);
     });
+  }
+
+  Widget _buildPremiumTreatmentMapPanel() {
+    final lang = AppLanguageController.instance;
+    final selectedPoints = _treatmentMapPoints
+        .where((point) => _selectedTreatmentPointIds.contains(point.id))
+        .toList();
+
+    return AppPanel(
+      padding: const EdgeInsets.all(20),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 860;
+          final map = _TreatmentPointMap(
+            points: _treatmentMapPoints,
+            selectedPointIds: _selectedTreatmentPointIds,
+            onToggle: (point) {
+              setState(() {
+                if (!_selectedTreatmentPointIds.add(point.id)) {
+                  _selectedTreatmentPointIds.remove(point.id);
+                }
+              });
+            },
+          );
+          final details = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.pine,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      'Premium ready',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.mint.withValues(alpha: 0.42),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: AppTheme.border),
+                    ),
+                    child: Text(
+                      lang.tr('Premium practitioner feature', '프리미엄 침술사 기능'),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: AppTheme.pine,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                lang.tr('Needle placement map', '침 놓은 자리 맵'),
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(color: AppTheme.ink),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                lang.tr(
+                  'Mark the points used today. Hover each point to see the label; later premium practitioner accounts can connect intake answers to suggested points and keep each visit easy to recall.',
+                  '오늘 사용한 자리를 표시하세요. 각 포인트에 마우스를 올리면 이름이 보이고, 나중에는 프리미엄 침술사 계정에서 환자 답변과 문진에 따라 추천 혈자리와 실제 사용 기록을 연결할 수 있습니다.',
+                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.ink.withValues(alpha: 0.72),
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                lang.tr('Marked today', '오늘 표시한 자리'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 10),
+              if (selectedPoints.isEmpty)
+                Text(
+                  lang.tr('No points selected yet.', '아직 선택한 자리가 없습니다.'),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.66),
+                  ),
+                )
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: selectedPoints
+                      .map(
+                        (point) => InputChip(
+                          label: Text('${point.code} · ${point.label}'),
+                          onDeleted: () => setState(
+                            () => _selectedTreatmentPointIds.remove(point.id),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
+          );
+
+          if (wide) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 340, child: map),
+                const SizedBox(width: 24),
+                Expanded(child: details),
+              ],
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(child: SizedBox(width: 330, child: map)),
+              const SizedBox(height: 18),
+              details,
+            ],
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildDateSelectorPanel() {
@@ -6208,6 +6356,262 @@ class _VisitWindowSummary {
   final String fromDate;
   final String toDate;
   final String periodLabel;
+}
+
+const List<_NeedlePoint> _treatmentMapPoints = [
+  _NeedlePoint(
+    id: 'gb20',
+    code: 'GB20',
+    label: 'Fengchi',
+    area: 'neck / occiput',
+    x: 0.43,
+    y: 0.17,
+  ),
+  _NeedlePoint(
+    id: 'gb21',
+    code: 'GB21',
+    label: 'Jianjing',
+    area: 'upper trapezius',
+    x: 0.63,
+    y: 0.25,
+  ),
+  _NeedlePoint(
+    id: 'li11',
+    code: 'LI11',
+    label: 'Quchi',
+    area: 'lateral elbow',
+    x: 0.28,
+    y: 0.45,
+  ),
+  _NeedlePoint(
+    id: 'pc6',
+    code: 'PC6',
+    label: 'Neiguan',
+    area: 'inner forearm',
+    x: 0.74,
+    y: 0.58,
+  ),
+  _NeedlePoint(
+    id: 'ren12',
+    code: 'REN12',
+    label: 'Zhongwan',
+    area: 'upper abdomen',
+    x: 0.5,
+    y: 0.43,
+  ),
+  _NeedlePoint(
+    id: 'st36',
+    code: 'ST36',
+    label: 'Zusanli',
+    area: 'anterolateral lower leg',
+    x: 0.43,
+    y: 0.76,
+  ),
+  _NeedlePoint(
+    id: 'sp6',
+    code: 'SP6',
+    label: 'Sanyinjiao',
+    area: 'medial lower leg',
+    x: 0.57,
+    y: 0.83,
+  ),
+];
+
+class _NeedlePoint {
+  const _NeedlePoint({
+    required this.id,
+    required this.code,
+    required this.label,
+    required this.area,
+    required this.x,
+    required this.y,
+  });
+
+  final String id;
+  final String code;
+  final String label;
+  final String area;
+  final double x;
+  final double y;
+}
+
+class _TreatmentPointMap extends StatelessWidget {
+  const _TreatmentPointMap({
+    required this.points,
+    required this.selectedPointIds,
+    required this.onToggle,
+  });
+
+  final List<_NeedlePoint> points;
+  final Set<String> selectedPointIds;
+  final ValueChanged<_NeedlePoint> onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 0.72,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSoft.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppTheme.border),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                Positioned.fill(child: CustomPaint(painter: _BodyMapPainter())),
+                for (final point in points)
+                  Positioned(
+                    left: constraints.maxWidth * point.x - 12,
+                    top: constraints.maxHeight * point.y - 12,
+                    child: Tooltip(
+                      message: '${point.code} · ${point.label}\n${point.area}',
+                      waitDuration: const Duration(milliseconds: 250),
+                      child: InkWell(
+                        onTap: () => onToggle(point),
+                        borderRadius: BorderRadius.circular(999),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: selectedPointIds.contains(point.id)
+                                ? AppTheme.copper
+                                : Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selectedPointIds.contains(point.id)
+                                  ? AppTheme.pine
+                                  : AppTheme.pine.withValues(alpha: 0.5),
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.12),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: selectedPointIds.contains(point.id)
+                                    ? Colors.white
+                                    : AppTheme.pine,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _BodyMapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bodyPaint = Paint()
+      ..color = AppTheme.mint.withValues(alpha: 0.38)
+      ..style = PaintingStyle.fill;
+    final outlinePaint = Paint()
+      ..color = AppTheme.pine.withValues(alpha: 0.34)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    final midlinePaint = Paint()
+      ..color = AppTheme.pine.withValues(alpha: 0.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+
+    final centerX = size.width / 2;
+    canvas.drawCircle(
+      Offset(centerX, size.height * 0.13),
+      size.width * 0.12,
+      bodyPaint,
+    );
+    canvas.drawCircle(
+      Offset(centerX, size.height * 0.13),
+      size.width * 0.12,
+      outlinePaint,
+    );
+
+    final torso = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(centerX, size.height * 0.38),
+        width: size.width * 0.34,
+        height: size.height * 0.34,
+      ),
+      const Radius.circular(48),
+    );
+    canvas.drawRRect(torso, bodyPaint);
+    canvas.drawRRect(torso, outlinePaint);
+
+    final leftArm = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.19,
+        size.height * 0.27,
+        size.width * 0.14,
+        size.height * 0.36,
+      ),
+      const Radius.circular(40),
+    );
+    final rightArm = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.67,
+        size.height * 0.27,
+        size.width * 0.14,
+        size.height * 0.36,
+      ),
+      const Radius.circular(40),
+    );
+    canvas.drawRRect(leftArm, bodyPaint);
+    canvas.drawRRect(rightArm, bodyPaint);
+    canvas.drawRRect(leftArm, outlinePaint);
+    canvas.drawRRect(rightArm, outlinePaint);
+
+    final leftLeg = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.38,
+        size.height * 0.54,
+        size.width * 0.12,
+        size.height * 0.34,
+      ),
+      const Radius.circular(34),
+    );
+    final rightLeg = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.5,
+        size.height * 0.54,
+        size.width * 0.12,
+        size.height * 0.34,
+      ),
+      const Radius.circular(34),
+    );
+    canvas.drawRRect(leftLeg, bodyPaint);
+    canvas.drawRRect(rightLeg, bodyPaint);
+    canvas.drawRRect(leftLeg, outlinePaint);
+    canvas.drawRRect(rightLeg, outlinePaint);
+
+    canvas.drawLine(
+      Offset(centerX, size.height * 0.24),
+      Offset(centerX, size.height * 0.88),
+      midlinePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _MiniKpi extends StatelessWidget {
