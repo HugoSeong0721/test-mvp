@@ -358,6 +358,15 @@ class PractitionerSessionService {
         createdAtIso: createdAtIso,
         lastLoginAtIso: createdAtIso,
       ),
+      _LocalPractitionerAccount(
+        id: 'platform_admin',
+        loginId: 'admin',
+        passwordHash: _passwordHash('Daisy'),
+        displayName: 'Platform Admin',
+        clinicId: 'seong_acupuncture_center',
+        createdAtIso: createdAtIso,
+        lastLoginAtIso: createdAtIso,
+      ),
     ];
   }
 
