@@ -1053,9 +1053,21 @@ class ClinicDataStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSlotOpen(String date, String time, bool isOpen) {
+  void setSlotOpen({
+    required String clinicId,
+    required String date,
+    required String time,
+    required bool isOpen,
+  }) {
+    final normalizedClinicId = clinicId.trim();
+    if (normalizedClinicId.isEmpty) {
+      return;
+    }
     final index = _slots.indexWhere(
-      (slot) => slot.date == date && slot.time == time,
+      (slot) =>
+          slot.clinicId == normalizedClinicId &&
+          slot.date == date &&
+          slot.time == time,
     );
     if (index < 0) return;
     _slots[index] = _slots[index].copyWith(isOpen: isOpen);

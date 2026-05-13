@@ -2854,7 +2854,12 @@ class _PractitionerDashboardScreenState
       rightSide = Switch(
         value: slot.isOpen,
         onChanged: (selected) {
-          _store.setSlotOpen(slot.date, slot.time, selected);
+          _store.setSlotOpen(
+            clinicId: slot.clinicId,
+            date: slot.date,
+            time: slot.time,
+            isOpen: selected,
+          );
         },
       );
     }
