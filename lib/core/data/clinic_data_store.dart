@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -30,6 +31,18 @@ class QaItem {
   final String category;
   final String question;
   final String answer;
+
+  Map<String, dynamic> toMap() {
+    return {'category': category, 'question': question, 'answer': answer};
+  }
+
+  factory QaItem.fromMap(Map<String, dynamic> data) {
+    return QaItem(
+      category: (data['category'] ?? '').toString(),
+      question: (data['question'] ?? '').toString(),
+      answer: (data['answer'] ?? '').toString(),
+    );
+  }
 }
 
 class PatientProfile {
@@ -87,6 +100,32 @@ class PatientProfile {
       memo: memo ?? this.memo,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'birthYear': birthYear,
+      'sex': sex,
+      'ethnicity': ethnicity,
+      'memo': memo,
+    };
+  }
+
+  factory PatientProfile.fromMap(Map<String, dynamic> data) {
+    return PatientProfile(
+      id: (data['id'] ?? '').toString(),
+      name: (data['name'] ?? 'New Patient').toString(),
+      phone: (data['phone'] ?? '').toString(),
+      email: (data['email'] ?? '').toString(),
+      birthYear: (data['birthYear'] as num?)?.toInt() ?? 1990,
+      sex: (data['sex'] ?? 'Not entered').toString(),
+      ethnicity: (data['ethnicity'] ?? 'Not entered').toString(),
+      memo: (data['memo'] ?? '').toString(),
+    );
+  }
 }
 
 class PatientVisit {
@@ -119,6 +158,58 @@ class PatientVisit {
   final String previousTreatmentArea;
   final String previousSessionNote;
   final List<QaItem> qaList;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'patientId': patientId,
+      'clinicId': clinicId,
+      'date': date,
+      'time': time,
+      'lastVisitDate': lastVisitDate,
+      'daysAgo': daysAgo,
+      'scheduledSinceLast': scheduledSinceLast,
+      'noShowSinceLast': noShowSinceLast,
+      'intakeStatus': intakeStatus.name,
+      'previousTreatmentArea': previousTreatmentArea,
+      'previousSessionNote': previousSessionNote,
+      'qaList': qaList.map((item) => item.toMap()).toList(),
+    };
+  }
+
+  factory PatientVisit.fromMap(Map<String, dynamic> data) {
+    final rawStatus = (data['intakeStatus'] ?? '').toString();
+    final status = IntakeStatus.values.firstWhere(
+      (item) => item.name == rawStatus,
+      orElse: () => IntakeStatus.notStarted,
+    );
+    final rawQaList = data['qaList'];
+    final qaList = rawQaList is List
+        ? rawQaList
+              .whereType<Map>()
+              .map(
+                (item) => QaItem.fromMap(
+                  item.map((key, value) => MapEntry(key.toString(), value)),
+                ),
+              )
+              .toList()
+        : <QaItem>[];
+    return PatientVisit(
+      id: (data['id'] ?? '').toString(),
+      patientId: (data['patientId'] ?? '').toString(),
+      clinicId: (data['clinicId'] ?? '').toString(),
+      date: (data['date'] ?? '').toString(),
+      time: (data['time'] ?? '').toString(),
+      lastVisitDate: (data['lastVisitDate'] ?? '').toString(),
+      daysAgo: (data['daysAgo'] as num?)?.toInt() ?? 0,
+      scheduledSinceLast: (data['scheduledSinceLast'] as num?)?.toInt() ?? 0,
+      noShowSinceLast: (data['noShowSinceLast'] as num?)?.toInt() ?? 0,
+      intakeStatus: status,
+      previousTreatmentArea: (data['previousTreatmentArea'] ?? '').toString(),
+      previousSessionNote: (data['previousSessionNote'] ?? '').toString(),
+      qaList: qaList,
+    );
+  }
 }
 
 class ScheduledVisit {
@@ -176,6 +267,19 @@ class AppointmentSlot {
       isOpen: isOpen ?? this.isOpen,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {'clinicId': clinicId, 'date': date, 'time': time, 'isOpen': isOpen};
+  }
+
+  factory AppointmentSlot.fromMap(Map<String, dynamic> data) {
+    return AppointmentSlot(
+      clinicId: (data['clinicId'] ?? '').toString(),
+      date: (data['date'] ?? '').toString(),
+      time: (data['time'] ?? '').toString(),
+      isOpen: data['isOpen'] == true,
+    );
+  }
 }
 
 class AppointmentRequest {
@@ -222,6 +326,49 @@ class AppointmentRequest {
       status: status ?? this.status,
       reviewedAt: reviewedAt ?? this.reviewedAt,
       practitionerNote: practitionerNote ?? this.practitionerNote,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'patientId': patientId,
+      'clinicId': clinicId,
+      'date': date,
+      'time': time,
+      'requestedAt': requestedAt.toIso8601String(),
+      'status': status.name,
+      if (reviewedAt != null) 'reviewedAt': reviewedAt!.toIso8601String(),
+      if (practitionerNote != null) 'practitionerNote': practitionerNote,
+    };
+  }
+
+  factory AppointmentRequest.fromMap(Map<String, dynamic> data) {
+    DateTime? parseDate(dynamic value) {
+      if (value is String) {
+        return DateTime.tryParse(value);
+      }
+      if (value is DateTime) {
+        return value;
+      }
+      return null;
+    }
+
+    final rawStatus = (data['status'] ?? '').toString();
+    final status = AppointmentRequestStatus.values.firstWhere(
+      (item) => item.name == rawStatus,
+      orElse: () => AppointmentRequestStatus.pending,
+    );
+    return AppointmentRequest(
+      id: (data['id'] ?? '').toString(),
+      patientId: (data['patientId'] ?? '').toString(),
+      clinicId: (data['clinicId'] ?? '').toString(),
+      date: (data['date'] ?? '').toString(),
+      time: (data['time'] ?? '').toString(),
+      requestedAt: parseDate(data['requestedAt']) ?? DateTime.now(),
+      status: status,
+      reviewedAt: parseDate(data['reviewedAt']),
+      practitionerNote: data['practitionerNote']?.toString(),
     );
   }
 }
@@ -469,12 +616,16 @@ class ClinicDataStore extends ChangeNotifier {
   static const String _patientSelectedClinicsKey =
       'patient_selected_clinics_v1';
   static const String _patientDefaultClinicsKey = 'patient_default_clinics_v1';
+  static const String _patientProfilesKey = 'patient_profiles_v1';
   static const String _practitionerClinicIdsKey = 'practitioner_clinic_ids_v1';
   static const String _patientPortalRegisteredIdsKey =
       'patient_portal_registered_ids_v1';
   static const String _clinicOpenRequestsKey = 'clinic_open_requests_v1';
   static const String _patientClinicMembershipRequestsKey =
       'patient_clinic_membership_requests_v1';
+  static const String _appointmentSlotsKey = 'appointment_slots_v1';
+  static const String _appointmentRequestsKey = 'appointment_requests_v1';
+  static const String _patientVisitsKey = 'patient_visits_v1';
 
   static String _storedDate(DateTime date) {
     final normalized = DateTime(date.year, date.month, date.day);
@@ -996,6 +1147,7 @@ class ClinicDataStore extends ChangeNotifier {
       ),
     );
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void cancelAppointmentRequest(String requestId) {
@@ -1012,6 +1164,7 @@ class ClinicDataStore extends ChangeNotifier {
       reviewedAt: DateTime.now(),
     );
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void confirmAppointmentRequest(String requestId) {
@@ -1051,6 +1204,7 @@ class ClinicDataStore extends ChangeNotifier {
       practitionerNote: note,
     );
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void setSlotOpen({
@@ -1072,6 +1226,7 @@ class ClinicDataStore extends ChangeNotifier {
     if (index < 0) return;
     _slots[index] = _slots[index].copyWith(isOpen: isOpen);
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void saveProfile(PatientProfile profile) {
@@ -1082,6 +1237,7 @@ class ClinicDataStore extends ChangeNotifier {
       _profiles.add(profile);
     }
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void deleteProfile(String profileId) {
@@ -1097,6 +1253,7 @@ class ClinicDataStore extends ChangeNotifier {
       _currentPatientId = _profiles.isNotEmpty ? _profiles.first.id : '';
     }
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void resetTestingStateForPatient(String patientId) {
@@ -1105,6 +1262,7 @@ class ClinicDataStore extends ChangeNotifier {
     );
     _visits.removeWhere((visit) => visit.patientId == patientId);
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void addTestingVisit(PatientVisit visit) {
@@ -1124,6 +1282,7 @@ class ClinicDataStore extends ChangeNotifier {
       return a.time.compareTo(b.time);
     });
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   void addAppointment({
@@ -1174,6 +1333,7 @@ class ClinicDataStore extends ChangeNotifier {
       return a.time.compareTo(b.time);
     });
     notifyListeners();
+    unawaited(_persistClinicState());
   }
 
   ClinicCenter? clinicById(String clinicId) {
@@ -1604,6 +1764,69 @@ class ClinicDataStore extends ChangeNotifier {
     _patientDefaultClinicIds
       ..clear()
       ..addAll(_readPersistedMap(_patientDefaultClinicsKey));
+    _restoreList(
+      key: _patientProfilesKey,
+      onRestore: (items) {
+        _profiles
+          ..clear()
+          ..addAll(
+            items
+                .map(PatientProfile.fromMap)
+                .where((profile) => profile.id.trim().isNotEmpty),
+          );
+      },
+    );
+    _restoreList(
+      key: _appointmentSlotsKey,
+      onRestore: (items) {
+        _slots
+          ..clear()
+          ..addAll(
+            items
+                .map(AppointmentSlot.fromMap)
+                .where(
+                  (slot) =>
+                      slot.clinicId.trim().isNotEmpty &&
+                      slot.date.trim().isNotEmpty &&
+                      slot.time.trim().isNotEmpty,
+                ),
+          );
+      },
+    );
+    _restoreList(
+      key: _appointmentRequestsKey,
+      onRestore: (items) {
+        _appointmentRequests
+          ..clear()
+          ..addAll(
+            items
+                .map(AppointmentRequest.fromMap)
+                .where(
+                  (request) =>
+                      request.id.trim().isNotEmpty &&
+                      request.patientId.trim().isNotEmpty &&
+                      request.clinicId.trim().isNotEmpty,
+                ),
+          );
+      },
+    );
+    _restoreList(
+      key: _patientVisitsKey,
+      onRestore: (items) {
+        _visits
+          ..clear()
+          ..addAll(
+            items
+                .map(PatientVisit.fromMap)
+                .where(
+                  (visit) =>
+                      visit.id.trim().isNotEmpty &&
+                      visit.patientId.trim().isNotEmpty &&
+                      visit.clinicId.trim().isNotEmpty,
+                ),
+          );
+      },
+    );
     _patientPortalRegisteredIds
       ..clear()
       ..addAll(
@@ -1793,6 +2016,29 @@ class ClinicDataStore extends ChangeNotifier {
     }
   }
 
+  void _restoreList({
+    required String key,
+    required void Function(List<Map<String, dynamic>> items) onRestore,
+  }) {
+    final raw = _prefs?.getString(key);
+    if (raw == null || raw.trim().isEmpty) {
+      return;
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) {
+        return;
+      }
+      final items = decoded
+          .whereType<Map>()
+          .map(
+            (item) => item.map((key, value) => MapEntry(key.toString(), value)),
+          )
+          .toList();
+      onRestore(items);
+    } catch (_) {}
+  }
+
   Future<void> _persistClinicState() async {
     final prefs = _prefs ??= await SharedPreferences.getInstance();
     await prefs.setString(
@@ -1806,6 +2052,24 @@ class ClinicDataStore extends ChangeNotifier {
     await prefs.setString(
       _patientDefaultClinicsKey,
       jsonEncode(_patientDefaultClinicIds),
+    );
+    await prefs.setString(
+      _patientProfilesKey,
+      jsonEncode(_profiles.map((profile) => profile.toMap()).toList()),
+    );
+    await prefs.setString(
+      _appointmentSlotsKey,
+      jsonEncode(_slots.map((slot) => slot.toMap()).toList()),
+    );
+    await prefs.setString(
+      _appointmentRequestsKey,
+      jsonEncode(
+        _appointmentRequests.map((request) => request.toMap()).toList(),
+      ),
+    );
+    await prefs.setString(
+      _patientVisitsKey,
+      jsonEncode(_visits.map((visit) => visit.toMap()).toList()),
     );
     await prefs.setString(
       _practitionerClinicIdsKey,
