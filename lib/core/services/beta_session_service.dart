@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/clinic_data_store.dart';
@@ -47,14 +46,11 @@ class BetaSessionService {
 
   static const String _accountsKey = 'beta_local_accounts_v1';
   static const String _sessionEmailKey = 'beta_local_session_email_v1';
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final StreamController<PatientSession?> _sessionController =
       StreamController<PatientSession?>.broadcast();
 
   static SharedPreferences? _prefs;
-  static StreamSubscription<User?>? _authSubscription;
   static Future<void>? _initialization;
-  static PatientSession? _firebaseSession;
   static PatientSession? _localSession;
 
   static Future<void> initialize() => _ensureInitialized();
@@ -65,8 +61,7 @@ class BetaSessionService {
     yield* _sessionController.stream;
   }
 
-  static PatientSession? get currentSession =>
-      _firebaseSession ?? _localSession;
+  static PatientSession? get currentSession => _localSession;
 
   static Future<PatientSession?> currentSessionAsync() async {
     await _ensureInitialized();
@@ -152,10 +147,6 @@ class BetaSessionService {
 
   static Future<void> signOut() async {
     await _ensureInitialized();
-    if (_auth.currentUser != null) {
-      await _auth.signOut();
-    }
-    _firebaseSession = null;
     _localSession = null;
     await _preferences().then((prefs) => prefs.remove(_sessionEmailKey));
     _emitSession();
@@ -181,7 +172,8 @@ class BetaSessionService {
     }
   }
 
-  static Future<List<LocalPatientAccountSummary>> localAccountSummaries() async {
+  static Future<List<LocalPatientAccountSummary>>
+  localAccountSummaries() async {
     await _ensureInitialized();
     final accounts = _readLocalAccounts()
       ..sort((a, b) => b.lastLoginAtIso.compareTo(a.lastLoginAtIso));
@@ -233,17 +225,6 @@ class BetaSessionService {
   static Future<void> _initializeInternal() async {
     await _preferences();
     await _restoreLocalSession();
-    _firebaseSession = _sessionFromFirebaseUser(_auth.currentUser);
-    _authSubscription ??= _auth.authStateChanges().listen((user) async {
-      _firebaseSession = _sessionFromFirebaseUser(user);
-      if (user != null) {
-        _localSession = null;
-        await _preferences().then((prefs) => prefs.remove(_sessionEmailKey));
-      } else {
-        await _restoreLocalSession();
-      }
-      _emitSession();
-    });
     _emitSession();
   }
 
@@ -299,18 +280,6 @@ class BetaSessionService {
 
   static Future<SharedPreferences> _preferences() async {
     return _prefs ??= await SharedPreferences.getInstance();
-  }
-
-  static PatientSession? _sessionFromFirebaseUser(User? user) {
-    if (user == null) {
-      return null;
-    }
-    return PatientSession(
-      id: user.uid,
-      email: (user.email ?? '').trim(),
-      displayName: (user.displayName ?? '').trim(),
-      usesFirebaseAuth: true,
-    );
   }
 
   static String _normalizeEmail(String email) => email.trim().toLowerCase();

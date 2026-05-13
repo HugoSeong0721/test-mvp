@@ -4332,36 +4332,59 @@ class _PractitionerDashboardScreenState
         .toList();
     final followUpTree = _defaultOnboardingFollowUpTree();
 
-    await _store.approvePatientClinicMembership(request.id);
-    await AppFirestoreService.sendAnswerRequest(
-      patientId: request.patientId,
-      clinicId: request.clinicId,
-      patientName: profile?.name ?? request.patientName,
-      patientPhone: profile?.phone ?? '',
-      patientEmail: profile?.email ?? request.patientEmail,
-      patientTime: 'Membership onboarding',
-      lastVisitDate: 'New patient',
-      intakeStatus: 'initial',
-      selectedQuestions: selectedQuestions,
-      customQuestionsByCategory: followUpTree,
-      note:
-          'Your clinic approved your account. Please start with this intake question tree so the practitioner can understand your baseline before the first visit.',
-      requestType: 'membership_onboarding',
-    );
+    var approved = false;
+    try {
+      await _store.approvePatientClinicMembership(request.id);
+      approved = true;
+      await AppFirestoreService.sendAnswerRequest(
+        patientId: request.patientId,
+        clinicId: request.clinicId,
+        patientName: profile?.name ?? request.patientName,
+        patientPhone: profile?.phone ?? '',
+        patientEmail: profile?.email ?? request.patientEmail,
+        patientTime: 'Membership onboarding',
+        lastVisitDate: 'New patient',
+        intakeStatus: 'initial',
+        selectedQuestions: selectedQuestions,
+        customQuestionsByCategory: followUpTree,
+        note:
+            'Your clinic approved your account. Please start with this intake question tree so the practitioner can understand your baseline before the first visit.',
+        requestType: 'membership_onboarding',
+      );
 
-    if (!mounted) {
-      return;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLanguageController.instance.tr(
-            'Patient approved and the starter question tree was sent.',
-            'Patient approved and the starter question tree was sent.',
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLanguageController.instance.tr(
+              'Patient approved and the starter question tree was sent.',
+              'Patient approved and the starter question tree was sent.',
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            approved
+                ? AppLanguageController.instance.tr(
+                    'Patient was approved, but the starter questions could not be sent. Please try sending questions again.',
+                    'Patient was approved, but the starter questions could not be sent. Please try sending questions again.',
+                  )
+                : AppLanguageController.instance.tr(
+                    'The approval button could not finish. Please try again.',
+                    'The approval button could not finish. Please try again.',
+                  ),
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildClinicOpenRequestsPanel() {
