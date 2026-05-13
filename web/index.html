@@ -34,21 +34,23 @@
 </head>
 <body>
   <script>
-    (function () {
+    (async function () {
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
           for (const registration of registrations) {
-            registration.unregister();
+          await registration.unregister();
           }
-        });
       }
       if ('caches' in window) {
-        caches.keys().then(function (keys) {
+        const keys = await caches.keys();
           for (const key of keys) {
-            caches.delete(key);
+          await caches.delete(key);
           }
-        });
       }
+      const script = document.createElement('script');
+      script.src = 'flutter_bootstrap.js?v=' + Date.now();
+      script.async = true;
+      document.body.appendChild(script);
     })();
   </script>
   <!--
@@ -59,6 +61,5 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
-  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

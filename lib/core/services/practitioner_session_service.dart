@@ -308,15 +308,15 @@ class PractitionerSessionService {
   static List<_LocalPractitionerAccount> _readLocalAccounts() {
     final raw = _prefs?.getString(_accountsKey);
     if (raw == null || raw.trim().isEmpty) {
-      return <_LocalPractitionerAccount>[];
+      return _demoPractitionerAccounts();
     }
 
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! List) {
-        return <_LocalPractitionerAccount>[];
+        return _demoPractitionerAccounts();
       }
-      return decoded
+      final accounts = decoded
           .whereType<Map>()
           .map(
             (item) => _LocalPractitionerAccount.fromJson(
@@ -324,9 +324,41 @@ class PractitionerSessionService {
             ),
           )
           .toList();
+      for (final demoAccount in _demoPractitionerAccounts()) {
+        if (!accounts.any(
+          (account) => account.loginId == demoAccount.loginId,
+        )) {
+          accounts.add(demoAccount);
+        }
+      }
+      return accounts;
     } catch (_) {
-      return <_LocalPractitionerAccount>[];
+      return _demoPractitionerAccounts();
     }
+  }
+
+  static List<_LocalPractitionerAccount> _demoPractitionerAccounts() {
+    const createdAtIso = '2026-05-13T00:00:00.000';
+    return [
+      _LocalPractitionerAccount(
+        id: 'beta_isaw_acu',
+        loginId: 'isaw',
+        passwordHash: _passwordHash('Daisy'),
+        displayName: 'Hugo Seong',
+        clinicId: 'isaw_acu',
+        createdAtIso: createdAtIso,
+        lastLoginAtIso: createdAtIso,
+      ),
+      _LocalPractitionerAccount(
+        id: 'beta_seong_acupuncture_center',
+        loginId: 'seong',
+        passwordHash: _passwordHash('Daisy'),
+        displayName: 'Dr. Hugo Seong',
+        clinicId: 'seong_acupuncture_center',
+        createdAtIso: createdAtIso,
+        lastLoginAtIso: createdAtIso,
+      ),
+    ];
   }
 
   static Future<void> _saveLocalAccounts(
