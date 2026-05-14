@@ -151,7 +151,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   final List<bool> _caffeineWeek = List<bool>.filled(5, false);
   final List<bool> _sleepWeek = List<bool>.filled(5, false);
   bool _isSubmitting = false;
-  bool _showStartGuide = true;
+  bool _showStartGuide = false;
   String? _lastChecklistReminderKey;
 
   List<_QuestionPair> get _activeQuestions =>
@@ -1732,8 +1732,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       const SizedBox(height: 10),
                       Text(
                         lang.tr(
-                          'This page is for finishing your intake in one clear flow. Start with the steps below, then answer the current question in the main panel.',
-                          '이 화면은 한 흐름 안에서 문진을 끝내기 위한 곳입니다. 아래 순서부터 확인한 뒤, 메인 패널에서 현재 질문에 답하면 됩니다.',
+                          'Answer and submit intake updates.',
+                          'Answer and submit intake updates.',
                         ),
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: AppTheme.ink.withValues(alpha: 0.72),

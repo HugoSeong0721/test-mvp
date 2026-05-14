@@ -31,7 +31,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
   PatientProfile? _sessionBackedProfile;
   _RequestFolder _selectedFolder = _RequestFolder.needsReply;
-  bool _showGuide = true;
+  bool _showGuide = false;
 
   PatientProfile get _currentProfile =>
       _sessionBackedProfile ?? _store.currentPatientProfile;
@@ -318,8 +318,8 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
           const SizedBox(height: 10),
           Text(
             lang.tr(
-              'This page works like a lightweight message center: read the newest practitioner follow-up, then continue in intake with the right visit context.',
-              '이 화면은 가벼운 메시지 센터처럼 작동합니다. 최신 침술사 후속 요청을 읽고, 같은 방문 맥락으로 문진 화면에서 이어서 답하면 됩니다.',
+              'Practitioner messages and follow-ups.',
+              'Practitioner messages and follow-ups.',
             ),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               color: AppTheme.ink.withValues(alpha: 0.72),

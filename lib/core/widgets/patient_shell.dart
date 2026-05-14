@@ -26,29 +26,29 @@ const List<PatientNavSpec> kPatientNavSpecs = [
   PatientNavSpec(
     item: PatientNavItem.home,
     icon: Icons.home_outlined,
-    labelEn: 'Home',
-    labelKo: '홈',
+    labelEn: 'Clinic',
+    labelKo: 'Clinic',
     routeName: '/patient-home',
   ),
   PatientNavSpec(
     item: PatientNavItem.intake,
     icon: Icons.assignment_outlined,
     labelEn: 'Intake',
-    labelKo: '문진',
+    labelKo: 'Intake',
     routeName: '/intake',
   ),
   PatientNavSpec(
     item: PatientNavItem.requests,
     icon: Icons.mail_outline,
-    labelEn: 'Requests',
-    labelKo: '요청함',
+    labelEn: 'Inbox',
+    labelKo: 'Inbox',
     routeName: '/patient-requests',
   ),
   PatientNavSpec(
     item: PatientNavItem.history,
     icon: Icons.event_note_outlined,
-    labelEn: 'History',
-    labelKo: '방문 기록',
+    labelEn: 'Visits',
+    labelKo: 'Visits',
     routeName: '/patient-history',
   ),
 ];
@@ -77,11 +77,7 @@ class PatientShell extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Header(
-                title: title,
-                subtitle: subtitle,
-                actions: actions,
-              ),
+              _Header(title: title, subtitle: subtitle, actions: actions),
               _TabBar(currentItem: currentItem),
               Expanded(child: body),
             ],
@@ -93,11 +89,7 @@ class PatientShell extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({
-    required this.title,
-    required this.actions,
-    this.subtitle,
-  });
+  const _Header({required this.title, required this.actions, this.subtitle});
 
   final String title;
   final String? subtitle;

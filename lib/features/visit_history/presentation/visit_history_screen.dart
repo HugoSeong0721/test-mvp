@@ -252,8 +252,8 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                     const SizedBox(height: 10),
                     Text(
                       lang.tr(
-                        'Use this page in order: review the session note, compare it with your memory, then send a correction only if something should be updated.',
-                        '이 화면은 세션 메모 확인, 기억과 비교, 필요한 경우 수정 요청 전송 순서로 보면 가장 쉽습니다.',
+                        'Past sessions, notes, and updates.',
+                        'Past sessions, notes, and updates.',
                       ),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: AppTheme.ink.withValues(alpha: 0.72),
@@ -282,43 +282,6 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                               ? '-'
                               : lastVisit.intakeStatus.label,
                           dark: false,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        AppGuideStep(
-                          dark: false,
-                          step: '1',
-                          title: lang.tr('Read the visit note', '방문 메모 읽기'),
-                          description: lang.tr(
-                            'Start with the treatment focus and session note at the top of each visit card.',
-                            '각 방문 카드 상단의 치료 부위와 세션 메모부터 읽어보세요.',
-                          ),
-                        ),
-                        AppGuideStep(
-                          dark: false,
-                          step: '2',
-                          title: lang.tr('Check Q&A snapshot', '질문/답변 보기'),
-                          description: lang.tr(
-                            'Then review what symptoms and answers were saved for that visit.',
-                            '그 다음 저장된 증상 질문과 답변을 확인하세요.',
-                          ),
-                        ),
-                        AppGuideStep(
-                          dark: false,
-                          step: '3',
-                          title: lang.tr(
-                            'Send an update if needed',
-                            '필요 시 수정 요청',
-                          ),
-                          description: lang.tr(
-                            'Only use the update box if something is missing or incorrect.',
-                            '빠진 내용이나 다른 점이 있을 때만 수정 요청 칸을 사용하세요.',
-                          ),
                         ),
                       ],
                     ),
