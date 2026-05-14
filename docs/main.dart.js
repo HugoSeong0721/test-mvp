@@ -108765,25 +108765,23 @@ return A.c7(A.aZ(A.b([m,B.Zq,A.b9(A.a0(A.b([k,B.X,l,B.C,A.c5(B.S,A.b([s,A.dc(B.O
 acU(){var s,r,q,p=this,o=null,n=$.af(),m=p.d,l=A.cs($.c3),k=m.a3U(l==null?o:l.d)
 l=A.cs($.c3)
 s=(l==null?o:l.b)==="admin"?m.gaCP():B.Ra
-m=n.a===B.c?"Patient clinic open requests":"\ud658\uc790 \ud55c\uc758\uc6d0 \ub4f1\ub85d \uc694\uccad"
+m=p.c
+m.toString
+m=A.d("Inbox",o,o,o,A.n(m).ok.r,o,o,o)
 l=p.c
 l.toString
-l=A.d(m,o,o,o,A.n(l).ok.r,o,o,o)
-m=n.a===B.c?"Patients can ask to connect the acupuncture center they already visit. Use this as early demand before inviting a clinic.":"\ud658\uc790\uac00 \ud604\uc7ac \ub2e4\ub2c8\ub294 \ud55c\uc758\uc6d0\uc744 \uc5f0\uacb0\ud558\uace0 \uc2f6\ub2e4\uace0 \uc694\uccad\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \ud55c\uc758\uc6d0\uc744 \ucd08\ub300\ud558\uae30 \uc804 \ucd08\uae30 \uc218\uc694\ub85c \ud655\uc778\ud558\uc138\uc694."
-r=p.c
-r.toString
-r=A.n(r).ok.z
-m=A.d(m,o,o,o,r==null?o:r.a3(B.k.J(0.68)),o,o,o)
+l=A.n(l).ok.z
+l=A.d("Patient joins and clinic leads.",o,o,o,l==null?o:l.a3(B.k.J(0.68)),o,o,o)
 r=p.c
 r.toString
 q=t.p
-r=A.b([l,B.O,m,B.C,A.d("Patient membership requests",o,o,o,A.n(r).ok.w,o,o,o),B.y],q)
-if(k.length===0)r.push(A.d("No patient membership requests are waiting for this clinic.",o,o,o,o,o,o,o))
+r=A.b([m,B.O,l,B.C,A.d("Patient joins",o,o,o,A.n(r).ok.w,o,o,o),B.y],q)
+if(k.length===0)r.push(A.d("No joins waiting.",o,o,o,o,o,o,o))
 else B.b.F(r,new A.K(k,new A.aIn(p,n),A.O(k).i("K<1,f>")))
 m=A.cs($.c3)
 if((m==null?o:m.b)==="admin"){m=p.c
 m.toString
-q=A.b([B.aF,A.d("New clinic lead requests",o,o,o,A.n(m).ok.w,o,o,o),B.y],q)
+q=A.b([B.aF,A.d("Clinic leads",o,o,o,A.n(m).ok.w,o,o,o),B.y],q)
 if(s.length===0)q.push(A.d(n.a===B.c?"No clinic open requests yet.":"\uc544\uc9c1 \ud55c\uc758\uc6d0 \ub4f1\ub85d \uc694\uccad\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",o,o,o,o,o,o,o))
 else B.b.F(q,new A.K(s,new A.aIo(p,n),A.O(s).i("K<1,f>")))
 B.b.F(r,q)}return A.c7(A.a0(r,B.m,B.f,B.i),o,B.bg)},
@@ -108891,81 +108889,81 @@ r.F(0,s)
 return r},
 $S:112}
 A.aKD.prototype={
-$2(a7,a8){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3=null,a4=$.af(),a5=A.n(a7),a6=A.cs($.c3)
-if((a6==null?a3:a6.d)==null)s=a3
-else{a6=A.cs($.c3)
-a6=a6==null?a3:a6.d
-a6.toString
-s=this.a.d.fE(a6)}a6=this.a
+$2(b0,b1){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3=null,a4="Patients",a5="Visit Insights",a6="Schedule",a7=$.af(),a8=A.n(b0),a9=A.cs($.c3)
+if((a9==null?a3:a9.d)==null)s=a3
+else{a9=A.cs($.c3)
+a9=a9==null?a3:a9.d
+a9.toString
+s=this.a.d.fE(a9)}a9=this.a
 r=A.cs($.c3)
 r=r==null?a3:r.d
-q=a6.d.a3U(r)
-r=a6.aoA()
+q=a9.d.a3U(r)
+r=a9.aoA()
 p=q.length
-o=a6.RZ(a6.XJ())
-n=a6.RZ(a6.asd())
+o=a9.RZ(a9.XJ())
+n=a9.RZ(a9.asd())
 m=A.O(o)
 l=new A.K(o,new A.aKp(),m.i("K<1,j>")).fI(0)
 k=A.S(l,A.p(l).c)
 B.b.fJ(k)
-j=B.d.O(a6.e.a.a).toLowerCase()
-if(a6.CW==="All Patients")i=o
+j=B.d.O(a9.e.a.a).toLowerCase()
+if(a9.CW==="All Patients")i=o
 else{m=m.i("X<1>")
-i=A.S(new A.X(o,new A.aKq(a6),m),m.i("o.E"))}m=A.O(i).i("X<1>")
-h=A.S(new A.X(i,new A.aKr(a6),m),m.i("o.E"))
+i=A.S(new A.X(o,new A.aKq(a9),m),m.i("o.E"))}m=A.O(i).i("X<1>")
+h=A.S(new A.X(i,new A.aKr(a9),m),m.i("o.E"))
 if(j.length===0)g=h
 else{m=A.O(h).i("X<1>")
-g=A.S(new A.X(h,new A.aKv(j),m),m.i("o.E"))}f=a6.atS(n)
-m=a6.db
-if(m==null){m=a6.ch
+g=A.S(new A.X(h,new A.aKv(j),m),m.i("o.E"))}f=a9.atS(n)
+m=a9.db
+if(m==null){m=a9.ch
 m===$&&A.a()
-m=a6.e3(m)+" Patients "+g.length
-l=a6.e3(a6.ch)+" \ud658\uc790 "+g.length+"\uba85"
-e=a4.a
+m=a9.e3(m)+" Patients "+g.length
+l=a9.e3(a9.ch)+" \ud658\uc790 "+g.length+"\uba85"
+e=a7.a
 d=e===B.c?m:l
-m=e}else{m=a6.fO(m.a)+" ~ "+a6.fO(a6.db.b)+" Patients "+g.length
-l=a6.fO(a6.db.a)+" ~ "+a6.fO(a6.db.b)+" \ud658\uc790 "+g.length+"\uba85"
-e=a4.a
+m=e}else{m=a9.fO(m.a)+" ~ "+a9.fO(a9.db.b)+" Patients "+g.length
+l=a9.fO(a9.db.a)+" ~ "+a9.fO(a9.db.b)+" \ud658\uc790 "+g.length+"\uba85"
+e=a7.a
 d=e===B.c?m:l
 m=e}m=m===B.c
 l=m?"Practitioner Dashboard":"\uce68\uc220\uc0ac \ub300\uc2dc\ubcf4\ub4dc"
 m=m?"Clinical operations and intake monitoring":"\uc6b4\uc601 \ud604\ud669 \ubc0f \ubb38\uc9c4 \ubaa8\ub2c8\ud130\ub9c1"
-r=a6.acX(r+p)
-e=a4.a===B.c?"Pick date range":"\ub0a0\uc9dc \ubc94\uc704 \uc120\ud0dd"
+r=a9.acX(r+p)
+e=a7.a===B.c?"Pick date range":"\ub0a0\uc9dc \ubc94\uc704 \uc120\ud0dd"
 c=t.p
-e=A.b([r,A.f_(a3,a3,a3,B.mX,a3,a3,a6.gWz(),a3,a3,a3,e,a3),A.f_(a3,a3,a3,B.mZ,a3,a3,new A.aKw(a6),a3,a3,a3,"Clinic settings",a3),B.hB],c)
-r=a6.dy
-r=A.b([new A.nP(B.N6,"Patient Management","\ud658\uc790 \uc815\ubcf4 \uad00\ub9ac",new A.aKx(a6),r===B.p_),new A.nP(B.Nl,"Today Summary","\uc624\ub298 \uc694\uc57d",new A.aKy(a6),r===B.oX),new A.nP(B.di,"Appointment Inbox","\uc608\uc57d \uc2e0\uccad Inbox",new A.aKz(a6),r===B.fM),new A.nP(B.NB,"Visit Window Insights","\ubc29\ubb38 \uad6c\uac04 \uc778\uc0ac\uc774\ud2b8",new A.aKA(a6),r===B.oY),new A.nP(B.hw,"Schedule / Slots","\uc77c\uc815 \xb7 \uc2ac\ub86f \uad00\ub9ac",new A.aKB(a6),r===B.oZ),new A.nP(B.tk,"Clinic Profile","\xed\u2022\u0153\xec\x9d\u02dc\xec\u203a\x90 \xec\xa0\u2022\xeb\xb3\xb4",new A.aKC(a6),r===B.fN)],t.YG)
+e=A.b([r,A.f_(a3,a3,a3,B.mX,a3,a3,a9.gWz(),a3,a3,a3,e,a3),A.f_(a3,a3,a3,B.mZ,a3,a3,new A.aKw(a9),a3,a3,a3,"Clinic settings",a3),B.hB],c)
+r=a9.dy
+r=A.b([new A.nP(B.N6,a4,a4,new A.aKx(a9),r===B.p_),new A.nP(B.Nl,"Today Summary","\uc624\ub298 \uc694\uc57d",new A.aKy(a9),r===B.oX),new A.nP(B.di,"Inbox","Inbox",new A.aKz(a9),r===B.fM),new A.nP(B.NB,a5,a5,new A.aKA(a9),r===B.oY),new A.nP(B.hw,a6,a6,new A.aKB(a9),r===B.oZ),new A.nP(B.tk,"Clinic","Clinic",new A.aKC(a9),r===B.fN)],t.YG)
 b=A.b([],c)
-if(!a6.gvN()){a=A.b([B.da.J(0.72),B.l],t.d)
-a0=a4.a===B.c
+if(!a9.gvN()){a=A.b([B.da.J(0.72),B.l],t.d)
+a0=a7.a===B.c
 a1=a0?"Set your clinic first":"\uba3c\uc800 \ud55c\uc758\uc6d0 \uc815\ubcf4\ub97c \uc124\uc815\ud574\uc8fc\uc138\uc694"
-a2=a5.ok
+a2=a8.ok
 a1=A.d(a1,a3,a3,a3,a2.r,a3,a3,a3)
 a0=a0?"The practitioner dashboard only shows the clinic you are logged into. Open Clinic Profile and save your clinic name first.":"\uce68\uc220\uc0ac \ub300\uc2dc\ubcf4\ub4dc\ub294 \ud604\uc7ac \ub85c\uadf8\uc778\ud55c \ud55c\uc758\uc6d0 \ub370\uc774\ud130\ub9cc \ubcf4\uc5ec\uc90d\ub2c8\ub2e4. \uba3c\uc800 Clinic Profile\uc5d0\uc11c \ud55c\uc758\uc6d0 \uc774\ub984\uc744 \uc800\uc7a5\ud574\uc8fc\uc138\uc694."
 a2=a2.z
 a0=A.d(a0,a3,a3,a3,a2==null?a3:a2.a3(B.k.J(0.72)),a3,a3,a3)
-B.b.F(b,A.b([A.c7(A.a0(A.b([a1,B.y,a0,B.a1,A.ej(B.mZ,A.d(a4.a===B.c?"Open clinic profile":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uc124\uc815 \uc5f4\uae30",a3,a3,a3,a3,a3,a3,a3),new A.aKs(a6),a3)],c),B.m,B.f,B.i),new A.fw(B.br,B.c4,B.bj,a,a3,a3),B.bg),B.C],c))}if(a6.dy===B.oX)B.b.F(b,A.b([a6.acZ(f,n,g.length),B.R],c))
-if(a6.dy===B.oY)B.b.F(b,A.b([a6.ad7(f,n),B.C],c))
-if(a6.dy===B.fL)if(p!==0)B.b.F(b,A.b([a6.adc(q),B.C],c))
-if(a6.dy===B.fL)b.push(new A.ha(a6.ad_(),a6.x))
-if(a6.dy===B.fM)B.b.F(b,A.b([B.X,a6.acU(),B.C,new A.ha(a6.adl(),a6.r)],c))
-if(a6.dy===B.oZ)B.b.F(b,A.b([B.X,new A.ha(a6.acQ(),a6.w)],c))
-if(a6.dy===B.p_)B.b.F(b,A.b([B.X,A.c7(A.c0(new A.qN(a3,!0,a3),720,a3),a3,B.al)],c))
-if(a6.dy===B.fN)B.b.F(b,A.b([B.X,B.Zz],c))
+B.b.F(b,A.b([A.c7(A.a0(A.b([a1,B.y,a0,B.a1,A.ej(B.mZ,A.d(a7.a===B.c?"Open clinic profile":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uc124\uc815 \uc5f4\uae30",a3,a3,a3,a3,a3,a3,a3),new A.aKs(a9),a3)],c),B.m,B.f,B.i),new A.fw(B.br,B.c4,B.bj,a,a3,a3),B.bg),B.C],c))}if(a9.dy===B.oX)B.b.F(b,A.b([a9.acZ(f,n,g.length),B.R],c))
+if(a9.dy===B.oY)B.b.F(b,A.b([a9.ad7(f,n),B.C],c))
+if(a9.dy===B.fL)if(p!==0)B.b.F(b,A.b([a9.adc(q),B.C],c))
+if(a9.dy===B.fL)b.push(new A.ha(a9.ad_(),a9.x))
+if(a9.dy===B.fM)B.b.F(b,A.b([B.X,a9.acU(),B.C,new A.ha(a9.adl(),a9.r)],c))
+if(a9.dy===B.oZ)B.b.F(b,A.b([B.X,new A.ha(a9.acQ(),a9.w)],c))
+if(a9.dy===B.p_)B.b.F(b,A.b([B.X,A.c7(A.c0(new A.qN(a3,!0,a3),720,a3),a3,B.al)],c))
+if(a9.dy===B.fN)B.b.F(b,A.b([B.X,B.Zz],c))
 b.push(B.R)
-if(a6.dy===B.fL){p=A.b([B.l.J(0.92),B.da.J(0.62)],t.d)
-b.push(new A.ha(A.c7(A.io(new A.aKt(a6,s,a4,a5,d,k,f,g,o)),new A.fw(B.br,B.c4,B.bj,p,a3,a3),B.bL),a6.y))}if(g.length===0){p=a4.a===B.c?"No patients match the selected filters.":"\uc120\ud0dd\ud55c \ud544\ud130\uc5d0 \ub9de\ub294 \ud658\uc790\uac00 \uc5c6\uc2b5\ub2c8\ub2e4."
-a=a5.ok
+if(a9.dy===B.fL){p=A.b([B.l.J(0.92),B.da.J(0.62)],t.d)
+b.push(new A.ha(A.c7(A.io(new A.aKt(a9,s,a7,a8,d,k,f,g,o)),new A.fw(B.br,B.c4,B.bj,p,a3,a3),B.bL),a9.y))}if(g.length===0){p=a7.a===B.c?"No patients match the selected filters.":"\uc120\ud0dd\ud55c \ud544\ud130\uc5d0 \ub9de\ub294 \ud658\uc790\uac00 \uc5c6\uc2b5\ub2c8\ub2e4."
+a=a8.ok
 p=A.b([A.d(p,a3,a3,a3,a.w,a3,a3,a3)],c)
-if(a6.db==null&&o.length!==0&&a6.cx!=="All"){a0=a6.ch
+if(a9.db==null&&o.length!==0&&a9.cx!=="All"){a0=a9.ch
 a0===$&&A.a()
-a0="There are visits on "+a6.e3(a0)+', but the current status filter "'+a6.Ke(a6.cx)+'" is hiding them.'
-a1=a6.e3(a6.ch)+'\uc5d0 \uc77c\uc815\uc740 \uc788\uc9c0\ub9cc \ud604\uc7ac \uc0c1\ud0dc \ud544\ud130 "'+a6.Ke(a6.cx)+'" \ub54c\ubb38\uc5d0 \uc228\uaca8\uc838 \uc788\uc2b5\ub2c8\ub2e4.'
-a0=a4.a===B.c?a0:a1
+a0="There are visits on "+a9.e3(a0)+', but the current status filter "'+a9.Ke(a9.cx)+'" is hiding them.'
+a1=a9.e3(a9.ch)+'\uc5d0 \uc77c\uc815\uc740 \uc788\uc9c0\ub9cc \ud604\uc7ac \uc0c1\ud0dc \ud544\ud130 "'+a9.Ke(a9.cx)+'" \ub54c\ubb38\uc5d0 \uc228\uaca8\uc838 \uc788\uc2b5\ub2c8\ub2e4.'
+a0=a7.a===B.c?a0:a1
 a=a.z
-B.b.F(p,A.b([B.y,A.d(a0,a3,a3,a3,a==null?a3:a.a3(B.k.J(0.66)),a3,a3,a3)],c))}b.push(A.c7(A.a0(p,B.m,B.f,B.i),a3,B.bL))}if(a6.dy===B.fL)B.b.F(b,new A.K(g,new A.aKu(a6,a7),A.O(g).i("K<1,f>")))
-return A.aTL(e,A.lU(b,a6.f,B.M0,a3,!1),B.nO,m,l,r)},
+B.b.F(p,A.b([B.y,A.d(a0,a3,a3,a3,a==null?a3:a.a3(B.k.J(0.66)),a3,a3,a3)],c))}b.push(A.c7(A.a0(p,B.m,B.f,B.i),a3,B.bL))}if(a9.dy===B.fL)B.b.F(b,new A.K(g,new A.aKu(a9,b0),A.O(g).i("K<1,f>")))
+return A.aTL(e,A.lU(b,a9.f,B.M0,a3,!1),B.nO,m,l,r)},
 $S:715}
 A.aKp.prototype={
 $1(a){return a.a.b},
@@ -109004,68 +109002,66 @@ A.aKs.prototype={
 $0(){return this.a.ky(B.fN)},
 $S:0}
 A.aKt.prototype={
-$2(a2,a3){var s,r,q,p,o,n,m,l,k,j,i=this,h=null,g="Refine the active patient set with status, date, and direct name search before opening patient cards.",f="\uc0c1\ud0dc, \ub0a0\uc9dc, \uc774\ub984 \uac80\uc0c9\uc73c\ub85c \ud65c\uc131 \ud658\uc790 \ubaa9\ub85d\uc744 \uba3c\uc800 \uc881\ud78c \ub4a4 \ud658\uc790 \uce74\ub4dc\ub97c \uc5f4\uc5b4\ubcf4\uc138\uc694.",e="All Patients",d="Patient filter",c=a3.b>=780,b=c?B.F_:B.S,a=t.p,a0=A.b([],a),a1=i.b
-if(a1!=null){s=B.b1.J(0.16)
+$2(a1,a2){var s,r,q,p,o,n,m,l,k,j,i=this,h=null,g="Filter, search, open a patient.",f="All Patients",e="Patient filter",d=a2.b>=780,c=d?B.F_:B.S,b=t.p,a=A.b([],b),a0=i.b
+if(a0!=null){s=B.b1.J(0.16)
 r=A.as(999)
 q=A.bo(B.Q.J(0.75),1)
-a1=a1.b
-p="Clinic: "+a1
-a1="\ud604\uc7ac \ud55c\uc758\uc6d0: "+a1
-if(i.c.a===B.c)a1=p
+a0=a0.b
+p="Clinic: "+a0
+a0="\ud604\uc7ac \ud55c\uc758\uc6d0: "+a0
+if(i.c.a===B.c)a0=p
 p=i.d.ok.z
-a0.push(A.aG(h,A.d(a1,h,h,h,p==null?h:p.fV(B.c6),h,h,h),B.n,h,new A.au(s,h,q,r,h,h,B.r),h,h,h,B.m1,h,h,h))}a1=i.a
+a.push(A.aG(h,A.d(a0,h,h,h,p==null?h:p.fV(B.c6),h,h,h),B.n,h,new A.au(s,h,q,r,h,h,B.r),h,h,h,B.m1,h,h,h))}a0=i.a
 s=i.c
-a0.push(A.dc(B.mX,A.d(s.a===B.c?"Pick date":"\ub2ec\ub825\uc5d0\uc11c \ub0a0\uc9dc \uc120\ud0dd",h,h,h,h,h,h,h),a1.gap2(),h))
-a0.push(A.kz(B.NT,A.d(s.a===B.c?"Today":"\uc624\ub298 \ub0a0\uc9dc\ub85c \uc774\ub3d9",h,h,h,h,h,h,h),a1.gam8()))
-o=A.c5(b,a0,B.U,8,8)
-b=A.b([],a)
-a0=i.e
+a.push(A.dc(B.mX,A.d(s.a===B.c?"Pick date":"\ub2ec\ub825\uc5d0\uc11c \ub0a0\uc9dc \uc120\ud0dd",h,h,h,h,h,h,h),a0.gap2(),h))
+a.push(A.kz(B.NT,A.d(s.a===B.c?"Today":"\uc624\ub298 \ub0a0\uc9dc\ub85c \uc774\ub3d9",h,h,h,h,h,h,h),a0.gam8()))
+o=A.c5(c,a,B.U,8,8)
+c=A.b([],b)
+a=i.e
 r=i.d.ok
-if(c){a0=A.d(a0,h,h,h,r.e,h,h,h)
-q=s.a===B.c?g:f
-p=r.y
-a0=A.b9(A.a0(A.b([a0,B.y,A.d(q,h,h,h,p==null?h:p.a3(B.k.J(0.72)),h,h,h)],a),B.m,B.f,B.i),1)
+if(d){a=A.d(a,h,h,h,r.e,h,h,h)
+q=r.y
+a=A.b9(A.a0(A.b([a,B.y,A.d(g,h,h,h,q==null?h:q.a3(B.k.J(0.72)),h,h,h)],b),B.m,B.f,B.i),1)
 q=i.f
-p=B.b.n(q,a1.CW)||a1.CW==="All Patients"?a1.CW:e
+p=B.b.n(q,a0.CW)||a0.CW==="All Patients"?a0.CW:f
 n=s.a===B.c
-m=A.by(h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,n?d:"\ud658\uc790 \ud544\ud130",!0,!0,!1,h,h,h,h,h,h,h,h,h,h,h,h,h,h)
+m=A.by(h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,n?e:"\ud658\uc790 \ud544\ud130",!0,!0,!1,h,h,h,h,h,h,h,h,h,h,h,h,h,h)
 l=t.N
-k=A.b([A.rT(A.d(n?e:"\uc804\uccb4 \ud658\uc790",h,h,h,h,h,h,h),e,l)],t.FG)
+k=A.b([A.rT(A.d(n?f:"\uc804\uccb4 \ud658\uc790",h,h,h,h,h,h,h),f,l)],t.FG)
 B.b.F(k,new A.K(q,new A.aKk(),A.O(q).i("K<1,eL<j>>")))
-b.push(A.aZ(A.b([a0,B.on,A.a0(A.b([o,B.C,A.c0(A.D5(m,p,k,new A.aKl(a1),l),h,240)],a),B.eY,B.f,B.i)],a),B.m,B.f,B.i,0))}else{a0=A.d(a0,h,h,h,r.e,h,h,h)
-q=s.a===B.c?g:f
-p=r.y
-q=A.d(q,h,h,h,p==null?h:p.a3(B.k.J(0.72)),h,h,h)
+c.push(A.aZ(A.b([a,B.on,A.a0(A.b([o,B.C,A.c0(A.D5(m,p,k,new A.aKl(a0),l),h,240)],b),B.eY,B.f,B.i)],b),B.m,B.f,B.i,0))}else{a=A.d(a,h,h,h,r.e,h,h,h)
+q=r.y
+q=A.d(g,h,h,h,q==null?h:q.a3(B.k.J(0.72)),h,h,h)
 p=i.f
-n=B.b.n(p,a1.CW)||a1.CW==="All Patients"?a1.CW:e
+n=B.b.n(p,a0.CW)||a0.CW==="All Patients"?a0.CW:f
 m=s.a===B.c
-l=A.by(h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,m?d:"\ud658\uc790 \ud544\ud130",!0,!0,!1,h,h,h,h,h,h,h,h,h,h,h,h,h,h)
+l=A.by(h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,m?e:"\ud658\uc790 \ud544\ud130",!0,!0,!1,h,h,h,h,h,h,h,h,h,h,h,h,h,h)
 k=t.N
-j=A.b([A.rT(A.d(m?e:"\uc804\uccb4 \ud658\uc790",h,h,h,h,h,h,h),e,k)],t.FG)
+j=A.b([A.rT(A.d(m?f:"\uc804\uccb4 \ud658\uc790",h,h,h,h,h,h,h),f,k)],t.FG)
 B.b.F(j,new A.K(p,new A.aKm(),A.O(p).i("K<1,eL<j>>")))
-B.b.F(b,A.b([a0,B.y,q,B.a1,o,B.a1,A.D5(l,n,j,new A.aKn(a1),k)],a))}b.push(B.R)
-b.push(A.c5(B.S,A.b([a1.t8("All"),a1.t8("Alert Ready"),a1.t8("Missing Profile"),a1.t8("No Response"),a1.t8("In Progress"),a1.t8("Complete")],a),B.U,8,8))
-b.push(B.a1)
-b.push(A.bN(!1,a1.e,A.by(h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,s.a===B.c?"Search patient name":"\ud658\uc790 \uc774\ub984 \uc9c1\uc811 \uac80\uc0c9",h,h,h,h,h,h,h,h,h,!0,!0,!1,h,B.n1,h,h,h,h,h,h,h,h,h,h,h,h),h,h,1,h,!1,new A.aKo(a1),h,h))
-b.push(B.B)
-a=i.r.e
-if(a1.db==null){a0="Visit summary: "+a
-a="\ubc29\ubb38 \uc694\uc57d: "+a
-if(s.a===B.c)a=a0}else{a0="Selected range summary: "+a
-a="\uc120\ud0dd \uae30\uac04 \uc694\uc57d: "+a
-if(s.a===B.c)a=a0}r=r.z
-a0=r==null
-b.push(A.d(a,h,h,h,a0?h:r.a3(B.k.J(0.62)),h,h,h))
-if(a1.db==null&&i.w.length!==0){a=i.w
-q=a.length
+B.b.F(c,A.b([a,B.y,q,B.a1,o,B.a1,A.D5(l,n,j,new A.aKn(a0),k)],b))}c.push(B.R)
+c.push(A.c5(B.S,A.b([a0.t8("All"),a0.t8("Alert Ready"),a0.t8("Missing Profile"),a0.t8("No Response"),a0.t8("In Progress"),a0.t8("Complete")],b),B.U,8,8))
+c.push(B.a1)
+c.push(A.bN(!1,a0.e,A.by(h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,s.a===B.c?"Search patient name":"\ud658\uc790 \uc774\ub984 \uc9c1\uc811 \uac80\uc0c9",h,h,h,h,h,h,h,h,h,!0,!0,!1,h,B.n1,h,h,h,h,h,h,h,h,h,h,h,h),h,h,1,h,!1,new A.aKo(a0),h,h))
+c.push(B.B)
+b=i.r.e
+if(a0.db==null){a="Visit summary: "+b
+b="\ubc29\ubb38 \uc694\uc57d: "+b
+if(s.a===B.c)b=a}else{a="Selected range summary: "+b
+b="\uc120\ud0dd \uae30\uac04 \uc694\uc57d: "+b
+if(s.a===B.c)b=a}r=r.z
+a=r==null
+c.push(A.d(b,h,h,h,a?h:r.a3(B.k.J(0.62)),h,h,h))
+if(a0.db==null&&i.w.length!==0){b=i.w
+q=b.length
 p=i.x
 n=p.length
-m=a1.ch
+m=a0.ch
 m===$&&A.a()
-m="Showing "+q+" of "+n+" patient portal booking(s) on "+a1.e3(m)+"."
-a=a1.e3(a1.ch)+" \ud658\uc790 \ud3ec\ud138 \uc77c\uc815 "+p.length+"\uac74 \uc911 "+a.length+"\uac74\uc744 \ud45c\uc2dc \uc911\uc785\ub2c8\ub2e4."
-if(s.a===B.c)a=m
-b.push(new A.ab(B.rn,A.d(a,h,h,h,a0?h:r.a3(B.k.J(0.62)),h,h,h),h))}return A.a0(b,B.m,B.f,B.i)},
+m="Showing "+q+" of "+n+" patient portal booking(s) on "+a0.e3(m)+"."
+b=a0.e3(a0.ch)+" \ud658\uc790 \ud3ec\ud138 \uc77c\uc815 "+p.length+"\uac74 \uc911 "+b.length+"\uac74\uc744 \ud45c\uc2dc \uc911\uc785\ub2c8\ub2e4."
+if(s.a===B.c)b=m
+c.push(new A.ab(B.rn,A.d(b,h,h,h,a?h:r.a3(B.k.J(0.62)),h,h,h),h))}return A.a0(c,B.m,B.f,B.i)},
 $S:97}
 A.aKk.prototype={
 $1(a){var s=null
@@ -110175,7 +110171,7 @@ q=A.bo(B.Q,1)
 p=k.c
 p.toString
 p=A.n(p).ok.Q
-j.push(A.aG(o,A.d("Approval will also send the starter 10-category intake tree, including follow-up prompts for deeper questions.",o,o,o,p==null?o:p.a3(B.k.J(0.68)),o,o,o),B.n,o,new A.au(B.au,o,q,r,o,o,B.r),o,o,o,B.aE,o,o,1/0))
+j.push(A.aG(o,A.d("Approving connects the patient and sends starter intake.",o,o,o,p==null?o:p.a3(B.k.J(0.68)),o,o,o),B.n,o,new A.au(B.au,o,q,r,o,o,B.r),o,o,o,B.aE,o,o,1/0))
 j.push(B.B)
 r=A.ej(B.mY,A.d("Approve + send questions",o,o,o,o,o,o,o),new A.aIl(k,a),o)
 j.push(A.c5(B.S,A.b([r,A.dc(B.mW,A.d("Decline",o,o,o,o,o,o,o),new A.aIm(k,a),o)],s),B.U,8,8))

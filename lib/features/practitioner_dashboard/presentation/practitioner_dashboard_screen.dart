@@ -213,8 +213,8 @@ class _PractitionerDashboardScreenState
           tools: [
             PractitionerToolItem(
               icon: Icons.people_outline,
-              labelEn: 'Patient Management',
-              labelKo: '환자 정보 관리',
+              labelEn: 'Patients',
+              labelKo: 'Patients',
               active: _subView == _DashboardSubView.patientManagement,
               onTap: () => _selectSubView(_DashboardSubView.patientManagement),
             ),
@@ -227,29 +227,29 @@ class _PractitionerDashboardScreenState
             ),
             PractitionerToolItem(
               icon: Icons.mark_email_unread_outlined,
-              labelEn: 'Appointment Inbox',
-              labelKo: '예약 신청 Inbox',
+              labelEn: 'Inbox',
+              labelKo: 'Inbox',
               active: _subView == _DashboardSubView.inbox,
               onTap: () => _selectSubView(_DashboardSubView.inbox),
             ),
             PractitionerToolItem(
               icon: Icons.query_stats_outlined,
-              labelEn: 'Visit Window Insights',
-              labelKo: '방문 구간 인사이트',
+              labelEn: 'Visit Insights',
+              labelKo: 'Visit Insights',
               active: _subView == _DashboardSubView.visitInsights,
               onTap: () => _selectSubView(_DashboardSubView.visitInsights),
             ),
             PractitionerToolItem(
               icon: Icons.event_available_outlined,
-              labelEn: 'Schedule / Slots',
-              labelKo: '일정 · 슬롯 관리',
+              labelEn: 'Schedule',
+              labelKo: 'Schedule',
               active: _subView == _DashboardSubView.schedule,
               onTap: () => _selectSubView(_DashboardSubView.schedule),
             ),
             PractitionerToolItem(
               icon: Icons.domain_add_outlined,
-              labelEn: 'Clinic Profile',
-              labelKo: 'í•œì˜ì› ì •ë³´',
+              labelEn: 'Clinic',
+              labelKo: 'Clinic',
               active: _subView == _DashboardSubView.clinicProfile,
               onTap: () => _selectSubView(_DashboardSubView.clinicProfile),
             ),
@@ -432,8 +432,8 @@ class _PractitionerDashboardScreenState
                                         const SizedBox(height: 8),
                                         Text(
                                           lang.tr(
-                                            'Refine the active patient set with status, date, and direct name search before opening patient cards.',
-                                            '상태, 날짜, 이름 검색으로 활성 환자 목록을 먼저 좁힌 뒤 환자 카드를 열어보세요.',
+                                            'Filter, search, open a patient.',
+                                            'Filter, search, open a patient.',
                                           ),
                                           style: theme.textTheme.bodyLarge
                                               ?.copyWith(
@@ -508,8 +508,8 @@ class _PractitionerDashboardScreenState
                               const SizedBox(height: 8),
                               Text(
                                 lang.tr(
-                                  'Refine the active patient set with status, date, and direct name search before opening patient cards.',
-                                  '상태, 날짜, 이름 검색으로 활성 환자 목록을 먼저 좁힌 뒤 환자 카드를 열어보세요.',
+                                  'Filter, search, open a patient.',
+                                  'Filter, search, open a patient.',
                                 ),
                                 style: theme.textTheme.bodyLarge?.copyWith(
                                   color: AppTheme.ink.withValues(alpha: 0.72),
@@ -4502,14 +4502,14 @@ class _PractitionerDashboardScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            lang.tr('Patient clinic open requests', '환자 한의원 등록 요청'),
+            lang.tr('Inbox', 'Inbox'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 6),
           Text(
             lang.tr(
-              'Patients can ask to connect the acupuncture center they already visit. Use this as early demand before inviting a clinic.',
-              '환자가 현재 다니는 한의원을 연결하고 싶다고 요청할 수 있습니다. 한의원을 초대하기 전 초기 수요로 확인하세요.',
+              'Patient joins and clinic leads.',
+              'Patient joins and clinic leads.',
             ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppTheme.ink.withValues(alpha: 0.68),
@@ -4517,20 +4517,12 @@ class _PractitionerDashboardScreenState
           ),
           const SizedBox(height: 12),
           Text(
-            lang.tr(
-              'Patient membership requests',
-              'Patient membership requests',
-            ),
+            lang.tr('Patient joins', 'Patient joins'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
           if (membershipRequests.isEmpty)
-            Text(
-              lang.tr(
-                'No patient membership requests are waiting for this clinic.',
-                'No patient membership requests are waiting for this clinic.',
-              ),
-            )
+            Text(lang.tr('No joins waiting.', 'No joins waiting.'))
           else
             ...membershipRequests.map((request) {
               return Container(
@@ -4570,8 +4562,8 @@ class _PractitionerDashboardScreenState
                       ),
                       child: Text(
                         lang.tr(
-                          'Approval will also send the starter 10-category intake tree, including follow-up prompts for deeper questions.',
-                          'Approval will also send the starter 10-category intake tree, including follow-up prompts for deeper questions.',
+                          'Approving connects the patient and sends starter intake.',
+                          'Approving connects the patient and sends starter intake.',
                         ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppTheme.ink.withValues(alpha: 0.68),
@@ -4609,7 +4601,7 @@ class _PractitionerDashboardScreenState
           if (_isPlatformAdmin) ...[
             const SizedBox(height: 18),
             Text(
-              lang.tr('New clinic lead requests', 'New clinic lead requests'),
+              lang.tr('Clinic leads', 'Clinic leads'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
