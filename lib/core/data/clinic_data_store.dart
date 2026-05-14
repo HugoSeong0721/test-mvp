@@ -791,6 +791,13 @@ class ClinicDataStore extends ChangeNotifier {
   List<PatientClinicMembershipRequest> pendingMembershipRequestsForClinic(
     String? clinicId,
   ) {
+    return membershipRequestsForClinic(clinicId, statuses: {'pending'});
+  }
+
+  List<PatientClinicMembershipRequest> membershipRequestsForClinic(
+    String? clinicId, {
+    Set<String>? statuses,
+  }) {
     final normalizedClinicId = clinicId?.trim();
     if (normalizedClinicId == null || normalizedClinicId.isEmpty) {
       return const [];
@@ -800,7 +807,7 @@ class ClinicDataStore extends ChangeNotifier {
             .where(
               (request) =>
                   request.clinicId == normalizedClinicId &&
-                  request.status == 'pending',
+                  (statuses == null || statuses.contains(request.status)),
             )
             .toList()
           ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
@@ -823,6 +830,11 @@ class ClinicDataStore extends ChangeNotifier {
         _patientClinicMembershipRequests[index] = request;
       } else {
         _patientClinicMembershipRequests.add(request);
+      }
+      if (request.status == 'approved') {
+        _ensureMembershipProfile(request);
+        _patientSelectedClinicIds[request.patientId] = request.clinicId;
+        _patientPortalRegisteredIds.add(request.patientId);
       }
       changed = true;
     }
@@ -1598,6 +1610,24 @@ class ClinicDataStore extends ChangeNotifier {
     } catch (_) {}
   }
 
+  Future<void> continueWithClinicForPatient({
+    required String patientId,
+    required String clinicId,
+  }) async {
+    if (clinicById(clinicId) == null || profileById(patientId) == null) {
+      return;
+    }
+    _patientSelectedClinicIds[patientId] = clinicId;
+    notifyListeners();
+    await _persistClinicState();
+    try {
+      await AppFirestoreService.savePatientClinicLink(
+        patientId: patientId,
+        selectedClinicId: clinicId,
+      );
+    } catch (_) {}
+  }
+
   Future<void> setDefaultClinicForPatient({
     required String patientId,
     required String clinicId,
@@ -1631,7 +1661,9 @@ class ClinicDataStore extends ChangeNotifier {
       status: 'approved',
       reviewedAt: reviewedAt,
     );
+    _ensureMembershipProfile(_patientClinicMembershipRequests[index]);
     _patientSelectedClinicIds[request.patientId] = request.clinicId;
+    _patientPortalRegisteredIds.add(request.patientId);
     notifyListeners();
     await _persistClinicState();
     try {
@@ -1643,6 +1675,26 @@ class ClinicDataStore extends ChangeNotifier {
         selectedClinicId: request.clinicId,
       );
     } catch (_) {}
+  }
+
+  void _ensureMembershipProfile(PatientClinicMembershipRequest request) {
+    if (profileById(request.patientId) != null) {
+      return;
+    }
+    _profiles.add(
+      PatientProfile(
+        id: request.patientId,
+        name: request.patientName.trim().isEmpty
+            ? 'New Patient'
+            : request.patientName.trim(),
+        phone: '',
+        email: request.patientEmail.trim(),
+        birthYear: 1990,
+        sex: 'Not entered',
+        ethnicity: 'Not entered',
+        memo: '',
+      ),
+    );
   }
 
   Future<void> declinePatientClinicMembership(String requestId) async {

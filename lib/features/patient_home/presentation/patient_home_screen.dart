@@ -389,8 +389,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   children: [
                     Text(
                       lang.tr(
-                        'Search by clinic name, practitioner, location, or keyword. Your default clinic can open automatically after future logins.',
-                        '한의원 이름, 침술사, 위치, 키워드로 검색할 수 있습니다. 기본 한의원으로 저장하면 다음 로그인부터 바로 연결됩니다.',
+                        'Search or continue with a clinic.',
+                        '검색하거나 이 한의원으로 계속하세요.',
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -522,6 +522,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                           patientId: patientId,
                                                           clinicId: clinic.id,
                                                         );
+                                                    await _store
+                                                        .continueWithClinicForPatient(
+                                                          patientId: patientId,
+                                                          clinicId: clinic.id,
+                                                        );
                                                     if (!context.mounted) {
                                                       return;
                                                     }
@@ -535,8 +540,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       SnackBar(
                                                         content: Text(
                                                           lang.tr(
-                                                            'Membership request sent to ${clinic.name}. The clinic must approve it before this portal connects.',
-                                                            'Membership request sent to ${clinic.name}. The clinic must approve it before this portal connects.',
+                                                            'Request sent to ${clinic.name}.',
+                                                            '${clinic.name}에 요청을 보냈습니다.',
                                                           ),
                                                         ),
                                                       ),
@@ -555,6 +560,31 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       'Request to join',
                                                       'Request to join',
                                                     ),
+                                            ),
+                                          ),
+                                          OutlinedButton.icon(
+                                            onPressed:
+                                                isCurrent || isPendingApproval
+                                                ? () async {
+                                                    await _store
+                                                        .continueWithClinicForPatient(
+                                                          patientId: patientId,
+                                                          clinicId: clinic.id,
+                                                        );
+                                                    if (!context.mounted) {
+                                                      return;
+                                                    }
+                                                    Navigator.pop(context);
+                                                  }
+                                                : null,
+                                            icon: const Icon(
+                                              Icons.arrow_forward,
+                                            ),
+                                            label: Text(
+                                              lang.tr(
+                                                'Continue here',
+                                                '여기로 계속하기',
+                                              ),
                                             ),
                                           ),
                                           OutlinedButton.icon(

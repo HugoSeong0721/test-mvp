@@ -162,6 +162,7 @@ class _PractitionerDashboardScreenState
             pendingMembershipRequests.length;
         final visibleVisits = _visibleVisits();
         final summaryVisits = _summaryWindowVisits();
+        final connectedProfiles = _store.profilesForClinic(_currentClinicId);
         final patientNames =
             visibleVisits.map((v) => v.profile.name).toSet().toList()..sort();
         final keyword = _patientFilterController.text.trim().toLowerCase();
@@ -179,6 +180,13 @@ class _PractitionerDashboardScreenState
                   .where((v) => v.profile.name.toLowerCase().contains(keyword))
                   .toList();
         final summary = _visitWindowSummary(summaryVisits);
+        final connectedPatientsWithoutVisit = connectedProfiles
+            .where(
+              (profile) => _store
+                  .historyForPatient(profile.id, clinicId: _currentClinicId)
+                  .isEmpty,
+            )
+            .toList();
         final titleLabel = _selectedDateRange == null
             ? lang.tr(
                 '${_formatStoredDateWithWeekday(_selectedDate)} Patients ${filteredVisits.length}',
@@ -613,6 +621,11 @@ class _PractitionerDashboardScreenState
                     ),
                   ),
                 ),
+              if (_subView == _DashboardSubView.main &&
+                  connectedPatientsWithoutVisit.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _buildConnectedPatientsPanel(connectedPatientsWithoutVisit),
+              ],
               if (filteredVisits.isEmpty)
                 AppPanel(
                   padding: const EdgeInsets.all(20),
@@ -652,6 +665,78 @@ class _PractitionerDashboardScreenState
           ),
         );
       },
+    );
+  }
+
+  Widget _buildConnectedPatientsPanel(List<PatientProfile> profiles) {
+    final lang = AppLanguageController.instance;
+    final theme = Theme.of(context);
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.person_add_alt_1, color: AppTheme.pine),
+              const SizedBox(width: 8),
+              Text(
+                lang.tr('New patients', 'New patients'),
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppTheme.pine.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '${profiles.length}',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: AppTheme.pine,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: profiles.map((profile) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person_outline, size: 18),
+                    const SizedBox(width: 8),
+                    Text(profile.name, style: theme.textTheme.labelLarge),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () => _openPatientManagement(
+                        context,
+                        initialProfileId: profile.id,
+                      ),
+                      child: Text(lang.tr('Open', 'Open')),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -4387,8 +4472,8 @@ class _PractitionerDashboardScreenState
         SnackBar(
           content: Text(
             AppLanguageController.instance.tr(
-              'Patient approved and the starter question tree was sent.',
-              'Patient approved and the starter question tree was sent.',
+              '${request.patientName} approved. It stays in Inbox under Recent joins.',
+              '${request.patientName} approved. It stays in Inbox under Recent joins.',
             ),
           ),
         ),
@@ -4493,6 +4578,13 @@ class _PractitionerDashboardScreenState
     final membershipRequests = _store.pendingMembershipRequestsForClinic(
       _currentClinicId,
     );
+    final recentMembershipRequests = _store
+        .membershipRequestsForClinic(
+          _currentClinicId,
+          statuses: {'approved', 'declined'},
+        )
+        .take(8)
+        .toList();
     final requests = _isPlatformAdmin
         ? _store.pendingClinicOpenRequests
         : const <ClinicOpenRequest>[];
@@ -4598,6 +4690,72 @@ class _PractitionerDashboardScreenState
                 ),
               );
             }),
+          if (recentMembershipRequests.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            Text(
+              lang.tr('Recent joins', 'Recent joins'),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            ...recentMembershipRequests.map((request) {
+              final profile = _store.profileById(request.patientId);
+              final isApproved = request.status == 'approved';
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppTheme.border.withValues(alpha: 0.72),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isApproved
+                          ? Icons.check_circle_outline
+                          : Icons.cancel_outlined,
+                      color: isApproved ? AppTheme.pine : AppTheme.copper,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            request.patientName,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          if (request.patientEmail.trim().isNotEmpty)
+                            Text(
+                              request.patientEmail,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      isApproved
+                          ? lang.tr('Approved', 'Approved')
+                          : lang.tr('Declined', 'Declined'),
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    const SizedBox(width: 8),
+                    if (profile != null)
+                      OutlinedButton(
+                        onPressed: () => _openPatientManagement(
+                          context,
+                          initialProfileId: profile.id,
+                        ),
+                        child: Text(lang.tr('Open', 'Open')),
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ],
           if (_isPlatformAdmin) ...[
             const SizedBox(height: 18),
             Text(
