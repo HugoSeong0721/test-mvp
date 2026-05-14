@@ -13,6 +13,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/patient_shell.dart';
+import '../../../core/widgets/patient_clinic_context_panel.dart';
+import '../../patient_home/presentation/patient_home_screen.dart';
 
 class VisitHistoryScreen extends StatefulWidget {
   const VisitHistoryScreen({super.key});
@@ -225,6 +227,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
       builder: (context, _) {
         final lang = AppLanguageController.instance;
         final profile = _currentProfile;
+        final activeClinic = _store.activeClinicForPatient(profile.id);
         final history = _history;
         final lastVisit = history.isNotEmpty ? history.first.visit : null;
 
@@ -321,6 +324,12 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 16),
+              PatientClinicContextPanel(
+                clinic: activeClinic,
+                onChooseClinic: () =>
+                    Navigator.pushNamed(context, PatientHomeScreen.routeName),
               ),
               const SizedBox(height: 16),
               if (history.isEmpty)

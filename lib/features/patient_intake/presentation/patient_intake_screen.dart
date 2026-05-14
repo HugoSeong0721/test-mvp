@@ -14,6 +14,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/patient_shell.dart';
+import '../../../core/widgets/patient_clinic_context_panel.dart';
+import '../../patient_home/presentation/patient_home_screen.dart';
 import '../../patient_requests/presentation/patient_requests_screen.dart';
 import '../../visit_history/presentation/visit_history_screen.dart';
 
@@ -1630,6 +1632,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     final lang = AppLanguageController.instance;
     final theme = Theme.of(context);
     final profile = _currentProfile;
+    final activeClinic = _store.activeClinicForPatient(profile.id);
     final history = _history;
     final latestVisit = history.isNotEmpty ? history.first.visit : null;
     final progress = (_currentQuestionIndex + 1) / _activeQuestions.length;
@@ -1734,6 +1737,14 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         ),
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: AppTheme.ink.withValues(alpha: 0.72),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      PatientClinicContextPanel(
+                        clinic: activeClinic,
+                        onChooseClinic: () => Navigator.pushNamed(
+                          context,
+                          PatientHomeScreen.routeName,
                         ),
                       ),
                       if (_showStartGuide) const SizedBox(height: 18),

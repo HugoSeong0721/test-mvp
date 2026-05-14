@@ -11,6 +11,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/patient_shell.dart';
+import '../../../core/widgets/patient_clinic_context_panel.dart';
 import '../../patient_home/presentation/patient_home_screen.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
 import '../../visit_history/presentation/visit_history_screen.dart';
@@ -429,6 +430,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
       builder: (context, _) {
         final lang = AppLanguageController.instance;
         final profile = _currentProfile;
+        final activeClinic = _store.activeClinicForPatient(profile.id);
 
         return PatientShell(
           currentItem: PatientNavItem.requests,
@@ -507,6 +509,14 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                     openCount: openCount,
                     completedCount: completedCount,
                     totalCount: docs.length,
+                  ),
+                  const SizedBox(height: 16),
+                  PatientClinicContextPanel(
+                    clinic: activeClinic,
+                    onChooseClinic: () => Navigator.pushNamed(
+                      context,
+                      PatientHomeScreen.routeName,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   AppPanel(
