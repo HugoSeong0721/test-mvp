@@ -31,7 +31,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
   PatientProfile? _sessionBackedProfile;
   _RequestFolder _selectedFolder = _RequestFolder.needsReply;
-  bool _showGuide = false;
 
   PatientProfile get _currentProfile =>
       _sessionBackedProfile ?? _store.currentPatientProfile;
@@ -199,26 +198,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
     }
   }
 
-  String _folderSubtitle(_RequestFolder folder, AppLanguageController lang) {
-    switch (folder) {
-      case _RequestFolder.needsReply:
-        return lang.tr(
-          'Follow-up requests that still need your action stay here.',
-          '아직 내가 확인하거나 답해야 하는 후속 요청이 여기에 모입니다.',
-        );
-      case _RequestFolder.completed:
-        return lang.tr(
-          'Already handled or closed request threads stay here for reference.',
-          '이미 처리되었거나 닫힌 요청 스레드는 참고용으로 여기에 남습니다.',
-        );
-      case _RequestFolder.all:
-        return lang.tr(
-          'Every portal message linked to your visits appears in one place.',
-          '방문과 연결된 모든 포털 메시지가 한곳에 보입니다.',
-        );
-    }
-  }
-
   String _statusLabel(String status, AppLanguageController lang) {
     return status == 'completed'
         ? lang.tr('Completed', '확인 완료')
@@ -295,35 +274,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                   ).textTheme.headlineMedium?.copyWith(color: AppTheme.ink),
                 ),
               ),
-              if (_showGuide)
-                IconButton(
-                  tooltip: lang.tr('Hide guide', '가이드 숨기기'),
-                  onPressed: () => setState(() => _showGuide = false),
-                  visualDensity: VisualDensity.compact,
-                  color: AppTheme.ink.withValues(alpha: 0.72),
-                  icon: const Icon(Icons.close),
-                )
-              else
-                TextButton.icon(
-                  onPressed: () => setState(() => _showGuide = true),
-                  icon: const Icon(Icons.visibility_outlined, size: 18),
-                  label: Text(lang.tr('Show guide', '가이드 다시 보기')),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppTheme.pine,
-                    textStyle: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
             ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            lang.tr(
-              'Practitioner messages and follow-ups.',
-              'Practitioner messages and follow-ups.',
-            ),
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.72),
-            ),
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -334,11 +285,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 icon: Icons.mark_email_unread_outlined,
                 label: lang.tr('Needs reply', '답변 필요'),
                 value: '$openCount',
-                helper: lang.tr(
-                  'Practitioner messages still waiting for your answer.',
-                  '아직 환자 답변이 필요한 침술사 요청입니다.',
-                ),
-                helperColor: AppTheme.ink.withValues(alpha: 0.62),
                 backgroundColor: AppTheme.surface,
                 labelColor: AppTheme.ink.withValues(alpha: 0.58),
                 valueColor: AppTheme.ink,
@@ -347,11 +293,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 icon: Icons.done_all_outlined,
                 label: lang.tr('Completed', '완료'),
                 value: '$completedCount',
-                helper: lang.tr(
-                  'Requests already answered or closed.',
-                  '이미 답변했거나 닫힌 요청입니다.',
-                ),
-                helperColor: AppTheme.ink.withValues(alpha: 0.62),
                 backgroundColor: AppTheme.surface,
                 labelColor: AppTheme.ink.withValues(alpha: 0.58),
                 valueColor: AppTheme.ink,
@@ -360,64 +301,12 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 icon: Icons.forum_outlined,
                 label: lang.tr('Threads', '스레드'),
                 value: '$totalCount',
-                helper: lang.tr(
-                  'All request conversations in this inbox.',
-                  '이 요청함에 있는 전체 대화 묶음입니다.',
-                ),
-                helperColor: AppTheme.ink.withValues(alpha: 0.62),
                 backgroundColor: AppTheme.surface,
                 labelColor: AppTheme.ink.withValues(alpha: 0.58),
                 valueColor: AppTheme.ink,
               ),
             ],
           ),
-          if (_showGuide) ...[
-            const SizedBox(height: 18),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                AppGuideStep(
-                  dark: false,
-                  step: '1',
-                  title: lang.tr('Read the newest request', '가장 최신 요청 읽기'),
-                  description: lang.tr(
-                    'Start with the visit time, requested questions, and the practitioner note.',
-                    '방문 시간, 요청 질문, 침술사 메모부터 먼저 읽어주세요.',
-                  ),
-                ),
-                AppGuideStep(
-                  dark: false,
-                  step: '2',
-                  title: lang.tr('Continue in intake', '문진 화면에서 이어가기'),
-                  description: lang.tr(
-                    'Use the intake button below the thread so your answers stay tied to the right context.',
-                    '스레드 아래 문진 버튼으로 들어가야 답변이 같은 맥락에 이어집니다.',
-                  ),
-                ),
-                AppGuideStep(
-                  dark: false,
-                  step: '3',
-                  title: lang.tr('Come back and review status', '다시 돌아와 상태 확인'),
-                  description: lang.tr(
-                    'Later, return here to see whether the thread moved to completed.',
-                    '나중에 다시 돌아와 이 스레드가 완료로 이동했는지 확인하면 됩니다.',
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
-            const SizedBox(height: 18),
-            Text(
-              lang.tr(
-                'The 1-2-3 guide is hidden. Use the button above if you want that walkthrough again.',
-                '1-2-3 가이드는 숨겨졌습니다. 다시 보고 싶으면 위 버튼을 눌러주세요.',
-              ),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.ink.withValues(alpha: 0.66),
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -528,14 +417,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                           _folderTitle(_selectedFolder, lang),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _folderSubtitle(_selectedFolder, lang),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: AppTheme.ink.withValues(alpha: 0.72),
-                              ),
-                        ),
                         const SizedBox(height: 14),
                         Wrap(
                           spacing: 10,
@@ -588,17 +469,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                             ),
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            lang.tr(
-                              'When your practitioner asks for a follow-up answer, that message will appear here first.',
-                              '침술사가 후속 답변을 요청하면 이 화면에 먼저 나타납니다.',
-                            ),
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: AppTheme.ink.withValues(alpha: 0.72),
-                                ),
-                          ),
                           const SizedBox(height: 16),
                           Wrap(
                             spacing: 10,
@@ -641,14 +511,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                               '이 폴더에는 지금 메시지가 없습니다.',
                             ),
                             style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _folderSubtitle(_selectedFolder, lang),
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: AppTheme.ink.withValues(alpha: 0.72),
-                                ),
                           ),
                         ],
                       ),
@@ -706,26 +568,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                           style: Theme.of(
                                             context,
                                           ).textTheme.titleLarge,
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          requestType == 'note'
-                                              ? lang.tr(
-                                                  'This thread is a practitioner note, so read the message first before deciding whether you need any follow-up action.',
-                                                  '이 스레드는 침술사 쪽지이므로, 후속 행동이 필요한지 결정하기 전에 먼저 내용을 읽어보면 됩니다.',
-                                                )
-                                              : lang.tr(
-                                                  'Newest message first so you can respond without scanning old history first.',
-                                                  '최신 메시지가 먼저 보여서 예전 기록을 먼저 훑지 않아도 바로 이어서 답할 수 있습니다.',
-                                                ),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                color: AppTheme.ink.withValues(
-                                                  alpha: 0.66,
-                                                ),
-                                              ),
                                         ),
                                       ],
                                     ),

@@ -151,7 +151,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
   final List<bool> _caffeineWeek = List<bool>.filled(5, false);
   final List<bool> _sleepWeek = List<bool>.filled(5, false);
   bool _isSubmitting = false;
-  bool _showStartGuide = false;
   String? _lastChecklistReminderKey;
 
   List<_QuestionPair> get _activeQuestions =>
@@ -1747,7 +1746,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           PatientHomeScreen.routeName,
                         ),
                       ),
-                      if (_showStartGuide) const SizedBox(height: 18),
                       Wrap(
                         spacing: 12,
                         runSpacing: 12,
@@ -1789,78 +1787,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      if (_showStartGuide)
-                        Text(
-                          lang.tr('Start here', '여기부터 시작'),
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      if (_showStartGuide)
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            tooltip: lang.tr('Hide guide', '가이드 숨기기'),
-                            onPressed: () {
-                              setState(() => _showStartGuide = false);
-                            },
-                            icon: const Icon(Icons.close),
-                            color: AppTheme.ink.withValues(alpha: 0.72),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ),
-                      if (_showStartGuide) const SizedBox(height: 12),
-                      if (_showStartGuide)
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: [
-                            AppGuideStep(
-                              dark: false,
-                              step: '1',
-                              title: lang.tr(
-                                'Review requests first',
-                                '먼저 요청 확인',
-                              ),
-                              description: requestDocs.isEmpty
-                                  ? lang.tr(
-                                      'There are no pending practitioner requests right now.',
-                                      '현재 대기 중인 침술사 요청은 없습니다.',
-                                    )
-                                  : lang.tr(
-                                      '${requestDocs.length} request(s) are waiting in the support panel.',
-                                      '지원 패널에 확인할 요청이 ${requestDocs.length}건 있습니다.',
-                                    ),
-                            ),
-                            AppGuideStep(
-                              dark: false,
-                              step: '2',
-                              title: lang.tr(
-                                'Answer the current question',
-                                '현재 질문에 답변',
-                              ),
-                              description: lang.tr(
-                                'The main panel keeps the question, extra note, and navigation together so you can move top to bottom without guessing.',
-                                '메인 패널 안에 질문, 추가 메모, 이동 버튼을 함께 두어 위에서 아래로 자연스럽게 진행할 수 있게 했습니다.',
-                              ),
-                            ),
-                            AppGuideStep(
-                              dark: false,
-                              step: '3',
-                              title: lang.tr('Submit when ready', '준비되면 제출'),
-                              description: profile.hasRequiredAlertInfo
-                                  ? lang.tr(
-                                      'Your contact info is saved, so you can submit as soon as you finish answering.',
-                                      '연락처가 저장되어 있으므로 답변을 마치면 바로 제출할 수 있습니다.',
-                                    )
-                                  : lang.tr(
-                                      'Add both your phone number and email first, then submit the intake.',
-                                      '전화번호와 이메일을 먼저 모두 입력한 뒤 문진을 제출하세요.',
-                                    ),
-                            ),
-                          ],
-                        ),
                       const SizedBox(height: 18),
                       Wrap(
                         spacing: 12,
@@ -1901,21 +1827,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Text(
                         lang.tr('Current intake form', '현재 문진 작성'),
                         style: theme.textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _isFirstVisitPreview
-                            ? lang.tr(
-                                'Use the full 10-category structure for a first visit.',
-                                '초진은 10개 카테고리를 모두 확인하는 전체 구조를 사용합니다.',
-                              )
-                            : lang.tr(
-                                'Use focused follow-up questions based on the last visit and practitioner guidance.',
-                                '재진은 지난 방문 기록과 침술사 안내를 바탕으로 한 추적 질문 흐름을 사용합니다.',
-                              ),
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.74),
-                        ),
                       ),
                       const SizedBox(height: 18),
                       Text(
@@ -1979,24 +1890,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           ],
                         ),
                       ),
-                      if (requestDocs.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.mint.withValues(alpha: 0.72),
-                            borderRadius: BorderRadius.circular(22),
-                            border: Border.all(color: AppTheme.border),
-                          ),
-                          child: Text(
-                            lang.tr(
-                              '${requestDocs.length} practitioner request(s) are still pending. Keep those follow-up points in mind while answering this form.',
-                              '아직 ${requestDocs.length}건의 침술사 요청이 남아 있습니다. 아래 문진에 답할 때 그 후속 질문들을 함께 참고하세요.',
-                            ),
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        ),
-                      ],
                       const SizedBox(height: 18),
                       Container(
                         padding: const EdgeInsets.all(20),
@@ -2229,16 +2122,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Text(
                         lang.tr('This week checklist', '이번 주 체크리스트'),
                         style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        lang.tr(
-                          'Keep the visit prep items visible while you complete the intake, and check off each weekday you followed through.',
-                          '문진을 작성하는 동안 방문 준비 항목을 함께 보고, 실제로 지킨 요일만 월-금으로 체크해둘 수 있습니다.',
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.72),
-                        ),
                       ),
                       const SizedBox(height: 14),
                       Container(
