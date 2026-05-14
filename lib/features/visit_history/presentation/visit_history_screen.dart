@@ -249,16 +249,6 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                         context,
                       ).textTheme.headlineMedium?.copyWith(color: AppTheme.ink),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      lang.tr(
-                        'Past sessions, notes, and updates.',
-                        'Past sessions, notes, and updates.',
-                      ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.ink.withValues(alpha: 0.72),
-                      ),
-                    ),
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 12,
@@ -460,13 +450,6 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 8),
-                                      Text(
-                                        lang.tr(
-                                          'If anything looks different from your memory, or if you want to add something you could not mention earlier, write it here for the practitioner.',
-                                          '기억과 다른 부분이 있거나 미처 못한 말이 있으면 여기 적어서 침술사에게 전달하세요.',
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
                                       TextField(
                                         controller: controller,
                                         enabled: !isReviewed,
@@ -478,15 +461,6 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                             'Your correction / additional note',
                                             '수정 또는 추가 메모',
                                           ),
-                                          helperText: isReviewed
-                                              ? lang.tr(
-                                                  'Editing is now locked because the practitioner reviewed this update.',
-                                                  '침술사가 확인해서 더 이상 수정할 수 없습니다.',
-                                                )
-                                              : lang.tr(
-                                                  'You can update this message until the practitioner marks it as reviewed.',
-                                                  '침술사가 확인 처리하기 전까지는 수정해서 다시 보낼 수 있습니다.',
-                                                ),
                                         ),
                                       ),
                                       const SizedBox(height: 10),
@@ -496,12 +470,12 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                         ),
                                         const SizedBox(height: 4),
                                       ],
-                                      Text(
-                                        isReviewed
-                                            ? '${lang.tr('Practitioner status', '침술사 상태')}: ${lang.tr('Reviewed', '확인 완료')} · ${_formatTimestamp(data?['reviewedAt'] as Timestamp?)}'
-                                            : '${lang.tr('Practitioner status', '침술사 상태')}: ${lang.tr('Not reviewed yet', '아직 확인 전')}',
-                                      ),
-                                      const SizedBox(height: 12),
+                                      if (isReviewed)
+                                        Text(
+                                          '${lang.tr('Reviewed', '확인 완료')} · ${_formatTimestamp(data?['reviewedAt'] as Timestamp?)}',
+                                        ),
+                                      if (isReviewed)
+                                        const SizedBox(height: 12),
                                       Align(
                                         alignment: Alignment.centerRight,
                                         child: FilledButton.icon(

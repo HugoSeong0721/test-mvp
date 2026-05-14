@@ -14,11 +14,15 @@ class PatientRecordWorkspace extends StatefulWidget {
     required this.profile,
     required this.onSave,
     this.clinicId,
+    this.pendingJoinRequest,
+    this.onApproveJoin,
   });
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
   final String? clinicId;
+  final PatientClinicMembershipRequest? pendingJoinRequest;
+  final Future<void> Function()? onApproveJoin;
 
   @override
   State<PatientRecordWorkspace> createState() => _PatientRecordWorkspaceState();
@@ -35,6 +39,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
   late TextEditingController _ethnicityController;
   late TextEditingController _memoController;
   _PatientRecordTab _selectedTab = _PatientRecordTab.overview;
+  bool _isApprovingJoin = false;
 
   @override
   void initState() {
@@ -168,17 +173,6 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(color: AppTheme.ink),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              lang.tr(
-                                'Use this as the single place to review demographics, visit-by-visit notes, pre-visit intake behavior, patient feedback, and your internal note.',
-                                '기본 정보, 방문별 기록, 사전문진 패턴, 환자 피드백, 내 메모를 한 곳에서 보는 공용 환자 차트입니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.72),
-                                  ),
-                            ),
                             const SizedBox(height: 14),
                             Wrap(
                               spacing: 12,
@@ -270,6 +264,67 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
+                      if (widget.pendingJoinRequest != null) ...[
+                        const SizedBox(height: 12),
+                        AppPanel(
+                          padding: const EdgeInsets.all(18),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppTheme.mint.withValues(alpha: 0.72),
+                              Colors.white.withValues(alpha: 0.94),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.person_add_alt_1,
+                                color: AppTheme.pine,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  lang.tr(
+                                    'Join request waiting',
+                                    'Join request waiting',
+                                  ),
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                              FilledButton.icon(
+                                onPressed:
+                                    _isApprovingJoin ||
+                                        widget.onApproveJoin == null
+                                    ? null
+                                    : () async {
+                                        setState(() => _isApprovingJoin = true);
+                                        await widget.onApproveJoin?.call();
+                                        if (mounted) {
+                                          setState(
+                                            () => _isApprovingJoin = false,
+                                          );
+                                        }
+                                      },
+                                icon: Icon(
+                                  _isApprovingJoin
+                                      ? Icons.hourglass_top
+                                      : Icons.check_circle_outline,
+                                ),
+                                label: Text(
+                                  _isApprovingJoin
+                                      ? lang.tr('Approving...', 'Approving...')
+                                      : lang.tr(
+                                          'Approve + send questions',
+                                          'Approve + send questions',
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox.shrink(),
                       Wrap(
                         spacing: 10,
@@ -333,24 +388,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr(
-                                  '1. Basic profile and my note',
-                                  '1. 기본 정보와 내 메모',
-                                ),
+                                lang.tr('Profile', 'Profile'),
                                 style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lang.tr(
-                                  'Keep demographics, contact information, and your standing note about this patient in sync here.',
-                                  '환자 기본 정보, 연락처, 그리고 이 환자에 대한 상시 메모를 여기서 함께 관리합니다.',
-                                ),
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.ink.withValues(
-                                        alpha: 0.66,
-                                      ),
-                                    ),
                               ),
                               const SizedBox(height: 14),
                               TextField(
@@ -460,24 +499,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr(
-                                  '2. Visit-by-visit record timeline',
-                                  '2. 방문별 전체 기록',
-                                ),
+                                lang.tr('Visits', 'Visits'),
                                 style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lang.tr(
-                                  'Review why the patient came in, what you focused on, what you documented, and whether the patient later sent a correction or follow-up message.',
-                                  '환자가 어떤 이유로 왔는지, 어떤 치료 포인트를 봤는지, 내가 무엇을 남겼는지, 이후 환자 피드백이 있었는지를 방문별로 확인합니다.',
-                                ),
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.ink.withValues(
-                                        alpha: 0.66,
-                                      ),
-                                    ),
                               ),
                               const SizedBox(height: 14),
                               if (history.isEmpty)
@@ -658,24 +681,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr(
-                                  '3. My pre-visit requests and notes',
-                                  '3. 내가 보낸 사전 요청과 메모',
-                                ),
+                                lang.tr('Requests', 'Requests'),
                                 style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lang.tr(
-                                  'See what you asked this patient before the visit and what note or guidance you sent along with the request.',
-                                  '방문 전에 어떤 질문을 요청했는지와 함께 보낸 메모를 한 번에 확인합니다.',
-                                ),
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.ink.withValues(
-                                        alpha: 0.66,
-                                      ),
-                                    ),
                               ),
                               const SizedBox(height: 14),
                               if (requestSnapshot.hasError)
@@ -796,24 +803,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr(
-                                  '4. How this patient fills pre-visit intake',
-                                  '4. 이 환자의 사전문진 제출 패턴',
-                                ),
+                                lang.tr('Intake', 'Intake'),
                                 style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lang.tr(
-                                  'Review how often they submit, how many questions they answer, what extra memo they leave, and which answers they mark as important.',
-                                  '문진을 얼마나 자주 제출하는지, 몇 개를 답하는지, 어떤 추가 메모를 남기는지, 어떤 답변을 중요 표시하는지 확인합니다.',
-                                ),
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.ink.withValues(
-                                        alpha: 0.66,
-                                      ),
-                                    ),
                               ),
                               const SizedBox(height: 14),
                               if (submissionSnapshot.hasError)
@@ -972,24 +963,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr(
-                                  '5. Patient corrections and follow-up feedback',
-                                  '5. 환자 수정 요청과 후속 피드백',
-                                ),
+                                lang.tr('Feedback', 'Feedback'),
                                 style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lang.tr(
-                                  'This section keeps what the patient later said about the visit record so you can compare your note with the patient response.',
-                                  '환자가 나중에 방문 기록에 대해 남긴 내용을 모아 보여주므로, 내 기록과 환자 반응을 바로 비교할 수 있습니다.',
-                                ),
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.ink.withValues(
-                                        alpha: 0.66,
-                                      ),
-                                    ),
                               ),
                               const SizedBox(height: 14),
                               if (feedbackSnapshot.hasError)

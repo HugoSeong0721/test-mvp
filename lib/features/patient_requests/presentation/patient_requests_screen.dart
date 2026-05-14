@@ -215,95 +215,140 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
     return selectedQuestions.length + customCount;
   }
 
-  String _nextStepBody(
-    String status,
-    String requestType,
-    int questionCount,
+  Widget _buildNextActionPanel(
     AppLanguageController lang,
+    QueryDocumentSnapshot<Map<String, dynamic>> requestDoc,
   ) {
-    if (requestType == 'note') {
-      return status == 'completed'
-          ? lang.tr(
-              'This portal note was already reviewed. Keep it as context for the next visit if needed.',
-              '이 포털 쪽지는 이미 확인된 상태입니다. 필요하면 다음 방문 맥락 참고용으로 두면 됩니다.',
-            )
-          : lang.tr(
-              'This is a practitioner note rather than a question set. Read it first, then return home or review history if you need context.',
-              '이 스레드는 질문 세트보다 침술사 쪽지에 가깝습니다. 먼저 읽고, 필요하면 홈이나 방문 기록으로 돌아가 맥락을 보면 됩니다.',
-            );
-    }
-    if (status == 'completed') {
-      return lang.tr(
-        'This thread was already handled. Use it as context if you want to review what was asked before.',
-        '이 스레드는 이미 처리되었습니다. 이전에 어떤 요청이 있었는지 다시 참고할 때 사용하면 됩니다.',
-      );
-    }
+    final data = requestDoc.data();
+    final requestType = (data['requestType'] ?? 'answer_request').toString();
+    final selectedQuestions = _safeStringList(data['selectedQuestions']);
+    final customByCategory = _safeQuestionMap(
+      data['customQuestionsByCategory'],
+    );
+    final questionCount = _questionCount(selectedQuestions, customByCategory);
+    final visitTime = (data['patientTime'] ?? '-').toString();
+    final isNote = requestType == 'note';
 
-    if (questionCount == 0) {
-      return lang.tr(
-        'The practitioner opened a follow-up without detailed questions, so reopen intake and share your current condition update.',
-        '세부 질문 없이 후속 요청이 열린 상태라, 문진을 다시 열어 현재 상태 업데이트를 남기면 됩니다.',
-      );
-    }
-
-    return lang.tr(
-      'Read the questions below, then open intake and answer while this visit context is still fresh.',
-      '아래 질문을 먼저 읽고, 이 방문 맥락이 남아 있을 때 문진 화면으로 들어가 답변해 주세요.',
+    return AppPanel(
+      padding: const EdgeInsets.all(22),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          AppTheme.mint.withValues(alpha: 0.72),
+          Colors.white.withValues(alpha: 0.94),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppTheme.pine.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              isNote ? Icons.mark_email_unread_outlined : Icons.edit_note,
+              color: AppTheme.pine,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isNote
+                      ? lang.tr('Read practitioner note', '침술사 메모 확인')
+                      : lang.tr('Reply needed', '답변 필요'),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: AppTheme.ink,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _RequestMetaPill(
+                      icon: Icons.schedule_outlined,
+                      label: visitTime,
+                    ),
+                    _RequestMetaPill(
+                      icon: Icons.quiz_outlined,
+                      label: isNote
+                          ? lang.tr('Note', '메모')
+                          : lang.tr(
+                              '$questionCount questions',
+                              '$questionCount개 질문',
+                            ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          FilledButton.icon(
+            onPressed: () => Navigator.pushNamed(
+              context,
+              isNote
+                  ? PatientHomeScreen.routeName
+                  : PatientIntakeScreen.routeName,
+            ),
+            icon: Icon(isNote ? Icons.home_outlined : Icons.arrow_forward),
+            label: Text(
+              isNote ? lang.tr('Home', '홈') : lang.tr('Open intake', '문진 열기'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildRequestsHero(
+  Widget _buildMessageHeader(
     AppLanguageController lang, {
     required int openCount,
     required int completedCount,
     required int totalCount,
   }) {
     return AppPanel(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  lang.tr('Requests inbox', '답변 요청함'),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.headlineMedium?.copyWith(color: AppTheme.ink),
-                ),
-              ),
-            ],
+          Text(
+            _folderTitle(_selectedFolder, lang),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Wrap(
-            spacing: 12,
-            runSpacing: 12,
+            spacing: 10,
+            runSpacing: 10,
             children: [
-              AppMetricChip(
-                icon: Icons.mark_email_unread_outlined,
-                label: lang.tr('Needs reply', '답변 필요'),
-                value: '$openCount',
-                backgroundColor: AppTheme.surface,
-                labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                valueColor: AppTheme.ink,
+              _MessageFolderChip(
+                label: lang.tr('Needs Reply', '답변 필요'),
+                count: openCount,
+                selected: _selectedFolder == _RequestFolder.needsReply,
+                onTap: () =>
+                    setState(() => _selectedFolder = _RequestFolder.needsReply),
               ),
-              AppMetricChip(
-                icon: Icons.done_all_outlined,
+              _MessageFolderChip(
                 label: lang.tr('Completed', '완료'),
-                value: '$completedCount',
-                backgroundColor: AppTheme.surface,
-                labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                valueColor: AppTheme.ink,
+                count: completedCount,
+                selected: _selectedFolder == _RequestFolder.completed,
+                onTap: () =>
+                    setState(() => _selectedFolder = _RequestFolder.completed),
               ),
-              AppMetricChip(
-                icon: Icons.forum_outlined,
-                label: lang.tr('Threads', '스레드'),
-                value: '$totalCount',
-                backgroundColor: AppTheme.surface,
-                labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                valueColor: AppTheme.ink,
+              _MessageFolderChip(
+                label: lang.tr('All', '전체'),
+                count: totalCount,
+                selected: _selectedFolder == _RequestFolder.all,
+                onTap: () =>
+                    setState(() => _selectedFolder = _RequestFolder.all),
               ),
             ],
           ),
@@ -383,6 +428,10 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 docs,
                 _RequestFolder.completed,
               ).length;
+              final needsReplyDocs = _docsForFolder(
+                docs,
+                _RequestFolder.needsReply,
+              );
               final filteredDocs = _docsForFolder(docs, _selectedFolder);
 
               if (snapshot.connectionState == ConnectionState.waiting &&
@@ -393,13 +442,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _buildRequestsHero(
-                    lang,
-                    openCount: openCount,
-                    completedCount: completedCount,
-                    totalCount: docs.length,
-                  ),
-                  const SizedBox(height: 16),
                   PatientClinicContextPanel(
                     clinic: activeClinic,
                     onChooseClinic: () => Navigator.pushNamed(
@@ -407,53 +449,16 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                       PatientHomeScreen.routeName,
                     ),
                   ),
+                  if (needsReplyDocs.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    _buildNextActionPanel(lang, needsReplyDocs.first),
+                  ],
                   const SizedBox(height: 16),
-                  AppPanel(
-                    padding: const EdgeInsets.all(18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _folderTitle(_selectedFolder, lang),
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 14),
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            _MessageFolderChip(
-                              label: lang.tr('Needs Reply', '답변 필요'),
-                              count: openCount,
-                              selected:
-                                  _selectedFolder == _RequestFolder.needsReply,
-                              onTap: () => setState(
-                                () =>
-                                    _selectedFolder = _RequestFolder.needsReply,
-                              ),
-                            ),
-                            _MessageFolderChip(
-                              label: lang.tr('Completed', '완료'),
-                              count: completedCount,
-                              selected:
-                                  _selectedFolder == _RequestFolder.completed,
-                              onTap: () => setState(
-                                () =>
-                                    _selectedFolder = _RequestFolder.completed,
-                              ),
-                            ),
-                            _MessageFolderChip(
-                              label: lang.tr('All', '전체'),
-                              count: docs.length,
-                              selected: _selectedFolder == _RequestFolder.all,
-                              onTap: () => setState(
-                                () => _selectedFolder = _RequestFolder.all,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  _buildMessageHeader(
+                    lang,
+                    openCount: openCount,
+                    completedCount: completedCount,
+                    totalCount: docs.length,
                   ),
                   const SizedBox(height: 16),
                   if (docs.isEmpty)
@@ -605,50 +610,8 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                 ],
                               ),
                               const SizedBox(height: 14),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: status == 'completed'
-                                      ? AppTheme.mint.withValues(alpha: 0.34)
-                                      : AppTheme.surfaceSoft.withValues(
-                                          alpha: 0.9,
-                                        ),
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: AppTheme.border),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      lang.tr('What to do next', '다음에 할 일'),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      _nextStepBody(
-                                        status,
-                                        requestType,
-                                        questionCount,
-                                        lang,
-                                      ),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
-                                            color: AppTheme.ink.withValues(
-                                              alpha: 0.74,
-                                            ),
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 14),
                               Text(
-                                lang.tr('Requested Questions', '요청 질문'),
+                                lang.tr('Questions', '질문'),
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(height: 8),

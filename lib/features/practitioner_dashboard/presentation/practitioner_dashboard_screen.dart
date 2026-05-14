@@ -352,7 +352,10 @@ class _PractitionerDashboardScreenState
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
                     height: 720,
-                    child: _PatientManagementDialog(embedded: true),
+                    child: _PatientManagementDialog(
+                      embedded: true,
+                      onApproveJoin: _approveMembershipAndSendQuestionTree,
+                    ),
                   ),
                 ),
               ],
@@ -4986,8 +4989,10 @@ class _PractitionerDashboardScreenState
   }) async {
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) =>
-          _PatientManagementDialog(initialProfileId: initialProfileId),
+      builder: (dialogContext) => _PatientManagementDialog(
+        initialProfileId: initialProfileId,
+        onApproveJoin: _approveMembershipAndSendQuestionTree,
+      ),
     );
   }
 
@@ -5983,10 +5988,13 @@ class _PatientManagementDialog extends StatefulWidget {
   const _PatientManagementDialog({
     this.initialProfileId,
     this.embedded = false,
+    this.onApproveJoin,
   });
 
   final String? initialProfileId;
   final bool embedded;
+  final Future<void> Function(PatientClinicMembershipRequest request)?
+  onApproveJoin;
 
   @override
   State<_PatientManagementDialog> createState() =>
@@ -6021,6 +6029,13 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
       }
       selected ??= profiles.isNotEmpty ? profiles.first : null;
     }
+    final pendingJoinRequest =
+        selected == null || activeClinicId == null || activeClinicId.isEmpty
+        ? null
+        : _store.membershipRequestForPatientClinic(
+            patientId: selected.id,
+            clinicId: activeClinicId,
+          );
 
     final body = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -6183,6 +6198,17 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
               : _PatientProfileEditor(
                   profile: selected,
                   clinicId: PractitionerSessionService.currentSession?.clinicId,
+                  pendingJoinRequest: pendingJoinRequest?.status == 'pending'
+                      ? pendingJoinRequest
+                      : null,
+                  onApproveJoin: pendingJoinRequest?.status == 'pending'
+                      ? () async {
+                          await widget.onApproveJoin?.call(pendingJoinRequest!);
+                          if (mounted) {
+                            setState(() => _selectedProfileId = selected!.id);
+                          }
+                        }
+                      : null,
                   onSave: (updated) {
                     _store.saveProfile(updated);
                     setState(() => _selectedProfileId = updated.id);
@@ -6216,11 +6242,15 @@ class _PatientProfileEditor extends StatefulWidget {
     required this.profile,
     required this.onSave,
     this.clinicId,
+    this.pendingJoinRequest,
+    this.onApproveJoin,
   });
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
   final String? clinicId;
+  final PatientClinicMembershipRequest? pendingJoinRequest;
+  final Future<void> Function()? onApproveJoin;
 
   @override
   State<_PatientProfileEditor> createState() => _PatientProfileEditorState();
@@ -6285,6 +6315,8 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
     return PatientRecordWorkspace(
       profile: widget.profile,
       clinicId: widget.clinicId,
+      pendingJoinRequest: widget.pendingJoinRequest,
+      onApproveJoin: widget.onApproveJoin,
       onSave: widget.onSave,
     );
     /*
