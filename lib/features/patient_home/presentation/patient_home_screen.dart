@@ -1675,138 +1675,69 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           },
                         ),
                       if (showLegacySummary) const SizedBox(height: 16),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                lang.tr('My Profile Snapshot', '내 프로필 요약'),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                '${lang.tr('Phone', '전화번호')}: ${profile.phone.isEmpty ? '-' : profile.phone}',
-                              ),
-                              Text(
-                                '${lang.tr('Email', '이메일')}: ${profile.email.isEmpty ? '-' : profile.email}',
-                              ),
-                              Text(
-                                '${lang.tr('Profile', '프로필')}: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
-                              ),
-                              if (profile.memo.trim().isNotEmpty) ...[
-                                const SizedBox(height: 8),
+                      if (showLegacySummary) const SizedBox(height: 16),
+                      if (showLegacySummary)
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  '${lang.tr('Memo', '메모')}: ${profile.memo}',
+                                  lang.tr('My Profile Snapshot', '내 프로필 요약'),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${lang.tr('Phone', '전화번호')}: ${profile.phone.isEmpty ? '-' : profile.phone}',
+                                ),
+                                Text(
+                                  '${lang.tr('Email', '이메일')}: ${profile.email.isEmpty ? '-' : profile.email}',
+                                ),
+                                Text(
+                                  '${lang.tr('Profile', '프로필')}: ${profile.sex}, ${profile.ageRange}, ${profile.ethnicity}',
                                 ),
                               ],
-                              if (!profile.hasRequiredAlertInfo) ...[
-                                const SizedBox(height: 12),
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.withValues(
-                                      alpha: 0.10,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      if (showLegacySummary) const SizedBox(height: 16),
+                      if (showLegacySummary)
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  lang.tr('Quick Checklist', '빠른 체크리스트'),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  child: Text(
-                                    lang.tr(
-                                      'Please add both your phone number and email before real workflow testing.',
-                                      '실제 워크플로우 테스트 전에는 전화번호와 이메일을 모두 입력해주세요.',
-                                    ),
+                                ),
+                                const SizedBox(height: 8),
+                                _TodoRow(
+                                  done: pendingRequests.isEmpty,
+                                  title: lang.tr(
+                                    'Check practitioner requests',
+                                    '침술사 요청 확인',
                                   ),
+                                  subtitle: pendingRequests.isEmpty
+                                      ? lang.tr('Done', '완료')
+                                      : lang.tr(
+                                          '${pendingRequests.length} pending',
+                                          '${pendingRequests.length}건 대기',
+                                        ),
                                 ),
                               ],
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      lang.tr('Quick Checklist', '빠른 체크리스트'),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pushNamed(
-                                      context,
-                                      PatientRequestsScreen.routeName,
-                                    ),
-                                    child: Text(lang.tr('See all', '전체 보기')),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              _TodoRow(
-                                done: pendingRequests.isEmpty,
-                                title: lang.tr(
-                                  'Check practitioner requests',
-                                  '침술사 요청 확인',
-                                ),
-                                subtitle: pendingRequests.isEmpty
-                                    ? lang.tr(
-                                        'You are caught up',
-                                        '현재 확인할 요청이 없습니다',
-                                      )
-                                    : lang.tr(
-                                        '${pendingRequests.length} request(s) still need attention',
-                                        '아직 확인하지 않은 요청이 ${pendingRequests.length}건 있습니다',
-                                      ),
-                              ),
-                              _TodoRow(
-                                done: profile.hasRequiredAlertInfo,
-                                title: lang.tr(
-                                  'Confirm contact information',
-                                  '연락처 확인',
-                                ),
-                                subtitle: profile.hasRequiredAlertInfo
-                                    ? lang.tr(
-                                        'Phone and email are saved',
-                                        '전화번호와 이메일이 저장되어 있습니다',
-                                      )
-                                    : lang.tr(
-                                        'Please add both phone and email',
-                                        '전화번호와 이메일을 모두 입력해주세요',
-                                      ),
-                              ),
-                              _TodoRow(
-                                done: latestSubmission != null,
-                                title: lang.tr(
-                                  'Submit your latest intake update',
-                                  '최신 문진 제출',
-                                ),
-                                subtitle: latestSubmission == null
-                                    ? lang.tr(
-                                        'No recent submission yet',
-                                        '아직 최근 제출 기록이 없습니다',
-                                      )
-                                    : lang.tr(
-                                        'Last submitted at ${_formatTimestamp(latestSubmission['submittedAt'] as Timestamp?)}',
-                                        '최근 제출 시각: ${_formatTimestamp(latestSubmission['submittedAt'] as Timestamp?)}',
-                                      ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      if (latestRequest != null) const SizedBox(height: 16),
                       if (latestRequest != null)
                         Card(
                           child: Padding(
@@ -1878,12 +1809,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               ),
                               const SizedBox(height: 10),
                               if (appointmentRequests.isEmpty)
-                                Text(
-                                  lang.tr(
-                                    'You have not sent any appointment requests yet.',
-                                    '아직 보낸 예약 신청이 없습니다.',
-                                  ),
-                                )
+                                Text(lang.tr('No requests', '신청 없음'))
                               else
                                 ...appointmentRequests.map((request) {
                                   final canCancel =
@@ -1951,19 +1877,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               '${_formatDateTime(request.reviewedAt!)}',
                                             ),
                                           const SizedBox(height: 6),
-                                          Text(
-                                            canCancel
-                                                ? lang.tr(
-                                                    'This request is not confirmed yet. You will get an update after the practitioner reviews it.',
-                                                    '이 요청은 아직 확정되지 않았습니다. 침술사가 확인하면 상태가 업데이트됩니다.',
-                                                  )
-                                                : lang.tr(
-                                                    'This request is locked because it has already been reviewed.',
-                                                    '이 요청은 이미 확인되었기 때문에 수정할 수 없습니다.',
-                                                  ),
-                                          ),
                                           if (canCancel) ...[
-                                            const SizedBox(height: 8),
                                             TextButton.icon(
                                               onPressed: () {
                                                 _store.cancelAppointmentRequest(
@@ -2027,8 +1941,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               if (upcomingVisits.isEmpty)
                                 Text(
                                   lang.tr(
-                                    'No confirmed appointments are scheduled yet.',
-                                    '아직 확정된 예약이 없습니다.',
+                                    'No confirmed appointments',
+                                    '확정된 예약 없음',
                                   ),
                                 )
                               else
@@ -2057,13 +1971,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             ),
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            lang.tr(
-                                              'This appointment has already been confirmed by your practitioner.',
-                                              '이 예약은 침술사 확인이 끝난 확정 일정입니다.',
                                             ),
                                           ),
                                           Text(
@@ -2111,12 +2018,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 ],
                               ),
                               if (latestVisit == null)
-                                Text(
-                                  lang.tr(
-                                    'No visit history is available yet.',
-                                    '아직 방문 기록이 없습니다.',
-                                  ),
-                                )
+                                Text(lang.tr('No visits', '방문 없음'))
                               else ...[
                                 Text(
                                   '${lang.tr('Last Visit', '최근 방문')}: ${_formatVisitSlot(latestVisit.date, latestVisit.time)}',
@@ -2151,12 +2053,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               ),
                               const SizedBox(height: 8),
                               if (submissionDocs.isEmpty)
-                                Text(
-                                  lang.tr(
-                                    'No submissions yet.',
-                                    '아직 제출 기록이 없습니다.',
-                                  ),
-                                )
+                                Text(lang.tr('No submissions', '제출 없음'))
                               else
                                 ...submissionDocs.take(3).map((doc) {
                                   final data = doc.data();
