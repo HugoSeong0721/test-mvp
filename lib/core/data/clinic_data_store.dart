@@ -351,6 +351,12 @@ class AppointmentRequest {
       if (value is DateTime) {
         return value;
       }
+      try {
+        final converted = (value as dynamic).toDate();
+        if (converted is DateTime) {
+          return converted;
+        }
+      } catch (_) {}
       return null;
     }
 
@@ -524,6 +530,12 @@ class PatientClinicMembershipRequest {
       if (value is DateTime) {
         return value;
       }
+      try {
+        final converted = (value as dynamic).toDate();
+        if (converted is DateTime) {
+          return converted;
+        }
+      } catch (_) {}
       return null;
     }
 
@@ -793,6 +805,32 @@ class ClinicDataStore extends ChangeNotifier {
             .toList()
           ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
     return List.unmodifiable(items);
+  }
+
+  Future<void> mergePatientClinicMembershipRequestsFromMaps(
+    Iterable<Map<String, dynamic>> items,
+  ) async {
+    var changed = false;
+    for (final data in items) {
+      final request = PatientClinicMembershipRequest.fromMap(data);
+      if (request.id.trim().isEmpty) {
+        continue;
+      }
+      final index = _patientClinicMembershipRequests.indexWhere(
+        (item) => item.id == request.id,
+      );
+      if (index >= 0) {
+        _patientClinicMembershipRequests[index] = request;
+      } else {
+        _patientClinicMembershipRequests.add(request);
+      }
+      changed = true;
+    }
+    if (!changed) {
+      return;
+    }
+    notifyListeners();
+    await _persistClinicState();
   }
 
   PatientClinicMembershipRequest? membershipRequestForPatientClinic({

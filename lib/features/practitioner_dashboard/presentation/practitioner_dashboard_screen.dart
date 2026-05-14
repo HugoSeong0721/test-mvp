@@ -83,6 +83,8 @@ class _PractitionerDashboardScreenState
   final GlobalKey _recentSubmissionsSectionKey = GlobalKey();
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
   _intakeSubmissionSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+  _membershipRequestSubscription;
   Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
       <String, Map<String, dynamic>>{};
 
@@ -124,11 +126,20 @@ class _PractitionerDashboardScreenState
             );
           });
         });
+    _membershipRequestSubscription = FirebaseFirestore.instance
+        .collection('patient_clinic_membership_requests')
+        .snapshots()
+        .listen((snapshot) async {
+          await _store.mergePatientClinicMembershipRequestsFromMaps(
+            snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
+          );
+        });
   }
 
   @override
   void dispose() {
     _intakeSubmissionSubscription?.cancel();
+    _membershipRequestSubscription?.cancel();
     _patientFilterController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -144,7 +155,11 @@ class _PractitionerDashboardScreenState
         final activeClinic = _currentClinicId == null
             ? null
             : _store.clinicById(_currentClinicId!);
-        final pendingAppointmentInboxCount = _pendingAppointmentRequestCount();
+        final pendingMembershipRequests = _store
+            .pendingMembershipRequestsForClinic(_currentClinicId);
+        final pendingAppointmentInboxCount =
+            _pendingAppointmentRequestCount() +
+            pendingMembershipRequests.length;
         final visibleVisits = _visibleVisits();
         final summaryVisits = _summaryWindowVisits();
         final patientNames =
@@ -297,6 +312,11 @@ class _PractitionerDashboardScreenState
                 _buildInsightPanel(summary, summaryVisits),
                 const SizedBox(height: 12),
               ],
+              if (_subView == _DashboardSubView.main)
+                if (pendingMembershipRequests.isNotEmpty) ...[
+                  _buildMembershipRequestAlertPanel(pendingMembershipRequests),
+                  const SizedBox(height: 12),
+                ],
               if (_subView == _DashboardSubView.main)
                 KeyedSubtree(
                   key: _dateSelectorKey,
@@ -4395,6 +4415,79 @@ class _PractitionerDashboardScreenState
     }
   }
 
+  Widget _buildMembershipRequestAlertPanel(
+    List<PatientClinicMembershipRequest> requests,
+  ) {
+    final lang = AppLanguageController.instance;
+    final next = requests.first;
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppTheme.copper.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(Icons.person_add_alt_1, color: AppTheme.pine),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  lang.tr(
+                    '${requests.length} patient registration request${requests.length == 1 ? '' : 's'} waiting',
+                    '${requests.length} patient registration request${requests.length == 1 ? '' : 's'} waiting',
+                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  lang.tr(
+                    '${next.patientName} requested to join ${next.clinicName}. Approve it to connect the patient to this clinic and send starter intake questions.',
+                    '${next.patientName} requested to join ${next.clinicName}. Approve it to connect the patient to this clinic and send starter intake questions.',
+                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.72),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: () =>
+                          _approveMembershipAndSendQuestionTree(next),
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: Text(
+                        lang.tr(
+                          'Approve + send questions',
+                          'Approve + send questions',
+                        ),
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => _selectSubView(_DashboardSubView.inbox),
+                      icon: const Icon(Icons.inbox_outlined),
+                      label: Text(lang.tr('Open inbox', 'Open inbox')),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildClinicOpenRequestsPanel() {
     final lang = AppLanguageController.instance;
     final membershipRequests = _store.pendingMembershipRequestsForClinic(
@@ -4916,7 +5009,13 @@ class _PractitionerDashboardScreenState
         'Open patient inbox',
         '환자 쪽지함 열기',
       ),
-      onPressed: _scrollToAppointmentInbox,
+      onPressed: () {
+        if (_subView == _DashboardSubView.inbox) {
+          _scrollToAppointmentInbox();
+          return;
+        }
+        _selectSubView(_DashboardSubView.inbox);
+      },
       icon: Stack(
         clipBehavior: Clip.none,
         children: [
