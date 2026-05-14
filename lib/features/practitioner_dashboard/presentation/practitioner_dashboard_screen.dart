@@ -93,7 +93,6 @@ class _PractitionerDashboardScreenState
   String _selectedStatusFilter = 'All';
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
-  bool _showDashboardGuide = false;
   _DashboardSubView _subView = _DashboardSubView.main;
 
   String? get _currentClinicId =>
@@ -440,19 +439,6 @@ class _PractitionerDashboardScreenState
                                           titleLabel,
                                           style: theme.textTheme.headlineMedium,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          lang.tr(
-                                            'Filter, search, open a patient.',
-                                            'Filter, search, open a patient.',
-                                          ),
-                                          style: theme.textTheme.bodyLarge
-                                              ?.copyWith(
-                                                color: AppTheme.ink.withValues(
-                                                  alpha: 0.72,
-                                                ),
-                                              ),
-                                        ),
                                       ],
                                     ),
                                   ),
@@ -515,16 +501,6 @@ class _PractitionerDashboardScreenState
                               Text(
                                 titleLabel,
                                 style: theme.textTheme.headlineMedium,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                lang.tr(
-                                  'Filter, search, open a patient.',
-                                  'Filter, search, open a patient.',
-                                ),
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: AppTheme.ink.withValues(alpha: 0.72),
-                                ),
                               ),
                               const SizedBox(height: 14),
                               headerActions,
@@ -589,35 +565,6 @@ class _PractitionerDashboardScreenState
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              _selectedDateRange == null
-                                  ? lang.tr(
-                                      'Visit summary: ${summary.periodLabel}',
-                                      '방문 요약: ${summary.periodLabel}',
-                                    )
-                                  : lang.tr(
-                                      'Selected range summary: ${summary.periodLabel}',
-                                      '선택 기간 요약: ${summary.periodLabel}',
-                                    ),
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: AppTheme.ink.withValues(alpha: 0.62),
-                              ),
-                            ),
-                            if (_selectedDateRange == null &&
-                                filteredVisits.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  lang.tr(
-                                    'Showing ${filteredVisits.length} of ${visibleVisits.length} patient portal booking(s) on ${_formatStoredDateWithWeekday(_selectedDate)}.',
-                                    '${_formatStoredDateWithWeekday(_selectedDate)} 환자 포털 일정 ${visibleVisits.length}건 중 ${filteredVisits.length}건을 표시 중입니다.',
-                                  ),
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.62),
-                                  ),
-                                ),
-                              ),
                           ],
                         );
                       },
@@ -636,26 +583,9 @@ class _PractitionerDashboardScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang.tr(
-                          'No patients match the selected filters.',
-                          '선택한 필터에 맞는 환자가 없습니다.',
-                        ),
+                        lang.tr('No patients', 'No patients'),
                         style: theme.textTheme.titleMedium,
                       ),
-                      if (_selectedDateRange == null &&
-                          visibleVisits.isNotEmpty &&
-                          _selectedStatusFilter != 'All') ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          lang.tr(
-                            'There are visits on ${_formatStoredDateWithWeekday(_selectedDate)}, but the current status filter "${_statusFilterLabel(_selectedStatusFilter)}" is hiding them.',
-                            '${_formatStoredDateWithWeekday(_selectedDate)}에 일정은 있지만 현재 상태 필터 "${_statusFilterLabel(_selectedStatusFilter)}" 때문에 숨겨져 있습니다.',
-                          ),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.ink.withValues(alpha: 0.66),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -763,175 +693,27 @@ class _PractitionerDashboardScreenState
             '최근 $_selectedRangeDays일 방문',
           )
         : AppLanguageController.instance.tr('Visits in range', '선택 기간 방문');
-    final selectionStart = _selectedDateRange == null
-        ? _parseDate(_selectedDate)
-        : DateTime(
-            _selectedDateRange!.start.year,
-            _selectedDateRange!.start.month,
-            _selectedDateRange!.start.day,
-          );
-    final selectionEnd = _selectedDateRange == null
-        ? _parseDate(_selectedDate)
-        : DateTime(
-            _selectedDateRange!.end.year,
-            _selectedDateRange!.end.month,
-            _selectedDateRange!.end.day,
-          );
-
-    bool isInSelection(String date) {
-      final parsed = _parseDate(date);
-      if (parsed == null || selectionStart == null || selectionEnd == null) {
-        return false;
-      }
-      return !parsed.isBefore(selectionStart) && !parsed.isAfter(selectionEnd);
-    }
-
-    final selectionSlots = _store
-        .slotsForClinic(_currentClinicId)
-        .where((slot) => isInSelection(slot.date));
-    var bookedSlots = 0;
-    var pendingSlotRequests = 0;
-    var openSlots = 0;
-    for (final slot in selectionSlots) {
-      final scheduledVisit = _store.scheduledVisitForSlot(
-        slot.date,
-        slot.time,
-        clinicId: _currentClinicId,
-      );
-      final latestRequest = _store.latestActiveRequestForSlot(
-        slot.date,
-        slot.time,
-        clinicId: _currentClinicId,
-      );
-      if (scheduledVisit != null) {
-        bookedSlots++;
-        continue;
-      }
-      if (latestRequest != null &&
-          latestRequest.status == AppointmentRequestStatus.pending) {
-        pendingSlotRequests++;
-        continue;
-      }
-      if (slot.isOpen) {
-        openSlots++;
-      }
-    }
-
     return AppPanel(
       padding: const EdgeInsets.all(24),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final theme = Theme.of(context);
           final wide = constraints.maxWidth >= 920;
-          Widget buildFocusCard({
-            required String step,
-            required String title,
-            required String value,
-            required String detail,
-            required IconData icon,
-            required Color accent,
-            VoidCallback? onTap,
-          }) {
-            return SizedBox(
-              width: wide ? 260 : double.infinity,
-              height: wide ? 220 : null,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(24),
-                  child: Ink(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surface,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 34,
-                              height: 34,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: accent.withValues(alpha: 0.22),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(icon, color: AppTheme.pine, size: 18),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                step,
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  color: AppTheme.ink.withValues(alpha: 0.58),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppTheme.ink,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          value,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            color: AppTheme.ink,
-                          ),
-                        ),
-                        if (wide) const Spacer() else const SizedBox(height: 4),
-                        Text(
-                          detail,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.ink.withValues(alpha: 0.66),
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
 
           final intro = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppLanguageController.instance.tr(
-                  'Clinic command center',
-                  '클리닉 운영 허브',
-                ),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: AppTheme.ink.withValues(alpha: 0.58),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                AppLanguageController.instance.tr(
-                  'See today'
-                      's patients, requests, and intake status in one place.',
-                  '환자 흐름, 문진 진행도, 후속 대응 리스크를 한 화면에서 관리합니다.',
-                ),
+                AppLanguageController.instance.tr('Today', 'Today'),
                 style: theme.textTheme.headlineLarge?.copyWith(
                   color: AppTheme.ink,
                 ),
               ),
+              const SizedBox(height: 6),
               Text(
                 AppLanguageController.instance.tr(
-                  'Window: ${_formatStoredDateWithWeekday(summary.fromDate)} to ${_formatStoredDateWithWeekday(summary.toDate)} | Filtered patient cards: $filteredCount',
-                  '집계 기간: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)} | 현재 표시 환자 카드: $filteredCount',
+                  '${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)} · $filteredCount',
+                  '${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)} · $filteredCount',
                 ),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: AppTheme.ink.withValues(alpha: 0.72),
@@ -989,183 +771,10 @@ class _PractitionerDashboardScreenState
             ],
           );
 
-          final quickFocus = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLanguageController.instance.tr(
-                  'Today first',
-                  '이 선택에서 먼저 볼 것',
-                ),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppTheme.ink,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  buildFocusCard(
-                    step: AppLanguageController.instance.tr(
-                      '1. Requests',
-                      '1. 예약 신청',
-                    ),
-                    title: AppLanguageController.instance.tr(
-                      'Patient inbox first',
-                      '환자 쪽지함 먼저',
-                    ),
-                    value: AppLanguageController.instance.tr(
-                      '$pendingSlotRequests waiting',
-                      '$pendingSlotRequests건 대기',
-                    ),
-                    detail: AppLanguageController.instance.tr(
-                      'Confirm or decline incoming appointment requests.',
-                      '먼저 예약 신청을 확인하고 확정/거절 처리하세요.',
-                    ),
-                    icon: Icons.mail_outline,
-                    accent: const Color(0xFF4E8EB4),
-                    onTap: _scrollToAppointmentInbox,
-                  ),
-                  buildFocusCard(
-                    step: AppLanguageController.instance.tr(
-                      '2. Schedule',
-                      '2. 예약 현황',
-                    ),
-                    title: AppLanguageController.instance.tr(
-                      'Shared slots and bookings',
-                      '공유 슬롯과 예약',
-                    ),
-                    value: AppLanguageController.instance.tr(
-                      '$bookedSlots booked · $openSlots open',
-                      '$bookedSlots건 예약 · $openSlots개 열림',
-                    ),
-                    detail: AppLanguageController.instance.tr(
-                      'See booked times and which slots are still open.',
-                      '이미 예약된 시간과 아직 열려 있는 슬롯을 바로 확인하세요.',
-                    ),
-                    icon: Icons.calendar_month_outlined,
-                    accent: const Color(0xFFC07A45),
-                    onTap: _scrollToAvailabilityBoard,
-                  ),
-                  buildFocusCard(
-                    step: AppLanguageController.instance.tr(
-                      '3. Follow-up',
-                      '3. 후속 확인',
-                    ),
-                    title: AppLanguageController.instance.tr(
-                      'Patients needing intake review',
-                      '문진 확인이 필요한 환자',
-                    ),
-                    value: AppLanguageController.instance.tr(
-                      '$inProgressIntakes pending · $noResponse no response',
-                      '$inProgressIntakes명 진행중 · $noResponse명 미응답',
-                    ),
-                    detail: AppLanguageController.instance.tr(
-                      'Review patients who still need intake or follow-up.',
-                      '예약과 신청을 본 뒤에는 문진 미완료 환자 카드를 확인하면 됩니다.',
-                    ),
-                    icon: Icons.assignment_late_outlined,
-                    accent: const Color(0xFF2C8C6B),
-                    onTap: _scrollToPatientCards,
-                  ),
-                ],
-              ),
-            ],
-          );
-
-          final guideSteps = Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              AppGuideStep(
-                dark: false,
-                step: '1',
-                title: AppLanguageController.instance.tr(
-                  'Choose a date window',
-                  '날짜 범위 선택',
-                ),
-                description: AppLanguageController.instance.tr(
-                  'Start with the date or range panel so the rest of the dashboard reflects the right visit set.',
-                  '먼저 날짜나 기간을 정하면 대시보드 전체가 그 방문 집합에 맞춰집니다.',
-                ),
-              ),
-              AppGuideStep(
-                dark: false,
-                step: '2',
-                title: AppLanguageController.instance.tr(
-                  'Filter the patient list',
-                  '환자 목록 좁히기',
-                ),
-                description: AppLanguageController.instance.tr(
-                  'Use patient and status filters to reduce noise before opening a detailed card.',
-                  '환자와 상태 필터로 범위를 줄인 뒤 상세 카드를 여는 게 가장 빠릅니다.',
-                ),
-              ),
-              AppGuideStep(
-                dark: false,
-                step: '3',
-                title: AppLanguageController.instance.tr(
-                  'Open a patient card',
-                  '환자 카드 열기',
-                ),
-                description: AppLanguageController.instance.tr(
-                  'Once the list is narrowed down, move into the patient card and then the detail brief.',
-                  '목록이 정리되면 환자 카드를 열고 그 다음 상세 브리핑으로 들어가면 됩니다.',
-                ),
-              ),
-            ],
-          );
-          final guideSection = !_showDashboardGuide
-              ? const SizedBox.shrink()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          AppLanguageController.instance.tr(
-                            'Quick workflow guide',
-                            '빠른 사용 가이드',
-                          ),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppTheme.ink,
-                          ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          tooltip: AppLanguageController.instance.tr(
-                            'Hide guide',
-                            '가이드 숨기기',
-                          ),
-                          onPressed: () {
-                            setState(() => _showDashboardGuide = false);
-                          },
-                          icon: const Icon(Icons.close),
-                          color: AppTheme.ink.withValues(alpha: 0.72),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    guideSteps,
-                  ],
-                );
-
           if (!wide) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                intro,
-                const SizedBox(height: 18),
-                metrics,
-                const SizedBox(height: 18),
-                quickFocus,
-                if (_showDashboardGuide) ...[
-                  const SizedBox(height: 18),
-                  guideSection,
-                ],
-              ],
+              children: [intro, const SizedBox(height: 18), metrics],
             );
           }
 
@@ -1183,12 +792,6 @@ class _PractitionerDashboardScreenState
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
-              quickFocus,
-              if (_showDashboardGuide) ...[
-                const SizedBox(height: 18),
-                guideSection,
-              ],
             ],
           );
         },
@@ -1268,16 +871,6 @@ class _PractitionerDashboardScreenState
             lang.tr('Selection Snapshot', '선택 기간 요약'),
             style: theme.textTheme.headlineMedium,
           ),
-          const SizedBox(height: 8),
-          Text(
-            lang.tr(
-              'A quick read on how many visits are in this selection and what needs attention first.',
-              '지금 선택한 기간에 방문이 얼마나 있고, 무엇부터 확인하면 되는지 빠르게 보는 영역입니다.',
-            ),
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.72),
-            ),
-          ),
           const SizedBox(height: 14),
           Wrap(
             spacing: 10,
@@ -1289,10 +882,6 @@ class _PractitionerDashboardScreenState
                   '${summary.totalVisits}',
                   '${summary.totalVisits}명',
                 ),
-                helper: lang.tr(
-                  'Total visit count in this range',
-                  '이 기간에 잡힌 전체 방문 수',
-                ),
               ),
               _MiniKpi(
                 title: lang.tr('Patients in view', '방문 환자'),
@@ -1300,7 +889,6 @@ class _PractitionerDashboardScreenState
                   '${visibleProfiles.length}',
                   '${visibleProfiles.length}명',
                 ),
-                helper: lang.tr('Unique patients, no duplicates', '중복 제외 환자 수'),
               ),
               _MiniKpi(
                 title: lang.tr('Contact ready', '연락 가능 환자'),
@@ -1308,30 +896,12 @@ class _PractitionerDashboardScreenState
                   '$contactReadyCount',
                   '$contactReadyCount명',
                 ),
-                helper: lang.tr(
-                  'Phone and email are both saved',
-                  '전화·이메일이 모두 저장됨',
-                ),
               ),
               _MiniKpi(
                 title: lang.tr('Intake completion', '문진 완료율'),
                 value: '$intakeCompletionRate%',
-                helper: lang.tr(
-                  'Share of visits with intake completed',
-                  '문진 완료된 일정 비율',
-                ),
               ),
             ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            lang.tr(
-              'Summary Window: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)}',
-              '집계 기간: ${_formatStoredDateWithWeekday(summary.fromDate)} ~ ${_formatStoredDateWithWeekday(summary.toDate)}',
-            ),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.62),
-            ),
           ),
           const SizedBox(height: 12),
           if (sexCounts.isNotEmpty)
@@ -4375,19 +3945,6 @@ class _PractitionerDashboardScreenState
     );
   }
 
-  Future<void> _scrollToAvailabilityBoard() async {
-    final targetContext = _availabilityBoardKey.currentContext;
-    if (targetContext == null) {
-      return;
-    }
-    await Scrollable.ensureVisible(
-      targetContext,
-      duration: const Duration(milliseconds: 320),
-      curve: Curves.easeOutCubic,
-      alignment: 0.04,
-    );
-  }
-
   Future<void> _scrollToAppointmentRequestsSection() async {
     final targetContext = _appointmentRequestsSectionKey.currentContext;
     if (targetContext == null) {
@@ -6501,15 +6058,10 @@ class _VisitWindowSummary {
 }
 
 class _MiniKpi extends StatelessWidget {
-  const _MiniKpi({
-    required this.title,
-    required this.value,
-    required this.helper,
-  });
+  const _MiniKpi({required this.title, required this.value});
 
   final String title;
   final String value;
-  final String helper;
 
   @override
   Widget build(BuildContext context) {
@@ -6544,14 +6096,6 @@ class _MiniKpi extends StatelessWidget {
               style: Theme.of(
                 context,
               ).textTheme.headlineMedium?.copyWith(fontSize: 26),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              helper,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.ink.withValues(alpha: 0.68),
-                height: 1.25,
-              ),
             ),
           ],
         ),
