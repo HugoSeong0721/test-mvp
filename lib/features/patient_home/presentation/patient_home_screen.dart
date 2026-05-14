@@ -886,24 +886,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lang.tr('Connected acupuncture center', '연결된 한의원'),
+                      lang.tr('Clinic', '한의원'),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      activeClinic == null
-                          ? lang.tr(
-                              'Choose the clinic you want to use in this portal. You can also save one clinic as the default for future logins.',
-                              '이 포털에서 사용할 한의원을 먼저 선택해주세요. 나중에 자동으로 열리도록 기본 한의원으로 저장할 수도 있습니다.',
-                            )
-                          : lang.tr(
-                              'This clinic stays attached to the patient-side workflow so requests, intake, and portal entry all start from the same center.',
-                              '요청함, 문진, 포털 진입이 모두 이 한의원 기준으로 이어지도록 연결됩니다.',
-                            ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.ink.withValues(alpha: 0.72),
                       ),
                     ),
                   ],
@@ -961,7 +946,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           if (activeClinic == null)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
@@ -970,9 +955,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
               ),
               child: Text(
-                lang.tr(
-                  'No clinic has been selected yet. Open the search and choose the acupuncture center you want this patient portal to follow.',
-                  '아직 선택된 한의원이 없습니다. 검색을 열고 이 환자 포털이 따라갈 한의원을 선택해주세요.',
+                lang.tr('No clinic selected', '선택된 한의원 없음'),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.ink,
                 ),
               ),
             )
@@ -1016,13 +1002,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     const SizedBox(height: 12),
                     Text(
                       defaultClinic.id == activeClinic.id
-                          ? lang.tr(
-                              'This clinic is already set as your default after login.',
-                              '이 한의원은 로그인 후 자동으로 열리는 기본 한의원입니다.',
-                            )
+                          ? lang.tr('Default clinic', '기본 한의원')
                           : lang.tr(
-                              'Default clinic on future login: ${defaultClinic.name}',
-                              '다음 로그인 기본 한의원: ${defaultClinic.name}',
+                              'Default: ${defaultClinic.name}',
+                              '기본: ${defaultClinic.name}',
                             ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppTheme.copper,
@@ -1291,12 +1274,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return PatientShell(
           currentItem: PatientNavItem.home,
           title: lang.tr('Patient Home', '환자 홈'),
-          subtitle: activeClinic == null
-              ? lang.tr(
-                  'Search and choose your acupuncture center after login.',
-                  '로그인 후 사용할 한의원을 검색하고 선택해주세요.',
-                )
-              : '${activeClinic.name}${activeClinic.location.isEmpty ? '' : ' · ${activeClinic.location}'}',
           actions: [
             IconButton(
               tooltip: lang.tr('Search clinic', '한의원 검색'),

@@ -187,17 +187,6 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
     }
   }
 
-  String _folderTitle(_RequestFolder folder, AppLanguageController lang) {
-    switch (folder) {
-      case _RequestFolder.needsReply:
-        return lang.tr('Needs reply', '답변 필요');
-      case _RequestFolder.completed:
-        return lang.tr('Completed threads', '완료된 스레드');
-      case _RequestFolder.all:
-        return lang.tr('All messages', '전체 메시지');
-    }
-  }
-
   String _statusLabel(String status, AppLanguageController lang) {
     return status == 'completed'
         ? lang.tr('Completed', '확인 완료')
@@ -316,41 +305,30 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
     required int totalCount,
   }) {
     return AppPanel(
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.all(14),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
         children: [
-          Text(
-            _folderTitle(_selectedFolder, lang),
-            style: Theme.of(context).textTheme.titleLarge,
+          _MessageFolderChip(
+            label: lang.tr('Needs Reply', '답변 필요'),
+            count: openCount,
+            selected: _selectedFolder == _RequestFolder.needsReply,
+            onTap: () =>
+                setState(() => _selectedFolder = _RequestFolder.needsReply),
           ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _MessageFolderChip(
-                label: lang.tr('Needs Reply', '답변 필요'),
-                count: openCount,
-                selected: _selectedFolder == _RequestFolder.needsReply,
-                onTap: () =>
-                    setState(() => _selectedFolder = _RequestFolder.needsReply),
-              ),
-              _MessageFolderChip(
-                label: lang.tr('Completed', '완료'),
-                count: completedCount,
-                selected: _selectedFolder == _RequestFolder.completed,
-                onTap: () =>
-                    setState(() => _selectedFolder = _RequestFolder.completed),
-              ),
-              _MessageFolderChip(
-                label: lang.tr('All', '전체'),
-                count: totalCount,
-                selected: _selectedFolder == _RequestFolder.all,
-                onTap: () =>
-                    setState(() => _selectedFolder = _RequestFolder.all),
-              ),
-            ],
+          _MessageFolderChip(
+            label: lang.tr('Completed', '완료'),
+            count: completedCount,
+            selected: _selectedFolder == _RequestFolder.completed,
+            onTap: () =>
+                setState(() => _selectedFolder = _RequestFolder.completed),
+          ),
+          _MessageFolderChip(
+            label: lang.tr('All', '전체'),
+            count: totalCount,
+            selected: _selectedFolder == _RequestFolder.all,
+            onTap: () => setState(() => _selectedFolder = _RequestFolder.all),
           ),
         ],
       ),
@@ -468,10 +446,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lang.tr(
-                              'No practitioner request threads are here yet.',
-                              '아직 침술사 요청 스레드가 없습니다.',
-                            ),
+                            lang.tr('No requests', '요청 없음'),
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 16),
@@ -485,9 +460,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   PatientIntakeScreen.routeName,
                                 ),
                                 icon: const Icon(Icons.edit_note),
-                                label: Text(
-                                  lang.tr('Open intake anyway', '문진 화면 열기'),
-                                ),
+                                label: Text(lang.tr('Intake', '문진')),
                               ),
                               OutlinedButton.icon(
                                 onPressed: () => Navigator.pushNamed(
@@ -495,9 +468,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   VisitHistoryScreen.routeName,
                                 ),
                                 icon: const Icon(Icons.history),
-                                label: Text(
-                                  lang.tr('Review visit history', '방문 기록 보기'),
-                                ),
+                                label: Text(lang.tr('History', '기록')),
                               ),
                             ],
                           ),
@@ -511,10 +482,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lang.tr(
-                              'Nothing is in this folder right now.',
-                              '이 폴더에는 지금 메시지가 없습니다.',
-                            ),
+                            lang.tr('Empty', '비어 있음'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ],
