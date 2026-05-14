@@ -75,23 +75,9 @@ class _TesterFeedbackInboxScreenState extends State<TesterFeedbackInboxScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr(
-                                'Review incoming tester feedback in one place',
-                                '들어오는 테스터 피드백을 한 곳에서 확인',
-                              ),
+                              lang.tr('Tester feedback', '테스터 피드백'),
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(color: AppTheme.ink),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              lang.tr(
-                                'Use this during beta to track what is still open, what has already been checked, and which screens are creating the most friction.',
-                                '베타 중에 아직 열린 이슈, 이미 확인한 항목, 어느 화면에서 가장 많이 막히는지를 여기서 바로 추적할 수 있습니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.72),
-                                  ),
                             ),
                             const SizedBox(height: 18),
                             Wrap(

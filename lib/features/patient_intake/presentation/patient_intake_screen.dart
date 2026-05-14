@@ -586,15 +586,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.sticky_note_2_outlined),
             labelText: lang.tr('Today note for this item', '오늘 이 항목에 대한 메모'),
-            helperText: _todayChecklistIndex() == null
-                ? lang.tr(
-                    'Notes save with today but weekday checks are locked.',
-                    '메모는 저장되지만 오늘은 요일 체크일이 아닙니다.',
-                  )
-                : lang.tr(
-                    'Example: done after dinner, skipped due to headache, felt easier today.',
-                    '예: 저녁 후 완료, 두통 때문에 못함, 오늘은 더 쉬웠음.',
-                  ),
           ),
         ),
       ],
@@ -2136,18 +2127,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         ),
                         child: Text(
                           _todayChecklistIndex() == null
-                              ? lang.tr(
-                                  'Weekday tracking is locked today. Come back Monday through Friday to check the matching day.',
-                                  '오늘은 주중 체크일이 아닙니다. 월요일부터 금요일 사이에 해당 요일만 체크할 수 있습니다.',
-                                )
+                              ? lang.tr('Weekday tracking locked', '주중 체크 잠김')
                               : _missingTodayChecklistItems(lang).isEmpty
-                              ? lang.tr(
-                                  'Today is complete. Older and future weekdays stay locked.',
-                                  '오늘 체크는 완료되었습니다. 지난 요일과 앞으로 올 요일은 잠겨 있습니다.',
-                                )
+                              ? lang.tr('Today complete', '오늘 완료')
                               : lang.tr(
-                                  'Today only: ${_todayChecklistLabel(lang)}. Please check only the items you completed today.',
-                                  '오늘만 체크 가능: ${_todayChecklistLabel(lang)}. 오늘 실제로 한 항목만 체크해주세요.',
+                                  'Today: ${_todayChecklistLabel(lang)}',
+                                  '오늘: ${_todayChecklistLabel(lang)}',
                                 ),
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: AppTheme.ink.withValues(alpha: 0.78),
@@ -2206,15 +2191,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             icon: const Icon(Icons.save_outlined),
                             label: Text(lang.tr('Save checklist', '체크리스트 저장')),
                           ),
-                          Text(
-                            lang.tr(
-                              'Saved checks and notes stay here when you leave this screen.',
-                              '체크와 메모는 다른 화면에 갔다 와도 유지됩니다.',
-                            ),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.ink.withValues(alpha: 0.62),
-                            ),
-                          ),
                         ],
                       ),
                     ],
@@ -2229,16 +2205,6 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Text(
                         lang.tr('Before you submit', '제출 전 확인'),
                         style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        lang.tr(
-                          'Use this support column to quickly verify profile details, latest activity, and any open tasks before you submit.',
-                          '이 지원 영역에서 제출 전에 프로필, 최근 활동, 열려 있는 작업을 빠르게 확인할 수 있습니다.',
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.72),
-                        ),
                       ),
                       const SizedBox(height: 14),
                       Wrap(

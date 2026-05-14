@@ -15,16 +15,12 @@ class PractitionerInsightsScreen extends StatelessWidget {
     return PractitionerShell(
       currentItem: PractitionerNavItem.insights,
       title: lang.tr('Insights', '인사이트'),
-      subtitle: lang.tr(
-        'Last 12 weeks summary and patient mix',
-        '최근 12주 요약 및 환자 구성',
-      ),
       actions: const [LanguageMenuButton()],
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            lang.tr('Last 12 Weeks Summary (Demo)', '최근 12주 요약 (데모)'),
+            lang.tr('Last 12 weeks', '최근 12주'),
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
@@ -80,10 +76,25 @@ class PractitionerInsightsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _TrendRow(lang.tr('Poor Sleep / Early Morning Waking', '수면 저하 / 새벽 각성'), 42),
+                  _TrendRow(
+                    lang.tr(
+                      'Poor Sleep / Early Morning Waking',
+                      '수면 저하 / 새벽 각성',
+                    ),
+                    42,
+                  ),
                   _TrendRow(lang.tr('Neck / Shoulder Pain', '목 / 어깨 통증'), 38),
-                  _TrendRow(lang.tr('Digestive Discomfort / Reflux', '소화 불편 / 역류'), 31),
-                  _TrendRow(lang.tr('Headache / Eye Fatigue (HEENT)', '두통 / 눈 피로 (HEENT)'), 27),
+                  _TrendRow(
+                    lang.tr('Digestive Discomfort / Reflux', '소화 불편 / 역류'),
+                    31,
+                  ),
+                  _TrendRow(
+                    lang.tr(
+                      'Headache / Eye Fatigue (HEENT)',
+                      '두통 / 눈 피로 (HEENT)',
+                    ),
+                    27,
+                  ),
                   _TrendRow(lang.tr('Low Energy / Fatigue', '기력 저하 / 피로'), 25),
                 ],
               ),
@@ -97,7 +108,10 @@ class PractitionerInsightsScreen extends StatelessWidget {
               child: Column(
                 children: [
                   _AdviceRow(
-                    label: lang.tr('Bedtime Stretching / Breathing Routine', '취침 전 스트레칭 / 호흡 루틴'),
+                    label: lang.tr(
+                      'Bedtime Stretching / Breathing Routine',
+                      '취침 전 스트레칭 / 호흡 루틴',
+                    ),
                     count: 36,
                     followupRate: 63,
                   ),
@@ -112,7 +126,10 @@ class PractitionerInsightsScreen extends StatelessWidget {
                     followupRate: 52,
                   ),
                   _AdviceRow(
-                    label: lang.tr('Hydration Pattern Adjustment', '수분 섭취 패턴 조정'),
+                    label: lang.tr(
+                      'Hydration Pattern Adjustment',
+                      '수분 섭취 패턴 조정',
+                    ),
                     count: 19,
                     followupRate: 48,
                   ),
@@ -207,7 +224,10 @@ class _KpiCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
