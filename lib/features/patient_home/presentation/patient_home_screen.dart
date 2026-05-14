@@ -32,7 +32,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
   bool _sessionResolved = false;
-  bool _showStartGuide = false;
   bool _loadTimedOut = false;
   bool _loadedRouteArgs = false;
   Object? _loadError;
@@ -1408,115 +1407,52 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       nextVisit == null && pendingAppointmentRequests.isEmpty;
 
                   late final String nextStepTitle;
-                  late final String nextStepBody;
                   late final String nextStepButton;
                   late final VoidCallback nextStepAction;
-                  late final String secondStepTitle;
-                  late final String thirdStepTitle;
 
                   if (needsRequestsFirst) {
                     nextStepTitle = lang.tr(
                       'Reply to your practitioner request first',
                       '먼저 침술사 요청에 답하기',
                     );
-                    nextStepBody = lang.tr(
-                      'You have ${pendingRequests.length} request(s) waiting. Open Requests first, then continue intake only if the request asks for it.',
-                      '대기 중인 요청이 ${pendingRequests.length}건 있습니다. 먼저 요청함을 열고, 그 안에서 문진을 다시 하라고 하면 그때 이어서 진행하면 됩니다.',
-                    );
                     nextStepButton = lang.tr('Open Requests', '요청함 열기');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       PatientRequestsScreen.routeName,
-                    );
-                    secondStepTitle = lang.tr(
-                      'Then update intake if needed',
-                      '그다음 필요하면 문진 업데이트',
-                    );
-                    thirdStepTitle = lang.tr(
-                      'Check visit date later',
-                      '마지막으로 방문 일정 확인',
                     );
                   } else if (needsProfileFirst) {
                     nextStepTitle = lang.tr(
                       'Add your contact info first',
                       '먼저 연락처 입력하기',
                     );
-                    nextStepBody = lang.tr(
-                      'Before you do anything else, save your phone and email so your clinic can follow up correctly.',
-                      '다른 작업보다 먼저 전화번호와 이메일을 저장해두면 한의원 쪽 후속 안내가 훨씬 정확해집니다.',
-                    );
                     nextStepButton = lang.tr('Edit Profile', '프로필 수정');
                     nextStepAction = _openProfileDialog;
-                    secondStepTitle = lang.tr(
-                      'Then continue intake',
-                      '그다음 문진 이어서 작성',
-                    );
-                    thirdStepTitle = lang.tr(
-                      'Request your next visit when ready',
-                      '준비되면 다음 예약 신청',
-                    );
                   } else if (needsIntakeFirst) {
                     nextStepTitle = lang.tr(
                       'Send today\'s intake update',
                       '오늘 상태 문진 보내기',
-                    );
-                    nextStepBody = lang.tr(
-                      'You do not need to do everything at once. Start by sending your current condition through Intake.',
-                      '한 번에 다 할 필요는 없습니다. 먼저 Intake에서 오늘 상태만 보내면 됩니다.',
                     );
                     nextStepButton = lang.tr('Continue Intake', '문진 이어쓰기');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       PatientIntakeScreen.routeName,
                     );
-                    secondStepTitle = lang.tr(
-                      'Then check for any replies',
-                      '그다음 답변/요청 확인',
-                    );
-                    thirdStepTitle = lang.tr(
-                      'Look at schedule and history later',
-                      '일정과 기록은 나중에 확인',
-                    );
                   } else if (needsAppointmentFirst) {
                     nextStepTitle = lang.tr(
                       'Request your next appointment',
                       '다음 예약 신청하기',
                     );
-                    nextStepBody = lang.tr(
-                      'Your latest intake is already saved, so the next useful step is to request a visit slot.',
-                      '최신 문진은 이미 저장되어 있으니, 지금 가장 도움이 되는 다음 단계는 예약 시간을 신청하는 것입니다.',
-                    );
                     nextStepButton = lang.tr('Book Appointment', '예약하기');
                     nextStepAction = _openAppointmentDialog;
-                    secondStepTitle = lang.tr(
-                      'Then wait for confirmation',
-                      '그다음 확정 알림 기다리기',
-                    );
-                    thirdStepTitle = lang.tr(
-                      'Open history only if you need past notes',
-                      '예전 메모가 필요할 때만 기록 보기',
-                    );
                   } else {
                     nextStepTitle = lang.tr(
                       'You are caught up for now',
                       '지금은 할 일을 거의 마쳤어요',
                     );
-                    nextStepBody = lang.tr(
-                      'Nothing urgent is waiting. You can review your visit history or update intake only if your condition changed.',
-                      '급한 작업은 없습니다. 몸 상태가 달라졌을 때만 문진을 다시 열고, 아니면 방문 기록만 가볍게 확인하면 됩니다.',
-                    );
                     nextStepButton = lang.tr('Visit History', '방문 기록');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       VisitHistoryScreen.routeName,
-                    );
-                    secondStepTitle = lang.tr(
-                      'Check requests only if a new message arrives',
-                      '새 메시지가 오면 요청함 확인',
-                    );
-                    thirdStepTitle = lang.tr(
-                      'Update intake only when your condition changes',
-                      '상태가 바뀔 때만 문진 업데이트',
                     );
                   }
 
@@ -1535,7 +1471,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr('Patient command center', '환자 시작 허브'),
+                              lang.tr('Today', 'Today'),
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
                                     color: AppTheme.ink.withValues(alpha: 0.58),
@@ -1543,18 +1479,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              lang.tr(
-                                'Welcome back, ${profile.name}',
-                                '${profile.name}님, 다시 오셨네요',
-                              ),
+                              profile.name,
                               style: Theme.of(context).textTheme.headlineLarge
                                   ?.copyWith(color: AppTheme.ink),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               lang.tr(
-                                'Keep requests, intake, and your next visit in one simple place.',
-                                '이 화면은 답변 요청 확인, 문진 이어쓰기, 다음 방문 정리를 위한 곳입니다. 아래 순서대로 위에서부터 보면 됩니다.',
+                                'Requests, intake, visits.',
+                                'Requests, intake, visits.',
                               ),
                               style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(
@@ -1624,44 +1557,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          lang.tr('Do this first', '지금 먼저 할 것'),
+                                          lang.tr('Next step', 'Next step'),
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge
                                               ?.copyWith(color: AppTheme.ink),
                                         ),
                                       ),
-                                      if (_showStartGuide)
-                                        IconButton(
-                                          tooltip: lang.tr(
-                                            'Hide guide',
-                                            '가이드 숨기기',
-                                          ),
-                                          onPressed: () {
-                                            setState(
-                                              () => _showStartGuide = false,
-                                            );
-                                          },
-                                          icon: const Icon(Icons.close),
-                                          color: AppTheme.ink.withValues(
-                                            alpha: 0.9,
-                                          ),
-                                          visualDensity: VisualDensity.compact,
-                                        )
-                                      else
-                                        TextButton(
-                                          onPressed: () {
-                                            setState(
-                                              () => _showStartGuide = true,
-                                            );
-                                          },
-                                          child: Text(
-                                            lang.tr('Show guide', '가이드 보기'),
-                                            style: const TextStyle(
-                                              color: AppTheme.pine,
-                                            ),
-                                          ),
-                                        ),
                                     ],
                                   ),
                                   const SizedBox(height: 10),
@@ -1673,17 +1575,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ?.copyWith(
                                           color: AppTheme.ink,
                                           fontWeight: FontWeight.w700,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    nextStepBody,
-                                    style: Theme.of(context).textTheme.bodyLarge
-                                        ?.copyWith(
-                                          color: AppTheme.ink.withValues(
-                                            alpha: 0.84,
-                                          ),
-                                          height: 1.5,
                                         ),
                                   ),
                                   const SizedBox(height: 14),
@@ -1756,65 +1647,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 16),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.72,
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          lang.tr('Simple order', '간단한 순서'),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium
-                                              ?.copyWith(color: AppTheme.ink),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          '1. $nextStepTitle',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.copyWith(
-                                                color: AppTheme.ink,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '2. $secondStepTitle',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                color: AppTheme.ink.withValues(
-                                                  alpha: 0.84,
-                                                ),
-                                              ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '3. $thirdStepTitle',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                color: AppTheme.ink.withValues(
-                                                  alpha: 0.84,
-                                                ),
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -1828,19 +1660,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr('Quick status', '빠른 상태 확인'),
+                              lang.tr('Status', 'Status'),
                               style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              lang.tr(
-                                'Use this only as a quick readout. If you are unsure what to do, follow the single next-step card above first.',
-                                '여기는 상태만 빠르게 보는 곳입니다. 무엇을 해야 할지 헷갈리면 위의 `지금 먼저 할 것` 카드만 먼저 따라가면 됩니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.72),
-                                  ),
                             ),
                             const SizedBox(height: 14),
                             LayoutBuilder(
@@ -2341,7 +2162,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '${lang.tr('Status', '상태')}: ${(latestRequest['status'] ?? 'pending').toString()}',
+                                  '${lang.tr('Status', 'Status')}: ${(latestRequest['status'] ?? 'pending').toString()}',
                                 ),
                                 Text(
                                   '${lang.tr('Requested At', '요청 시각')}: ${_formatTimestamp(latestRequest['requestedAt'] as Timestamp?)}',
