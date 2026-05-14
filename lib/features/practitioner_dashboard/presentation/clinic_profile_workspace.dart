@@ -19,8 +19,7 @@ class ClinicProfileWorkspace extends StatefulWidget {
 class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
   final ClinicDataStore _store = ClinicDataStore.instance;
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _practitionerController =
-      TextEditingController();
+  final TextEditingController _practitionerController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _searchKeywordsController =
       TextEditingController();
@@ -195,10 +194,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          lang.tr(
-            'Patient access link copied.',
-            '환자 접속 링크를 복사했습니다.',
-          ),
+          lang.tr('Patient access link copied.', '환자 접속 링크를 복사했습니다.'),
         ),
       ),
     );
@@ -219,7 +215,8 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
 
         if (sessionClinic != null &&
             !_creatingNewClinic &&
-            (_selectedClinicId == null || _selectedClinicId != sessionClinic.id)) {
+            (_selectedClinicId == null ||
+                _selectedClinicId != sessionClinic.id)) {
           _loadClinic(sessionClinic);
         } else if (!_creatingNewClinic &&
             (_selectedClinicId == null ||
@@ -245,10 +242,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                     children: [
                       Expanded(
                         child: Text(
-                          lang.tr(
-                            'Clinic profile builder',
-                            '한의원 정보 설정',
-                          ),
+                          lang.tr('Clinic profile builder', '한의원 정보 설정'),
                           style: theme.textTheme.headlineSmall,
                         ),
                       ),
@@ -284,15 +278,13 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                   ),
                   const SizedBox(height: 18),
                   DropdownButtonFormField<String>(
-                    initialValue: currentClinic?.id ??
+                    initialValue:
+                        currentClinic?.id ??
                         (_creatingNewClinic || clinics.isEmpty
                             ? null
                             : clinics.first.id),
                     decoration: InputDecoration(
-                      labelText: lang.tr(
-                        'Clinic to edit',
-                        '수정할 한의원',
-                      ),
+                      labelText: lang.tr('Clinic to edit', '수정할 한의원'),
                     ),
                     items: clinics
                         .map(
@@ -325,42 +317,22 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _practitionerController,
-                    label: lang.tr(
-                      'Practitioner display name',
-                      '침술사 표시 이름',
-                    ),
+                    label: lang.tr('Practitioner display name', '침술사 표시 이름'),
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _locationController,
-                    label: lang.tr(
-                      'Location / search label',
-                      '위치 / 검색 라벨',
-                    ),
+                    label: lang.tr('Location / search label', '위치 / 검색 라벨'),
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _searchKeywordsController,
-                    label: lang.tr(
-                      'Search keywords',
-                      '검색 키워드',
-                    ),
-                    helper: lang.tr(
-                      'Examples: fort lee, sleep, korean, shoulder',
-                      '예: fort lee, sleep, korean, shoulder',
-                    ),
+                    label: lang.tr('Search keywords', '검색 키워드'),
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _patientNoteController,
-                    label: lang.tr(
-                      'Patient-facing note',
-                      '환자에게 보이는 메모',
-                    ),
-                    helper: lang.tr(
-                      'Patients see this note in the clinic search and clinic selection view.',
-                      '이 메모는 환자 검색 화면과 한의원 선택 화면에서 그대로 보입니다.',
-                    ),
+                    label: lang.tr('Patient-facing note', '환자에게 보이는 메모'),
                     minLines: 4,
                     maxLines: 6,
                   ),
@@ -417,10 +389,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                         children: [
                           Text(
                             _nameController.text.trim().isEmpty
-                                ? lang.tr(
-                                    'Clinic name preview',
-                                    '한의원 이름 미리보기',
-                                  )
+                                ? lang.tr('Clinic name preview', '한의원 이름 미리보기')
                                 : _nameController.text.trim(),
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w700,
@@ -508,11 +477,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
 
               if (!wide) {
                 return ListView(
-                  children: [
-                    form,
-                    const SizedBox(height: 16),
-                    preview,
-                  ],
+                  children: [form, const SizedBox(height: 16), preview],
                 );
               }
 
@@ -534,7 +499,6 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    String? helper,
     int minLines = 1,
     int maxLines = 1,
   }) {
@@ -542,10 +506,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
       controller: controller,
       minLines: minLines,
       maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        helperText: helper,
-      ),
+      decoration: InputDecoration(labelText: label),
       onChanged: (_) => setState(() {}),
     );
   }

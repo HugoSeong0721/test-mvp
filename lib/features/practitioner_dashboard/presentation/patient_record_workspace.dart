@@ -251,7 +251,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                     ),
                                   ),
                                   Text(
-                                    '${lang.tr('Internal note', '내 메모')}: ${profile.memo.trim().isEmpty ? lang.tr('No internal note yet', '아직 메모 없음') : profile.memo.trim()}',
+                                    '${lang.tr('Note', '메모')}: ${profile.memo.trim().isEmpty ? '-' : profile.memo.trim()}',
                                     style: TextStyle(
                                       color: AppTheme.ink.withValues(
                                         alpha: 0.78,
@@ -505,10 +505,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               const SizedBox(height: 14),
                               if (history.isEmpty)
                                 _EmptyRecordState(
-                                  message: lang.tr(
-                                    'No visit history is saved for this patient yet.',
-                                    '이 환자에게는 아직 저장된 방문 기록이 없습니다.',
-                                  ),
+                                  message: lang.tr('No visits', '방문 없음'),
                                 )
                               else
                                 ...history.map((item) {
@@ -581,8 +578,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                           if (visit.qaList.isEmpty)
                                             Text(
                                               lang.tr(
-                                                'No intake answers were saved for this visit.',
-                                                '이 방문에는 저장된 사전문진 답변이 없습니다.',
+                                                'No intake answers',
+                                                '문진 답변 없음',
                                               ),
                                             )
                                           else ...[
@@ -633,10 +630,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                                   .trim()
                                                   .isEmpty)
                                             Text(
-                                              lang.tr(
-                                                'No patient correction or follow-up feedback yet.',
-                                                '아직 환자 수정 요청이나 후속 피드백이 없습니다.',
-                                              ),
+                                              lang.tr('No feedback', '피드백 없음'),
                                             )
                                           else ...[
                                             Text(
@@ -691,10 +685,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 const LinearProgressIndicator(minHeight: 4)
                               else if (requestDocs.isEmpty)
                                 _EmptyRecordState(
-                                  message: lang.tr(
-                                    'No practitioner answer requests were saved for this patient yet.',
-                                    '이 환자에게 보낸 사전 질문 요청이 아직 없습니다.',
-                                  ),
+                                  message: lang.tr('No requests', '요청 없음'),
                                 )
                               else
                                 ...requestDocs.map((doc) {
@@ -813,10 +804,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 const LinearProgressIndicator(minHeight: 4)
                               else if (submissionDocs.isEmpty)
                                 _EmptyRecordState(
-                                  message: lang.tr(
-                                    'No intake submissions were saved for this patient yet.',
-                                    '이 환자의 사전문진 제출 기록이 아직 없습니다.',
-                                  ),
+                                  message: lang.tr('No intake', '문진 없음'),
                                 )
                               else
                                 ...submissionDocs.map((doc) {
@@ -973,10 +961,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 const LinearProgressIndicator(minHeight: 4)
                               else if (feedbackDocs.isEmpty)
                                 _EmptyRecordState(
-                                  message: lang.tr(
-                                    'No patient feedback has been submitted yet.',
-                                    '아직 제출된 환자 피드백이 없습니다.',
-                                  ),
+                                  message: lang.tr('No feedback', '피드백 없음'),
                                 )
                               else
                                 ...feedbackDocs.map((doc) {

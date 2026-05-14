@@ -199,10 +199,6 @@ class _PractitionerDashboardScreenState
         return PractitionerShell(
           currentItem: PractitionerNavItem.dashboard,
           title: lang.tr('Practitioner Dashboard', '침술사 대시보드'),
-          subtitle: lang.tr(
-            'Clinical operations and intake monitoring',
-            '운영 현황 및 문진 모니터링',
-          ),
           actions: [
             _buildCompactTopInboxAction(pendingAppointmentInboxCount),
             IconButton(
