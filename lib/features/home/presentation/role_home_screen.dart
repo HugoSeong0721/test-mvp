@@ -40,15 +40,7 @@ class RoleHomeScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      lang.tr('Choose where you are heading.', '진입할 곳을 선택하세요.'),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.ink.withValues(alpha: 0.68),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: 28),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final wide = constraints.maxWidth >= 720;
@@ -58,10 +50,6 @@ class RoleHomeScreen extends StatelessWidget {
                           icon: Icons.health_and_safety_outlined,
                           eyebrow: lang.tr('Practitioner', '침술사'),
                           title: lang.tr('Clinic Portal', '클리닉 포털'),
-                          description: lang.tr(
-                            'Open today\'s schedule, review intake, and leave notes.',
-                            '오늘 일정 확인, 문진 검토, 메모 작성을 합니다.',
-                          ),
                           buttonLabel: lang.tr(
                             'Continue as Practitioner',
                             '침술사로 시작',
@@ -93,10 +81,6 @@ class RoleHomeScreen extends StatelessWidget {
                           icon: Icons.favorite_outline,
                           eyebrow: lang.tr('Patient', '환자'),
                           title: lang.tr('Patient Portal', '환자 포털'),
-                          description: lang.tr(
-                            'Sign up or log in to complete your intake and see visit history.',
-                            '회원가입 또는 로그인 후 문진을 작성하고 방문 기록을 확인합니다.',
-                          ),
                           buttonLabel: lang.tr('Continue as Patient', '환자로 시작'),
                           onPressed: () => Navigator.pushNamed(
                             context,
@@ -142,7 +126,6 @@ class _RoleCard extends StatelessWidget {
     required this.icon,
     required this.eyebrow,
     required this.title,
-    required this.description,
     required this.buttonLabel,
     required this.onPressed,
     this.secondaryButtonLabel,
@@ -154,7 +137,6 @@ class _RoleCard extends StatelessWidget {
   final IconData icon;
   final String eyebrow;
   final String title;
-  final String description;
   final String buttonLabel;
   final VoidCallback onPressed;
   final String? secondaryButtonLabel;
@@ -197,14 +179,7 @@ class _RoleCard extends StatelessWidget {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.74),
-            ),
-          ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 20),
           if (secondaryButtonLabel != null && onSecondaryPressed != null) ...[
             SizedBox(
               width: double.infinity,

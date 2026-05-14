@@ -18,7 +18,8 @@ void main() {
 
     await tester.pumpWidget(const TestMvpApp());
 
-    expect(find.text('Choose where you are heading.'), findsOneWidget);
+    expect(find.text('Clinic Portal'), findsOneWidget);
+    expect(find.text('Patient Portal'), findsOneWidget);
 
     await tester.ensureVisible(
       find.widgetWithText(FilledButton, 'Continue as Practitioner'),
@@ -29,11 +30,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Practitioner Login'), findsWidgets);
-    expect(
-      find.text(
-        'Log in with a practitioner account created in this browser.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('Login'), findsWidgets);
+    expect(find.text('Create Account'), findsOneWidget);
   });
 }

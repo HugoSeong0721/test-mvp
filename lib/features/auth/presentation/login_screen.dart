@@ -213,9 +213,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _submit(String role) async {
@@ -227,10 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (id.isEmpty || password.isEmpty) {
       _setFormError(
-        lang.tr(
-          'Please enter your ID and password.',
-          '아이디와 비밀번호를 입력해주세요.',
-        ),
+        lang.tr('Please enter your ID and password.', '아이디와 비밀번호를 입력해주세요.'),
       );
       return;
     }
@@ -274,7 +271,9 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushReplacementNamed(context, PatientBetaAuthScreen.routeName);
   }
 
-  String _friendlyPractitionerAuthMessage(LocalPractitionerAuthException error) {
+  String _friendlyPractitionerAuthMessage(
+    LocalPractitionerAuthException error,
+  ) {
     final lang = AppLanguageController.instance;
     switch (error.code) {
       case 'invalid-login-id':
@@ -293,10 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
           '침술사 이름을 입력해주세요.',
         );
       case 'missing-clinic-name':
-        return lang.tr(
-          'Please enter the clinic name.',
-          '한의원 이름을 입력해주세요.',
-        );
+        return lang.tr('Please enter the clinic name.', '한의원 이름을 입력해주세요.');
       case 'login-id-already-in-use':
         return lang.tr(
           'This practitioner login ID is already being used in this browser.',
@@ -337,20 +333,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final roleLabel = isPractitioner
         ? lang.tr('Practitioner', '침술사')
         : lang.tr('Patient', '환자');
-    final helperText = isPractitioner
-        ? (_isPractitionerRegisterMode
-              ? lang.tr(
-                  'Create your own practitioner account and seed your clinic name into the patient-facing clinic list.',
-                  '침술사 계정을 만들고, 환자가 보게 될 한의원 이름을 바로 등록할 수 있습니다.',
-                )
-              : lang.tr(
-                  'Log in with a practitioner account created in this browser.',
-                  '이 브라우저에서 만든 침술사 계정으로 로그인할 수 있습니다.',
-                ))
-        : lang.tr(
-            'Patient sign-in now starts from the patient portal page.',
-            '환자 로그인은 이제 환자 포털 화면에서 시작합니다.',
-          );
     final submitLabel = isPractitioner && _isPractitionerRegisterMode
         ? lang.tr('Create account', '계정 만들기')
         : lang.tr('Login', '로그인');
@@ -379,14 +361,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        helperText,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.66),
-                        ),
                       ),
                       if (isPractitioner) ...[
                         const SizedBox(height: 18),
@@ -424,10 +398,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textInputAction: TextInputAction.next,
                           onChanged: (_) => _clearFormErrorOnChange(),
                           decoration: InputDecoration(
-                            labelText: lang.tr(
-                              'Practitioner name',
-                              '침술사 이름',
-                            ),
+                            labelText: lang.tr('Practitioner name', '침술사 이름'),
                             prefixIcon: const Icon(Icons.person_outline),
                           ),
                         ),
@@ -438,30 +409,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           onChanged: (_) => _clearFormErrorOnChange(),
                           decoration: InputDecoration(
                             labelText: lang.tr('Clinic name', '한의원 이름'),
-                            helperText: lang.tr(
-                              'This clinic name will appear in the patient clinic search right away.',
-                              '이 한의원 이름은 환자 한의원 검색 목록에 바로 나타납니다.',
+                            prefixIcon: const Icon(
+                              Icons.local_hospital_outlined,
                             ),
-                            prefixIcon: const Icon(Icons.local_hospital_outlined),
                           ),
                         ),
                         const SizedBox(height: 12),
-                      ],
-                      if (isPractitioner) ...[
-                        _buildFieldHintCard(
-                          context,
-                          accent: accent,
-                          message: _isPractitionerRegisterMode
-                              ? lang.tr(
-                                  'Create a login ID for this clinic. Patients do not see this ID.',
-                                  '이 한의원에서 쓸 로그인 아이디를 만들어주세요. 환자에게는 보이지 않습니다.',
-                                )
-                              : lang.tr(
-                                  'Enter the practitioner login ID you created for this clinic.',
-                                  '이 한의원용으로 만든 침술사 로그인 아이디를 입력해주세요.',
-                                ),
-                        ),
-                        const SizedBox(height: 10),
                       ],
                       TextField(
                         controller: _idController,
@@ -477,16 +430,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'Enter your practitioner login ID',
                                   '침술사 로그인 아이디를 입력해주세요',
                                 )
-                              : lang.tr(
-                                  'Enter your ID',
-                                  '아이디를 입력해주세요',
-                                ),
-                          helperText: isPractitioner && _isPractitionerRegisterMode
-                              ? lang.tr(
-                                  'Use at least 3 letters or numbers.',
-                                  '3자 이상 영문/숫자를 사용해주세요.',
-                                )
-                              : null,
+                              : lang.tr('Enter your ID', '아이디를 입력해주세요'),
                           prefixIcon: const Icon(Icons.badge_outlined),
                         ),
                       ),
@@ -499,17 +443,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         onSubmitted: (_) => _submit(role),
                         decoration: InputDecoration(
                           labelText: lang.tr('Password', '비밀번호'),
-                          helperText: isPractitioner && _isPractitionerRegisterMode
-                              ? lang.tr(
-                                  'Use at least 4 characters.',
-                                  '4자 이상으로 입력해주세요.',
-                                )
-                              : null,
                           prefixIcon: const Icon(Icons.lock_outline),
                           suffixIcon: IconButton(
-                            onPressed: () => setState(
-                              () => _showPassword = !_showPassword,
-                            ),
+                            onPressed: () =>
+                                setState(() => _showPassword = !_showPassword),
                             icon: Icon(
                               _showPassword
                                   ? Icons.visibility_off
@@ -544,19 +481,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: _isSubmitting
                                   ? null
                                   : _showSavedPractitionerAccounts,
-                              child: Text(
-                                lang.tr('Find ID', '아이디 찾기'),
-                              ),
+                              child: Text(lang.tr('Find ID', '아이디 찾기')),
                             ),
                             TextButton(
                               onPressed: _isSubmitting
                                   ? null
                                   : _showPractitionerPasswordResetDialog,
                               child: Text(
-                                lang.tr(
-                                  'Reset password',
-                                  '비밀번호 찾기/재설정',
-                                ),
+                                lang.tr('Reset password', '비밀번호 찾기/재설정'),
                               ),
                             ),
                           ],
@@ -601,39 +533,6 @@ class _LoginScreenState extends State<LoginScreen> {
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: errorColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFieldHintCard(
-    BuildContext context, {
-    required Color accent,
-    required String message,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: accent.withValues(alpha: 0.16)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline, color: accent, size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.ink.withValues(alpha: 0.72),
-                height: 1.4,
                 fontWeight: FontWeight.w600,
               ),
             ),

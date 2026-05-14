@@ -5632,28 +5632,6 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                     AppLanguageController.instance.tr('Add Patient', '환자 추가'),
                   ),
                 ),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.82),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: AppTheme.border.withValues(alpha: 0.5),
-                  ),
-                ),
-                child: Text(
-                  AppLanguageController.instance.tr(
-                    'Patients appear here after they sign up in the patient portal and choose this clinic.',
-                    '환자가 환자 포털에서 가입하고 이 한의원을 선택하면 여기 나타납니다.',
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.ink.withValues(alpha: 0.74),
-                    height: 1.45,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
               Expanded(
                 child: profiles.isEmpty
                     ? Center(
@@ -5661,8 +5639,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             AppLanguageController.instance.tr(
-                              'No patient account has selected this clinic yet.',
-                              '아직 이 한의원을 선택한 환자 계정이 없습니다.',
+                              'No patients',
+                              '환자 없음',
                             ),
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium
@@ -5702,8 +5680,8 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                                       ),
                                       child: Text(
                                         AppLanguageController.instance.tr(
-                                          'Missing Required Info',
-                                          '필수 정보 부족',
+                                          'Missing info',
+                                          '정보 부족',
                                         ),
                                         style: TextStyle(
                                           color: Colors.redAccent,
