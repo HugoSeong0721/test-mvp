@@ -1944,8 +1944,8 @@ class _PractitionerDashboardScreenState
             if (requests.isEmpty)
               Text(
                 AppLanguageController.instance.tr(
-                  'There are no pending appointment requests right now.',
-                  '지금 확인할 예약 신청이 없습니다.',
+                  'No appointment requests',
+                  '예약 신청 없음',
                 ),
               )
             else
@@ -2070,16 +2070,6 @@ class _PractitionerDashboardScreenState
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      lang.tr(
-                        'Patient notes from Visit History appear here until you mark them as reviewed.',
-                        '환자가 Visit History에서 보낸 수정 메모는 확인 처리 전까지 여기에 남습니다.',
-                      ),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.ink.withValues(alpha: 0.66),
-                      ),
-                    ),
                     const SizedBox(height: 10),
                     if (!feedbackSnapshot.hasData)
                       const LinearProgressIndicator(minHeight: 4)
@@ -2100,12 +2090,7 @@ class _PractitionerDashboardScreenState
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: AppTheme.border),
                         ),
-                        child: Text(
-                          lang.tr(
-                            'No patient record-update messages are waiting right now.',
-                            '지금 대기 중인 방문기록 수정 요청이 없습니다.',
-                          ),
-                        ),
+                        child: Text(lang.tr('No updates', '수정 요청 없음')),
                       )
                     else
                       ...actionableDocs.take(4).map((doc) {
@@ -4082,16 +4067,16 @@ class _PractitionerDashboardScreenState
               children: [
                 Text(
                   lang.tr(
-                    '${requests.length} patient registration request${requests.length == 1 ? '' : 's'} waiting',
-                    '${requests.length} patient registration request${requests.length == 1 ? '' : 's'} waiting',
+                    '${requests.length} join request${requests.length == 1 ? '' : 's'}',
+                    '${requests.length} join request${requests.length == 1 ? '' : 's'}',
                   ),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   lang.tr(
-                    '${next.patientName} requested to join ${next.clinicName}. Approve it to connect the patient to this clinic and send starter intake questions.',
-                    '${next.patientName} requested to join ${next.clinicName}. Approve it to connect the patient to this clinic and send starter intake questions.',
+                    '${next.patientName} · ${next.clinicName}',
+                    '${next.patientName} · ${next.clinicName}',
                   ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppTheme.ink.withValues(alpha: 0.72),
@@ -4153,16 +4138,6 @@ class _PractitionerDashboardScreenState
             lang.tr('Inbox', 'Inbox'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 6),
-          Text(
-            lang.tr(
-              'Patient joins and clinic leads.',
-              'Patient joins and clinic leads.',
-            ),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.68),
-            ),
-          ),
           const SizedBox(height: 12),
           Text(
             lang.tr('Patient joins', 'Patient joins'),
@@ -4170,7 +4145,7 @@ class _PractitionerDashboardScreenState
           ),
           const SizedBox(height: 8),
           if (membershipRequests.isEmpty)
-            Text(lang.tr('No joins waiting.', 'No joins waiting.'))
+            Text(lang.tr('No joins', 'No joins'))
           else
             ...membershipRequests.map((request) {
               return Container(
@@ -4199,25 +4174,6 @@ class _PractitionerDashboardScreenState
                       Text(
                         '${lang.tr('Email', 'Email')}: ${request.patientEmail}',
                       ),
-                    const SizedBox(height: 10),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: Text(
-                        lang.tr(
-                          'Approving connects the patient and sends starter intake.',
-                          'Approving connects the patient and sends starter intake.',
-                        ),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.68),
-                        ),
-                      ),
-                    ),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
@@ -4320,9 +4276,7 @@ class _PractitionerDashboardScreenState
             ),
             const SizedBox(height: 8),
             if (requests.isEmpty)
-              Text(
-                lang.tr('No clinic open requests yet.', '아직 한의원 등록 요청이 없습니다.'),
-              )
+              Text(lang.tr('No clinic leads', '한의원 요청 없음'))
             else
               ...requests.map((request) {
                 final detail = [
@@ -4352,13 +4306,6 @@ class _PractitionerDashboardScreenState
                         const SizedBox(height: 4),
                         Text(detail),
                       ],
-                      const SizedBox(height: 4),
-                      Text(
-                        lang.tr(
-                          '${request.patientName} wants this clinic opened for patient portal access.',
-                          '${request.patientName} 님이 이 한의원을 환자 포털에서 열어달라고 요청했습니다.',
-                        ),
-                      ),
                       if (request.patientEmail.trim().isNotEmpty)
                         Text(
                           '${lang.tr('Email', '이메일')}: ${request.patientEmail}',
