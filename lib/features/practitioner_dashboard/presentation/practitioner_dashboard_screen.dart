@@ -5729,6 +5729,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
               : _PatientProfileEditor(
                   profile: selected,
                   clinicId: PractitionerSessionService.currentSession?.clinicId,
+                  membershipStatus: pendingJoinRequest?.status,
                   pendingJoinRequest: pendingJoinRequest?.status == 'pending'
                       ? pendingJoinRequest
                       : null,
@@ -5773,6 +5774,7 @@ class _PatientProfileEditor extends StatefulWidget {
     required this.profile,
     required this.onSave,
     this.clinicId,
+    this.membershipStatus,
     this.pendingJoinRequest,
     this.onApproveJoin,
   });
@@ -5780,6 +5782,7 @@ class _PatientProfileEditor extends StatefulWidget {
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
   final String? clinicId;
+  final String? membershipStatus;
   final PatientClinicMembershipRequest? pendingJoinRequest;
   final Future<void> Function()? onApproveJoin;
 
@@ -5846,6 +5849,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
     return PatientRecordWorkspace(
       profile: widget.profile,
       clinicId: widget.clinicId,
+      membershipStatus: widget.membershipStatus,
       pendingJoinRequest: widget.pendingJoinRequest,
       onApproveJoin: widget.onApproveJoin,
       onSave: widget.onSave,

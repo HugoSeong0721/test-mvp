@@ -139,16 +139,6 @@ class _TesterFeedbackSheetState extends State<_TesterFeedbackSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                lang.tr(
-                  'Use this whenever something is broken, confusing, or worth improving during testing.',
-                  '테스트 중 막히는 점, 헷갈리는 점, 개선 아이디어가 있으면 바로 여기로 남겨주세요.',
-                ),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.ink.withValues(alpha: 0.72),
-                ),
-              ),
               const SizedBox(height: 16),
               Container(
                 width: double.infinity,

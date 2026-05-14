@@ -194,14 +194,8 @@ class _TesterFeedbackInboxScreenState extends State<TesterFeedbackInboxScreen> {
                           padding: const EdgeInsets.all(20),
                           child: Text(
                             _filter == _FeedbackFilter.reviewed
-                                ? lang.tr(
-                                    'No reviewed tester feedback has been saved yet.',
-                                    '아직 확인 완료된 테스터 피드백이 없습니다.',
-                                  )
-                                : lang.tr(
-                                    'No tester feedback is waiting in this view right now.',
-                                    '지금 이 보기에는 대기 중인 테스터 피드백이 없습니다.',
-                                  ),
+                                ? lang.tr('No reviewed feedback', '확인 완료 없음')
+                                : lang.tr('No feedback', '피드백 없음'),
                           ),
                         )
                       else

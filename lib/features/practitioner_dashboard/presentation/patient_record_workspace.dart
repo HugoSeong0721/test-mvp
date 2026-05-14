@@ -14,6 +14,7 @@ class PatientRecordWorkspace extends StatefulWidget {
     required this.profile,
     required this.onSave,
     this.clinicId,
+    this.membershipStatus,
     this.pendingJoinRequest,
     this.onApproveJoin,
   });
@@ -21,6 +22,7 @@ class PatientRecordWorkspace extends StatefulWidget {
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
   final String? clinicId;
+  final String? membershipStatus;
   final PatientClinicMembershipRequest? pendingJoinRequest;
   final Future<void> Function()? onApproveJoin;
 
@@ -323,6 +325,13 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               ),
                             ],
                           ),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 12),
+                        _MembershipStatusPanel(
+                          status: widget.membershipStatus == 'approved'
+                              ? lang.tr('Approved', '승인됨')
+                              : lang.tr('Linked', '연결됨'),
                         ),
                       ],
                       const SizedBox.shrink(),
@@ -1187,6 +1196,33 @@ class _EmptyRecordState extends StatelessWidget {
         border: Border.all(color: AppTheme.border),
       ),
       child: Text(message),
+    );
+  }
+}
+
+class _MembershipStatusPanel extends StatelessWidget {
+  const _MembershipStatusPanel({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppPanel(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_circle_outline, color: AppTheme.pine),
+          const SizedBox(width: 10),
+          Text(
+            status,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: AppTheme.pine,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

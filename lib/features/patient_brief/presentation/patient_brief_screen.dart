@@ -47,7 +47,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
   final TextEditingController _actionGuideController = TextEditingController();
 
   bool _initialized = false;
-  bool _showGuide = true;
+  bool _showGuide = false;
 
   @override
   void didChangeDependencies() {
@@ -171,17 +171,6 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(color: AppTheme.ink),
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              lang.tr(
-                                'Read this page from top to bottom: first scan the history, then review intake categories, then write notes and patient-facing guidance.',
-                                '이 화면은 위에서 아래로 보면 됩니다. 먼저 이력 확인, 그 다음 문진 검토, 마지막으로 메모와 환자 공유 문구 작성 순서입니다.',
-                              ),
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    color: AppTheme.ink.withValues(alpha: 0.72),
-                                  ),
-                            ),
                           ],
                         ),
                       ),
@@ -202,32 +191,20 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                       AppGuideStep(
                         dark: false,
                         step: '1',
-                        title: lang.tr('Scan history first', '먼저 이력 보기'),
-                        description: lang.tr(
-                          'Check visit timeline, last treatment area, and previous notes before reading intake answers.',
-                          '문진 답변 전에 방문 이력, 지난 치료 부위, 이전 메모를 먼저 확인하세요.',
-                        ),
+                        title: lang.tr('History', '이력'),
+                        description: lang.tr('Visits and notes', '방문/메모'),
                       ),
                       AppGuideStep(
                         dark: false,
                         step: '2',
-                        title: lang.tr(
-                          'Review intake by category',
-                          '카테고리별 문진 검토',
-                        ),
-                        description: lang.tr(
-                          'Look for uncovered categories and symptom clusters in the 10-category intake section.',
-                          '10개 카테고리 문진에서 빠진 항목과 증상 묶음을 확인하세요.',
-                        ),
+                        title: lang.tr('Intake', '문진'),
+                        description: lang.tr('Categories', '카테고리'),
                       ),
                       AppGuideStep(
                         dark: false,
                         step: '3',
-                        title: lang.tr('Write practitioner notes', '침술사 메모 작성'),
-                        description: lang.tr(
-                          'Finish with internal notes, follow-up advice, and the patient-facing shared note.',
-                          '마지막으로 내부 메모, 추후 확인 포인트, 환자 공유 메모를 작성하세요.',
-                        ),
+                        title: lang.tr('Notes', '메모'),
+                        description: lang.tr('Plan and share', '계획/공유'),
                       ),
                     ],
                   ),
@@ -255,10 +232,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   children: [
                     _BriefBadge(
                       icon: Icons.visibility_outlined,
-                      label: lang.tr(
-                        'This brief is for the current visit',
-                        '지금 보고 있는 내용은 이번 방문 기준',
-                      ),
+                      label: lang.tr('Current visit', '이번 방문'),
                     ),
                     _BriefBadge(
                       icon: Icons.schedule_outlined,
@@ -273,16 +247,6 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                 Text(
                   '${patient.name} · ${_formatStoredDateWithWeekday(visit.date)} ${visit.time}',
                   style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  lang.tr(
-                    'This summary is centered on the visit currently being prepared.',
-                    '이 브리핑은 지금 준비 중인 이번 방문 내용을 중심으로 보여줍니다.',
-                  ),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppTheme.ink.withValues(alpha: 0.72),
-                  ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -313,12 +277,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                     border: Border.all(color: AppTheme.border),
                   ),
                   child: previousVisit == null
-                      ? Text(
-                          lang.tr(
-                            'There is no earlier visit on record yet, so this current brief is the only timeline entry.',
-                            '아직 더 이른 방문 기록이 없어 이번 방문 브리핑만 확인하면 됩니다.',
-                          ),
-                        )
+                      ? Text(lang.tr('No earlier visits', '이전 방문 없음'))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -416,23 +375,6 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                                       '${_formatStoredDateWithWeekday(item.visit.date)} · ${item.visit.time}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      isCurrentVisit
-                                          ? lang.tr(
-                                              'This is the visit currently being reviewed on this page.',
-                                              '이 카드가 지금 이 화면에서 검토 중인 이번 방문입니다.',
-                                            )
-                                          : lang.tr(
-                                              'This is an earlier visit record you can reopen for deeper detail.',
-                                              '이 카드는 이전 방문 기록이며 필요하면 다시 상세로 열어볼 수 있습니다.',
-                                            ),
-                                      style: TextStyle(
-                                        color: AppTheme.ink.withValues(
-                                          alpha: 0.66,
-                                        ),
                                       ),
                                     ),
                                   ],

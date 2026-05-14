@@ -1179,14 +1179,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         setDialogState(() => selectedTime = value);
                       },
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      lang.tr(
-                        'This sends an appointment request. After your practitioner reviews it, you may receive an intake form to complete before the visit.',
-                        '이 단계는 예약 신청을 보내는 것입니다. 침술사가 확인한 뒤 방문 전 작성할 문진 폼을 받을 수 있습니다.',
-                      ),
-                      style: const TextStyle(color: Colors.black54),
-                    ),
                   ],
                 ),
               ),
