@@ -189,8 +189,8 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
 
   String _statusLabel(String status, AppLanguageController lang) {
     return status == 'completed'
-        ? lang.tr('Completed', '확인 완료')
-        : lang.tr('Pending', '대기 중');
+        ? lang.tr('Done', '완료')
+        : lang.tr('Open', '열림');
   }
 
   int _questionCount(
@@ -249,9 +249,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isNote
-                      ? lang.tr('Read practitioner note', '침술사 메모 확인')
-                      : lang.tr('Reply needed', '답변 필요'),
+                  isNote ? lang.tr('New note', '새 메모') : lang.tr('Reply', '답변'),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: AppTheme.ink,
                     fontWeight: FontWeight.w800,
@@ -290,7 +288,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
             ),
             icon: Icon(isNote ? Icons.home_outlined : Icons.arrow_forward),
             label: Text(
-              isNote ? lang.tr('Home', '홈') : lang.tr('Open intake', '문진 열기'),
+              isNote ? lang.tr('Home', '홈') : lang.tr('Intake', '문진'),
             ),
           ),
         ],
@@ -318,7 +316,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 setState(() => _selectedFolder = _RequestFolder.needsReply),
           ),
           _MessageFolderChip(
-            label: lang.tr('Completed', '완료'),
+            label: lang.tr('Done', '완료'),
             count: completedCount,
             selected: _selectedFolder == _RequestFolder.completed,
             onTap: () =>

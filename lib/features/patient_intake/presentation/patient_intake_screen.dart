@@ -1148,7 +1148,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     final remainingCount = _activeQuestions.length - answeredCount;
     return PatientShell(
       currentItem: PatientNavItem.intake,
-      title: lang.tr('Patient Intake', '환자 사전 문진'),
+      title: lang.tr('Intake', '문진'),
       actions: [
         IconButton(
           tooltip: lang.tr('Edit profile', '프로필 수정'),
@@ -1219,17 +1219,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Text(
                         docs.isNotEmpty
                             ? lang.tr(
-                                'New Answer Requests (${docs.length})',
+                                'New requests (${docs.length})',
                                 '새 답변 요청 ${docs.length}건',
                               )
-                            : lang.tr('Answer Requests', '답변 요청'),
+                            : lang.tr('Requests', '요청'),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 8),
                       if (docs.isEmpty)
                         Text(
                           lang.tr(
-                            'No pending requests right now.',
+                            'No open requests.',
                             '현재 대기 중인 요청이 없습니다.',
                           ),
                         ),
@@ -1252,7 +1252,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               children: [
                                 Text(
                                   lang.tr(
-                                    'Requested questions: ${selected.length}',
+                                    'Questions: ${selected.length}',
                                     '요청된 질문 수: ${selected.length}',
                                   ),
                                   style: const TextStyle(fontWeight: FontWeight.w600),
@@ -1285,20 +1285,20 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lang.tr('Last Visit Summary', '지난 방문 요약'),
+                      lang.tr('Last visit', '지난 방문'),
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${lang.tr('Last visit', '지난 방문')}: ${latestVisit.lastVisitDate} (${latestVisit.daysAgo} ${lang.tr('days ago', '일 전')})',
+                      '${lang.tr('Date', '날짜')}: ${latestVisit.lastVisitDate} (${latestVisit.daysAgo} ${lang.tr('days ago', '일 전')})',
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${lang.tr('Treatment area', '치료 부위')}: ${latestVisit.previousTreatmentArea}',
+                      '${lang.tr('Focus', '부위')}: ${latestVisit.previousTreatmentArea}',
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${lang.tr('Practitioner note', '침술사 메모')}: ${latestVisit.previousSessionNote}',
+                      '${lang.tr('Note', '메모')}: ${latestVisit.previousSessionNote}',
                     ),
                   ],
                 ),
@@ -1755,7 +1755,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           ),
                           AppMetricChip(
                             icon: Icons.mark_email_unread_outlined,
-                            label: lang.tr('Pending requests', '대기 요청'),
+                            label: lang.tr('Pending', '대기'),
                             value: '${requestDocs.length}',
                             backgroundColor: AppTheme.surface,
                             labelColor: AppTheme.ink.withValues(alpha: 0.58),
@@ -1766,7 +1766,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             label: lang.tr('Profile', '프로필'),
                             value: profile.hasRequiredAlertInfo
                                 ? lang.tr('Ready', '준비됨')
-                                : lang.tr('Needs update', '업데이트 필요'),
+                                : lang.tr('Missing', '누락'),
                             backgroundColor: AppTheme.surface,
                             labelColor: AppTheme.ink.withValues(alpha: 0.58),
                             valueColor: AppTheme.ink,
@@ -1789,7 +1789,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           OutlinedButton.icon(
                             onPressed: _openProfileDialog,
                             icon: const Icon(Icons.account_circle_outlined),
-                            label: Text(lang.tr('Edit Profile', '프로필 수정')),
+                            label: Text(lang.tr('Profile', '프로필')),
                           ),
                           OutlinedButton.icon(
                             onPressed: () => Navigator.pushNamed(
@@ -1797,7 +1797,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               VisitHistoryScreen.routeName,
                             ),
                             icon: const Icon(Icons.history),
-                            label: Text(lang.tr('Visit History', '방문 기록')),
+                            label: Text(lang.tr('Visits', '방문')),
                           ),
                         ],
                       ),
@@ -1811,12 +1811,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang.tr('Current intake form', '현재 문진 작성'),
+                        lang.tr('Form', '문진'),
                         style: theme.textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 18),
                       Text(
-                        lang.tr('Question mode', '문진 모드'),
+                        lang.tr('Mode', '모드'),
                         style: theme.textTheme.titleLarge,
                       ),
                       const SizedBox(height: 10),
@@ -1847,7 +1847,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr('Intake progress', '문진 진행 상태'),
+                              lang.tr('Progress', '진행'),
                               style: theme.textTheme.titleLarge,
                             ),
                             const SizedBox(height: 10),
@@ -1858,7 +1858,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             const SizedBox(height: 10),
                             Text(
                               lang.tr(
-                                'Question ${_currentQuestionIndex + 1}/${_activeQuestions.length} | $remainingCount remaining',
+                                '${_currentQuestionIndex + 1}/${_activeQuestions.length} | $remainingCount left',
                                 '질문 ${_currentQuestionIndex + 1}/${_activeQuestions.length} | 남은 질문 $remainingCount개',
                               ),
                               style: theme.textTheme.bodyLarge,
@@ -1866,7 +1866,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             const SizedBox(height: 4),
                             Text(
                               lang.tr(
-                                '$answeredCount answered so far',
+                                '$answeredCount answered',
                                 '지금까지 $answeredCount개 답변 완료',
                               ),
                               style: theme.textTheme.bodyMedium?.copyWith(
@@ -1910,7 +1910,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               maxLines: 8,
                               decoration: InputDecoration(
                                 hintText: lang.tr(
-                                  'Write your answer here in as much detail as you want.',
+                                  'Answer here.',
                                   '답변을 적어주세요. 편한 만큼 자세히 적어도 됩니다.',
                                 ),
                               ),
@@ -1922,7 +1922,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               maxLines: 4,
                               decoration: InputDecoration(
                                 hintText: lang.tr(
-                                  'Extra note for your practitioner',
+                                  'Extra note',
                                   '침술사에게 추가로 남길 메모',
                                 ),
                               ),
@@ -2067,7 +2067,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               const SizedBox(height: 12),
                               Text(
                                 lang.tr(
-                                  'Add both your phone number and email before submitting.',
+                                  'Add phone and email before submitting.',
                                   '제출 전에 전화번호와 이메일을 모두 입력해주세요.',
                                 ),
                                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -2088,7 +2088,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang.tr('This week checklist', '이번 주 체크리스트'),
+                        lang.tr('Checklist', '체크리스트'),
                         style: theme.textTheme.titleLarge,
                       ),
                       const SizedBox(height: 14),
@@ -2104,7 +2104,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         ),
                         child: Text(
                           _todayChecklistIndex() == null
-                              ? lang.tr('Weekday tracking locked', '주중 체크 잠김')
+                              ? lang.tr('Locked', '잠김')
                               : _missingTodayChecklistItems(lang).isEmpty
                               ? lang.tr('Today complete', '오늘 완료')
                               : lang.tr(
