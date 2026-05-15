@@ -218,81 +218,101 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
     final visitTime = (data['patientTime'] ?? '-').toString();
     final isNote = requestType == 'note';
 
-    return AppPanel(
-      padding: const EdgeInsets.all(22),
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          AppTheme.mint.withValues(alpha: 0.72),
-          Colors.white.withValues(alpha: 0.94),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: AppTheme.pine.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              isNote ? Icons.mark_email_unread_outlined : Icons.edit_note,
-              color: AppTheme.pine,
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 520;
+        final icon = Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppTheme.pine.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Icon(
+            isNote ? Icons.mark_email_unread_outlined : Icons.edit_note,
+            color: AppTheme.pine,
+          ),
+        );
+        final copy = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isNote ? lang.tr('New note', '새 메모') : lang.tr('Reply', '답변'),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: AppTheme.ink,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Text(
-                  isNote ? lang.tr('New note', '새 메모') : lang.tr('Reply', '답변'),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppTheme.ink,
-                    fontWeight: FontWeight.w800,
-                  ),
+                _RequestMetaPill(
+                  icon: Icons.schedule_outlined,
+                  label: visitTime,
                 ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _RequestMetaPill(
-                      icon: Icons.schedule_outlined,
-                      label: visitTime,
-                    ),
-                    _RequestMetaPill(
-                      icon: Icons.quiz_outlined,
-                      label: isNote
-                          ? lang.tr('Note', '메모')
-                          : lang.tr(
-                              '$questionCount questions',
-                              '$questionCount개 질문',
-                            ),
-                    ),
-                  ],
+                _RequestMetaPill(
+                  icon: Icons.quiz_outlined,
+                  label: isNote
+                      ? lang.tr('Note', '메모')
+                      : lang.tr(
+                          '$questionCount questions',
+                          '$questionCount개 질문',
+                        ),
                 ),
               ],
             ),
+          ],
+        );
+        final button = FilledButton.icon(
+          onPressed: () => Navigator.pushNamed(
+            context,
+            isNote
+                ? PatientHomeScreen.routeName
+                : PatientIntakeScreen.routeName,
           ),
-          const SizedBox(width: 12),
-          FilledButton.icon(
-            onPressed: () => Navigator.pushNamed(
-              context,
-              isNote
-                  ? PatientHomeScreen.routeName
-                  : PatientIntakeScreen.routeName,
-            ),
-            icon: Icon(isNote ? Icons.home_outlined : Icons.arrow_forward),
-            label: Text(
-              isNote ? lang.tr('Home', '홈') : lang.tr('Intake', '문진'),
-            ),
+          icon: Icon(isNote ? Icons.home_outlined : Icons.arrow_forward),
+          label: Text(isNote ? lang.tr('Home', '홈') : lang.tr('Intake', '문진')),
+        );
+
+        return AppPanel(
+          padding: const EdgeInsets.all(22),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.mint.withValues(alpha: 0.72),
+              Colors.white.withValues(alpha: 0.94),
+            ],
           ),
-        ],
-      ),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        icon,
+                        const SizedBox(width: 12),
+                        Expanded(child: copy),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    button,
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    icon,
+                    const SizedBox(width: 14),
+                    Expanded(child: copy),
+                    const SizedBox(width: 12),
+                    button,
+                  ],
+                ),
+        );
+      },
     );
   }
 

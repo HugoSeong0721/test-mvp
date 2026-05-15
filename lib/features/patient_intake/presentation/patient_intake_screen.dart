@@ -720,9 +720,13 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
           title: Text(lang.tr('Edit My Profile', '내 프로필 수정')),
-          content: SizedBox(
-            width: 540,
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 540),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -899,9 +903,13 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
           title: Text(lang.tr('Previous Submission', '이전 제출 내용')),
-          content: SizedBox(
-            width: 680,
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 680),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

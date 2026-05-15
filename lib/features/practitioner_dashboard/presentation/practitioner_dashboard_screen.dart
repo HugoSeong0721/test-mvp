@@ -5484,175 +5484,185 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
             clinicId: activeClinicId,
           );
 
-    final body = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 280,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (_showManualPatientCreation)
-                FilledButton.icon(
-                  onPressed: () async {
-                    final newProfile = PatientProfile(
-                      id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
-                      name: 'New Patient',
-                      phone: '',
-                      email: '',
-                      birthYear: 1990,
-                      sex: 'Female',
-                      ethnicity: 'Unknown',
-                      memo: '',
-                    );
-                    _store.saveProfile(newProfile);
-                    if (activeClinicId != null && activeClinicId.isNotEmpty) {
-                      await _store.setDefaultClinicForPatient(
-                        patientId: newProfile.id,
-                        clinicId: activeClinicId,
-                      );
-                    }
-                    if (!mounted) {
-                      return;
-                    }
-                    setState(() => _selectedProfileId = newProfile.id);
-                  },
-                  icon: const Icon(Icons.person_add_alt_1),
-                  label: Text(
-                    AppLanguageController.instance.tr('Add Patient', '환자 추가'),
-                  ),
-                ),
-              Expanded(
-                child: profiles.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            AppLanguageController.instance.tr(
-                              'No patients',
-                              '환자 없음',
-                            ),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: AppTheme.ink.withValues(alpha: 0.68),
-                                  height: 1.45,
-                                ),
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: profiles.length,
-                        itemBuilder: (context, index) {
-                          final profile = profiles[index];
-                          final isSelected = selected?.id == profile.id;
-                          final missingFields = <String>[
-                            if (profile.phone.trim().isEmpty)
-                              AppLanguageController.instance.tr(
-                                'Phone',
-                                '전화번호',
-                              ),
-                            if (profile.email.trim().isEmpty)
-                              AppLanguageController.instance.tr('Email', '이메일'),
-                          ];
-                          final missingContactLabel = missingFields.length == 1
-                              ? AppLanguageController.instance.tr(
-                                  '${missingFields.first} missing',
-                                  '${missingFields.first} 없음',
-                                )
-                              : AppLanguageController.instance.tr(
-                                  'Contact missing',
-                                  '연락처 없음',
-                                );
-                          return Card(
-                            color: isSelected ? const Color(0xFFF4FBFA) : null,
-                            child: ListTile(
-                              title: Row(
-                                children: [
-                                  Expanded(child: Text(profile.name)),
-                                  if (missingFields.isNotEmpty)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFFE2E2),
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        missingContactLabel,
-                                        style: TextStyle(
-                                          color: Colors.redAccent,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              subtitle: Text(
-                                missingFields.isEmpty
-                                    ? '${profile.phone} · ${profile.email}'
-                                    : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
-                              ),
-                              trailing: IconButton(
-                                onPressed: () {
-                                  _store.deleteProfile(profile.id);
-                                  setState(() {
-                                    if (_selectedProfileId == profile.id) {
-                                      _selectedProfileId = null;
-                                    }
-                                  });
-                                },
-                                icon: const Icon(Icons.delete_outline),
-                              ),
-                              onTap: () => setState(
-                                () => _selectedProfileId = profile.id,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+    final patientList = SizedBox(
+      width: 280,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_showManualPatientCreation)
+            FilledButton.icon(
+              onPressed: () async {
+                final newProfile = PatientProfile(
+                  id: 'patient_${DateTime.now().millisecondsSinceEpoch}',
+                  name: 'New Patient',
+                  phone: '',
+                  email: '',
+                  birthYear: 1990,
+                  sex: 'Female',
+                  ethnicity: 'Unknown',
+                  memo: '',
+                );
+                _store.saveProfile(newProfile);
+                if (activeClinicId != null && activeClinicId.isNotEmpty) {
+                  await _store.setDefaultClinicForPatient(
+                    patientId: newProfile.id,
+                    clinicId: activeClinicId,
+                  );
+                }
+                if (!mounted) {
+                  return;
+                }
+                setState(() => _selectedProfileId = newProfile.id);
+              },
+              icon: const Icon(Icons.person_add_alt_1),
+              label: Text(
+                AppLanguageController.instance.tr('Add Patient', '환자 추가'),
               ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: selected == null
-              ? Center(
-                  child: Text(
-                    AppLanguageController.instance.tr(
-                      'Select a patient to manage.',
-                      '관리할 환자를 선택하세요.',
+            ),
+          Expanded(
+            child: profiles.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        AppLanguageController.instance.tr(
+                          'No patients',
+                          '환자 없음',
+                        ),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.ink.withValues(alpha: 0.68),
+                          height: 1.45,
+                        ),
+                      ),
                     ),
+                  )
+                : ListView.builder(
+                    itemCount: profiles.length,
+                    itemBuilder: (context, index) {
+                      final profile = profiles[index];
+                      final isSelected = selected?.id == profile.id;
+                      final missingFields = <String>[
+                        if (profile.phone.trim().isEmpty)
+                          AppLanguageController.instance.tr('Phone', '전화번호'),
+                        if (profile.email.trim().isEmpty)
+                          AppLanguageController.instance.tr('Email', '이메일'),
+                      ];
+                      final missingContactLabel = missingFields.length == 1
+                          ? AppLanguageController.instance.tr(
+                              '${missingFields.first} missing',
+                              '${missingFields.first} 없음',
+                            )
+                          : AppLanguageController.instance.tr(
+                              'Contact missing',
+                              '연락처 없음',
+                            );
+                      return Card(
+                        color: isSelected ? const Color(0xFFF4FBFA) : null,
+                        child: ListTile(
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(profile.name)),
+                              if (missingFields.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFE2E2),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    missingContactLabel,
+                                    style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          subtitle: Text(
+                            missingFields.isEmpty
+                                ? '${profile.phone} · ${profile.email}'
+                                : '${AppLanguageController.instance.tr('Missing', '누락')}: ${missingFields.join(', ')}',
+                          ),
+                          trailing: IconButton(
+                            onPressed: () {
+                              _store.deleteProfile(profile.id);
+                              setState(() {
+                                if (_selectedProfileId == profile.id) {
+                                  _selectedProfileId = null;
+                                }
+                              });
+                            },
+                            icon: const Icon(Icons.delete_outline),
+                          ),
+                          onTap: () =>
+                              setState(() => _selectedProfileId = profile.id),
+                        ),
+                      );
+                    },
                   ),
-                )
-              : _PatientProfileEditor(
-                  profile: selected,
-                  clinicId: PractitionerSessionService.currentSession?.clinicId,
-                  membershipStatus: pendingJoinRequest?.status,
-                  pendingJoinRequest: pendingJoinRequest?.status == 'pending'
-                      ? pendingJoinRequest
-                      : null,
-                  onApproveJoin: pendingJoinRequest?.status == 'pending'
-                      ? () async {
-                          await widget.onApproveJoin?.call(pendingJoinRequest!);
-                          if (mounted) {
-                            setState(() => _selectedProfileId = selected!.id);
-                          }
-                        }
-                      : null,
-                  onSave: (updated) {
-                    _store.saveProfile(updated);
-                    setState(() => _selectedProfileId = updated.id);
-                  },
-                ),
-        ),
-      ],
+          ),
+        ],
+      ),
+    );
+    final patientEditor = selected == null
+        ? Center(
+            child: Text(
+              AppLanguageController.instance.tr(
+                'Select a patient to manage.',
+                '관리할 환자를 선택하세요.',
+              ),
+            ),
+          )
+        : _PatientProfileEditor(
+            profile: selected,
+            clinicId: PractitionerSessionService.currentSession?.clinicId,
+            membershipStatus: pendingJoinRequest?.status,
+            pendingJoinRequest: pendingJoinRequest?.status == 'pending'
+                ? pendingJoinRequest
+                : null,
+            onApproveJoin: pendingJoinRequest?.status == 'pending'
+                ? () async {
+                    await widget.onApproveJoin?.call(pendingJoinRequest!);
+                    if (mounted) {
+                      setState(() => _selectedProfileId = selected!.id);
+                    }
+                  }
+                : null,
+            onSave: (updated) {
+              _store.saveProfile(updated);
+              setState(() => _selectedProfileId = updated.id);
+            },
+          );
+
+    final body = LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 720;
+        if (compact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 220, child: patientList),
+              const SizedBox(height: 12),
+              Expanded(child: patientEditor),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            patientList,
+            const SizedBox(width: 16),
+            Expanded(child: patientEditor),
+          ],
+        );
+      },
     );
 
     if (widget.embedded) {
@@ -5663,7 +5673,12 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
       title: Text(
         AppLanguageController.instance.tr('Patient Management', '환자 정보 관리'),
       ),
-      content: SizedBox(width: 1280, height: 760, child: body),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width,
+        height: MediaQuery.sizeOf(context).height * 0.78,
+        child: body,
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),

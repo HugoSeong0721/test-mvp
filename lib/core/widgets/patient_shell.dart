@@ -99,9 +99,10 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final lang = AppLanguageController.instance;
+    final compact = MediaQuery.sizeOf(context).width < 430;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 12, 10),
+      padding: EdgeInsets.fromLTRB(compact ? 12 : 20, 10, 8, 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.85),
         border: Border(
@@ -110,21 +111,22 @@ class _Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppTheme.copper.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(8),
+          if (!compact)
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppTheme.copper.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.favorite_outline,
+                color: AppTheme.copper,
+                size: 18,
+              ),
             ),
-            child: const Icon(
-              Icons.favorite_outline,
-              color: AppTheme.copper,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 12),
+          if (!compact) const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,6 +137,8 @@ class _Header extends StatelessWidget {
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
                   const SizedBox(height: 2),
@@ -143,6 +147,8 @@ class _Header extends StatelessWidget {
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: AppTheme.ink.withValues(alpha: 0.62),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ],
@@ -150,7 +156,13 @@ class _Header extends StatelessWidget {
           ),
           if (actions.isNotEmpty) ...[
             const SizedBox(width: 8),
-            ...actions,
+            Flexible(
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 2,
+                children: actions,
+              ),
+            ),
             const SizedBox(width: 4),
           ],
           IconButton(

@@ -434,9 +434,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         title: Text(lang.tr('Saved patient emails', '저장된 환자 이메일')),
-        content: SizedBox(
-          width: 420,
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
           child: accounts.isEmpty
               ? Text(
                   lang.tr('No saved account.', '이 브라우저에 저장된 환자 계정이 아직 없습니다.'),
@@ -485,9 +486,13 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         context: context,
         builder: (context) => StatefulBuilder(
           builder: (context, setDialogState) => AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
+            ),
             title: Text(lang.tr('Reset patient password', '환자 비밀번호 재설정')),
-            content: SizedBox(
-              width: 420,
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

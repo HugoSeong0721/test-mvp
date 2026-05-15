@@ -233,9 +233,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
           title: Text(lang.tr('Edit My Profile', '내 프로필 수정')),
-          content: SizedBox(
-            width: 540,
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 540),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -378,9 +382,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             }
 
             return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
               title: Text(lang.tr('Choose clinic', '한의원 선택')),
-              content: SizedBox(
-                width: 720,
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +404,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     ),
                     const SizedBox(height: 14),
                     SizedBox(
-                      height: 420,
+                      height: MediaQuery.sizeOf(context).height * 0.58,
                       child: SingleChildScrollView(
                         child: Column(
                           children:
@@ -850,23 +858,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lang.tr('Clinic', '한의원'),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Wrap(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 520;
+              final title = Text(
+                lang.tr('Clinic', '한의원'),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              );
+              final actions = Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
@@ -910,8 +911,21 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       ),
                     ),
                 ],
-              ),
-            ],
+              );
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [title, const SizedBox(height: 12), actions],
+                );
+              }
+              return Row(
+                children: [
+                  Expanded(child: title),
+                  const SizedBox(width: 12),
+                  actions,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 16),
           if (activeClinic == null)

@@ -45,8 +45,9 @@ class AppPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 430;
     return Container(
-      padding: padding,
+      padding: compact ? const EdgeInsets.all(16) : padding,
       decoration: BoxDecoration(
         gradient: gradient,
         color: gradient == null ? Colors.white.withValues(alpha: 0.94) : null,
@@ -94,9 +95,13 @@ class AppMetricChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final compact = MediaQuery.sizeOf(context).width < 430;
     final content = Container(
-      constraints: const BoxConstraints(minWidth: 136),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      constraints: BoxConstraints(minWidth: compact ? 112 : 136),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 14,
+        vertical: compact ? 10 : 12,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.white.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(22),
@@ -109,39 +114,46 @@ class AppMetricChip extends StatelessWidget {
             Icon(icon, size: 18, color: valueColor ?? AppTheme.pine),
             const SizedBox(width: 10),
           ],
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: labelColor ?? AppTheme.ink.withValues(alpha: 0.72),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: valueColor ?? AppTheme.ink,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              if (helper != null && helper!.trim().isNotEmpty) ...[
-                const SizedBox(height: 5),
-                SizedBox(
-                  width: 104,
-                  child: Text(
-                    helper!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color:
-                          helperColor ??
-                          (labelColor ?? AppTheme.ink.withValues(alpha: 0.62)),
-                      height: 1.2,
-                    ),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: labelColor ?? AppTheme.ink.withValues(alpha: 0.72),
                   ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: valueColor ?? AppTheme.ink,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (helper != null && helper!.trim().isNotEmpty) ...[
+                  const SizedBox(height: 5),
+                  SizedBox(
+                    width: compact ? 88 : 104,
+                    child: Text(
+                      helper!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color:
+                            helperColor ??
+                            (labelColor ??
+                                AppTheme.ink.withValues(alpha: 0.62)),
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ],
       ),

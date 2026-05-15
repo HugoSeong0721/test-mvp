@@ -149,9 +149,7 @@ class _PractitionerShellState extends State<PractitionerShell> {
                       actions: widget.actions,
                       onToggleSidebar: () {
                         if (wide) {
-                          setState(
-                            () => _sidebarExpanded = !_sidebarExpanded,
-                          );
+                          setState(() => _sidebarExpanded = !_sidebarExpanded);
                         } else {
                           _scaffoldKey.currentState?.openDrawer();
                         }
@@ -171,10 +169,7 @@ class _PractitionerShellState extends State<PractitionerShell> {
 }
 
 class _Sidebar extends StatelessWidget {
-  const _Sidebar({
-    required this.currentItem,
-    this.tools = const [],
-  });
+  const _Sidebar({required this.currentItem, this.tools = const []});
 
   final PractitionerNavItem currentItem;
   final List<PractitionerToolItem> tools;
@@ -242,16 +237,10 @@ class _Sidebar extends StatelessWidget {
                 ],
                 const SizedBox(height: 14),
                 _SidebarSectionLabel(
-                  label: AppLanguageController.instance.tr(
-                    'Analytics',
-                    '분석',
-                  ),
+                  label: AppLanguageController.instance.tr('Analytics', '분석'),
                 ),
                 for (final spec in _analyticsNavSpecs)
-                  _NavTile(
-                    spec: spec,
-                    selected: spec.item == currentItem,
-                  ),
+                  _NavTile(spec: spec, selected: spec.item == currentItem),
               ],
             ),
           ),
@@ -380,8 +369,9 @@ class _ToolTile extends StatelessWidget {
                     lang.tr(tool.labelEn, tool.labelKo),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: fg.withValues(alpha: 0.92),
-                      fontWeight:
-                          tool.active ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: tool.active
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -422,9 +412,9 @@ class _SignOutTile extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 lang.tr('Sign out', '로그아웃'),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.white),
               ),
             ],
           ),
@@ -453,9 +443,13 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final lang = AppLanguageController.instance;
+    final compact = MediaQuery.sizeOf(context).width < 430;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 6 : 12,
+        vertical: compact ? 8 : 10,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.78),
         border: Border(
@@ -471,7 +465,7 @@ class _TopBar extends StatelessWidget {
                 ? lang.tr('Hide menu', '메뉴 숨기기')
                 : lang.tr('Show menu', '메뉴 표시'),
           ),
-          const SizedBox(width: 4),
+          if (!compact) const SizedBox(width: 4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,6 +476,8 @@ class _TopBar extends StatelessWidget {
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
                   const SizedBox(height: 2),
@@ -490,14 +486,23 @@ class _TopBar extends StatelessWidget {
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: AppTheme.ink.withValues(alpha: 0.62),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ],
             ),
           ),
           if (actions.isNotEmpty) ...[
-            const SizedBox(width: 12),
-            ...actions,
+            SizedBox(width: compact ? 4 : 12),
+            Flexible(
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 2,
+                runSpacing: 2,
+                children: actions,
+              ),
+            ),
           ],
         ],
       ),

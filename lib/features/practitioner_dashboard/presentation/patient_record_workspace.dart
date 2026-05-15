@@ -403,69 +403,47 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              Row(
+                              _ResponsiveFieldGroup(
                                 children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _phoneController,
-                                      decoration: InputDecoration(
-                                        labelText: lang.tr('Phone', '전화번호'),
-                                        border: const OutlineInputBorder(),
-                                      ),
+                                  TextField(
+                                    controller: _phoneController,
+                                    decoration: InputDecoration(
+                                      labelText: lang.tr('Phone', '전화번호'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _emailController,
-                                      decoration: InputDecoration(
-                                        labelText: lang.tr('Email', '이메일'),
-                                        border: const OutlineInputBorder(),
-                                      ),
+                                  TextField(
+                                    controller: _emailController,
+                                    decoration: InputDecoration(
+                                      labelText: lang.tr('Email', '이메일'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              Row(
+                              _ResponsiveFieldGroup(
                                 children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _birthYearController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        labelText: lang.tr(
-                                          'Birth Year',
-                                          '출생연도',
-                                        ),
-                                        border: const OutlineInputBorder(),
-                                      ),
+                                  TextField(
+                                    controller: _birthYearController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: lang.tr('Birth Year', '출생연도'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _sexController,
-                                      decoration: InputDecoration(
-                                        labelText: lang.tr(
-                                          'Sex / Gender',
-                                          '성별',
-                                        ),
-                                        border: const OutlineInputBorder(),
-                                      ),
+                                  TextField(
+                                    controller: _sexController,
+                                    decoration: InputDecoration(
+                                      labelText: lang.tr('Sex / Gender', '성별'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _ethnicityController,
-                                      decoration: InputDecoration(
-                                        labelText: lang.tr(
-                                          'Ethnicity',
-                                          '인종/민족',
-                                        ),
-                                        border: const OutlineInputBorder(),
-                                      ),
+                                  TextField(
+                                    controller: _ethnicityController,
+                                    decoration: InputDecoration(
+                                      labelText: lang.tr('Ethnicity', '인종/민족'),
+                                      border: const OutlineInputBorder(),
                                     ),
                                   ),
                                 ],
@@ -1179,6 +1157,40 @@ class _EmptyRecordState extends StatelessWidget {
         border: Border.all(color: AppTheme.border),
       ),
       child: Text(message),
+    );
+  }
+}
+
+class _ResponsiveFieldGroup extends StatelessWidget {
+  const _ResponsiveFieldGroup({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked = constraints.maxWidth < 560;
+        if (stacked) {
+          return Column(
+            children: [
+              for (var i = 0; i < children.length; i++) ...[
+                if (i > 0) const SizedBox(height: 10),
+                children[i],
+              ],
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0) const SizedBox(width: 10),
+              Expanded(child: children[i]),
+            ],
+          ],
+        );
+      },
     );
   }
 }

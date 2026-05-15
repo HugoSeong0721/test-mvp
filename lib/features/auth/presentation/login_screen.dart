@@ -80,9 +80,10 @@ class _LoginScreenState extends State<LoginScreen> {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         title: Text(lang.tr('Saved practitioner IDs', '저장된 침술사 아이디')),
-        content: SizedBox(
-          width: 420,
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
           child: accounts.isEmpty
               ? Text(lang.tr('No saved account.', '저장된 계정 없음'))
               : ListView.separated(
@@ -127,11 +128,15 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context) {
           return StatefulBuilder(
             builder: (context, setDialogState) => AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
               title: Text(
                 lang.tr('Reset practitioner password', '침술사 비밀번호 재설정'),
               ),
-              content: SizedBox(
-                width: 420,
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
