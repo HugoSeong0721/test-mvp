@@ -533,8 +533,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       SnackBar(
                                                         content: Text(
                                                           lang.tr(
-                                                            'Request sent to ${clinic.name}.',
-                                                            '${clinic.name}에 요청을 보냈습니다.',
+                                                            'Request sent.',
+                                                            '요청 완료',
                                                           ),
                                                         ),
                                                       ),
@@ -545,14 +545,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             ),
                                             label: Text(
                                               isDeclined
-                                                  ? lang.tr(
-                                                      'Request again',
-                                                      'Request again',
-                                                    )
-                                                  : lang.tr(
-                                                      'Request to join',
-                                                      'Request to join',
-                                                    ),
+                                                  ? lang.tr('Again', '다시')
+                                                  : lang.tr('Join', '가입'),
                                             ),
                                           ),
                                           OutlinedButton.icon(
@@ -793,12 +787,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               ? Icons.hourglass_top
                                               : Icons.outgoing_mail,
                                         ),
-                                        label: Text(
-                                          lang.tr(
-                                            'Request to open',
-                                            '열어달라고 요청하기',
-                                          ),
-                                        ),
+                                        label: Text(lang.tr('Request', '신청')),
                                       ),
                                     ],
                                   ),
@@ -1754,22 +1743,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       AppointmentRequestStatus.pending;
                                   final statusText = switch (request.status) {
                                     AppointmentRequestStatus.pending => lang.tr(
-                                      'Pending Confirmation',
-                                      '확정 대기',
+                                      'Pending',
+                                      '대기',
                                     ),
                                     AppointmentRequestStatus.confirmed =>
-                                      lang.tr(
-                                        'Confirmed by Practitioner',
-                                        '침술사 확인 완료',
-                                      ),
+                                      lang.tr('Confirmed', '확정'),
                                     AppointmentRequestStatus.declined =>
-                                      lang.tr(
-                                        'Declined by Practitioner',
-                                        '침술사가 거절함',
-                                      ),
+                                      lang.tr('Declined', '거절'),
                                     AppointmentRequestStatus
                                         .canceledByPatient =>
-                                      lang.tr('Canceled by You', '본인이 취소함'),
+                                      lang.tr('Canceled', '취소'),
                                   };
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
@@ -1805,7 +1788,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${lang.tr('Requested At', '신청 시각')}: '
+                                            '${lang.tr('Requested', '신청')}: '
                                             '${_formatDateTime(request.requestedAt)}',
                                           ),
                                           if (request.reviewedAt != null)
@@ -1825,7 +1808,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 Icons.cancel_outlined,
                                               ),
                                               label: Text(
-                                                lang.tr('Cancel', '신청 취소'),
+                                                lang.tr('Cancel', '취소'),
                                               ),
                                             ),
                                           ],
@@ -1849,10 +1832,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      lang.tr(
-                                        'Confirmed Appointments',
-                                        '확정된 예약',
-                                      ),
+                                      lang.tr('Confirmed', '확정'),
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -1868,12 +1848,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               ),
                               const SizedBox(height: 10),
                               if (upcomingVisits.isEmpty)
-                                Text(
-                                  lang.tr(
-                                    'No confirmed appointments',
-                                    '확정된 예약 없음',
-                                  ),
-                                )
+                                Text(lang.tr('No confirmed visits', '확정 예약 없음'))
                               else
                                 ...upcomingVisits.map((scheduledVisit) {
                                   final visit = scheduledVisit.visit;
@@ -1925,10 +1900,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      lang.tr(
-                                        'Visit History Snapshot',
-                                        '방문 기록 요약',
-                                      ),
+                                      lang.tr('History', '기록'),
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,

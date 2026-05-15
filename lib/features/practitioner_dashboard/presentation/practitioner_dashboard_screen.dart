@@ -281,10 +281,7 @@ class _PractitionerDashboardScreenState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        lang.tr(
-                          'The practitioner dashboard only shows the clinic you are logged into. Open Clinic Profile and save your clinic name first.',
-                          '침술사 대시보드는 현재 로그인한 한의원 데이터만 보여줍니다. 먼저 Clinic Profile에서 한의원 이름을 저장해주세요.',
-                        ),
+                        lang.tr('Save clinic profile first.', '한의원 정보 먼저 저장'),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: AppTheme.ink.withValues(alpha: 0.72),
                         ),
@@ -294,9 +291,7 @@ class _PractitionerDashboardScreenState
                         onPressed: () =>
                             _selectSubView(_DashboardSubView.clinicProfile),
                         icon: const Icon(Icons.domain_add_outlined),
-                        label: Text(
-                          lang.tr('Open clinic profile', '한의원 정보 설정 열기'),
-                        ),
+                        label: Text(lang.tr('Clinic', '한의원')),
                       ),
                     ],
                   ),
@@ -1922,7 +1917,7 @@ class _PractitionerDashboardScreenState
             KeyedSubtree(
               key: _appointmentRequestsSectionKey,
               child: Text(
-                lang.tr('Pending appointment requests', '대기 중인 예약 신청'),
+                lang.tr('Appointments', '예약'),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
@@ -1959,7 +1954,7 @@ class _PractitionerDashboardScreenState
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${AppLanguageController.instance.tr('Requested At', '신청 시각')}: '
+                          '${AppLanguageController.instance.tr('Requested', '신청')}: '
                           '${_formatDateTimeValue(request.requestedAt)}',
                         ),
                         Text(
@@ -2001,7 +1996,7 @@ class _PractitionerDashboardScreenState
                               onPressed: () =>
                                   _openLatestPatientBriefForProfile(profile),
                               icon: const Icon(Icons.history_outlined),
-                              label: Text(lang.tr('Open History', '기존 기록 보기')),
+                              label: Text(lang.tr('History', '기록')),
                             ),
                             OutlinedButton.icon(
                               onPressed: () => _openPatientManagement(
@@ -2009,7 +2004,7 @@ class _PractitionerDashboardScreenState
                                 initialProfileId: profile.id,
                               ),
                               icon: const Icon(Icons.person_outline),
-                              label: Text(lang.tr('Patient Info', '환자 정보')),
+                              label: Text(lang.tr('Patient', '환자')),
                             ),
                           ],
                         ),
@@ -2175,9 +2170,7 @@ class _PractitionerDashboardScreenState
                                               initialProfileId: profile.id,
                                             ),
                                       icon: const Icon(Icons.person_outline),
-                                      label: Text(
-                                        lang.tr('Patient Info', '환자 정보'),
-                                      ),
+                                      label: Text(lang.tr('Patient', '환자')),
                                     ),
                                   ],
                                 ),
@@ -2319,7 +2312,7 @@ class _PractitionerDashboardScreenState
                                           initialProfileId: profile.id,
                                         ),
                                   icon: const Icon(Icons.person_outline),
-                                  label: Text(lang.tr('Patient Info', '환자 정보')),
+                                  label: Text(lang.tr('Patient', '환자')),
                                 ),
                               ],
                             ),
@@ -2610,12 +2603,12 @@ class _PractitionerDashboardScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  lang.tr('Daily patient counts', '날짜별 환자 수'),
+                  lang.tr('Daily counts', '날짜별 수'),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  lang.tr('Scheduled by date.', '날짜별 예약 수'),
+                  lang.tr('By date', '날짜별'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppTheme.ink.withValues(alpha: 0.72),
                   ),
@@ -2755,7 +2748,7 @@ class _PractitionerDashboardScreenState
                   if (request != null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      '${lang.tr('Requested At', '신청 시각')}: '
+                      '${lang.tr('Requested', '신청')}: '
                       '${_formatDateTimeValue(request.requestedAt)}',
                     ),
                   ],
@@ -2805,7 +2798,7 @@ class _PractitionerDashboardScreenState
                 );
               },
               icon: const Icon(Icons.badge_outlined),
-              label: Text(lang.tr('Patient Info', '환자 정보')),
+              label: Text(lang.tr('Patient', '환자')),
             ),
             if (scheduledVisit != null)
               FilledButton.icon(
@@ -2824,7 +2817,7 @@ class _PractitionerDashboardScreenState
                   );
                 },
                 icon: const Icon(Icons.chevron_right),
-                label: Text(lang.tr('Open Detail', '상세 보기')),
+                label: Text(lang.tr('Detail', '상세')),
               ),
           ],
         );
@@ -3588,10 +3581,7 @@ class _PractitionerDashboardScreenState
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            lang.tr(
-                              'Choose a clinic date to update the dashboard.',
-                              '대시보드에 반영할 날짜를 선택하세요.',
-                            ),
+                            lang.tr('Pick date.', '날짜 선택'),
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: AppTheme.ink.withValues(alpha: 0.68),
                             ),
@@ -4105,12 +4095,12 @@ class _PractitionerDashboardScreenState
           ),
           const SizedBox(height: 12),
           Text(
-            lang.tr('Patient joins', 'Patient joins'),
+            lang.tr('Joins', '가입'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
           if (membershipRequests.isEmpty)
-            Text(lang.tr('No joins', 'No joins'))
+            Text(lang.tr('No joins', '가입 없음'))
           else
             ...membershipRequests.map((request) {
               return Container(
@@ -4233,7 +4223,7 @@ class _PractitionerDashboardScreenState
           if (_isPlatformAdmin) ...[
             const SizedBox(height: 18),
             Text(
-              lang.tr('Clinic leads', 'Clinic leads'),
+              lang.tr('Leads', '리드'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -4287,15 +4277,13 @@ class _PractitionerDashboardScreenState
                             onPressed: () =>
                                 _selectSubView(_DashboardSubView.clinicProfile),
                             icon: const Icon(Icons.domain_add_outlined),
-                            label: Text(
-                              lang.tr('Open Clinic Profile', '한의원 정보 열기'),
-                            ),
+                            label: Text(lang.tr('Clinic', '한의원')),
                           ),
                           OutlinedButton.icon(
                             onPressed: () => _store
                                 .markClinicOpenRequestReviewed(request.id),
                             icon: const Icon(Icons.done_outline),
-                            label: Text(lang.tr('Mark reviewed', '확인 완료')),
+                            label: Text(lang.tr('Reviewed', '확인')),
                           ),
                         ],
                       ),
@@ -4919,7 +4907,7 @@ class _PatientRealtimeActivity extends StatelessWidget {
                       if (latestFeedback == null)
                         Text(
                           AppLanguageController.instance.tr(
-                            'No visit-record feedback yet',
+                            'No feedback',
                             '방문 기록 피드백 없음',
                           ),
                         )
@@ -4984,7 +4972,7 @@ class _BetaSubmissionBoard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               AppLanguageController.instance.tr(
-                'Review the most recent submissions from beta sign-ups using email and password.',
+                'Recent beta submissions.',
                 '이메일/비밀번호로 가입한 지인들의 최근 제출을 확인합니다.',
               ),
               style: TextStyle(color: Colors.grey.shade700),
@@ -5904,7 +5892,7 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
             icon: const Icon(Icons.save_outlined),
             label: Text(
               AppLanguageController.instance.tr(
-                'Save Patient Info',
+                'Save patient',
                 '환자 정보 저장',
               ),
             ),

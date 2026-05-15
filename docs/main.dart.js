@@ -104949,7 +104949,7 @@ c=A.n(a7).ok.z
 B.b.F(g,A.b([B.K,A.aN(a,A.f(d,a,a,a,c==null?a:c.dE(B.T,B.M),a,a,a),B.n,a,new A.aw(l,a,i,k,a,a,B.r),a,a,a,B.aG,a,a,1/0)],e))}g.push(B.D)
 a0=r?new A.aEA(a5,a0,a1,a8,j,h,f,s):a
 a1=A.cF(a5.b?B.mO:B.t9,a,a,a)
-g.push(A.dW(a1,A.f(s.a===B.c?"Request to open":"\uc5f4\uc5b4\ub2ec\ub77c\uace0 \uc694\uccad\ud558\uae30",a,a,a,a,a,a,a),a0,a))
+g.push(A.dW(a1,A.f(s.a===B.c?"Request":"\uc2e0\uccad",a,a,a,a,a,a,a),a0,a))
 a2.push(A.aN(a,A.a1(g,B.m,B.f,B.j),B.n,a,new A.aw(q,a,m,n,a,a,B.r),a,a,B.LL,B.ax,a,a,1/0))
 a0=A.c7(A.a1(A.b([o,B.aa,A.c7(A.i1(A.a1(a2,B.v,B.f,B.j),a,a,B.a7),420,a)],e),B.m,B.f,B.W),a,720)
 if(b.y)a1=s.a===B.c?"Choose later":"\ub098\uc911\uc5d0 \uc120\ud0dd"
@@ -104963,70 +104963,72 @@ A.aEt.prototype={
 $0(){return this.a.a=B.d.N(this.b)},
 $S:0}
 A.aEv.prototype={
-$1(a){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d=this,c=null,b=d.b
-b=b==null?c:b.a
-s=a.a
-r=b===s
-q=d.c===s
-b=d.a
-p=d.d
-o=b.d.a3q(s,p)
+$1(a1){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b=this,a=null,a0=b.b
+a0=a0==null?a:a0.a
+s=a1.a
+r=a0===s
+q=b.c===s
+a0=b.a
+p=b.d
+o=a0.d.a3q(s,p)
 s=o==null
-n=(s?c:o.w)==="pending"
-s=s?c:o.w
+n=(s?a:o.w)==="pending"
+s=s?a:o.w
 m=r?B.aW.P(0.2):B.k
 l=A.aA(18)
 k=A.bC(r?B.aV.P(0.52):B.R.P(0.45),1)
-j=d.e
+j=b.e
 i=A.n(j).ok.r
-i=i==null?c:i.fC(B.M)
+i=i==null?a:i.fC(B.M)
 h=t.p
-i=A.b([A.bg(A.f(a.b,c,c,c,i,c,c,c),1)],h)
-if(r)i.push(b.acZ(j,d.f.a===B.c?"Current":"\ud604\uc7ac \uc120\ud0dd"))
-if(n)B.b.F(i,A.b([B.be,b.He(j,d.f.a===B.c?"Pending approval":"\uc2b9\uc778 \ub300\uae30",B.aV)],h))
-if(q)B.b.F(i,A.b([B.be,b.He(j,d.f.a===B.c?"Default":"\uae30\ubcf8 \ud55c\uc758\uc6d0",B.aV)],h))
+i=A.b([A.bg(A.f(a1.b,a,a,a,i,a,a,a),1)],h)
+if(r)i.push(a0.acZ(j,b.f.a===B.c?"Current":"\ud604\uc7ac \uc120\ud0dd"))
+if(n)B.b.F(i,A.b([B.be,a0.He(j,b.f.a===B.c?"Pending approval":"\uc2b9\uc778 \ub300\uae30",B.aV)],h))
+if(q)B.b.F(i,A.b([B.be,a0.He(j,b.f.a===B.c?"Default":"\uae30\ubcf8 \ud55c\uc758\uc6d0",B.aV)],h))
 i=A.b1(i,B.v,B.f,B.j,0)
-g=a.d
+g=a1.d
 g=g.length===0?"":" \xb7 "+g
 f=A.n(j).ok.y
-f=f==null?c:f.aB(B.p.P(0.72))
-f=A.b([i,B.H,A.f(a.c+g,c,c,c,f,c,c,c)],h)
-i=a.e
+f=f==null?a:f.aB(B.p.P(0.72))
+f=A.b([i,B.H,A.f(a1.c+g,a,a,a,f,a,a,a)],h)
+i=a1.e
 if(B.d.N(i).length!==0){g=A.n(j).ok.z
-B.b.F(f,A.b([B.K,A.f(i,c,c,c,g==null?c:g.tD(1.5),c,c,c)],h))}f.push(B.D)
+B.b.F(f,A.b([B.K,A.f(i,a,a,a,g==null?a:g.tD(1.5),a,a,a)],h))}f.push(B.D)
 i=!r
-g=!i||n?c:new A.aEq(b,p,a,j,d.r,d.f)
-if(s==="declined")s="Request again"
-else s="Request to join"
-g=A.ky(B.NX,A.f(s,c,c,c,c,c,c,c),g)
-s=!i||n?new A.aEr(b,p,a,j):c
-j=d.f
-e=j.a===B.c
-s=A.d5(B.ty,A.f(e?"Continue here":"\uc5ec\uae30\ub85c \uacc4\uc18d\ud558\uae30",c,c,c,c,c,c,c),s,c)
-b=q||i?c:new A.aEs(b,p,a,d.r,j)
-f.push(A.cd(B.U,A.b([g,s,A.d5(B.tx,A.f(e?"Default":"\uae30\ubcf8\uac12",c,c,c,c,c,c,c),b,c)],h),B.X,8,8))
-return A.aN(c,A.a1(f,B.m,B.f,B.j),B.n,c,new A.aw(m,c,k,l,c,c,B.r),c,c,B.cH,B.ax,c,c,c)},
+g=!i||n?a:new A.aEq(a0,p,a1,j,b.r,b.f)
+e=b.f
+if(s==="declined"){s=e.a
+d=s===B.c?"Again":"\ub2e4\uc2dc"
+c=d
+d=s
+s=c}else{s=e.a
+d=s===B.c?"Join":"\uac00\uc785"
+c=d
+d=s
+s=c}g=A.ky(B.NX,A.f(s,a,a,a,a,a,a,a),g)
+s=!i||n?new A.aEr(a0,p,a1,j):a
+j=d===B.c
+s=A.d5(B.ty,A.f(j?"Continue here":"\uc5ec\uae30\ub85c \uacc4\uc18d\ud558\uae30",a,a,a,a,a,a,a),s,a)
+a0=q||i?a:new A.aEs(a0,p,a1,b.r,e)
+f.push(A.cd(B.U,A.b([g,s,A.d5(B.tx,A.f(j?"Default":"\uae30\ubcf8\uac12",a,a,a,a,a,a,a),a0,a)],h),B.X,8,8))
+return A.aN(a,A.a1(f,B.m,B.f,B.j),B.n,a,new A.aw(m,a,k,l,a,a,B.r),a,a,B.cH,B.ax,a,a,a)},
 $S:681}
 A.aEq.prototype={
-$0(){var s=0,r=A.v(t.H),q,p=this,o,n,m,l,k
+$0(){var s=0,r=A.v(t.H),q,p=this,o,n,m,l
 var $async$$0=A.q(function(a,b){if(a===1)return A.r(b,r)
 for(;;)switch(s){case 0:o=p.a
 n=o.d
 m=p.b
-l=p.c
-k=l.a
+l=p.c.a
 s=3
-return A.m(n.r1(k,m),$async$$0)
+return A.m(n.r1(l,m),$async$$0)
 case 3:s=4
-return A.m(n.tC(k,m),$async$$0)
+return A.m(n.tC(l,m),$async$$0)
 case 4:if(p.d.e==null){s=1
 break}if(o.c==null){s=1
 break}p.e.$1(new A.aEj())
 o=o.c.X(t.q).f
-l=l.b
-n="Request sent to "+l+"."
-l+="\uc5d0 \uc694\uccad\uc744 \ubcf4\ub0c8\uc2b5\ub2c8\ub2e4."
-o.cE(A.cO(null,null,null,null,null,B.y,null,A.f(p.f.a===B.c?n:l,null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
+o.cE(A.cO(null,null,null,null,null,B.y,null,A.f(p.f.a===B.c?"Request sent.":"\uc694\uccad \uc644\ub8cc",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
 case 1:return A.t(q,r)}})
 return A.u($async$$0,r)},
 $S:2}
@@ -105295,17 +105297,17 @@ $1(a){var s=a.aU(0).h(0,"status")
 return J.d(s==null?"pending":s,"pending")},
 $S:12}
 A.aF1.prototype={
-$2(b4,b5){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7=this,a8=null,a9="Requests",b0="Profile",b1="Book",b2=A.b([],t.xE),b3=b5.b
-b3=b3==null?a8:b3.gdO()
-if(b3!=null)B.b.F(b2,b3)
-B.b.bx(b2,new A.aEN())
-b3=t.FV
-s=A.S(new A.X(b2,new A.aEO(a7.b),b3),b3.i("o.E"))
-if(s.length!==0){b3=B.b.gT(s).aU(0)
-b3.toString
-r=b3}else r=a8
-b3=a7.c
-q=b3.length
+$2(b5,b6){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7=this,a8=null,a9="Requests",b0="Profile",b1="Book",b2="History",b3=A.b([],t.xE),b4=b6.b
+b4=b4==null?a8:b4.gdO()
+if(b4!=null)B.b.F(b3,b4)
+B.b.bx(b3,new A.aEN())
+b4=t.FV
+s=A.S(new A.X(b3,new A.aEO(a7.b),b4),b4.i("o.E"))
+if(s.length!==0){b4=B.b.gT(s).aU(0)
+b4.toString
+r=b4}else r=a8
+b4=a7.c
+q=b4.length
 p=a7.d
 o=p.ghU()
 n=a7.e
@@ -105317,27 +105319,27 @@ i=A.c5()
 if(q!==0){q=a7.r
 k.scp(q.a===B.c?"Reply needed":"\uba3c\uc800 \uce68\uc220\uc0ac \uc694\uccad\uc5d0 \ub2f5\ud558\uae30")
 j.scp(q.a===B.c?a9:"\uc694\uccad\ud568")
-i.scp(new A.aEP(b4))}else if(!o){q=a7.r
+i.scp(new A.aEP(b5))}else if(!o){q=a7.r
 k.scp(q.a===B.c?"Contact missing":"\uba3c\uc800 \uc5f0\ub77d\ucc98 \uc785\ub825\ud558\uae30")
 j.scp(q.a===B.c?b0:"\ud504\ub85c\ud544")
 i.scp(a7.a.gWr())}else if(r==null){q=a7.r
 k.scp(q.a===B.c?"Intake due":"\uc624\ub298 \uc0c1\ud0dc \ubb38\uc9c4 \ubcf4\ub0b4\uae30")
 j.scp(q.a===B.c?"Intake":"\ubb38\uc9c4")
-i.scp(new A.aER(b4))}else{q=a7.r
+i.scp(new A.aER(b5))}else{q=a7.r
 if(l){k.scp(q.a===B.c?"Book next visit":"\ub2e4\uc74c \uc608\uc57d \uc2e0\uccad\ud558\uae30")
 j.scp(q.a===B.c?b1:"\uc608\uc57d")
 i.scp(a7.a.gW7())}else{k.scp(q.a===B.c?"All set":"\uc9c0\uae08\uc740 \ud560 \uc77c\uc744 \uac70\uc758 \ub9c8\ucce4\uc5b4\uc694")
-j.scp(q.a===B.c?"History":"\uae30\ub85d")
-i.scp(new A.aES(b4))}}h=A.aC(new A.b3(Date.now(),0,!1))<0
+j.scp(q.a===B.c?b2:"\uae30\ub85d")
+i.scp(new A.aES(b5))}}h=A.aC(new A.b3(Date.now(),0,!1))<0
 o=a7.a
-g=o.acY(b4,p)
-f=A.n(b4).ok.as
+g=o.acY(b5,p)
+f=A.n(b5).ok.as
 f=A.f("Today",a8,a8,a8,f==null?a8:f.aB(B.p.P(0.58)),a8,a8,a8)
-e=A.n(b4).ok.d
+e=A.n(b5).ok.d
 e=e==null?a8:e.aB(B.p)
 e=A.f(p.b,a8,a8,a8,e,a8,a8,a8)
 d=q.a===B.c?"Pending items":"\ub300\uae30 \ud56d\ubaa9"
-c=b3.length
+c=b4.length
 b=a7.f
 a=b.length
 a=A.es(B.aL,B.jr,d,B.p.P(0.58),a8,""+(c+a),B.p)
@@ -105357,19 +105359,19 @@ d=B.aW.P(0.34)
 m=A.aA(16)
 a=A.bC(B.R.P(0.7),1)
 a1=q.a===B.c?"Next":"\ub2e4\uc74c"
-a2=A.n(b4).ok.r
+a2=A.n(b5).ok.r
 a1=A.b1(A.b([A.bg(A.f(a1,a8,a8,a8,a2==null?a8:a2.aB(B.p),a8,a8,a8),1)],a0),B.v,B.f,B.j,0)
 a2=k.aQ()
-a3=A.n(b4).ok.f
+a3=A.n(b5).ok.f
 a2=A.f(a2,a8,a8,a8,a3==null?a8:a3.dE(B.p,B.M),a8,a8,a8)
 a3=i.aQ()
 a3=A.dW(B.ty,A.f(j.aQ(),a8,a8,a8,a8,a8,a8,a8),a3,a8)
-a4=A.d5(B.tC,A.f(q.a===B.c?a9:"\uc694\uccad\ud568",a8,a8,a8,B.oE,a8,a8,a8),new A.aET(b4),A.aTx(a8,a8,a8,a8,a8,a8,a8,a8,a8,B.p,a8,a8,a8,a8,a8,B.dw,a8,a8,a8,a8))
-a5=A.d5(B.to,A.f(q.a===B.c?"Intake":"\ubb38\uc9c4",a8,a8,a8,B.oE,a8,a8,a8),new A.aEU(b4),A.aTx(a8,a8,a8,a8,a8,a8,a8,a8,a8,B.p,a8,a8,a8,a8,a8,B.dw,a8,a8,a8,a8))
+a4=A.d5(B.tC,A.f(q.a===B.c?a9:"\uc694\uccad\ud568",a8,a8,a8,B.oE,a8,a8,a8),new A.aET(b5),A.aTx(a8,a8,a8,a8,a8,a8,a8,a8,a8,B.p,a8,a8,a8,a8,a8,B.dw,a8,a8,a8,a8))
+a5=A.d5(B.to,A.f(q.a===B.c?"Intake":"\ubb38\uc9c4",a8,a8,a8,B.oE,a8,a8,a8),new A.aEU(b5),A.aTx(a8,a8,a8,a8,a8,a8,a8,a8,a8,B.p,a8,a8,a8,a8,a8,B.dw,a8,a8,a8,a8))
 a6=o.gW7()
 m=A.b([g,B.P,A.c2(A.a1(A.b([f,B.K,e,B.aM,c,B.aM,A.aN(a8,A.a1(A.b([a1,B.K,a2,B.aa,A.cd(B.U,A.b([a3,a4,a5,A.d5(B.Od,A.f(q.a===B.c?b1:"\uc608\uc57d",a8,a8,a8,B.oE,a8,a8,a8),a6,A.aTx(a8,a8,a8,a8,a8,a8,a8,a8,a8,B.p,a8,a8,a8,a8,a8,B.dw,a8,a8,a8,a8))],a0),B.X,10,10)],a0),B.m,B.f,B.j),B.n,a8,new A.aw(d,a8,a,m,a8,a8,B.r),a8,a8,a8,B.bi,a8,a8,1/0)],a0),B.m,B.f,B.j),a8,B.cr)],a0)
 if(h)m.push(B.P)
-if(h)m.push(A.j5(new A.aEV(o,q,b3,b,n,p)))
+if(h)m.push(A.j5(new A.aEV(o,q,b4,b,n,p)))
 if(h)m.push(B.P)
 if(h)m.push(B.P)
 if(h){n=q.a===B.c
@@ -105386,62 +105388,62 @@ n=n?b0:"\ud504\ub85c\ud544"
 m.push(A.f8(new A.ab(B.ax,A.a1(A.b([g,B.K,e,d,A.f(n+": "+p.f+", "+p.gtg()+", "+p.r,a8,a8,a8,a8,a8,a8,a8)],a0),B.m,B.f,B.j),a8),a8,a8))}if(h)m.push(B.P)
 if(h){p=q.a===B.c
 n=A.f(p?"Quick Checklist":"\ube60\ub978 \uccb4\ud06c\ub9ac\uc2a4\ud2b8",a8,a8,a8,B.ca,a8,a8,a8)
-b3=b3.length
-g=b3===0
+b4=b4.length
+g=b4===0
 f=p?"Check practitioner requests":"\uce68\uc220\uc0ac \uc694\uccad \ud655\uc778"
-if(g)b3=p?"Done":"\uc644\ub8cc"
-else{b3=""+b3
-e=b3+" pending"
-b3+="\uac74 \ub300\uae30"
-if(p)b3=e}m.push(A.f8(new A.ab(B.ax,A.a1(A.b([n,B.H,new A.a4t(g,f,b3,a8)],a0),B.m,B.f,B.j),a8),a8,a8))}b3=a7.w
-p=b3!=null
+if(g)b4=p?"Done":"\uc644\ub8cc"
+else{b4=""+b4
+e=b4+" pending"
+b4+="\uac74 \ub300\uae30"
+if(p)b4=e}m.push(A.f8(new A.ab(B.ax,A.a1(A.b([n,B.H,new A.a4t(g,f,b4,a8)],a0),B.m,B.f,B.j),a8),a8,a8))}b4=a7.w
+p=b4!=null
 if(p)m.push(B.P)
 if(p){n=A.f(q.a===B.c?"Latest request":"\ucd5c\uadfc \ub2f5\ubcc0 \uc694\uccad",a8,a8,a8,B.ca,a8,a8,a8)
-g=b3.h(0,"status")
+g=b4.h(0,"status")
 g=A.f("Status: "+J.Z(g==null?"pending":g),a8,a8,a8,a8,a8,a8,a8)
 f=q.a===B.c?"Requested At":"\uc694\uccad \uc2dc\uac01"
-f=A.f(f+": "+o.Wq(t.B.a(b3.h(0,"requestedAt"))),a8,a8,a8,a8,a8,a8,a8)
+f=A.f(f+": "+o.Wq(t.B.a(b4.h(0,"requestedAt"))),a8,a8,a8,a8,a8,a8,a8)
 e=q.a===B.c?"Requested Questions":"\uc694\uccad \uc9c8\ubb38 \uc218"
-d=t.kc.a(b3.h(0,"selectedQuestions"))
+d=t.kc.a(b4.h(0,"selectedQuestions"))
 n=A.b([n,B.H,g,f,A.f(e+": "+J.bG(d==null?B.dF:d),a8,a8,a8,a8,a8,a8,a8)],a0)
-g=b3.h(0,"note")
+g=b4.h(0,"note")
 if(B.d.N(A.bm(g==null?"":g)).length!==0){g=q.a===B.c?"Practitioner Note":"\uce68\uc220\uc0ac \uba54\ubaa8"
-B.b.F(n,A.b([B.H,A.f(g+": "+A.w(b3.h(0,"note")),a8,a8,a8,a8,a8,a8,a8)],a0))}m.push(A.f8(new A.ab(B.ax,A.a1(n,B.m,B.f,B.j),a8),a8,a8))}if(p)m.push(B.P)
-b3=q.a===B.c
-p=A.bg(A.f(b3?"Appointments":"\uc608\uc57d \uc2e0\uccad \ud604\ud669",a8,a8,a8,B.ca,a8,a8,a8),1)
-p=A.b([A.b1(A.b([p,A.ky(B.tE,A.f(b3?b1:"\uc608\uc57d",a8,a8,a8,a8,a8,a8,a8),a6)],a0),B.v,B.f,B.j,0),B.K],a0)
-b3=a7.x
-if(b3.length===0)p.push(A.f(q.a===B.c?"No requests":"\uc2e0\uccad \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
-else B.b.F(p,new A.K(b3,new A.aEW(o,q),A.N(b3).i("K<1,e>")))
+B.b.F(n,A.b([B.H,A.f(g+": "+A.w(b4.h(0,"note")),a8,a8,a8,a8,a8,a8,a8)],a0))}m.push(A.f8(new A.ab(B.ax,A.a1(n,B.m,B.f,B.j),a8),a8,a8))}if(p)m.push(B.P)
+b4=q.a===B.c
+p=A.bg(A.f(b4?"Appointments":"\uc608\uc57d \uc2e0\uccad \ud604\ud669",a8,a8,a8,B.ca,a8,a8,a8),1)
+p=A.b([A.b1(A.b([p,A.ky(B.tE,A.f(b4?b1:"\uc608\uc57d",a8,a8,a8,a8,a8,a8,a8),a6)],a0),B.v,B.f,B.j,0),B.K],a0)
+b4=a7.x
+if(b4.length===0)p.push(A.f(q.a===B.c?"No requests":"\uc2e0\uccad \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
+else B.b.F(p,new A.K(b4,new A.aEW(o,q),A.N(b4).i("K<1,e>")))
 m.push(A.f8(new A.ab(B.ax,A.a1(p,B.m,B.f,B.j),a8),a8,a8))
 m.push(B.P)
-b3=q.a===B.c
-p=A.bg(A.f(b3?"Confirmed Appointments":"\ud655\uc815\ub41c \uc608\uc57d",a8,a8,a8,B.ca,a8,a8,a8),1)
-p=A.b([A.b1(A.b([p,A.ky(B.tE,A.f(b3?"Request":"\ub2e4\ub978 \uc2dc\uac04 \uc2e0\uccad",a8,a8,a8,a8,a8,a8,a8),a6)],a0),B.v,B.f,B.j,0),B.K],a0)
-b3=a7.y
-if(b3.length===0)p.push(A.f(q.a===B.c?"No confirmed appointments":"\ud655\uc815\ub41c \uc608\uc57d \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
-else B.b.F(p,new A.K(b3,new A.aEX(o,q),A.N(b3).i("K<1,e>")))
+b4=q.a===B.c
+p=A.bg(A.f(b4?"Confirmed":"\ud655\uc815",a8,a8,a8,B.ca,a8,a8,a8),1)
+p=A.b([A.b1(A.b([p,A.ky(B.tE,A.f(b4?"Request":"\ub2e4\ub978 \uc2dc\uac04 \uc2e0\uccad",a8,a8,a8,a8,a8,a8,a8),a6)],a0),B.v,B.f,B.j,0),B.K],a0)
+b4=a7.y
+if(b4.length===0)p.push(A.f(q.a===B.c?"No confirmed visits":"\ud655\uc815 \uc608\uc57d \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
+else B.b.F(p,new A.K(b4,new A.aEX(o,q),A.N(b4).i("K<1,e>")))
 m.push(A.f8(new A.ab(B.ax,A.a1(p,B.m,B.f,B.j),a8),a8,a8))
 m.push(B.P)
-b3=q.a===B.c
-p=A.bg(A.f(b3?"Visit History Snapshot":"\ubc29\ubb38 \uae30\ub85d \uc694\uc57d",a8,a8,a8,B.ca,a8,a8,a8),1)
-p=A.b([A.b1(A.b([p,A.dP(A.f(b3?"History":"\uae30\ub85d",a8,a8,a8,a8,a8,a8,a8),a8,a8,new A.aEY(b4),a8,a8)],a0),B.v,B.f,B.j,0)],a0)
-b3=a7.z
-if(b3==null)p.push(A.f(q.a===B.c?"No visits":"\ubc29\ubb38 \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
+b4=q.a===B.c
+p=A.bg(A.f(b4?b2:"\uae30\ub85d",a8,a8,a8,B.ca,a8,a8,a8),1)
+p=A.b([A.b1(A.b([p,A.dP(A.f(b4?b2:"\uae30\ub85d",a8,a8,a8,a8,a8,a8,a8),a8,a8,new A.aEY(b5),a8,a8)],a0),B.v,B.f,B.j,0)],a0)
+b4=a7.z
+if(b4==null)p.push(A.f(q.a===B.c?"No visits":"\ubc29\ubb38 \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
 else{n=q.a===B.c?"Last Visit":"\ucd5c\uadfc \ubc29\ubb38"
-g=b3.d
-f=b3.e
+g=b4.d
+f=b4.e
 f=A.f(n+": "+(o.py(g)+" \xb7 "+f),a8,a8,a8,a8,a8,a8,a8)
 n=q.a===B.c
 g=n?"Treatment Focus":"\uce58\ub8cc \ubd80\uc704"
-g=A.f(g+": "+b3.z,a8,a8,a8,a8,a8,a8,a8)
+g=A.f(g+": "+b4.z,a8,a8,a8,a8,a8,a8,a8)
 n=n?"Session Note":"\uc138\uc158 \uba54\ubaa8"
-B.b.F(p,A.b([f,g,A.f(n+": "+b3.Q,a8,a8,a8,a8,a8,a8,a8)],a0))}m.push(A.f8(new A.ab(B.ax,A.a1(p,B.m,B.f,B.j),a8),a8,a8))
+B.b.F(p,A.b([f,g,A.f(n+": "+b4.Q,a8,a8,a8,a8,a8,a8,a8)],a0))}m.push(A.f8(new A.ab(B.ax,A.a1(p,B.m,B.f,B.j),a8),a8,a8))
 m.push(B.P)
-b3=A.b([A.f(q.a===B.c?"Recent Submission Activity":"\ucd5c\uadfc \uc81c\ucd9c \ud65c\ub3d9",a8,a8,a8,B.ca,a8,a8,a8),B.H],a0)
-if(b2.length===0)b3.push(A.f(q.a===B.c?"No submissions":"\uc81c\ucd9c \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
-else{b2=A.fC(b2,0,A.hK(3,"count",t.S),t.D4)
-B.b.F(b3,new A.K(b2,new A.aEQ(o,q),b2.$ti.i("K<ai.E,e>")))}m.push(A.f8(new A.ab(B.ax,A.a1(b3,B.m,B.f,B.j),a8),a8,a8))
+b4=A.b([A.f(q.a===B.c?"Recent Submission Activity":"\ucd5c\uadfc \uc81c\ucd9c \ud65c\ub3d9",a8,a8,a8,B.ca,a8,a8,a8),B.H],a0)
+if(b3.length===0)b4.push(A.f(q.a===B.c?"No submissions":"\uc81c\ucd9c \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
+else{b3=A.fC(b3,0,A.hK(3,"count",t.S),t.D4)
+B.b.F(b4,new A.K(b3,new A.aEQ(o,q),b3.$ti.i("K<ai.E,e>")))}m.push(A.f8(new A.ab(B.ax,A.a1(b4,B.m,B.f,B.j),a8),a8,a8))
 return A.lT(m,a8,B.ax,a8,!1)},
 $S:280}
 A.aEN.prototype={
@@ -105513,13 +105515,13 @@ $1(a){return new A.ab(B.cH,a,null)},
 $S:691}
 A.aEW.prototype={
 $1(a){var s,r,q,p,o,n,m,l,k=this,j=null,i=a.r
-switch(i.a){case 0:s=k.b.a===B.c?"Pending Confirmation":"\ud655\uc815 \ub300\uae30"
+switch(i.a){case 0:s=k.b.a===B.c?"Pending":"\ub300\uae30"
 break
-case 1:s=k.b.a===B.c?"Confirmed by Practitioner":"\uce68\uc220\uc0ac \ud655\uc778 \uc644\ub8cc"
+case 1:s=k.b.a===B.c?"Confirmed":"\ud655\uc815"
 break
-case 2:s=k.b.a===B.c?"Declined by Practitioner":"\uce68\uc220\uc0ac\uac00 \uac70\uc808\ud568"
+case 2:s=k.b.a===B.c?"Declined":"\uac70\uc808"
 break
-case 3:s=k.b.a===B.c?"Canceled by You":"\ubcf8\uc778\uc774 \ucde8\uc18c\ud568"
+case 3:s=k.b.a===B.c?"Canceled":"\ucde8\uc18c"
 break
 default:s=j}r=A.aA(14)
 q=A.bC(B.eX,1)
@@ -105527,12 +105529,12 @@ p=k.a
 o=t.p
 s=A.b1(A.b([A.bg(A.f(p.py(a.d)+" \xb7 "+a.e,j,j,j,B.az,j,j,j),1),A.ls(A.f(s,j,j,j,j,j,j,j),j)],o),B.v,B.f,B.j,0)
 n=k.b
-m=n.a===B.c?"Requested At":"\uc2e0\uccad \uc2dc\uac01"
+m=n.a===B.c?"Requested":"\uc2e0\uccad"
 m=A.b([s,B.a_,A.f(m+": "+p.JC(a.f),j,j,j,j,j,j,j)],o)
 s=a.w
 if(s!=null){l=n.a===B.c?"Reviewed At":"\ud655\uc778 \uc2dc\uac01"
 m.push(A.f(l+": "+p.JC(s),j,j,j,j,j,j,j))}m.push(B.a0)
-if(i===B.bs)B.b.F(m,A.b([A.VP(B.mY,A.f(n.a===B.c?"Cancel":"\uc2e0\uccad \ucde8\uc18c",j,j,j,j,j,j,j),new A.aEL(p,a))],o))
+if(i===B.bs)B.b.F(m,A.b([A.VP(B.mY,A.f(n.a===B.c?"Cancel":"\ucde8\uc18c",j,j,j,j,j,j,j),new A.aEL(p,a))],o))
 return new A.ab(B.bM,A.aN(j,A.a1(m,B.m,B.f,B.j),B.n,j,new A.aw(B.e7,j,q,r,j,j,B.r),j,j,j,B.aG,j,j,1/0),j)},
 $S:692}
 A.aEL.prototype={
@@ -108121,7 +108123,7 @@ e=$.dB()
 A.cj(o,e,!0)
 p=t._C
 n=A.hg(new A.aJ1(k,f,g,r),A.fb(new A.cP(o)).by(h).f_(),p)
-m=g.a===B.c?"Pending appointment requests":"\ub300\uae30 \uc911\uc778 \uc608\uc57d \uc2e0\uccad"
+m=g.a===B.c?"Appointments":"\uc608\uc57d"
 l=k.c
 l.toString
 l=A.b([s,B.a0,q,B.D,n,B.P,new A.ha(A.f(m,j,j,j,A.n(l).ok.w,j,j,j),k.z),B.a0],t.p)
@@ -108455,36 +108457,38 @@ s=n.a===B.c
 r=A.dW(B.n_,A.f(s?"Approve + questions":"\uc2b9\uc778 + \uc9c8\ubb38",o,o,o,o,o,o,o),new A.aIF(p,m),o)
 q=t.p
 return A.c2(A.b1(A.b([l,B.Ek,A.bg(A.a1(A.b([j,B.a_,k,B.D,A.cd(B.U,A.b([r,A.d5(B.NW,A.f(s?"Inbox":"\uc694\uccad\ud568",o,o,o,o,o,o,o),new A.aIG(p),o)],q),B.X,8,8)],q),B.m,B.f,B.j),1)],q),B.m,B.f,B.j,0),o,B.bi)},
-acX(){var s,r,q,p,o=this,n=null,m=$.ac(),l=o.d,k=A.ct($.c3)
-k=k==null?n:k.d
+acX(){var s,r,q,p,o,n=this,m=null,l=$.ac(),k=n.d,j=A.ct($.c3)
+j=j==null?m:j.d
 s=t.N
-r=l.NJ(k,A.cp(["pending"],s))
-k=A.ct($.c3)
-k=k==null?n:k.d
-s=l.NJ(k,A.cp(["approved","declined"],s))
+r=k.NJ(j,A.cp(["pending"],s))
+j=A.ct($.c3)
+j=j==null?m:j.d
+s=k.NJ(j,A.cp(["approved","declined"],s))
 q=A.fC(s,0,A.hK(8,"count",t.S),A.N(s).c).ed(0)
-k=A.ct($.c3)
-p=(k==null?n:k.b)==="admin"?l.gaCN():B.R2
-l=o.c
-l.toString
-l=A.f("Inbox",n,n,n,A.n(l).ok.r,n,n,n)
-k=o.c
+j=A.ct($.c3)
+p=(j==null?m:j.b)==="admin"?k.gaCN():B.R2
+k=n.c
 k.toString
-s=t.p
-k=A.b([l,B.D,A.f("Patient joins",n,n,n,A.n(k).ok.w,n,n,n),B.H],s)
-if(r.length===0)k.push(A.f("No joins",n,n,n,n,n,n,n))
-else B.b.F(k,new A.K(r,new A.aIh(o,m),A.N(r).i("K<1,e>")))
-if(q.length!==0){l=o.c
-l.toString
-l=A.b([B.aM,A.f("Recent joins",n,n,n,A.n(l).ok.w,n,n,n),B.H],s)
-B.b.F(l,new A.K(q,new A.aIi(o,m),A.N(q).i("K<1,e>")))
-B.b.F(k,l)}l=A.ct($.c3)
-if((l==null?n:l.b)==="admin"){l=o.c
-l.toString
-s=A.b([B.aM,A.f("Clinic leads",n,n,n,A.n(l).ok.w,n,n,n),B.H],s)
-if(p.length===0)s.push(A.f(m.a===B.c?"No clinic leads":"\ud55c\uc758\uc6d0 \uc694\uccad \uc5c6\uc74c",n,n,n,n,n,n,n))
-else B.b.F(s,new A.K(p,new A.aIj(o,m),A.N(p).i("K<1,e>")))
-B.b.F(k,s)}return A.c2(A.a1(k,B.m,B.f,B.j),n,B.bi)},
+k=A.f("Inbox",m,m,m,A.n(k).ok.r,m,m,m)
+j=l.a===B.c?"Joins":"\uac00\uc785"
+s=n.c
+s.toString
+o=t.p
+s=A.b([k,B.D,A.f(j,m,m,m,A.n(s).ok.w,m,m,m),B.H],o)
+if(r.length===0)s.push(A.f(l.a===B.c?"No joins":"\uac00\uc785 \uc5c6\uc74c",m,m,m,m,m,m,m))
+else B.b.F(s,new A.K(r,new A.aIh(n,l),A.N(r).i("K<1,e>")))
+if(q.length!==0){k=n.c
+k.toString
+k=A.b([B.aM,A.f("Recent joins",m,m,m,A.n(k).ok.w,m,m,m),B.H],o)
+B.b.F(k,new A.K(q,new A.aIi(n,l),A.N(q).i("K<1,e>")))
+B.b.F(s,k)}k=A.ct($.c3)
+if((k==null?m:k.b)==="admin"){k=l.a===B.c?"Leads":"\ub9ac\ub4dc"
+j=n.c
+j.toString
+o=A.b([B.aM,A.f(k,m,m,m,A.n(j).ok.w,m,m,m),B.H],o)
+if(p.length===0)o.push(A.f(l.a===B.c?"No clinic leads":"\ud55c\uc758\uc6d0 \uc694\uccad \uc5c6\uc74c",m,m,m,m,m,m,m))
+else B.b.F(o,new A.K(p,new A.aIj(n,l),A.N(p).i("K<1,e>")))
+B.b.F(s,o)}return A.c2(A.a1(s,B.m,B.f,B.j),m,B.bi)},
 BE(){var s=0,r=A.v(t.H),q,p=this,o
 var $async$BE=A.q(function(a,b){if(a===1)return A.r(b,r)
 for(;;)switch(s){case 0:o=$.a7.ai$.x.h(0,p.x)
@@ -108589,77 +108593,77 @@ r.F(0,s)
 return r},
 $S:101}
 A.aKy.prototype={
-$2(b1,b2){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4=null,a5="Patients",a6="Visit Insights",a7="Schedule",a8=$.ac(),a9=A.n(b1),b0=A.ct($.c3)
-if((b0==null?a4:b0.d)==null)s=a4
-else{b0=A.ct($.c3)
-b0=b0==null?a4:b0.d
-b0.toString
-s=this.a.d.fh(b0)}b0=this.a
-r=b0.d
+$2(b2,b3){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4=null,a5="Patients",a6="Visit Insights",a7="Schedule",a8="Clinic",a9=$.ac(),b0=A.n(b2),b1=A.ct($.c3)
+if((b1==null?a4:b1.d)==null)s=a4
+else{b1=A.ct($.c3)
+b1=b1==null?a4:b1.d
+b1.toString
+s=this.a.d.fh(b1)}b1=this.a
+r=b1.d
 q=A.ct($.c3)
 q=q==null?a4:q.d
 p=r.NJ(q,A.cp(["pending"],t.N))
-q=b0.aoB()
+q=b1.aoB()
 o=p.length
-n=b0.RX(b0.XL())
-m=b0.RX(b0.asb())
+n=b1.RX(b1.XL())
+m=b1.RX(b1.asb())
 l=A.ct($.c3)
 k=r.a45(l==null?a4:l.d)
 r=A.N(n)
 l=new A.K(n,new A.aKj(),r.i("K<1,j>")).fG(0)
 j=A.S(l,A.p(l).c)
 B.b.fH(j)
-i=B.d.N(b0.e.a.a).toLowerCase()
-if(b0.CW==="All Patients")h=n
+i=B.d.N(b1.e.a.a).toLowerCase()
+if(b1.CW==="All Patients")h=n
 else{r=r.i("X<1>")
-h=A.S(new A.X(n,new A.aKk(b0),r),r.i("o.E"))}r=A.N(h).i("X<1>")
-g=A.S(new A.X(h,new A.aKl(b0),r),r.i("o.E"))
+h=A.S(new A.X(n,new A.aKk(b1),r),r.i("o.E"))}r=A.N(h).i("X<1>")
+g=A.S(new A.X(h,new A.aKl(b1),r),r.i("o.E"))
 if(i.length===0)f=g
 else{r=A.N(g).i("X<1>")
-f=A.S(new A.X(g,new A.aKq(i),r),r.i("o.E"))}e=b0.atQ(m)
+f=A.S(new A.X(g,new A.aKq(i),r),r.i("o.E"))}e=b1.atQ(m)
 r=A.N(k).i("X<1>")
-d=A.S(new A.X(k,new A.aKr(b0),r),r.i("o.E"))
-r=b0.db
-if(r==null){r=b0.ch
+d=A.S(new A.X(k,new A.aKr(b1),r),r.i("o.E"))
+r=b1.db
+if(r==null){r=b1.ch
 r===$&&A.a()
-r=b0.h6(r)+" Patients "+f.length
-l=b0.h6(b0.ch)+" \ud658\uc790 "+f.length+"\uba85"
-c=a8.a
+r=b1.h6(r)+" Patients "+f.length
+l=b1.h6(b1.ch)+" \ud658\uc790 "+f.length+"\uba85"
+c=a9.a
 b=c===B.c?r:l
-r=c}else{r=b0.fM(r.a)+" ~ "+b0.fM(b0.db.b)+" Patients "+f.length
-l=b0.fM(b0.db.a)+" ~ "+b0.fM(b0.db.b)+" \ud658\uc790 "+f.length+"\uba85"
-c=a8.a
+r=c}else{r=b1.fM(r.a)+" ~ "+b1.fM(b1.db.b)+" Patients "+f.length
+l=b1.fM(b1.db.a)+" ~ "+b1.fM(b1.db.b)+" \ud658\uc790 "+f.length+"\uba85"
+c=a9.a
 b=c===B.c?r:l
 r=c}r=r===B.c?"Practitioner Dashboard":"\uce68\uc220\uc0ac \ub300\uc2dc\ubcf4\ub4dc"
-q=b0.ad_(q+o)
-l=a8.a===B.c?"Pick date range":"\ub0a0\uc9dc \ubc94\uc704 \uc120\ud0dd"
+q=b1.ad_(q+o)
+l=a9.a===B.c?"Pick date range":"\ub0a0\uc9dc \ubc94\uc704 \uc120\ud0dd"
 c=t.p
-l=A.b([q,A.fv(a4,a4,a4,B.mZ,a4,a4,b0.gWA(),a4,a4,a4,l,a4),A.fv(a4,a4,a4,B.n0,a4,a4,new A.aKs(b0),a4,a4,a4,"Clinic settings",a4),B.hA],c)
-q=b0.dx
-q=A.b([new A.nM(B.N5,a5,a5,new A.aKt(b0),q===B.p1),new A.nM(B.Ni,"Today Summary","\uc624\ub298 \uc694\uc57d",new A.aKu(b0),q===B.oZ),new A.nM(B.dE,"Inbox","Inbox",new A.aKv(b0),q===B.fL),new A.nM(B.Nw,a6,a6,new A.aKw(b0),q===B.p_),new A.nM(B.hv,a7,a7,new A.aKx(b0),q===B.p0),new A.nM(B.tm,"Clinic","Clinic",new A.aKm(b0),q===B.fM)],t.YG)
+l=A.b([q,A.fv(a4,a4,a4,B.mZ,a4,a4,b1.gWA(),a4,a4,a4,l,a4),A.fv(a4,a4,a4,B.n0,a4,a4,new A.aKs(b1),a4,a4,a4,"Clinic settings",a4),B.hA],c)
+q=b1.dx
+q=A.b([new A.nM(B.N5,a5,a5,new A.aKt(b1),q===B.p1),new A.nM(B.Ni,"Today Summary","\uc624\ub298 \uc694\uc57d",new A.aKu(b1),q===B.oZ),new A.nM(B.dE,"Inbox","Inbox",new A.aKv(b1),q===B.fL),new A.nM(B.Nw,a6,a6,new A.aKw(b1),q===B.p_),new A.nM(B.hv,a7,a7,new A.aKx(b1),q===B.p0),new A.nM(B.tm,a8,a8,new A.aKm(b1),q===B.fM)],t.YG)
 a=A.b([],c)
-if(!b0.gvK()){a0=A.b([B.db.P(0.72),B.k],t.c)
-a1=a8.a===B.c
+if(!b1.gvK()){a0=A.b([B.db.P(0.72),B.k],t.c)
+a1=a9.a===B.c
 a2=a1?"Set your clinic first":"\uba3c\uc800 \ud55c\uc758\uc6d0 \uc815\ubcf4\ub97c \uc124\uc815\ud574\uc8fc\uc138\uc694"
-a3=a9.ok
+a3=b0.ok
 a2=A.f(a2,a4,a4,a4,a3.r,a4,a4,a4)
-a1=a1?"The practitioner dashboard only shows the clinic you are logged into. Open Clinic Profile and save your clinic name first.":"\uce68\uc220\uc0ac \ub300\uc2dc\ubcf4\ub4dc\ub294 \ud604\uc7ac \ub85c\uadf8\uc778\ud55c \ud55c\uc758\uc6d0 \ub370\uc774\ud130\ub9cc \ubcf4\uc5ec\uc90d\ub2c8\ub2e4. \uba3c\uc800 Clinic Profile\uc5d0\uc11c \ud55c\uc758\uc6d0 \uc774\ub984\uc744 \uc800\uc7a5\ud574\uc8fc\uc138\uc694."
+a1=a1?"Save clinic profile first.":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uba3c\uc800 \uc800\uc7a5"
 a3=a3.z
 a1=A.f(a1,a4,a4,a4,a3==null?a4:a3.aB(B.p.P(0.72)),a4,a4,a4)
-B.b.F(a,A.b([A.c2(A.a1(A.b([a2,B.H,a1,B.aa,A.dW(B.n0,A.f(a8.a===B.c?"Open clinic profile":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uc124\uc815 \uc5f4\uae30",a4,a4,a4,a4,a4,a4,a4),new A.aKn(b0),a4)],c),B.m,B.f,B.j),new A.eZ(B.bg,B.bH,B.b7,a0,a4,a4),B.bi),B.D],c))}if(b0.dx===B.oZ)B.b.F(a,A.b([b0.ad2(e,m,f.length),B.P],c))
-if(b0.dx===B.p_)B.b.F(a,A.b([b0.adb(e,m),B.D],c))
-if(b0.dx===B.eK)if(o!==0)B.b.F(a,A.b([b0.adh(p),B.D],c))
-if(b0.dx===B.eK)a.push(new A.ha(b0.ad3(),b0.x))
-if(b0.dx===B.fL)B.b.F(a,A.b([B.a_,b0.acX(),B.D,new A.ha(b0.adr(),b0.r)],c))
-if(b0.dx===B.p0)B.b.F(a,A.b([B.a_,new A.ha(b0.acT(),b0.w)],c))
-if(b0.dx===B.p1)B.b.F(a,A.b([B.a_,A.c2(A.c7(new A.qK(a4,!0,b0.gRA(),a4),720,a4),a4,B.ax)],c))
-if(b0.dx===B.fM)B.b.F(a,A.b([B.a_,B.Zs],c))
+B.b.F(a,A.b([A.c2(A.a1(A.b([a2,B.H,a1,B.aa,A.dW(B.n0,A.f(a9.a===B.c?a8:"\ud55c\uc758\uc6d0",a4,a4,a4,a4,a4,a4,a4),new A.aKn(b1),a4)],c),B.m,B.f,B.j),new A.eZ(B.bg,B.bH,B.b7,a0,a4,a4),B.bi),B.D],c))}if(b1.dx===B.oZ)B.b.F(a,A.b([b1.ad2(e,m,f.length),B.P],c))
+if(b1.dx===B.p_)B.b.F(a,A.b([b1.adb(e,m),B.D],c))
+if(b1.dx===B.eK)if(o!==0)B.b.F(a,A.b([b1.adh(p),B.D],c))
+if(b1.dx===B.eK)a.push(new A.ha(b1.ad3(),b1.x))
+if(b1.dx===B.fL)B.b.F(a,A.b([B.a_,b1.acX(),B.D,new A.ha(b1.adr(),b1.r)],c))
+if(b1.dx===B.p0)B.b.F(a,A.b([B.a_,new A.ha(b1.acT(),b1.w)],c))
+if(b1.dx===B.p1)B.b.F(a,A.b([B.a_,A.c2(A.c7(new A.qK(a4,!0,b1.gRA(),a4),720,a4),a4,B.ax)],c))
+if(b1.dx===B.fM)B.b.F(a,A.b([B.a_,B.Zs],c))
 a.push(B.P)
-if(b0.dx===B.eK){o=A.b([B.k.P(0.92),B.db.P(0.62)],t.c)
-a.push(new A.ha(A.c2(A.j5(new A.aKo(b0,s,a8,a9,b,j)),new A.eZ(B.bg,B.bH,B.b7,o,a4,a4),B.bN),b0.y))}if(b0.dx===B.eK&&d.length!==0)B.b.F(a,A.b([B.P,b0.ad1(d)],c))
-if(f.length===0)a.push(A.c2(A.a1(A.b([A.f("No patients",a4,a4,a4,a9.ok.w,a4,a4,a4)],c),B.m,B.f,B.j),a4,B.bN))
-if(b0.dx===B.eK)B.b.F(a,new A.K(f,new A.aKp(b0,b1),A.N(f).i("K<1,e>")))
-return A.aTG(l,A.lT(a,b0.f,B.M0,a4,!1),B.nQ,r,q)},
+if(b1.dx===B.eK){o=A.b([B.k.P(0.92),B.db.P(0.62)],t.c)
+a.push(new A.ha(A.c2(A.j5(new A.aKo(b1,s,a9,b0,b,j)),new A.eZ(B.bg,B.bH,B.b7,o,a4,a4),B.bN),b1.y))}if(b1.dx===B.eK&&d.length!==0)B.b.F(a,A.b([B.P,b1.ad1(d)],c))
+if(f.length===0)a.push(A.c2(A.a1(A.b([A.f("No patients",a4,a4,a4,b0.ok.w,a4,a4,a4)],c),B.m,B.f,B.j),a4,B.bN))
+if(b1.dx===B.eK)B.b.F(a,new A.K(f,new A.aKp(b1,b2),A.N(f).i("K<1,e>")))
+return A.aTG(l,A.lT(a,b1.f,B.M0,a4,!1),B.nQ,r,q)},
 $S:715}
 A.aKj.prototype={
 $1(a){return a.a.b},
@@ -109021,7 +109025,7 @@ s=A.aA(14)
 r=A.bC(B.eX,1)
 q=A.f(g.b+" \xb7 "+h.h6(a.d)+" "+a.e,i,i,i,B.az,i,i,i)
 p=$.ac()
-o=p.a===B.c?"Requested At":"\uc2e0\uccad \uc2dc\uac01"
+o=p.a===B.c?"Requested":"\uc2e0\uccad"
 o=A.f(o+": "+h.Au(a.f),i,i,i,i,i,i,i)
 p=p.a===B.c
 n=p?"Contact":"\uc5f0\ub77d\ucc98"
@@ -109033,9 +109037,9 @@ l=A.f(n+": "+m+" / "+l,i,i,i,i,i,i,i)
 n=A.dW(B.n_,A.f(p?"Confirm":"\ud655\uc815\ud558\uae30",i,i,i,i,i,i,i),new A.aIV(h,a),i)
 m=A.d5(B.mY,A.f(p?"Decline":"\uac70\uc808\ud558\uae30",i,i,i,i,i,i,i),new A.aIW(h,a),i)
 p=this.b.a===B.c
-k=A.d5(B.NL,A.f(p?"Open History":"\uae30\uc874 \uae30\ub85d \ubcf4\uae30",i,i,i,i,i,i,i),new A.aIX(h,g),i)
+k=A.d5(B.NL,A.f(p?"History":"\uae30\ub85d",i,i,i,i,i,i,i),new A.aIX(h,g),i)
 j=t.p
-return new A.ab(B.bM,A.aN(i,A.a1(A.b([q,B.a_,o,l,B.H,A.cd(B.U,A.b([n,m,k,A.d5(B.hw,A.f(p?"Patient Info":"\ud658\uc790 \uc815\ubcf4",i,i,i,i,i,i,i),new A.aIY(h,g),i)],j),B.X,8,8)],j),B.m,B.f,B.j),B.n,i,new A.aw(B.e7,i,r,s,i,i,B.r),i,i,i,B.aG,i,i,1/0),i)},
+return new A.ab(B.bM,A.aN(i,A.a1(A.b([q,B.a_,o,l,B.H,A.cd(B.U,A.b([n,m,k,A.d5(B.hw,A.f(p?"Patient":"\ud658\uc790",i,i,i,i,i,i,i),new A.aIY(h,g),i)],j),B.X,8,8)],j),B.m,B.f,B.j),B.n,i,new A.aw(B.e7,i,r,s,i,i,B.r),i,i,i,B.aG,i,i,1/0),i)},
 $S:725}
 A.aIV.prototype={
 $0(){this.a.d.avT(this.b.a)},
@@ -109118,7 +109122,7 @@ i=i.a===B.c
 f=A.ky(B.tt,A.f(i?"Mark Reviewed":"\ud655\uc778 \uc644\ub8cc",c,c,c,c,c,c,c),f)
 a=m==null?c:new A.aIM(a,d.c,m)
 e=t.p
-return new A.ab(B.bM,A.aN(c,A.a1(A.b([j,B.a_,h,B.H,g,B.H,A.cd(B.U,A.b([f,A.d5(B.hw,A.f(i?"Patient Info":"\ud658\uc790 \uc815\ubcf4",c,c,c,c,c,c,c),a,c)],e),B.X,8,8)],e),B.m,B.f,B.j),B.n,c,new A.aw(B.e8,c,k,l,c,c,B.r),c,c,c,B.aG,c,c,1/0),c)},
+return new A.ab(B.bM,A.aN(c,A.a1(A.b([j,B.a_,h,B.H,g,B.H,A.cd(B.U,A.b([f,A.d5(B.hw,A.f(i?"Patient":"\ud658\uc790",c,c,c,c,c,c,c),a,c)],e),B.X,8,8)],e),B.m,B.f,B.j),B.n,c,new A.aw(B.e8,c,k,l,c,c,B.r),c,c,c,B.aG,c,c,1/0),c)},
 $S:40}
 A.aIL.prototype={
 $0(){var s=0,r=A.v(t.H),q,p=this,o
@@ -109209,7 +109213,7 @@ h=A.b([k,B.a_,i,A.f(g+": "+f+" \xb7 "+h+" "+q,c,c,c,c,c,c,c)],e)
 if(p.length!==0)B.b.F(h,A.b([B.H,A.f((j.a===B.c?"Memo":"\uba54\ubaa8")+": "+p,c,c,c,c,c,c,c)],e))
 h.push(B.H)
 a=n==null?c:new A.aIK(a,d.c,n)
-h.push(A.d5(B.hw,A.f(j.a===B.c?"Patient Info":"\ud658\uc790 \uc815\ubcf4",c,c,c,c,c,c,c),a,c))
+h.push(A.d5(B.hw,A.f(j.a===B.c?"Patient":"\ud658\uc790",c,c,c,c,c,c,c),a,c))
 return new A.ab(B.bM,A.aN(c,A.a1(h,B.m,B.f,B.j),B.n,c,new A.aw(B.e7,c,l,m,c,c,B.r),c,c,c,B.aG,c,c,1/0),c)},
 $S:40}
 A.aIK.prototype={
@@ -109272,10 +109276,10 @@ A.aJk.prototype={
 $1(a){return a.b},
 $S:273}
 A.aJl.prototype={
-$1(a){var s,r=null,q=this.b,p=q.a===B.c?"Daily patient counts":"\ub0a0\uc9dc\ubcc4 \ud658\uc790 \uc218",o=this.a,n=o.c
+$1(a){var s,r=null,q=this.b,p=q.a===B.c?"Daily counts":"\ub0a0\uc9dc\ubcc4 \uc218",o=this.a,n=o.c
 n.toString
 n=A.f(p,r,r,r,A.n(n).ok.r,r,r,r)
-p=q.a===B.c?"Scheduled by date.":"\ub0a0\uc9dc\ubcc4 \uc608\uc57d \uc218"
+p=q.a===B.c?"By date":"\ub0a0\uc9dc\ubcc4"
 s=o.c
 s.toString
 s=A.n(s).ok.z
@@ -109315,7 +109319,7 @@ i=i?"Profile":"\ud504\ub85c\ud544"
 g=t.p
 i=A.b([k,B.H,h,B.a_,s,B.a_,A.f(i+": "+n.f+", "+n.gtg()+", "+n.r,p,p,p,p,p,p,p)],g)
 k=q.w
-if(k!=null){h=j.a===B.c?"Requested At":"\uc2e0\uccad \uc2dc\uac01"
+if(k!=null){h=j.a===B.c?"Requested":"\uc2e0\uccad"
 B.b.F(i,A.b([B.a_,A.f(h+": "+q.a.Au(k.f),p,p,p,p,p,p,p)],g))}k=q.x
 if(k!=null){h=j.a===B.c?"Last Visit Summary":"\uc9c0\ub09c \ubc29\ubb38 \uc694\uc57d"
 h=A.f(h,p,p,p,A.n(l).ok.x,p,p,p)
@@ -109331,9 +109335,9 @@ B.b.F(i,A.b([B.D,A.f(k,p,p,p,A.n(l).ok.x,p,p,p),B.a0,A.f(n,p,p,p,p,p,p,p)],g))}n
 k=j.a===B.c
 i=A.dP(A.f(k?"Close":"\ub2eb\uae30",p,p,p,p,p,p,p),p,p,new A.aJn(a),p,p)
 h=q.a
-i=A.b([i,A.d5(B.tD,A.f(k?"Patient Info":"\ud658\uc790 \uc815\ubcf4",p,p,p,p,p,p,p),new A.aJo(h,a,l,o),p)],g)
+i=A.b([i,A.d5(B.tD,A.f(k?"Patient":"\ud658\uc790",p,p,p,p,p,p,p),new A.aJo(h,a,l,o),p)],g)
 k=q.y
-if(k!=null)i.push(A.dW(B.tA,A.f(j.a===B.c?"Open Detail":"\uc0c1\uc138 \ubcf4\uae30",p,p,p,p,p,p,p),new A.aJp(h,a,l,k,o),p))
+if(k!=null)i.push(A.dW(B.tA,A.f(j.a===B.c?"Detail":"\uc0c1\uc138",p,p,p,p,p,p,p),new A.aJp(h,a,l,k,o),p))
 return A.iS(i,n,m)},
 $S:48}
 A.aJn.prototype={
@@ -109701,7 +109705,7 @@ p=d.a===B.c?"Booked = saved visits plus pending or confirmed reservations for th
 n=b.Q
 m=t.p
 k=A.aN(h,A.a1(A.b([c,B.aM,r,B.aa,o,B.K,q,B.D,A.f(p,h,h,h,n==null?h:n.CT(B.p.P(0.62),1.35),h,h,h)],m),B.m,B.f,B.j),B.n,h,new A.aw(f,h,e,h,h,h,B.r),h,h,h,B.bN,h,h,h)
-f=d.a===B.c?"Choose a clinic date to update the dashboard.":"\ub300\uc2dc\ubcf4\ub4dc\uc5d0 \ubc18\uc601\ud560 \ub0a0\uc9dc\ub97c \uc120\ud0dd\ud558\uc138\uc694."
+f=d.a===B.c?"Pick date.":"\ub0a0\uc9dc \uc120\ud0dd"
 b=b.z
 f=A.f(f,h,h,h,b==null?h:b.aB(B.p.P(0.68)),h,h,h)
 e=s.a
@@ -109835,8 +109839,8 @@ n=a.w
 if(B.d.N(n).length!==0)B.b.F(p,A.b([B.a0,A.f((l.b.a===B.c?"Patient note":"\ud658\uc790 \uba54\ubaa8")+": "+n,k,k,k,k,k,k,k)],o))
 p.push(B.K)
 n=l.b.a===B.c
-m=A.dW(B.n0,A.f(n?"Open Clinic Profile":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uc5f4\uae30",k,k,k,k,k,k,k),new A.aIc(q),k)
-p.push(A.cd(B.U,A.b([m,A.d5(B.NU,A.f(n?"Mark reviewed":"\ud655\uc778 \uc644\ub8cc",k,k,k,k,k,k,k),new A.aId(q,a),k)],o),B.X,8,8))
+m=A.dW(B.n0,A.f(n?"Clinic":"\ud55c\uc758\uc6d0",k,k,k,k,k,k,k),new A.aIc(q),k)
+p.push(A.cd(B.U,A.b([m,A.d5(B.NU,A.f(n?"Reviewed":"\ud655\uc778",k,k,k,k,k,k,k),new A.aId(q,a),k)],o),B.X,8,8))
 return A.aN(k,A.a1(p,B.m,B.f,B.j),B.n,k,new A.aw(j,k,r,i,k,k,B.r),k,k,B.bM,B.b4,k,k,1/0)},
 $S:744}
 A.aIc.prototype={
@@ -109938,7 +109942,7 @@ else{a1=J.af(g)
 s="Latest patient submission: "+a1.gA(g)+" answers ? "+r.nJ(l)
 a1="\ucd5c\uadfc \ud658\uc790 \uc81c\ucd9c: \ub2f5\ubcc0 "+a1.gA(g)+"\uac1c \xb7 "+r.nJ(l)
 c.push(A.f(d.a===B.c?s:a1,a0,a0,a0,a0,a0,a0,a0))}c.push(B.a_)
-if(k)c.push(A.f(d.a===B.c?"No visit-record feedback yet":"\ubc29\ubb38 \uae30\ub85d \ud53c\ub4dc\ubc31 \uc5c6\uc74c",a0,a0,a0,a0,a0,a0,a0))
+if(k)c.push(A.f(d.a===B.c?"No feedback":"\ubc29\ubb38 \uae30\ub85d \ud53c\ub4dc\ubc31 \uc5c6\uc74c",a0,a0,a0,a0,a0,a0,a0))
 else{a1=""+m
 s="Visit-record feedback: "+a1+" pending ? "+r.nJ(i)
 r="\ubc29\ubb38 \uae30\ub85d \ud53c\ub4dc\ubc31: \ubbf8\ud655\uc778 "+a1+"\uac74 \xb7 "+r.nJ(i)
