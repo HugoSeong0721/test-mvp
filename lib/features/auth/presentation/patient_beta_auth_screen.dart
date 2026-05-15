@@ -439,10 +439,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           width: 420,
           child: accounts.isEmpty
               ? Text(
-                  lang.tr(
-                    'No patient account has been saved in this browser yet.',
-                    '이 브라우저에 저장된 환자 계정이 아직 없습니다.',
-                  ),
+                  lang.tr('No saved account.', '이 브라우저에 저장된 환자 계정이 아직 없습니다.'),
                 )
               : ListView.separated(
                   shrinkWrap: true,
@@ -535,7 +532,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                     Navigator.pop(context);
                     _showMessage(
                       lang.tr(
-                        'Local password was reset. You can log in now.',
+                        'Password reset.',
                         '로컬 비밀번호를 재설정했습니다. 이제 로그인할 수 있습니다.',
                       ),
                     );
@@ -574,7 +571,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     switch (error.code) {
       case 'email-already-in-use':
         return lang.tr(
-          'This email is already registered. Please log in instead.',
+          'Email already registered.',
           '이미 등록된 이메일입니다. 로그인으로 진행해주세요.',
         );
       case 'invalid-email':
@@ -584,7 +581,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         );
       case 'weak-password':
         return lang.tr(
-          'Please use a password with at least 6 characters.',
+          'Password needs 6+ characters.',
           '비밀번호는 6자 이상으로 입력해주세요.',
         );
       case 'user-not-found':
@@ -606,19 +603,19 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     switch (error.code) {
       case 'email-already-in-use':
         return lang.tr(
-          'This tester email is already saved in this browser. Please log in instead.',
+          'Email already saved.',
           '이 이메일은 이미 이 브라우저에 저장되어 있습니다. 로그인으로 진행해주세요.',
         );
       case 'invalid-email':
         return lang.tr('Use a valid email.', '올바른 이메일 필요');
       case 'weak-password':
         return lang.tr(
-          'Please use a password with at least 6 characters.',
+          'Password needs 6+ characters.',
           '비밀번호는 6자 이상으로 입력해주세요.',
         );
       case 'user-not-found':
         return lang.tr(
-          'No saved tester account was found in this browser yet. Please sign up first.',
+          'No saved account.',
           '이 브라우저에는 아직 저장된 계정이 없습니다. 먼저 가입해주세요.',
         );
       case 'wrong-password':

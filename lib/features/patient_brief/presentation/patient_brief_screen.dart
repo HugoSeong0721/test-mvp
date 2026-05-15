@@ -327,7 +327,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                 const SizedBox(height: 8),
                 Text(
                   lang.tr(
-                    'The highlighted current card is the visit this screen is about. Older visits can be opened one by one.',
+                    'Current visit is highlighted.',
                     '현재 강조된 카드가 지금 이 화면이 다루는 이번 방문입니다. 이전 방문은 각각 상세로 열 수 있습니다.',
                   ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -474,7 +474,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                     const SizedBox(height: 8),
                     if (list.isEmpty)
                       Text(
-                        lang.tr('No questions yet', '아직 질문 없음'),
+                        lang.tr('No questions', '질문 없음'),
                         style: const TextStyle(color: Colors.black54),
                       ),
                     ...list.map(

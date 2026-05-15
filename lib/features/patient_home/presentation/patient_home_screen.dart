@@ -1691,10 +1691,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  lang.tr(
-                                    'Latest Practitioner Request',
-                                    '최근 답변 요청',
-                                  ),
+                                  lang.tr('Latest request', '최근 답변 요청'),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,
@@ -1733,10 +1730,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      lang.tr(
-                                        'Appointment Requests',
-                                        '예약 신청 현황',
-                                      ),
+                                      lang.tr('Appointments', '예약 신청 현황'),
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -1909,7 +1903,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             ),
                                           ),
                                           Text(
-                                            '${lang.tr('Current Intake Status', '현재 문진 상태')}: ${visit.intakeStatus.label}',
+                                            '${lang.tr('Intake', '문진')}: ${visit.intakeStatus.label}',
                                           ),
                                         ],
                                       ),
@@ -1946,9 +1940,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       context,
                                       VisitHistoryScreen.routeName,
                                     ),
-                                    child: Text(
-                                      lang.tr('Open history', '기록 열기'),
-                                    ),
+                                    child: Text(lang.tr('History', '기록')),
                                   ),
                                 ],
                               ),
@@ -2087,7 +2079,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 const SizedBox(height: 10),
                 Text(
                   lang.tr(
-                    'This usually means your network or VPN is blocking Firebase. Please turn off VPN, check your connection, then retry.',
+                    'Check network or VPN, then retry.',
                     '네트워크 또는 VPN이 Firebase 호출을 막고 있는 경우가 많습니다. VPN을 끄고 연결을 확인한 뒤 다시 시도해주세요.',
                   ),
                   style: Theme.of(

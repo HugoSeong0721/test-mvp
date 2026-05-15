@@ -103805,10 +103805,10 @@ pH(a){var s=null,r=this.c
 if(r==null)return
 r.X(t.q).f.cE(A.cO(s,s,s,s,s,B.y,s,A.f(a,s,s,s,s,s,s,s),s,B.ai,s,s,s,s,s,s,s,s,s,s))},
 TV(a){var s=$.ac()
-switch(a.a){case"email-already-in-use":return s.a===B.c?"This tester email is already saved in this browser. Please log in instead.":"\uc774 \uc774\uba54\uc77c\uc740 \uc774\ubbf8 \uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc800\uc7a5\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4. \ub85c\uadf8\uc778\uc73c\ub85c \uc9c4\ud589\ud574\uc8fc\uc138\uc694."
+switch(a.a){case"email-already-in-use":return s.a===B.c?"Email already saved.":"\uc774 \uc774\uba54\uc77c\uc740 \uc774\ubbf8 \uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc800\uc7a5\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4. \ub85c\uadf8\uc778\uc73c\ub85c \uc9c4\ud589\ud574\uc8fc\uc138\uc694."
 case"invalid-email":return s.a===B.c?"Use a valid email.":"\uc62c\ubc14\ub978 \uc774\uba54\uc77c \ud544\uc694"
-case"weak-password":return s.a===B.c?"Please use a password with at least 6 characters.":"\ube44\ubc00\ubc88\ud638\ub294 6\uc790 \uc774\uc0c1\uc73c\ub85c \uc785\ub825\ud574\uc8fc\uc138\uc694."
-case"user-not-found":return s.a===B.c?"No saved tester account was found in this browser yet. Please sign up first.":"\uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0\ub294 \uc544\uc9c1 \uc800\uc7a5\ub41c \uacc4\uc815\uc774 \uc5c6\uc2b5\ub2c8\ub2e4. \uba3c\uc800 \uac00\uc785\ud574\uc8fc\uc138\uc694."
+case"weak-password":return s.a===B.c?"Password needs 6+ characters.":"\ube44\ubc00\ubc88\ud638\ub294 6\uc790 \uc774\uc0c1\uc73c\ub85c \uc785\ub825\ud574\uc8fc\uc138\uc694."
+case"user-not-found":return s.a===B.c?"No saved account.":"\uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0\ub294 \uc544\uc9c1 \uc800\uc7a5\ub41c \uacc4\uc815\uc774 \uc5c6\uc2b5\ub2c8\ub2e4. \uba3c\uc800 \uac00\uc785\ud574\uc8fc\uc138\uc694."
 case"wrong-password":return s.a===B.c?"The saved tester password does not match.":"\uc800\uc7a5\ub41c \ube44\ubc00\ubc88\ud638\uac00 \uc77c\uce58\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4."
 default:return s.a===B.c?"The local session could not be opened right now.":"\ub85c\uceec \uc138\uc158\uc744 \uc9c0\uae08 \uc5f4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4."}},
 I(a){return A.ef($.ac(),new A.aDE(this),null)},
@@ -103960,7 +103960,7 @@ $0(){return this.a.z=!1},
 $S:0}
 A.aDw.prototype={
 $1(a){var s=null,r=this.b,q=A.f(r.a===B.c?"Saved patient emails":"\uc800\uc7a5\ub41c \ud658\uc790 \uc774\uba54\uc77c",s,s,s,s,s,s,s),p=this.c,o=J.af(p)
-if(o.gag(p))p=A.f(r.a===B.c?"No patient account has been saved in this browser yet.":"\uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc800\uc7a5\ub41c \ud658\uc790 \uacc4\uc815\uc774 \uc544\uc9c1 \uc5c6\uc2b5\ub2c8\ub2e4.",s,s,s,s,s,s,s)
+if(o.gag(p))p=A.f(r.a===B.c?"No saved account.":"\uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc800\uc7a5\ub41c \ud658\uc790 \uacc4\uc815\uc774 \uc544\uc9c1 \uc5c6\uc2b5\ub2c8\ub2e4.",s,s,s,s,s,s,s)
 else p=A.aYQ(new A.aDt(this.a,p),o.gA(p),new A.aDu(),!0)
 p=A.c7(p,s,420)
 return A.iS(A.b([A.dP(A.f(r.a===B.c?"Close":"\ub2eb\uae30",s,s,s,s,s,s,s),s,s,new A.aDv(a),s,s)],t.p),p,q)},
@@ -104021,7 +104021,7 @@ break}j=n.b
 j.f.sc9(0,B.d.N(l.a.a))
 j.r.fe(0,B.c9)
 A.b2(k,!1).cP(null)
-j.pH(n.f.a===B.c?"Local password was reset. You can log in now.":"\ub85c\uceec \ube44\ubc00\ubc88\ud638\ub97c \uc7ac\uc124\uc815\ud588\uc2b5\ub2c8\ub2e4. \uc774\uc81c \ub85c\uadf8\uc778\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.")
+j.pH(n.f.a===B.c?"Password reset.":"\ub85c\uceec \ube44\ubc00\ubc88\ud638\ub97c \uc7ac\uc124\uc815\ud588\uc2b5\ub2c8\ub2e4. \uc774\uc81c \ub85c\uadf8\uc778\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.")
 j.L(new A.aDl(j))
 p=2
 s=6
@@ -104334,7 +104334,7 @@ d="1. Full Visit History ("+k+" visits)"
 k="1. \uc804\uccb4 \ubc29\ubb38 \uc774\ub825 ("+k+"\ud68c)"
 if(a8.a===B.c)k=d
 k=A.f(k,a7,a7,a7,A.n(b2).ok.r,a7,a7,a7)
-f=a8.a===B.c?"The highlighted current card is the visit this screen is about. Older visits can be opened one by one.":"\ud604\uc7ac \uac15\uc870\ub41c \uce74\ub4dc\uac00 \uc9c0\uae08 \uc774 \ud654\uba74\uc774 \ub2e4\ub8e8\ub294 \uc774\ubc88 \ubc29\ubb38\uc785\ub2c8\ub2e4. \uc774\uc804 \ubc29\ubb38\uc740 \uac01\uac01 \uc0c1\uc138\ub85c \uc5f4 \uc218 \uc788\uc2b5\ub2c8\ub2e4."
+f=a8.a===B.c?"Current visit is highlighted.":"\ud604\uc7ac \uac15\uc870\ub41c \uce74\ub4dc\uac00 \uc9c0\uae08 \uc774 \ud654\uba74\uc774 \ub2e4\ub8e8\ub294 \uc774\ubc88 \ubc29\ubb38\uc785\ub2c8\ub2e4. \uc774\uc804 \ubc29\ubb38\uc740 \uac01\uac01 \uc0c1\uc138\ub85c \uc5f4 \uc218 \uc788\uc2b5\ub2c8\ub2e4."
 e=A.n(b2).ok.z
 k=A.b([k,B.H,A.f(f,a7,a7,a7,e==null?a7:e.aB(B.p.P(0.68)),a7,a7,a7),B.aa],h)
 B.b.F(k,new A.K(p,new A.aDP(a6,a8,q,p),n.i("K<1,e>")))
@@ -104475,7 +104475,7 @@ r=s.gA(n)
 q=this.b
 p=q.a===B.c?"questions":"\uc9c8\ubb38"
 p=A.b([A.f(a+" ("+r+" "+p+")",o,o,o,B.az,o,o,o),B.H],t.p)
-if(s.gag(n))p.push(A.f(q.a===B.c?"No questions yet":"\uc544\uc9c1 \uc9c8\ubb38 \uc5c6\uc74c",o,o,o,B.fF,o,o,o))
+if(s.gag(n))p.push(A.f(q.a===B.c?"No questions":"\uc9c8\ubb38 \uc5c6\uc74c",o,o,o,B.fF,o,o,o))
 B.b.F(p,s.eT(n,new A.aDH(),t.l))
 return A.f8(new A.ab(B.aG,A.a1(p,B.m,B.f,B.j),o),o,o)},
 $S:676}
@@ -104790,7 +104790,7 @@ if(!j){r=b.a===B.c?"Loading your patient profile...":"\ud658\uc790 \ud504\ub85c\
 B.b.F(s,A.b([B.lr,B.aM,A.f(r,m,m,m,A.n(a).ok.w,B.c8,m,m)],l))}else{r=A.cF(B.Nh,A.n(a).ax.fy,m,56)
 q=b.a===B.c?"Could not load your profile.":"\ud504\ub85c\ud544\uc744 \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4."
 q=A.f(q,m,m,m,A.n(a).ok.r,B.c8,m,m)
-p=b.a===B.c?"This usually means your network or VPN is blocking Firebase. Please turn off VPN, check your connection, then retry.":"\ub124\ud2b8\uc6cc\ud06c \ub610\ub294 VPN\uc774 Firebase \ud638\ucd9c\uc744 \ub9c9\uace0 \uc788\ub294 \uacbd\uc6b0\uac00 \ub9ce\uc2b5\ub2c8\ub2e4. VPN\uc744 \ub044\uace0 \uc5f0\uacb0\uc744 \ud655\uc778\ud55c \ub4a4 \ub2e4\uc2dc \uc2dc\ub3c4\ud574\uc8fc\uc138\uc694."
+p=b.a===B.c?"Check network or VPN, then retry.":"\ub124\ud2b8\uc6cc\ud06c \ub610\ub294 VPN\uc774 Firebase \ud638\ucd9c\uc744 \ub9c9\uace0 \uc788\ub294 \uacbd\uc6b0\uac00 \ub9ce\uc2b5\ub2c8\ub2e4. VPN\uc744 \ub044\uace0 \uc5f0\uacb0\uc744 \ud655\uc778\ud55c \ub4a4 \ub2e4\uc2dc \uc2dc\ub3c4\ud574\uc8fc\uc138\uc694."
 o=A.n(a).ok.z
 p=A.f(p,m,m,m,o==null?m:o.aB(B.a5),B.c8,m,m)
 o=b.a===B.c
@@ -105396,7 +105396,7 @@ b3+="\uac74 \ub300\uae30"
 if(p)b3=e}m.push(A.f8(new A.ab(B.ax,A.a1(A.b([n,B.H,new A.a4t(g,f,b3,a8)],a0),B.m,B.f,B.j),a8),a8,a8))}b3=a7.w
 p=b3!=null
 if(p)m.push(B.P)
-if(p){n=A.f(q.a===B.c?"Latest Practitioner Request":"\ucd5c\uadfc \ub2f5\ubcc0 \uc694\uccad",a8,a8,a8,B.ca,a8,a8,a8)
+if(p){n=A.f(q.a===B.c?"Latest request":"\ucd5c\uadfc \ub2f5\ubcc0 \uc694\uccad",a8,a8,a8,B.ca,a8,a8,a8)
 g=b3.h(0,"status")
 g=A.f("Status: "+J.Z(g==null?"pending":g),a8,a8,a8,a8,a8,a8,a8)
 f=q.a===B.c?"Requested At":"\uc694\uccad \uc2dc\uac01"
@@ -105408,7 +105408,7 @@ g=b3.h(0,"note")
 if(B.d.N(A.bm(g==null?"":g)).length!==0){g=q.a===B.c?"Practitioner Note":"\uce68\uc220\uc0ac \uba54\ubaa8"
 B.b.F(n,A.b([B.H,A.f(g+": "+A.w(b3.h(0,"note")),a8,a8,a8,a8,a8,a8,a8)],a0))}m.push(A.f8(new A.ab(B.ax,A.a1(n,B.m,B.f,B.j),a8),a8,a8))}if(p)m.push(B.P)
 b3=q.a===B.c
-p=A.bg(A.f(b3?"Appointment Requests":"\uc608\uc57d \uc2e0\uccad \ud604\ud669",a8,a8,a8,B.ca,a8,a8,a8),1)
+p=A.bg(A.f(b3?"Appointments":"\uc608\uc57d \uc2e0\uccad \ud604\ud669",a8,a8,a8,B.ca,a8,a8,a8),1)
 p=A.b([A.b1(A.b([p,A.ky(B.tE,A.f(b3?b1:"\uc608\uc57d",a8,a8,a8,a8,a8,a8,a8),a6)],a0),B.v,B.f,B.j,0),B.K],a0)
 b3=a7.x
 if(b3.length===0)p.push(A.f(q.a===B.c?"No requests":"\uc2e0\uccad \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
@@ -105425,7 +105425,7 @@ m.push(A.f8(new A.ab(B.ax,A.a1(p,B.m,B.f,B.j),a8),a8,a8))
 m.push(B.P)
 b3=q.a===B.c
 p=A.bg(A.f(b3?"Visit History Snapshot":"\ubc29\ubb38 \uae30\ub85d \uc694\uc57d",a8,a8,a8,B.ca,a8,a8,a8),1)
-p=A.b([A.b1(A.b([p,A.dP(A.f(b3?"Open history":"\uae30\ub85d \uc5f4\uae30",a8,a8,a8,a8,a8,a8,a8),a8,a8,new A.aEY(b4),a8,a8)],a0),B.v,B.f,B.j,0)],a0)
+p=A.b([A.b1(A.b([p,A.dP(A.f(b3?"History":"\uae30\ub85d",a8,a8,a8,a8,a8,a8,a8),a8,a8,new A.aEY(b4),a8,a8)],a0),B.v,B.f,B.j,0)],a0)
 b3=a7.z
 if(b3==null)p.push(A.f(q.a===B.c?"No visits":"\ubc29\ubb38 \uc5c6\uc74c",a8,a8,a8,a8,a8,a8,a8))
 else{n=q.a===B.c?"Last Visit":"\ucd5c\uadfc \ubc29\ubb38"
@@ -105539,7 +105539,7 @@ A.aEL.prototype={
 $0(){this.a.d.avm(this.b.a)},
 $S:0}
 A.aEX.prototype={
-$1(a){var s=null,r=a.b,q=A.aA(14),p=A.bC(B.eX,1),o=A.f(this.a.py(r.d)+" \xb7 "+r.e,s,s,s,B.az,s,s,s),n=this.b.a===B.c?"Current Intake Status":"\ud604\uc7ac \ubb38\uc9c4 \uc0c1\ud0dc"
+$1(a){var s=null,r=a.b,q=A.aA(14),p=A.bC(B.eX,1),o=A.f(this.a.py(r.d)+" \xb7 "+r.e,s,s,s,B.az,s,s,s),n=this.b.a===B.c?"Intake":"\ubb38\uc9c4"
 return new A.ab(B.bM,A.aN(s,A.a1(A.b([o,A.f(n+": "+A.xx(r.y),s,s,s,s,s,s,s)],t.p),B.m,B.f,B.j),B.n,s,new A.aw(B.e7,s,p,q,s,s,B.r),s,s,s,B.aG,s,s,1/0),s)},
 $S:110}
 A.aEY.prototype={
