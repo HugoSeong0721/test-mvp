@@ -266,14 +266,7 @@ class _TesterFeedbackSheetState extends State<_TesterFeedbackSheet> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            lang.tr(
-              'Please write at least a short problem or note before sending.',
-              '보내기 전에 짧게라도 문제나 메모를 적어주세요.',
-            ),
-          ),
-        ),
+        SnackBar(content: Text(lang.tr('Add a note first.', '메모를 먼저 적어주세요.'))),
       );
       return;
     }
@@ -308,12 +301,7 @@ class _TesterFeedbackSheetState extends State<_TesterFeedbackSheet> {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            lang.tr(
-              'Feedback could not be sent right now. Please try again in a moment.',
-              '지금은 피드백을 보내지 못했습니다. 잠시 후 다시 시도해주세요.',
-            ),
-          ),
+          content: Text(lang.tr('Could not send feedback.', '피드백을 보내지 못했습니다.')),
         ),
       );
     } finally {

@@ -601,12 +601,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     if (!_currentProfile.hasRequiredAlertInfo) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            lang.tr(
-              'Please add both your phone number and email before submitting so the test flow can work properly.',
-              '제출 전 전화번호와 이메일을 모두 입력해야 테스트 흐름이 정상 작동합니다.',
-            ),
-          ),
+          content: Text(lang.tr('Add phone and email.', '전화번호와 이메일 필요')),
         ),
       );
       _openProfileDialog();
@@ -1195,8 +1190,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       ),
                       child: Text(
                         lang.tr(
-                          'Please add both your phone number and email so your practitioner can reach you for real testing.',
-                          '실제 테스트를 위해 전화번호와 이메일을 모두 입력해주세요.',
+                          'Add phone and email.',
+                          '전화번호와 이메일 필요',
                         ),
                       ),
                     ),
@@ -1475,7 +1470,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             ? const Icon(Icons.local_fire_department, size: 18)
                             : null,
                         label: Text(
-                          lang.tr('This is my main pain', '이게 메인 통증이에요'),
+                          lang.tr('Main pain', '메인 통증'),
                         ),
                       ),
                       FilterChip(
@@ -1498,7 +1493,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             ? const Icon(Icons.push_pin, size: 18)
                             : null,
                         label: Text(
-                          lang.tr('Please remember this', '기억해줬으면 해요'),
+                          lang.tr('Remember', '기억'),
                         ),
                       ),
                     ],
@@ -1564,8 +1559,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       if (docs.isEmpty)
                         Text(
                           lang.tr(
-                            'No submissions yet.',
-                            '아직 제출 기록이 없습니다.',
+                            'No submissions',
+                            '제출 기록 없음',
                           ),
                         ),
                       ...docs.take(5).map((doc) {
@@ -1962,12 +1957,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                           size: 18,
                                         )
                                       : null,
-                                  label: Text(
-                                    lang.tr(
-                                      'This is my main pain',
-                                      '이게 메인 통증이에요',
-                                    ),
-                                  ),
+                                  label: Text(lang.tr('Main pain', '메인 통증')),
                                 ),
                                 FilterChip(
                                   selected: _activeRememberQuestionIndexes
@@ -1991,12 +1981,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                       )
                                       ? const Icon(Icons.push_pin, size: 18)
                                       : null,
-                                  label: Text(
-                                    lang.tr(
-                                      'Please remember this',
-                                      '기억해줬으면 해요',
-                                    ),
-                                  ),
+                                  label: Text(lang.tr('Remember', '기억')),
                                 ),
                               ],
                             ),
@@ -2279,10 +2264,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             ),
                           ),
                           child: Text(
-                            lang.tr(
-                              'Please add both your phone number and email so your practitioner can reach you for real testing.',
-                              '실제 테스트를 위해 전화번호와 이메일을 모두 입력해주세요.',
-                            ),
+                            lang.tr('Add phone and email.', '전화번호와 이메일 필요'),
                           ),
                         ),
                         const SizedBox(height: 12),

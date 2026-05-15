@@ -1350,10 +1350,7 @@ class _PractitionerDashboardScreenState
     final profile = scheduledVisit.profile;
     final visit = scheduledVisit.visit;
     final firstQa = visit.qaList.isEmpty
-        ? AppLanguageController.instance.tr(
-            'No intake submitted yet - please review directly before the session',
-            '문진 미제출 - 세션 전 직접 확인 필요',
-          )
+        ? AppLanguageController.instance.tr('No intake', '문진 없음')
         : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
     final currentInputLabel = visit.qaList.isEmpty
         ? AppLanguageController.instance.tr(
@@ -1799,16 +1796,10 @@ class _PractitionerDashboardScreenState
                 : IntakeStatus.completed,
             previousTreatmentArea:
                 latestHistory?.visit.previousTreatmentArea ??
-                AppLanguageController.instance.tr(
-                  'No prior treatment area saved yet',
-                  '이전 치료 부위 기록 없음',
-                ),
+                AppLanguageController.instance.tr('No prior area', '이전 부위 없음'),
             previousSessionNote:
                 latestHistory?.visit.previousSessionNote ??
-                AppLanguageController.instance.tr(
-                  'This visit was booked from the patient portal.',
-                  '이번 방문은 환자 포털에서 예약되었습니다.',
-                ),
+                AppLanguageController.instance.tr('Portal booking', '포털 예약'),
             qaList: qaList,
           ),
         ),
@@ -2273,12 +2264,7 @@ class _PractitionerDashboardScreenState
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: AppTheme.border),
                         ),
-                        child: Text(
-                          lang.tr(
-                            'No recent patient intake submissions are available yet.',
-                            '아직 최근 환자 문진 제출이 없습니다.',
-                          ),
-                        ),
+                        child: Text(lang.tr('No submissions', '제출 없음')),
                       )
                     else
                       ...patientSubmissions.map((doc) {
@@ -2634,10 +2620,7 @@ class _PractitionerDashboardScreenState
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  lang.tr(
-                    'Use this list to check how many patients are scheduled for each slot date.',
-                    '각 슬롯 날짜마다 몇 명의 환자가 잡혀 있는지 빠르게 확인하는 목록입니다.',
-                  ),
+                  lang.tr('Scheduled by date.', '날짜별 예약 수'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppTheme.ink.withValues(alpha: 0.72),
                   ),
@@ -3364,8 +3347,8 @@ class _PractitionerDashboardScreenState
                     children: [
                       Text(
                         AppLanguageController.instance.tr(
-                          'This note will appear in the patient requests inbox.',
-                          '이 쪽지는 환자 요청함에 바로 표시됩니다.',
+                          'Patient note',
+                          '환자 메모',
                         ),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
@@ -3379,12 +3362,12 @@ class _PractitionerDashboardScreenState
                       Text(
                         profile.email.trim().isEmpty
                             ? AppLanguageController.instance.tr(
-                                'No email is saved, so this will stay as an in-app portal note only.',
-                                '이메일이 저장되어 있지 않아 앱 안 포털 쪽지로만 전달됩니다.',
+                                'Portal only',
+                                '포털에만 표시',
                               )
                             : AppLanguageController.instance.tr(
-                                'If email is saved, a portal notification email will also be queued.',
-                                '이메일이 저장되어 있으면 포털 알림 메일도 함께 대기열에 들어갑니다.',
+                                'Email also queued',
+                                '이메일 알림 포함',
                               ),
                         style: const TextStyle(color: Colors.black54),
                       ),
@@ -3403,8 +3386,8 @@ class _PractitionerDashboardScreenState
                       '환자에게 보낼 내용',
                     ),
                     hintText: AppLanguageController.instance.tr(
-                      'Example: Please review your last visit note and come hydrated for the next session.',
-                      '예: 지난 방문 기록을 다시 보고, 다음 세션 전에는 물을 충분히 마시고 와주세요.',
+                      'Write a short note',
+                      '짧게 입력',
                     ),
                   ),
                 ),
@@ -5060,8 +5043,8 @@ class _BetaSubmissionBoard extends StatelessWidget {
                 if (docs.isEmpty) {
                   return Text(
                     AppLanguageController.instance.tr(
-                      'No beta submissions yet.',
-                      '아직 베타 가입자의 제출이 없습니다.',
+                      'No beta submissions',
+                      '베타 제출 없음',
                     ),
                   );
                 }
@@ -5202,8 +5185,8 @@ class _BetaRegistrantBoard extends StatelessWidget {
                     if (patientDocs.isEmpty) {
                       return Text(
                         AppLanguageController.instance.tr(
-                          'No beta users have signed up yet.',
-                          '아직 가입한 베타 사용자가 없습니다.',
+                          'No beta users',
+                          '베타 사용자 없음',
                         ),
                       );
                     }

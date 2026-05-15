@@ -331,9 +331,7 @@ class AppFirestoreService {
     const feedbackInbox = 'mg.seong0721@gmail.com';
     final feedbackRef = _db.collection('tester_feedback').doc();
     final screenLabel = routeName.trim().isEmpty ? 'unknown_screen' : routeName;
-    final summaryLine = summary.trim().isEmpty
-        ? 'No short summary added'
-        : summary.trim();
+    final summaryLine = summary.trim().isEmpty ? 'No summary' : summary.trim();
     final detailsLine = details.trim().isEmpty
         ? 'No extra detail added'
         : details.trim();

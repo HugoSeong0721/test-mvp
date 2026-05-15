@@ -29492,7 +29492,7 @@ for(;;)switch(s){case 0:e=$.f5()
 d=e.by("tester_feedback").a13()
 c=B.d.N(a3).length===0?"unknown_screen":a3
 b=B.d.N(a4)
-if(b.length===0)b="No short summary added"
+if(b.length===0)b="No summary"
 q=B.d.N(a0)
 if(q.length===0)q="No extra detail added"
 p=B.d.N(a2)
@@ -103042,7 +103042,7 @@ f=B.d.N(m.r.a.a)
 if(J.bG(g)===0&&J.bG(f)===0){l=m.c
 if(l==null){s=1
 break}l=l.X(t.q).f
-l.cE(A.cO(null,null,null,null,null,B.y,null,A.f(h.a===B.c?"Please write at least a short problem or note before sending.":"\ubcf4\ub0b4\uae30 \uc804\uc5d0 \uc9e7\uac8c\ub77c\ub3c4 \ubb38\uc81c\ub098 \uba54\ubaa8\ub97c \uc801\uc5b4\uc8fc\uc138\uc694.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
+l.cE(A.cO(null,null,null,null,null,B.y,null,A.f(h.a===B.c?"Add a note first.":"\uba54\ubaa8\ub97c \uba3c\uc800 \uc801\uc5b4\uc8fc\uc138\uc694.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
 s=1
 break}m.L(new A.aNY(m))
 p=4
@@ -103066,7 +103066,7 @@ l=m.c
 if(l==null){n=[1]
 s=5
 break}l=l.X(t.q).f
-l.cE(A.cO(null,null,null,null,null,B.y,null,A.f(h.a===B.c?"Feedback could not be sent right now. Please try again in a moment.":"\uc9c0\uae08\uc740 \ud53c\ub4dc\ubc31\uc744 \ubcf4\ub0b4\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \uc7a0\uc2dc \ud6c4 \ub2e4\uc2dc \uc2dc\ub3c4\ud574\uc8fc\uc138\uc694.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
+l.cE(A.cO(null,null,null,null,null,B.y,null,A.f(h.a===B.c?"Could not send feedback.":"\ud53c\ub4dc\ubc31\uc744 \ubcf4\ub0b4\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
 n.push(6)
 s=5
 break
@@ -104784,7 +104784,7 @@ case 5:s=1
 break
 case 4:o=k.a_w(p.glj().a,j.a)
 if(o.length===0){m=p.c.X(t.q).f
-m.cE(A.cO(null,null,null,null,null,B.y,null,A.f(l.a===B.c?"There are no open appointment slots right now.":"\uc9c0\uae08\uc740 \uc120\ud0dd \uac00\ub2a5\ud55c \uc608\uc57d \uc2ac\ub86f\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
+m.cE(A.cO(null,null,null,null,null,B.y,null,A.f(l.a===B.c?"No open slots.":"\uc608\uc57d \uac00\ub2a5 \uc2ac\ub86f \uc5c6\uc74c",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
 s=1
 break}k=new A.K(o,new A.aEf(),A.N(o).i("K<1,j>")).fG(0)
 n=A.S(k,A.p(k).c)
@@ -105503,23 +105503,23 @@ if(q){p=r.d
 r=r.e
 r=k.a.nT(p)+" \xb7 "+r}else r="-"
 if(q){e=i.a
-q=e===B.c?"Your next scheduled session":"\ub2e4\uc74c\uc73c\ub85c \uc608\uc815\ub41c \uc138\uc158\uc785\ub2c8\ub2e4"
+q=e===B.c?"Scheduled":"\uc608\uc57d\ub428"
 o=q
 q=e
 e=o}else if(e.length!==0){e=i.a
-q=e===B.c?"You have a pending appointment request waiting for confirmation":"\ud655\uc815 \ub300\uae30 \uc911\uc778 \uc608\uc57d \uc2e0\uccad\uc774 \uc788\uc2b5\ub2c8\ub2e4"
+q=e===B.c?"Pending":"\ub300\uae30 \uc911"
 o=q
 q=e
 e=o}else{e=i.a
-q=e===B.c?"No future visit is listed yet":"\uc544\uc9c1 \uc608\uc815\ub41c \ubc29\ubb38\uc774 \uc5c6\uc2b5\ub2c8\ub2e4"
+q=e===B.c?"Not booked":"\uc608\uc57d \uc5c6\uc74c"
 o=q
 q=e
 e=o}q=q===B.c?"Profile Ready":"\ud504\ub85c\ud544 \uc900\ube44 \uc0c1\ud0dc"
 p=k.f
 if(p.ghU())n=i.a===B.c?"Ready":"\uc900\ube44\ub428"
 else n=i.a===B.c?"Needs Update":"\uc5c5\ub370\uc774\ud2b8 \ud544\uc694"
-if(p.ghU())i=i.a===B.c?"Phone and email are both saved":"\uc804\ud654\ubc88\ud638\uc640 \uc774\uba54\uc77c\uc774 \ubaa8\ub450 \uc800\uc7a5\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4"
-else i=i.a===B.c?"Please add both phone and email":"\uc804\ud654\ubc88\ud638\uc640 \uc774\uba54\uc77c\uc744 \ubaa8\ub450 \uc785\ub825\ud574\uc8fc\uc138\uc694"
+if(p.ghU())i=i.a===B.c?"Complete":"\uc644\ub8cc"
+else i=i.a===B.c?"Missing contact":"\uc5f0\ub77d\ucc98 \ud544\uc694"
 m=A.b([new A.mG(g,""+(f+d),s,B.jr,j),new A.mG(h,r,e,B.hv,j),new A.mG(q,n,i,B.mW,j)],t.xf)
 if(b.b<860){i=t.BF
 i=A.S(new A.K(m,new A.aEM(),i),i.i("ai.E"))
@@ -105768,7 +105768,7 @@ var $async$wq=A.q(function(a4,a5){if(a4===1){o.push(a5)
 s=p}for(;;)switch(s){case 0:a2=$.ac()
 if(m.dy){s=1
 break}if(!m.gew().ghU()){h=m.c.X(t.q).f
-h.cE(A.cO(null,null,null,null,null,B.y,null,A.f(a2.a===B.c?"Please add both your phone number and email before submitting so the test flow can work properly.":"\uc81c\ucd9c \uc804 \uc804\ud654\ubc88\ud638\uc640 \uc774\uba54\uc77c\uc744 \ubaa8\ub450 \uc785\ub825\ud574\uc57c \ud14c\uc2a4\ud2b8 \ud750\ub984\uc774 \uc815\uc0c1 \uc791\ub3d9\ud569\ub2c8\ub2e4.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
+h.cE(A.cO(null,null,null,null,null,B.y,null,A.f(a2.a===B.c?"Add phone and email.":"\uc804\ud654\ubc88\ud638\uc640 \uc774\uba54\uc77c \ud544\uc694",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
 m.w3()
 s=1
 break}m.JX()
@@ -106387,12 +106387,12 @@ a4=b9.cx?b9.at:b9.ax
 a4=a4.n(0,b9.CW)
 a5=b9.cx?b9.at:b9.ax
 a5=a5.n(0,b9.CW)?B.O5:b5
-a4=A.aeS(a5,b5,b5,A.f(s.a===B.c?"This is my main pain":"\uc774\uac8c \uba54\uc778 \ud1b5\uc99d\uc774\uc5d0\uc694",b5,b5,b5,b5,b5,b5,b5),b5,b5,new A.aFu(b9),b5,a4,b5,b5,b5,b5)
+a4=A.aeS(a5,b5,b5,A.f(s.a===B.c?"Main pain":"\uba54\uc778 \ud1b5\uc99d",b5,b5,b5,b5,b5,b5,b5),b5,b5,new A.aFu(b9),b5,a4,b5,b5,b5,b5)
 a5=b9.cx?b9.ay:b9.ch
 a5=a5.n(0,b9.CW)
 a6=b9.cx?b9.ay:b9.ch
 a6=a6.n(0,b9.CW)?B.Oj:b5
-a4=A.cd(B.U,A.b([a4,A.aeS(a6,b5,b5,A.f(s.a===B.c?"Please remember this":"\uae30\uc5b5\ud574\uc92c\uc73c\uba74 \ud574\uc694",b5,b5,b5,b5,b5,b5,b5),b5,b5,new A.aFv(b9),b5,a5,b5,b5,b5,b5)],a),B.X,10,10)
+a4=A.cd(B.U,A.b([a4,A.aeS(a6,b5,b5,A.f(s.a===B.c?"Remember":"\uae30\uc5b5",b5,b5,b5,b5,b5,b5,b5),b5,b5,new A.aFv(b9),b5,a5,b5,b5,b5,b5)],a),B.X,10,10)
 a5=A.j5(new A.aFw(b9,s))
 a6=b9.dy
 a7=a6?b5:b9.gas9()
@@ -106454,7 +106454,7 @@ B.b.F(q,A.b([B.K,A.f(n,b5,b5,b5,g?b5:o.aB(B.p.P(0.72)),b5,b5,b5)],a))}if(!c.ghU(
 n=A.ax(20)
 m=A.bC(B.hR.P(0.25),1)
 l=s.a===B.c
-o=A.aN(b5,A.f(l?"Please add both your phone number and email so your practitioner can reach you for real testing.":"\uc2e4\uc81c \ud14c\uc2a4\ud2b8\ub97c \uc704\ud574 \uc804\ud654\ubc88\ud638\uc640 \uc774\uba54\uc77c\uc744 \ubaa8\ub450 \uc785\ub825\ud574\uc8fc\uc138\uc694.",b5,b5,b5,b5,b5,b5,b5),B.n,b5,new A.av(o,b5,m,n,b5,b5,B.r),b5,b5,b5,B.b4,b5,b5,b5)
+o=A.aN(b5,A.f(l?"Add phone and email.":"\uc804\ud654\ubc88\ud638\uc640 \uc774\uba54\uc77c \ud544\uc694",b5,b5,b5,b5,b5,b5,b5),B.n,b5,new A.av(o,b5,m,n,b5,b5,B.r),b5,b5,b5,B.b4,b5,b5,b5)
 B.b.F(q,A.b([B.a9,o,B.D,A.d5(B.O6,A.f(l?"Update Profile":"\ud504\ub85c\ud544 \uc5c5\ub370\uc774\ud2b8",b5,b5,b5,b5,b5,b5,b5),f,b5)],a))}b1=A.c2(A.a1(q,B.m,B.f,B.j),b5,B.ct)
 q=e.length
 if(q!==0){q=""+q
@@ -107943,7 +107943,7 @@ case"In Progress":return a.b.y===B.ju
 case"Complete":return a.b.y===B.ek
 case"All":default:return!0}},
 adq(a,a0){var s,r,q,p,o,n,m,l,k,j,i,h,g,f=this,e=null,d=a0.a,c=a0.b,b=c.as
-if(b.length===0)s=$.ac().a===B.c?"No intake submitted yet - please review directly before the session":"\ubb38\uc9c4 \ubbf8\uc81c\ucd9c - \uc138\uc158 \uc804 \uc9c1\uc811 \ud655\uc778 \ud544\uc694"
+if(b.length===0)s=$.ac().a===B.c?"No intake":"\ubb38\uc9c4 \uc5c6\uc74c"
 else s=B.b.gT(b).b+" / "+B.b.gT(b).c
 if(b.length===0){b=$.ac()
 r=b.a===B.c?"Current visit status for this selected booking date":"\uc120\ud0dd\ud55c \uc608\uc57d \ub0a0\uc9dc \uae30\uc900 \ud604\uc7ac \ubc29\ubb38 \uc0c1\ud0dc"}else{b=$.ac()
@@ -108122,9 +108122,9 @@ e=g<0?0:g
 c=i?0:1
 b=d.length===0?B.ej:B.ek
 a=i?a1:k.b.z
-if(a==null)a=$.ac().a===B.c?"No prior treatment area saved yet":"\uc774\uc804 \uce58\ub8cc \ubd80\uc704 \uae30\ub85d \uc5c6\uc74c"
+if(a==null)a=$.ac().a===B.c?"No prior area":"\uc774\uc804 \ubd80\uc704 \uc5c6\uc74c"
 i=i?a1:k.b.Q
-if(i==null)i=$.ac().a===B.c?"This visit was booked from the patient portal.":"\uc774\ubc88 \ubc29\ubb38\uc740 \ud658\uc790 \ud3ec\ud138\uc5d0\uc11c \uc608\uc57d\ub418\uc5c8\uc2b5\ub2c8\ub2e4."
+if(i==null)i=$.ac().a===B.c?"Portal booking":"\ud3ec\ud138 \uc608\uc57d"
 a2.push(new A.dA(n,new A.ez("dashboard_"+p.a,o,p.c,m,l,f,e,c,0,b,a,i,d)))}B.b.bx(a2,new A.aJ5())
 return a2},
 adr(){var s,r,q,p,o,n,m,l,k=this,j=null,i="[DEFAULT]",h="visit_record_feedback",g=$.ac(),f=k.ar4(),e=A.ct($.c3)
@@ -109175,7 +109175,7 @@ else if(b.c!=null)s.push(A.f(n.a===B.c?"Could not load recent patient submission
 else if(r.length===0){m=B.bK.P(0.62)
 l=A.ax(16)
 q=A.bC(B.R,1)
-s.push(A.aN(o,A.f(n.a===B.c?"No recent patient intake submissions are available yet.":"\uc544\uc9c1 \ucd5c\uadfc \ud658\uc790 \ubb38\uc9c4 \uc81c\ucd9c\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",o,o,o,o,o,o,o),B.n,o,new A.av(m,o,q,l,o,o,B.r),o,o,o,B.b4,o,o,1/0))}else B.b.F(s,new A.K(r,new A.aIR(m,n,a),A.N(r).i("K<1,e>")))
+s.push(A.aN(o,A.f(n.a===B.c?"No submissions":"\uc81c\ucd9c \uc5c6\uc74c",o,o,o,o,o,o,o),B.n,o,new A.av(m,o,q,l,o,o,B.r),o,o,o,B.b4,o,o,1/0))}else B.b.F(s,new A.K(r,new A.aIR(m,n,a),A.N(r).i("K<1,e>")))
 return A.a1(s,B.m,B.f,B.j)},
 $S:292}
 A.aIP.prototype={
@@ -109295,7 +109295,7 @@ A.aJl.prototype={
 $1(a){var s,r=null,q=this.b,p=q.a===B.c?"Daily patient counts":"\ub0a0\uc9dc\ubcc4 \ud658\uc790 \uc218",o=this.a,n=o.c
 n.toString
 n=A.f(p,r,r,r,A.n(n).ok.r,r,r,r)
-p=q.a===B.c?"Use this list to check how many patients are scheduled for each slot date.":"\uac01 \uc2ac\ub86f \ub0a0\uc9dc\ub9c8\ub2e4 \uba87 \uba85\uc758 \ud658\uc790\uac00 \uc7a1\ud600 \uc788\ub294\uc9c0 \ube60\ub974\uac8c \ud655\uc778\ud558\ub294 \ubaa9\ub85d\uc785\ub2c8\ub2e4."
+p=q.a===B.c?"Scheduled by date.":"\ub0a0\uc9dc\ubcc4 \uc608\uc57d \uc218"
 s=o.c
 s.toString
 s=A.n(s).ok.z
@@ -109609,7 +109609,7 @@ s=i.a===B.c
 g=A.f(s?f:g,j,j,j,j,j,j,j)
 f=A.ax(12)
 r=A.bC(B.hc,1)
-q=A.f(s?"This note will appear in the patient requests inbox.":"\uc774 \ucabd\uc9c0\ub294 \ud658\uc790 \uc694\uccad\ud568\uc5d0 \ubc14\ub85c \ud45c\uc2dc\ub429\ub2c8\ub2e4.",j,j,j,B.az,j,j,j)
+q=A.f(s?"Patient note":"\ud658\uc790 \uba54\ubaa8",j,j,j,B.az,j,j,j)
 p=k.a
 o=k.c
 n=o.d
@@ -109618,14 +109618,14 @@ l="Visit context: "+p.h6(n)+" "+m
 m="\ubc29\ubb38 \ub9e5\ub77d: "+p.h6(n)+" "+m
 s=i.a===B.c
 n=A.f(s?l:m,j,j,j,j,j,j,j)
-if(B.d.N(h.d).length===0)s=s?"No email is saved, so this will stay as an in-app portal note only.":"\uc774\uba54\uc77c\uc774 \uc800\uc7a5\ub418\uc5b4 \uc788\uc9c0 \uc54a\uc544 \uc571 \uc548 \ud3ec\ud138 \ucabd\uc9c0\ub85c\ub9cc \uc804\ub2ec\ub429\ub2c8\ub2e4."
-else s=s?"If email is saved, a portal notification email will also be queued.":"\uc774\uba54\uc77c\uc774 \uc800\uc7a5\ub418\uc5b4 \uc788\uc73c\uba74 \ud3ec\ud138 \uc54c\ub9bc \uba54\uc77c\ub3c4 \ud568\uaed8 \ub300\uae30\uc5f4\uc5d0 \ub4e4\uc5b4\uac11\ub2c8\ub2e4."
+if(B.d.N(h.d).length===0)s=s?"Portal only":"\ud3ec\ud138\uc5d0\ub9cc \ud45c\uc2dc"
+else s=s?"Email also queued":"\uc774\uba54\uc77c \uc54c\ub9bc \ud3ec\ud568"
 m=t.p
 f=A.aN(j,A.a1(A.b([q,B.a0,n,A.f(s,j,j,j,B.eG,j,j,j)],m),B.m,B.f,B.j),B.n,j,new A.av(B.e8,j,r,f,j,j,B.r),j,j,j,B.aH,j,j,1/0)
 r=k.d
 s=i.a===B.c
 q=s?"Message for the patient":"\ud658\uc790\uc5d0\uac8c \ubcf4\ub0bc \ub0b4\uc6a9"
-f=A.c7(A.a1(A.b([f,B.D,A.bN(!1,r,A.bx(j,B.aX,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,s?"Example: Please review your last visit note and come hydrated for the next session.":"\uc608: \uc9c0\ub09c \ubc29\ubb38 \uae30\ub85d\uc744 \ub2e4\uc2dc \ubcf4\uace0, \ub2e4\uc74c \uc138\uc158 \uc804\uc5d0\ub294 \ubb3c\uc744 \ucda9\ubd84\ud788 \ub9c8\uc2dc\uace0 \uc640\uc8fc\uc138\uc694.",j,j,j,j,j,j,j,j,q,!0,!0,!1,j,j,j,j,j,j,j,j,j,j,j,j,j,j),j,j,7,4,!1,j,j,j)],m),B.m,B.f,B.W),j,500)
+f=A.c7(A.a1(A.b([f,B.D,A.bN(!1,r,A.bx(j,B.aX,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,s?"Write a short note":"\uc9e7\uac8c \uc785\ub825",j,j,j,j,j,j,j,j,q,!0,!0,!1,j,j,j,j,j,j,j,j,j,j,j,j,j,j),j,j,7,4,!1,j,j,j)],m),B.m,B.f,B.W),j,500)
 i=i.a===B.c
 s=A.dP(A.f(i?"Cancel":"\ucde8\uc18c",j,j,j,j,j,j,j),j,j,new A.aJG(r,a),j,j)
 return A.iS(A.b([s,A.dW(B.n4,A.f(i?"Send":"\uc804\uc1a1",j,j,j,j,j,j,j),new A.aJH(p,r,k.e,h,o,a),j)],m),f,g)},
@@ -110363,7 +110363,7 @@ a0=A.cC(s?B.ti:B.mR,c,c,c)
 if(s)p=a.a===B.c?"Mark reviewed":"\ud655\uc778 \uc644\ub8cc"
 else p=a.a===B.c?"Reopen":"\ub2e4\uc2dc \uc5f4\uae30"
 p=A.aZ(A.b([k,B.bT,A.ky(a0,A.f(p,c,c,c,c,c,c,c),new A.azv(d,s))],j),B.m,B.f,B.j,0)
-if(o.length===0)a0=a.a===B.c?"No short summary was added.":"\uc9e7\uc740 \uc694\uc57d\uc774 \uc5c6\uc2b5\ub2c8\ub2e4."
+if(o.length===0)a0=a.a===B.c?"No summary":"\uc694\uc57d \uc5c6\uc74c"
 else a0=o
 k=A.n(a1).ok.r
 a0=A.f(a0,c,c,c,k==null?c:k.fC(B.M),c,c,c)
@@ -110557,7 +110557,7 @@ m=j.a===B.c?"Most Recent Status":"\ucd5c\uadfc \uc0c1\ud0dc"
 o=o?"-":A.xx(d.y)
 l=t.p
 l=A.b([A.c2(A.a1(A.b([s,B.P,A.cd(B.U,A.b([new A.A_(q,""+p,!1,k),new A.A_(r,n,!1,k),new A.A_(m,o,!1,k)],l),B.X,12,12)],l),B.m,B.f,B.j),k,B.ct),B.P,new A.y9(f,new A.aPh(a),k),B.P],l)
-if(e.length===0)l.push(A.f8(new A.ab(B.bN,A.f(j.a===B.c?"No visit history is available yet.":"\uc544\uc9c1 \ubc29\ubb38 \uae30\ub85d\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",k,k,k,k,k,k,k),k),k,k))
+if(e.length===0)l.push(A.f8(new A.ab(B.bN,A.f(j.a===B.c?"No visits":"\ubc29\ubb38 \uae30\ub85d \uc5c6\uc74c",k,k,k,k,k,k,k),k),k,k))
 else B.b.F(l,new A.K(e,new A.aPi(i,h,j),A.N(e).i("K<1,e>")))
 return A.T1(B.dj,A.lT(l,k,B.ax,k,!1),B.zF,g)},
 $S:156}

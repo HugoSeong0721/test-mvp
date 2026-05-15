@@ -332,9 +332,7 @@ class _FeedbackCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            summary.isEmpty
-                ? lang.tr('No short summary was added.', '짧은 요약이 없습니다.')
-                : summary,
+            summary.isEmpty ? lang.tr('No summary', '요약 없음') : summary,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),

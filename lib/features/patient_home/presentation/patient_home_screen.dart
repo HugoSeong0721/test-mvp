@@ -1095,14 +1095,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     );
     if (availableSlots.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            lang.tr(
-              'There are no open appointment slots right now.',
-              '지금은 선택 가능한 예약 슬롯이 없습니다.',
-            ),
-          ),
-        ),
+        SnackBar(content: Text(lang.tr('No open slots.', '예약 가능 슬롯 없음'))),
       );
       return;
     }
@@ -1607,19 +1600,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       )
                                     : '-',
                                 subtitle: nextVisit != null
-                                    ? lang.tr(
-                                        'Your next scheduled session',
-                                        '다음으로 예정된 세션입니다',
-                                      )
+                                    ? lang.tr('Scheduled', '예약됨')
                                     : pendingAppointmentRequests.isNotEmpty
-                                    ? lang.tr(
-                                        'You have a pending appointment request waiting for confirmation',
-                                        '확정 대기 중인 예약 신청이 있습니다',
-                                      )
-                                    : lang.tr(
-                                        'No future visit is listed yet',
-                                        '아직 예정된 방문이 없습니다',
-                                      ),
+                                    ? lang.tr('Pending', '대기 중')
+                                    : lang.tr('Not booked', '예약 없음'),
                                 icon: Icons.event_available_outlined,
                               ),
                               _SummaryCard(
@@ -1628,14 +1612,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     ? lang.tr('Ready', '준비됨')
                                     : lang.tr('Needs Update', '업데이트 필요'),
                                 subtitle: profile.hasRequiredAlertInfo
-                                    ? lang.tr(
-                                        'Phone and email are both saved',
-                                        '전화번호와 이메일이 모두 저장되어 있습니다',
-                                      )
-                                    : lang.tr(
-                                        'Please add both phone and email',
-                                        '전화번호와 이메일을 모두 입력해주세요',
-                                      ),
+                                    ? lang.tr('Complete', '완료')
+                                    : lang.tr('Missing contact', '연락처 필요'),
                                 icon: Icons.verified_user_outlined,
                               ),
                             ];

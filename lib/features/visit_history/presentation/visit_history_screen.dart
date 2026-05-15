@@ -289,12 +289,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
-                    child: Text(
-                      lang.tr(
-                        'No visit history is available yet.',
-                        '아직 방문 기록이 없습니다.',
-                      ),
-                    ),
+                    child: Text(lang.tr('No visits', '방문 기록 없음')),
                   ),
                 )
               else
