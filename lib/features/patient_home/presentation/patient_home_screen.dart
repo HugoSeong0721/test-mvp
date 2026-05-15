@@ -1112,7 +1112,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   children: [
                     Text(
                       lang.tr(
-                        'Choose a date and time to add another upcoming visit.',
+                        'Choose date and time.',
                         '다가오는 방문 일정을 추가할 날짜와 시간을 선택해주세요.',
                       ),
                     ),
@@ -1183,14 +1183,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       SnackBar(
                         content: Text(
                           lang.tr(
-                            'Appointment request sent for ${_formatVisitSlot(selectedDate, selectedTime)}. If your practitioner needs more context, an intake form will appear in your portal.',
+                            'Request sent.',
                             '${_formatVisitSlot(selectedDate, selectedTime)} 예약 신청을 보냈습니다. 침술사가 추가 정보가 필요하면 문진 폼이 포털에 표시됩니다.',
                           ),
                         ),
                       ),
                     );
                   },
-                  child: Text(lang.tr('Request Appointment', '예약 신청')),
+                  child: Text(lang.tr('Request', '신청')),
                 ),
               ],
             );
@@ -1329,45 +1329,30 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   late final VoidCallback nextStepAction;
 
                   if (needsRequestsFirst) {
-                    nextStepTitle = lang.tr(
-                      'Reply to your practitioner request first',
-                      '먼저 침술사 요청에 답하기',
-                    );
-                    nextStepButton = lang.tr('Open Requests', '요청함 열기');
+                    nextStepTitle = lang.tr('Reply needed', '먼저 침술사 요청에 답하기');
+                    nextStepButton = lang.tr('Requests', '요청함');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       PatientRequestsScreen.routeName,
                     );
                   } else if (needsProfileFirst) {
-                    nextStepTitle = lang.tr(
-                      'Add your contact info first',
-                      '먼저 연락처 입력하기',
-                    );
-                    nextStepButton = lang.tr('Edit Profile', '프로필 수정');
+                    nextStepTitle = lang.tr('Contact missing', '먼저 연락처 입력하기');
+                    nextStepButton = lang.tr('Profile', '프로필');
                     nextStepAction = _openProfileDialog;
                   } else if (needsIntakeFirst) {
-                    nextStepTitle = lang.tr(
-                      'Send today\'s intake update',
-                      '오늘 상태 문진 보내기',
-                    );
-                    nextStepButton = lang.tr('Continue Intake', '문진 이어쓰기');
+                    nextStepTitle = lang.tr('Intake due', '오늘 상태 문진 보내기');
+                    nextStepButton = lang.tr('Intake', '문진');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       PatientIntakeScreen.routeName,
                     );
                   } else if (needsAppointmentFirst) {
-                    nextStepTitle = lang.tr(
-                      'Request your next appointment',
-                      '다음 예약 신청하기',
-                    );
-                    nextStepButton = lang.tr('Book Appointment', '예약하기');
+                    nextStepTitle = lang.tr('Book next visit', '다음 예약 신청하기');
+                    nextStepButton = lang.tr('Book', '예약');
                     nextStepAction = _openAppointmentDialog;
                   } else {
-                    nextStepTitle = lang.tr(
-                      'You are caught up for now',
-                      '지금은 할 일을 거의 마쳤어요',
-                    );
-                    nextStepButton = lang.tr('Visit History', '방문 기록');
+                    nextStepTitle = lang.tr('All set', '지금은 할 일을 거의 마쳤어요');
+                    nextStepButton = lang.tr('History', '기록');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       VisitHistoryScreen.routeName,
@@ -1462,7 +1447,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          lang.tr('Next step', 'Next step'),
+                                          lang.tr('Next', '다음'),
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge
@@ -1761,9 +1746,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   FilledButton.tonalIcon(
                                     onPressed: _openAppointmentDialog,
                                     icon: const Icon(Icons.add),
-                                    label: Text(
-                                      lang.tr('Book Appointment', '예약하기'),
-                                    ),
+                                    label: Text(lang.tr('Book', '예약')),
                                   ),
                                 ],
                               ),
@@ -1848,10 +1831,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 Icons.cancel_outlined,
                                               ),
                                               label: Text(
-                                                lang.tr(
-                                                  'Cancel Request',
-                                                  '신청 취소',
-                                                ),
+                                                lang.tr('Cancel', '신청 취소'),
                                               ),
                                             ),
                                           ],
@@ -1888,12 +1868,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   FilledButton.tonalIcon(
                                     onPressed: _openAppointmentDialog,
                                     icon: const Icon(Icons.add),
-                                    label: Text(
-                                      lang.tr(
-                                        'Request Another Slot',
-                                        '다른 시간 신청',
-                                      ),
-                                    ),
+                                    label: Text(lang.tr('Request', '다른 시간 신청')),
                                   ),
                                 ],
                               ),
@@ -2136,7 +2111,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         context,
                       ).pushNamedAndRemoveUntil('/', (_) => false),
                       icon: const Icon(Icons.home_outlined),
-                      label: Text(lang.tr('Back to entry', '진입 화면으로')),
+                      label: Text(lang.tr('Entry', '시작')),
                     ),
                   ],
                 ),

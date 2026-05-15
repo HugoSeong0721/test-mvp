@@ -587,7 +587,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   customByCategory.isEmpty)
                                 Text(
                                   lang.tr(
-                                    'No detailed questions were saved in this thread.',
+                                    'No questions',
                                     '이 스레드에는 저장된 세부 질문이 없습니다.',
                                   ),
                                   style: Theme.of(context).textTheme.bodyMedium,
