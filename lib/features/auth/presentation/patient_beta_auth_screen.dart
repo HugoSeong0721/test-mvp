@@ -709,11 +709,11 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         ? lang.tr('Sign up', '회원가입')
         : lang.tr('Log in', '로그인');
     final submitLabel = _isRegisterMode
-        ? lang.tr('Sign Up and Continue', '가입하고 계속')
-        : lang.tr('Log In and Continue', '로그인하고 계속');
+        ? lang.tr('Create', '가입')
+        : lang.tr('Login', '로그인');
     final toggleLabel = _isRegisterMode
-        ? lang.tr('Already have an account? Log in', '이미 계정이 있나요? 로그인')
-        : lang.tr('New here? Sign up', '처음이신가요? 회원가입');
+        ? lang.tr('Use existing account', '기존 계정 사용')
+        : lang.tr('Create account', '계정 만들기');
 
     return AppPanel(
       padding: const EdgeInsets.all(28),
@@ -774,7 +774,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             onChanged: (_) => _clearFormErrorOnChange(),
             decoration: InputDecoration(
               labelText: lang.tr('Email', '이메일'),
-              hintText: lang.tr('Enter your email address', '이메일 주소를 입력해주세요'),
+              hintText: lang.tr('Email address', '이메일 주소'),
               prefixIcon: const Icon(Icons.alternate_email),
             ),
           ),
@@ -803,9 +803,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             icon: Icon(
               _isRegisterMode ? Icons.arrow_circle_right_outlined : Icons.login,
             ),
-            label: Text(
-              _loading ? lang.tr('Working...', '처리 중...') : submitLabel,
-            ),
+            label: Text(_loading ? lang.tr('Working...', '처리 중') : submitLabel),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -815,7 +813,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             children: [
               TextButton(
                 onPressed: _loading ? null : _showSavedPatientAccounts,
-                child: Text(lang.tr('Find saved email', '저장된 이메일 찾기')),
+                child: Text(lang.tr('Find email', '이메일 찾기')),
               ),
               TextButton(
                 onPressed: _loading ? null : _showPatientPasswordResetDialog,
@@ -855,7 +853,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            lang.tr('You are signed in', '현재 로그인됨'),
+            lang.tr('Signed in', '로그인됨'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 6),
@@ -903,7 +901,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                     ? null
                     : () => _reloadTesterPortalData(session),
                 icon: const Icon(Icons.refresh),
-                label: Text(lang.tr('Reload sample', '샘플 다시 채우기')),
+                label: Text(lang.tr('Reload', '다시 불러오기')),
               ),
             ],
           ),
@@ -926,13 +924,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            lang.tr('Continue or switch account.', '계속하거나 계정 변경'),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.72),
-            ),
           ),
         ],
       ),
@@ -984,7 +975,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            lang.tr('Clinic link received', '한의원 링크로 들어왔습니다'),
+            lang.tr('Clinic selected', '한의원 선택됨'),
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
@@ -1010,7 +1001,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           const SizedBox(height: 12),
           Text(
             lang.tr(
-              'After sign up or login, this clinic will already be selected in the patient portal.',
+              'This clinic opens after login.',
               '로그인 후에는 이 한의원이 환자 포털에 미리 선택된 상태로 열립니다.',
             ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(

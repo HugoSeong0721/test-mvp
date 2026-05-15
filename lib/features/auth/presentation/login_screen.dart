@@ -315,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ? lang.tr('Practitioner', '침술사')
         : lang.tr('Patient', '환자');
     final submitLabel = isPractitioner && _isPractitionerRegisterMode
-        ? lang.tr('Create account', '계정 만들기')
+        ? lang.tr('Create', '가입')
         : lang.tr('Login', '로그인');
 
     return Scaffold(
@@ -407,11 +407,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? lang.tr('Login ID', '로그인 아이디')
                               : lang.tr('ID', '아이디'),
                           hintText: isPractitioner
-                              ? lang.tr(
-                                  'Enter your practitioner login ID',
-                                  '침술사 로그인 아이디를 입력해주세요',
-                                )
-                              : lang.tr('Enter your ID', '아이디를 입력해주세요'),
+                              ? lang.tr('Login ID', '침술사 로그인 아이디를 입력해주세요')
+                              : lang.tr('ID', '아이디'),
                           prefixIcon: const Icon(Icons.badge_outlined),
                         ),
                       ),
@@ -447,7 +444,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         label: Text(
                           _isSubmitting
-                              ? lang.tr('Working...', '처리 중...')
+                              ? lang.tr('Working...', '처리 중')
                               : submitLabel,
                         ),
                       ),
