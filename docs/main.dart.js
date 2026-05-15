@@ -108318,8 +108318,10 @@ return A.m(A.wg(a.e,f,"initial","New patient","Your clinic approved your account
 case 8:j=n.c
 if(j==null){s=1
 break}j=j.X(t.q).f
-$.ab()
-j.cE(A.cN(null,null,null,null,null,B.y,null,A.f(a.c+" approved. It stays in Inbox under Recent joins.",null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
+i=a.c
+m=i+" approved."
+i+=" \uc2b9\uc778\ub428"
+j.cE(A.cN(null,null,null,null,null,B.y,null,A.f($.ab().a===B.c?m:i,null,null,null,null,null,null,null),null,B.ai,null,null,null,null,null,null,null,null,null,null))
 p=2
 s=6
 break
@@ -108375,11 +108377,12 @@ o=t.p
 s=A.b([k,B.C,A.f(j,m,m,m,A.o(s).ok.w,m,m,m),B.J],o)
 if(r.length===0)s.push(A.f(l.a===B.c?"No joins":"\uac00\uc785 \uc5c6\uc74c",m,m,m,m,m,m,m))
 else B.b.F(s,new A.K(r,new A.aId(n,l),A.N(r).i("K<1,e>")))
-if(q.length!==0){k=n.c
-k.toString
-k=A.b([B.aM,A.f("Recent joins",m,m,m,A.o(k).ok.w,m,m,m),B.J],o)
-B.b.F(k,new A.K(q,new A.aIe(n,l),A.N(q).i("K<1,e>")))
-B.b.F(s,k)}k=A.ct($.c2)
+if(q.length!==0){k=l.a===B.c?"Recent joins":"\ucd5c\uadfc \uac00\uc785"
+j=n.c
+j.toString
+j=A.b([B.aM,A.f(k,m,m,m,A.o(j).ok.w,m,m,m),B.J],o)
+B.b.F(j,new A.K(q,new A.aIe(n,l),A.N(q).i("K<1,e>")))
+B.b.F(s,j)}k=A.ct($.c2)
 if((k==null?m:k.b)==="admin"){k=l.a===B.c?"Leads":"\ub9ac\ub4dc"
 j=n.c
 j.toString
@@ -108448,7 +108451,7 @@ h6(a){var s=this.fO(a)
 if(s==null)return a
 return this.TS(s,!1)},
 Au(a){return this.fM(a)+" "+B.d.bl(B.h.k(A.m3(a)),2,"0")+":"+B.d.bl(B.h.k(A.m4(a)),2,"0")},
-acZ(a){var s,r,q=null,p=$.ab().a===B.c?"Open patient inbox":"\ud658\uc790 \ucabd\uc9c0\ud568 \uc5f4\uae30",o=A.b([B.tz],t.p)
+acZ(a){var s,r,q=null,p=$.ab().a===B.c?"Inbox":"\uc694\uccad\ud568",o=A.b([B.tz],t.p)
 if(a>0){s=A.aC(999)
 r=this.c
 r.toString
@@ -109703,8 +109706,9 @@ q=a.d
 if(B.d.N(q).length!==0){p=n.c
 p.toString
 s.push(A.f(q,o,o,o,A.o(p).ok.Q,o,o,o))}s=A.bk(A.a2(s,B.m,B.f,B.j),1)
-if(l)q="Approved"
-else q="Declined"
+q=this.b
+if(l)q=q.a===B.c?"Clinic approved":"\ud55c\uc758\uc6d0 \uc2b9\uc778\ub428"
+else q=q.a===B.c?"Declined":"\uac70\uc808\ub428"
 p=n.c
 p.toString
 r=A.b([i,B.cX,s,A.f(q,o,o,o,A.o(p).ok.as,o,o,o),B.be],r)
@@ -109829,21 +109833,21 @@ h=A.bE(B.hc,1)
 d=$.ab()
 c=A.b([A.f(d.a===B.c?"Real-Time App Activity":"\uc2e4\uc2dc\uac04 \uc571 \ud65c\ub3d9",a0,a0,a0,B.ay,a0,a0,a0),B.J],t.p)
 if(s)c.push(A.f(d.a===B.c?"No recent answer request":"\ucd5c\uadfc \ub2f5\ubcc0 \uc694\uccad \uc5c6\uc74c",a0,a0,a0,a0,a0,a0,a0))
-else{if(e==="note"){s="Latest practitioner note: "+r.nJ(j)
-b="\ucd5c\uadfc \uce68\uc220\uc0ac \ucabd\uc9c0: "+r.nJ(j)
+else{if(e==="note"){s="Note \xb7 "+r.nJ(j)
+b="\ucabd\uc9c0 \xb7 "+r.nJ(j)
 s=d.a===B.c?s:b}else{s=J.ad(f)
-b="Latest answer request: "+s.gA(f)+" questions ? "+r.nJ(j)
-s="\ucd5c\uadfc \ub2f5\ubcc0 \uc694\uccad: \uc9c8\ubb38 "+s.gA(f)+"\uac1c \xb7 "+r.nJ(j)
+b="Request \xb7 "+s.gA(f)+" \xb7 "+r.nJ(j)
+s="\uc694\uccad \xb7 "+s.gA(f)+" \xb7 "+r.nJ(j)
 if(d.a===B.c)s=b}c.push(A.f(s,a0,a0,a0,a0,a0,a0,a0))}c.push(B.a1)
 if(a1)c.push(A.f(d.a===B.c?"No recent submission":"\ucd5c\uadfc \uc81c\ucd9c \uc5c6\uc74c",a0,a0,a0,a0,a0,a0,a0))
 else{a1=J.ad(g)
-s="Latest patient submission: "+a1.gA(g)+" answers ? "+r.nJ(l)
-a1="\ucd5c\uadfc \ud658\uc790 \uc81c\ucd9c: \ub2f5\ubcc0 "+a1.gA(g)+"\uac1c \xb7 "+r.nJ(l)
+s="Submission \xb7 "+a1.gA(g)+" \xb7 "+r.nJ(l)
+a1="\uc81c\ucd9c \xb7 "+a1.gA(g)+" \xb7 "+r.nJ(l)
 c.push(A.f(d.a===B.c?s:a1,a0,a0,a0,a0,a0,a0,a0))}c.push(B.a1)
 if(k)c.push(A.f(d.a===B.c?"No feedback":"\ubc29\ubb38 \uae30\ub85d \ud53c\ub4dc\ubc31 \uc5c6\uc74c",a0,a0,a0,a0,a0,a0,a0))
 else{a1=""+m
-s="Visit-record feedback: "+a1+" pending ? "+r.nJ(i)
-r="\ubc29\ubb38 \uae30\ub85d \ud53c\ub4dc\ubc31: \ubbf8\ud655\uc778 "+a1+"\uac74 \xb7 "+r.nJ(i)
+s="Feedback \xb7 "+a1+" \xb7 "+r.nJ(i)
+r="\ud53c\ub4dc\ubc31 \xb7 "+a1+" \xb7 "+r.nJ(i)
 a1=d.a===B.c?s:r
 s=m>0
 r=s?B.TP:B.an

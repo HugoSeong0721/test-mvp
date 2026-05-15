@@ -3973,8 +3973,8 @@ class _PractitionerDashboardScreenState
         SnackBar(
           content: Text(
             AppLanguageController.instance.tr(
-              '${request.patientName} approved. It stays in Inbox under Recent joins.',
-              '${request.patientName} approved. It stays in Inbox under Recent joins.',
+              '${request.patientName} approved.',
+              '${request.patientName} 승인됨',
             ),
           ),
         ),
@@ -4157,7 +4157,7 @@ class _PractitionerDashboardScreenState
           if (recentMembershipRequests.isNotEmpty) ...[
             const SizedBox(height: 18),
             Text(
-              lang.tr('Recent joins', 'Recent joins'),
+              lang.tr('Recent joins', '최근 가입'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -4202,8 +4202,8 @@ class _PractitionerDashboardScreenState
                     ),
                     Text(
                       isApproved
-                          ? lang.tr('Approved', 'Approved')
-                          : lang.tr('Declined', 'Declined'),
+                          ? lang.tr('Clinic approved', '한의원 승인됨')
+                          : lang.tr('Declined', '거절됨'),
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                     const SizedBox(width: 8),
@@ -4610,10 +4610,7 @@ class _PractitionerDashboardScreenState
 
   Widget _buildCompactTopInboxAction(int count) {
     return IconButton(
-      tooltip: AppLanguageController.instance.tr(
-        'Open patient inbox',
-        '환자 쪽지함 열기',
-      ),
+      tooltip: AppLanguageController.instance.tr('Inbox', '요청함'),
       onPressed: () {
         if (_subView == _DashboardSubView.inbox) {
           _scrollToAppointmentInbox();
@@ -4880,12 +4877,12 @@ class _PatientRealtimeActivity extends StatelessWidget {
                         Text(
                           latestRequestType == 'note'
                               ? AppLanguageController.instance.tr(
-                                  'Latest practitioner note: ${_formatDateTime(requestAt)}',
-                                  '최근 침술사 쪽지: ${_formatDateTime(requestAt)}',
+                                  'Note · ${_formatDateTime(requestAt)}',
+                                  '쪽지 · ${_formatDateTime(requestAt)}',
                                 )
                               : AppLanguageController.instance.tr(
-                                  'Latest answer request: ${selectedQuestions.length} questions ? ${_formatDateTime(requestAt)}',
-                                  '최근 답변 요청: 질문 ${selectedQuestions.length}개 · ${_formatDateTime(requestAt)}',
+                                  'Request · ${selectedQuestions.length} · ${_formatDateTime(requestAt)}',
+                                  '요청 · ${selectedQuestions.length} · ${_formatDateTime(requestAt)}',
                                 ),
                         ),
                       const SizedBox(height: 4),
@@ -4899,8 +4896,8 @@ class _PatientRealtimeActivity extends StatelessWidget {
                       else
                         Text(
                           AppLanguageController.instance.tr(
-                            'Latest patient submission: ${answers.length} answers ? ${_formatDateTime(submissionAt)}',
-                            '최근 환자 제출: 답변 ${answers.length}개 · ${_formatDateTime(submissionAt)}',
+                            'Submission · ${answers.length} · ${_formatDateTime(submissionAt)}',
+                            '제출 · ${answers.length} · ${_formatDateTime(submissionAt)}',
                           ),
                         ),
                       const SizedBox(height: 4),
@@ -4914,8 +4911,8 @@ class _PatientRealtimeActivity extends StatelessWidget {
                       else
                         Text(
                           AppLanguageController.instance.tr(
-                            'Visit-record feedback: $pendingFeedbackCount pending ? ${_formatDateTime(feedbackAt)}',
-                            '방문 기록 피드백: 미확인 $pendingFeedbackCount건 · ${_formatDateTime(feedbackAt)}',
+                            'Feedback · $pendingFeedbackCount · ${_formatDateTime(feedbackAt)}',
+                            '피드백 · $pendingFeedbackCount · ${_formatDateTime(feedbackAt)}',
                           ),
                           style: TextStyle(
                             color: pendingFeedbackCount > 0
@@ -5274,12 +5271,12 @@ class _BetaRegistrantBoard extends StatelessWidget {
                                       label: Text(
                                         hasRequired
                                             ? AppLanguageController.instance.tr(
-                                                'Contact Ready',
-                                                '연락처 준비됨',
+                                                'Contact ready',
+                                                '연락처 준비',
                                               )
                                             : AppLanguageController.instance.tr(
-                                                'Missing Required Info',
-                                                '필수 정보 부족',
+                                                'Contact missing',
+                                                '연락처 없음',
                                               ),
                                       ),
                                       backgroundColor: hasRequired
