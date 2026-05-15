@@ -425,8 +425,8 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                           Expanded(
                                             child: Text(
                                               lang.tr(
-                                                'Request a Record Update',
-                                                '방문기록 수정/추가 요청',
+                                                'Request update',
+                                                '수정 요청',
                                               ),
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w700,
@@ -494,10 +494,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                                     'Sending...',
                                                     '보내는 중...',
                                                   )
-                                                : lang.tr(
-                                                    'Send to Practitioner',
-                                                    '침술사에게 보내기',
-                                                  ),
+                                                : lang.tr('Send', '보내기'),
                                           ),
                                         ),
                                       ),

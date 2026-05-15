@@ -1437,10 +1437,7 @@ class _PractitionerDashboardScreenState
                   icon: const Icon(Icons.notifications_active_outlined),
                   label: Text(
                     canSendRequest
-                        ? AppLanguageController.instance.tr(
-                            'Request Answers',
-                            '답변 요청',
-                          )
+                        ? AppLanguageController.instance.tr('Request', '요청')
                         : AppLanguageController.instance.tr(
                             'Contact Needed',
                             '연락처 필요',
@@ -1450,9 +1447,7 @@ class _PractitionerDashboardScreenState
                 OutlinedButton.icon(
                   onPressed: () => _sendPatientNote(context, scheduledVisit),
                   icon: const Icon(Icons.mail_outline),
-                  label: Text(
-                    AppLanguageController.instance.tr('Send Note', '쪽지 보내기'),
-                  ),
+                  label: Text(AppLanguageController.instance.tr('Note', '쪽지')),
                 ),
                 FilledButton.icon(
                   onPressed: () {
@@ -1470,7 +1465,7 @@ class _PractitionerDashboardScreenState
                   },
                   icon: const Icon(Icons.chevron_right),
                   label: Text(
-                    AppLanguageController.instance.tr('View Detail', '상세 보기'),
+                    AppLanguageController.instance.tr('Detail', '상세'),
                   ),
                 ),
               ],
@@ -1479,8 +1474,8 @@ class _PractitionerDashboardScreenState
               const SizedBox(height: 8),
               Text(
                 AppLanguageController.instance.tr(
-                  'You can only send an answer request after both phone number and email are saved in Patient Management.',
-                  '환자 정보 관리에서 전화번호와 이메일을 모두 입력해야 답변 요청 전송이 가능합니다.',
+                  'Phone and email needed.',
+                  '전화번호와 이메일 필요',
                 ),
                 style: const TextStyle(color: Colors.redAccent),
               ),
@@ -4067,17 +4062,12 @@ class _PractitionerDashboardScreenState
                       onPressed: () =>
                           _approveMembershipAndSendQuestionTree(next),
                       icon: const Icon(Icons.check_circle_outline),
-                      label: Text(
-                        lang.tr(
-                          'Approve + send questions',
-                          'Approve + send questions',
-                        ),
-                      ),
+                      label: Text(lang.tr('Approve + questions', '승인 + 질문')),
                     ),
                     OutlinedButton.icon(
                       onPressed: () => _selectSubView(_DashboardSubView.inbox),
                       icon: const Icon(Icons.inbox_outlined),
-                      label: Text(lang.tr('Open inbox', 'Open inbox')),
+                      label: Text(lang.tr('Inbox', '요청함')),
                     ),
                   ],
                 ),
@@ -4159,10 +4149,7 @@ class _PractitionerDashboardScreenState
                               _approveMembershipAndSendQuestionTree(request),
                           icon: const Icon(Icons.check_circle_outline),
                           label: Text(
-                            lang.tr(
-                              'Approve + send questions',
-                              'Approve + send questions',
-                            ),
+                            lang.tr('Approve + questions', '승인 + 질문'),
                           ),
                         ),
                         OutlinedButton.icon(

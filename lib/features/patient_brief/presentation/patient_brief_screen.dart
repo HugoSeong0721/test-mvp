@@ -303,12 +303,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                               onPressed: () =>
                                   _openVisitDetail(previousVisit, history),
                               icon: const Icon(Icons.open_in_new),
-                              label: Text(
-                                lang.tr(
-                                  'Open last visit detail',
-                                  '지난 방문 상세 보기',
-                                ),
-                              ),
+                              label: Text(lang.tr('Last visit', '지난 방문')),
                             ),
                           ],
                         ),
@@ -413,10 +408,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                               label: Text(
                                 isCurrentVisit
                                     ? lang.tr('Viewing now', '현재 보고 있음')
-                                    : lang.tr(
-                                        'Open this visit detail',
-                                        '이 방문 상세 보기',
-                                      ),
+                                    : lang.tr('Open', '열기'),
                               ),
                             ),
                           ),

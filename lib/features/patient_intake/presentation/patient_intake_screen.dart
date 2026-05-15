@@ -1507,7 +1507,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               ? null
                               : () => _changeQuestion(_currentQuestionIndex - 1),
                           child: Text(
-                            lang.tr('Previous Question', '이전 질문'),
+                            lang.tr('Previous', '이전'),
                           ),
                         ),
                       ),
@@ -1518,7 +1518,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               ? null
                               : () => _changeQuestion(_currentQuestionIndex + 1),
                           child: Text(
-                            lang.tr('Next Question', '다음 질문'),
+                            lang.tr('Next', '다음'),
                           ),
                         ),
                       ),
@@ -1530,7 +1530,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     child: Text(
                       _isSubmitting
                           ? lang.tr('Submitting...', '제출 중...')
-                          : lang.tr('Submit Intake', '문진 제출하기'),
+                          : lang.tr('Submit', '제출'),
                     ),
                   ),
                 ],
@@ -1784,7 +1784,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               PatientRequestsScreen.routeName,
                             ),
                             icon: const Icon(Icons.mark_email_unread_outlined),
-                            label: Text(lang.tr('Open Requests', '답변 요청 보기')),
+                            label: Text(lang.tr('Requests', '요청')),
                           ),
                           OutlinedButton.icon(
                             onPressed: _openProfileDialog,
@@ -2001,9 +2001,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                             : () => _changeQuestion(
                                                 _currentQuestionIndex - 1,
                                               ),
-                                        child: Text(
-                                          lang.tr('Previous Question', '이전 질문'),
-                                        ),
+                                        child: Text(lang.tr('Previous', '이전')),
                                       ),
                                       const SizedBox(height: 12),
                                       OutlinedButton(
@@ -2014,9 +2012,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                             : () => _changeQuestion(
                                                 _currentQuestionIndex + 1,
                                               ),
-                                        child: Text(
-                                          lang.tr('Next Question', '다음 질문'),
-                                        ),
+                                        child: Text(lang.tr('Next', '다음')),
                                       ),
                                     ],
                                   );
@@ -2031,9 +2027,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                             : () => _changeQuestion(
                                                 _currentQuestionIndex - 1,
                                               ),
-                                        child: Text(
-                                          lang.tr('Previous Question', '이전 질문'),
-                                        ),
+                                        child: Text(lang.tr('Previous', '이전')),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
@@ -2046,9 +2040,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                             : () => _changeQuestion(
                                                 _currentQuestionIndex + 1,
                                               ),
-                                        child: Text(
-                                          lang.tr('Next Question', '다음 질문'),
-                                        ),
+                                        child: Text(lang.tr('Next', '다음')),
                                       ),
                                     ),
                                   ],
@@ -2068,7 +2060,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               label: Text(
                                 _isSubmitting
                                     ? lang.tr('Submitting...', '제출 중...')
-                                    : lang.tr('Submit Intake', '문진 제출하기'),
+                                    : lang.tr('Submit', '제출'),
                               ),
                             ),
                             if (!profile.hasRequiredAlertInfo) ...[
@@ -2271,7 +2263,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         OutlinedButton.icon(
                           onPressed: _openProfileDialog,
                           icon: const Icon(Icons.edit_outlined),
-                          label: Text(lang.tr('Update Profile', '프로필 업데이트')),
+                          label: Text(lang.tr('Profile', '프로필')),
                         ),
                       ],
                     ],
@@ -2370,7 +2362,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           PatientRequestsScreen.routeName,
                         ),
                         icon: const Icon(Icons.open_in_new),
-                        label: Text(lang.tr('Open inbox', '요청함 열기')),
+                        label: Text(lang.tr('Inbox', '요청함')),
                       ),
                     ],
                   ),
@@ -2406,9 +2398,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 VisitHistoryScreen.routeName,
                               ),
                               icon: const Icon(Icons.history),
-                              label: Text(
-                                lang.tr('Review visit history', '방문 기록 보기'),
-                              ),
+                              label: Text(lang.tr('History', '기록')),
                             ),
                           ],
                         ),
