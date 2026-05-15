@@ -138,45 +138,20 @@ class PractitionerInsightsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _SectionTitle(
-            lang.tr(
-              'Product Opportunity Insights (For Practitioner)',
-              '제품 기회 인사이트 (침술사용)',
-            ),
-          ),
+          _SectionTitle(lang.tr('Opportunities', '기회')),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    lang.tr(
-                      '1) Sleep + pain tracking card: high priority because repeat visits often cluster here',
-                      '1) 수면 + 통증 추적 카드: 재내원 패턴이 자주 모이는 영역이라 우선순위가 높음',
-                    ),
-                  ),
+                  Text(lang.tr('Sleep + pain tracking', '수면 + 통증 추적')),
                   const SizedBox(height: 6),
-                  Text(
-                    lang.tr(
-                      '2) Personalized reminder templates: clear room to improve pre-visit intake response rate',
-                      '2) 개인화 리마인더 템플릿: 사전 문진 응답률을 높일 여지가 큼',
-                    ),
-                  ),
+                  Text(lang.tr('Personalized reminders', '개인화 리마인더')),
                   const SizedBox(height: 6),
-                  Text(
-                    lang.tr(
-                      '3) Advice adherence checklist: useful for capturing behavior data tied to return visits',
-                      '3) 조언 이행 체크리스트: 재내원과 연결된 행동 데이터를 잡기 좋음',
-                    ),
-                  ),
+                  Text(lang.tr('Advice checklist', '조언 체크리스트')),
                   const SizedBox(height: 6),
-                  Text(
-                    lang.tr(
-                      '4) Missing-category warning (based on the 10-question system): helps improve diagnostic consistency',
-                      '4) 누락 카테고리 경고 (10문항 시스템 기반): 진단 일관성 향상에 도움',
-                    ),
-                  ),
+                  Text(lang.tr('Missing-category warning', '누락 카테고리 경고')),
                 ],
               ),
             ),

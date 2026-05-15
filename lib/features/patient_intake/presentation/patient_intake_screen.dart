@@ -2304,21 +2304,11 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Text(
                         requestDocs.isNotEmpty
                             ? lang.tr(
-                                'Practitioner requests (${requestDocs.length})',
-                                '침술사 요청 ${requestDocs.length}건',
+                                'Requests (${requestDocs.length})',
+                                '요청 ${requestDocs.length}건',
                               )
-                            : lang.tr('Practitioner requests', '침술사 요청'),
+                            : lang.tr('Requests', '요청'),
                         style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        lang.tr(
-                          'This is the request inbox for follow-up questions tied to your next visit.',
-                          '다음 방문과 연결된 후속 질문 요청을 확인하는 영역입니다.',
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.72),
-                        ),
                       ),
                       const SizedBox(height: 12),
                       if (requestDocs.isEmpty)
@@ -2329,12 +2319,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: AppTheme.border),
                           ),
-                          child: Text(
-                            lang.tr(
-                              'No pending requests right now.',
-                              '현재 대기 중인 요청이 없습니다.',
-                            ),
-                          ),
+                          child: Text(lang.tr('No requests', '요청 없음')),
                         ),
                       ...requestDocs.take(3).map((doc) {
                         final data = doc.data();
@@ -2366,8 +2351,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 const SizedBox(height: 8),
                                 Text(
                                   lang.tr(
-                                    'Requested questions: ${selected.length}',
-                                    '요청된 질문 수: ${selected.length}',
+                                    '${selected.length} question${selected.length == 1 ? '' : 's'}',
+                                    '질문 ${selected.length}개',
                                   ),
                                   style: theme.textTheme.titleMedium,
                                 ),
@@ -2403,9 +2388,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           PatientRequestsScreen.routeName,
                         ),
                         icon: const Icon(Icons.open_in_new),
-                        label: Text(
-                          lang.tr('Open full request inbox', '전체 요청함 열기'),
-                        ),
+                        label: Text(lang.tr('Open inbox', '요청함 열기')),
                       ),
                     ],
                   ),
@@ -2455,18 +2438,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang.tr('Recent submissions', '최근 제출 기록'),
+                        lang.tr('Recent', '최근'),
                         style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        lang.tr(
-                          'Use this list to confirm what you already sent most recently.',
-                          '가장 최근에 어떤 문진을 보냈는지 빠르게 확인하는 영역입니다.',
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.72),
-                        ),
                       ),
                       if (submissionDocs.isEmpty) ...[
                         const SizedBox(height: 12),
@@ -2477,9 +2450,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: AppTheme.border),
                           ),
-                          child: Text(
-                            lang.tr('No submissions yet.', '아직 제출 기록이 없습니다.'),
-                          ),
+                          child: Text(lang.tr('No submissions', '제출 없음')),
                         ),
                       ],
                       ...submissionDocs.take(3).map((doc) {
