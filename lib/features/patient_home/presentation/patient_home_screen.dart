@@ -378,9 +378,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             }
 
             return AlertDialog(
-              title: Text(
-                lang.tr('Choose your acupuncture center', '한의원을 선택해주세요'),
-              ),
+              title: Text(lang.tr('Choose clinic', '한의원 선택')),
               content: SizedBox(
                 width: 720,
                 child: Column(
@@ -459,10 +457,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             const SizedBox(width: 8),
                                             _buildClinicStatusChip(
                                               context,
-                                              lang.tr(
-                                                'Pending approval',
-                                                '승인 대기',
-                                              ),
+                                              lang.tr('Pending', '승인 대기'),
                                               accent: AppTheme.copper,
                                             ),
                                           ],
@@ -568,10 +563,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               Icons.arrow_forward,
                                             ),
                                             label: Text(
-                                              lang.tr(
-                                                'Continue here',
-                                                '여기로 계속하기',
-                                              ),
+                                              lang.tr('Continue', '여기로 계속하기'),
                                             ),
                                           ),
                                           OutlinedButton.icon(
@@ -633,7 +625,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        lang.tr('Can’t find it?', '없나요?'),
+                                        lang.tr('Add clinic', '한의원 추가'),
                                         style: Theme.of(
                                           context,
                                         ).textTheme.titleMedium,
@@ -1378,7 +1370,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               children: [
                                 AppMetricChip(
                                   icon: Icons.notifications_active_outlined,
-                                  label: lang.tr('Pending items', '대기 항목'),
+                                  label: lang.tr('Pending', '대기'),
                                   value:
                                       '${pendingRequests.length + pendingAppointmentRequests.length}',
                                   backgroundColor: AppTheme.surface,
@@ -1395,7 +1387,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           nextVisit.date,
                                           nextVisit.time,
                                         )
-                                      : lang.tr('Not booked', '미예약'),
+                                      : lang.tr('None', '없음'),
                                   backgroundColor: AppTheme.surface,
                                   labelColor: AppTheme.ink.withValues(
                                     alpha: 0.58,
@@ -1407,7 +1399,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   label: lang.tr('Profile', '프로필'),
                                   value: profile.hasRequiredAlertInfo
                                       ? lang.tr('Ready', '준비됨')
-                                      : lang.tr('Needs update', '업데이트 필요'),
+                                      : lang.tr('Missing', '누락'),
                                   backgroundColor: AppTheme.surface,
                                   labelColor: AppTheme.ink.withValues(
                                     alpha: 0.58,
@@ -1599,7 +1591,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      lang.tr('Appointments', '예약 신청 현황'),
+                                      lang.tr('Requests', '예약 요청'),
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -1627,7 +1619,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       '대기',
                                     ),
                                     AppointmentRequestStatus.confirmed =>
-                                      lang.tr('Confirmed', '확정'),
+                                      lang.tr('Booked', '예약됨'),
                                     AppointmentRequestStatus.declined =>
                                       lang.tr('Declined', '거절'),
                                     AppointmentRequestStatus
@@ -1780,7 +1772,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      lang.tr('History', '기록'),
+                                      lang.tr('Visits', '방문'),
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -1792,7 +1784,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                       context,
                                       VisitHistoryScreen.routeName,
                                     ),
-                                    child: Text(lang.tr('History', '기록')),
+                                    child: Text(lang.tr('Open', '열기')),
                                   ),
                                 ],
                               ),
@@ -1800,13 +1792,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 Text(lang.tr('No visits', '방문 없음'))
                               else ...[
                                 Text(
-                                  '${lang.tr('Last Visit', '최근 방문')}: ${_formatVisitSlot(latestVisit.date, latestVisit.time)}',
+                                  '${lang.tr('Last', '최근')}: ${_formatVisitSlot(latestVisit.date, latestVisit.time)}',
                                 ),
                                 Text(
-                                  '${lang.tr('Treatment Focus', '치료 부위')}: ${latestVisit.previousTreatmentArea}',
+                                  '${lang.tr('Focus', '부위')}: ${latestVisit.previousTreatmentArea}',
                                 ),
                                 Text(
-                                  '${lang.tr('Session Note', '세션 메모')}: ${latestVisit.previousSessionNote}',
+                                  '${lang.tr('Note', '메모')}: ${latestVisit.previousSessionNote}',
                                 ),
                               ],
                             ],
@@ -1821,10 +1813,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr(
-                                  'Recent Submission Activity',
-                                  '최근 제출 활동',
-                                ),
+                                lang.tr('Submissions', '최근 제출 활동'),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -1864,10 +1853,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${lang.tr('Visit Type', '방문 유형')}: ${data['visitType'] ?? '-'}',
+                                            '${lang.tr('Type', '유형')}: ${data['visitType'] ?? '-'}',
                                           ),
                                           Text(
-                                            '${lang.tr('Answered Questions', '답변 수')}: ${answers.length}',
+                                            '${lang.tr('Answers', '답변')}: ${answers.length}',
                                           ),
                                         ],
                                       ),
@@ -1909,10 +1898,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 const CircularProgressIndicator(),
                 const SizedBox(height: 18),
                 Text(
-                  lang.tr(
-                    'Loading your patient profile...',
-                    '환자 프로필을 불러오는 중...',
-                  ),
+                  lang.tr('Loading profile...', '환자 프로필을 불러오는 중...'),
                   style: Theme.of(context).textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -1924,7 +1910,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  lang.tr('Could not load your profile.', '프로필을 불러오지 못했습니다.'),
+                  lang.tr('Profile unavailable.', '프로필을 불러오지 못했습니다.'),
                   style: Theme.of(context).textTheme.titleLarge,
                   textAlign: TextAlign.center,
                 ),

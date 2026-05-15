@@ -255,19 +255,19 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                       runSpacing: 12,
                       children: [
                         _HistorySummaryChip(
-                          label: lang.tr('Total Visits', '총 방문'),
+                          label: lang.tr('Visits', '방문'),
                           value: '${history.length}',
                           dark: false,
                         ),
                         _HistorySummaryChip(
-                          label: lang.tr('Last Visit', '최근 방문'),
+                          label: lang.tr('Last', '최근'),
                           value: lastVisit == null
                               ? '-'
                               : _formatStoredDateWithWeekday(lastVisit.date),
                           dark: false,
                         ),
                         _HistorySummaryChip(
-                          label: lang.tr('Most Recent Status', '최근 상태'),
+                          label: lang.tr('Status', '상태'),
                           value: lastVisit == null
                               ? '-'
                               : lastVisit.intakeStatus.label,
@@ -351,14 +351,14 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '${lang.tr('Last Visit Before This', '그 전 방문')}: ${_formatStoredDateWithWeekday(visit.lastVisitDate)} (${visit.daysAgo} ${lang.tr('days ago', '일 전')})',
+                                  '${lang.tr('Previous', '이전')}: ${_formatStoredDateWithWeekday(visit.lastVisitDate)} (${visit.daysAgo} ${lang.tr('days ago', '일 전')})',
                                 ),
                                 Text(
-                                  '${lang.tr('Treatment Focus', '치료 부위')}: ${visit.previousTreatmentArea}',
+                                  '${lang.tr('Focus', '부위')}: ${visit.previousTreatmentArea}',
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  lang.tr('Session Note', '세션 메모'),
+                                  lang.tr('Note', '메모'),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -369,10 +369,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                 _VisitTreatmentPointPreview(visitId: visit.id),
                                 const SizedBox(height: 12),
                                 Text(
-                                  lang.tr(
-                                    'Question / Answer Snapshot',
-                                    '질문 / 답변 요약',
-                                  ),
+                                  lang.tr('Q&A', '질문 / 답변 요약'),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -381,7 +378,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                 if (visit.qaList.isEmpty)
                                   Text(
                                     lang.tr(
-                                      'No intake answers were saved for this visit.',
+                                      'No answers saved.',
                                       '이 방문에는 저장된 문진 답변이 없습니다.',
                                     ),
                                   )
@@ -424,10 +421,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              lang.tr(
-                                                'Request update',
-                                                '수정 요청',
-                                              ),
+                                              lang.tr('Correction', '수정 요청'),
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -453,7 +447,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                         decoration: InputDecoration(
                                           border: const OutlineInputBorder(),
                                           labelText: lang.tr(
-                                            'Your correction / additional note',
+                                            'Correction note',
                                             '수정 또는 추가 메모',
                                           ),
                                         ),
@@ -461,7 +455,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                       const SizedBox(height: 10),
                                       if (hasFeedback) ...[
                                         Text(
-                                          '${lang.tr('Sent at', '보낸 시각')}: ${_formatTimestamp(data['submittedAt'] as Timestamp?)}',
+                                          '${lang.tr('Sent', '보냄')}: ${_formatTimestamp(data['submittedAt'] as Timestamp?)}',
                                         ),
                                         const SizedBox(height: 4),
                                       ],
