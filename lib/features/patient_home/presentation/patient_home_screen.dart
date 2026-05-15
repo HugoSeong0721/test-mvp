@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iottie_automation/features/patient_requests/presentation/patient_requests_screen.dart';
 import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
 
@@ -376,6 +377,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             final canRequestClinic =
                 requestClinicNameController.text.trim().isNotEmpty &&
                 !isSendingClinicOpenRequest;
+            final mapsQuery = _clinicMapsQuery(
+              clinicName: requestClinicNameController.text,
+              practitionerName: requestPractitionerController.text,
+              location: requestLocationController.text,
+            );
             if (requestClinicNameController.text.trim().isEmpty &&
                 query.trim().isNotEmpty) {
               requestClinicNameController.text = query.trim();
@@ -670,6 +676,62 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 8),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: [
+                                          for (final suggestion
+                                              in _clinicLocationSuggestions(
+                                                requestClinicNameController
+                                                    .text,
+                                              ))
+                                            ActionChip(
+                                              avatar: const Icon(
+                                                Icons.place_outlined,
+                                                size: 16,
+                                              ),
+                                              label: Text(suggestion),
+                                              onPressed: () {
+                                                requestLocationController.text =
+                                                    suggestion;
+                                                setDialogState(() {});
+                                              },
+                                            ),
+                                          OutlinedButton.icon(
+                                            onPressed: mapsQuery.isEmpty
+                                                ? null
+                                                : () async {
+                                                    final url =
+                                                        'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(mapsQuery)}';
+                                                    await Clipboard.setData(
+                                                      ClipboardData(text: url),
+                                                    );
+                                                    if (!mounted) {
+                                                      return;
+                                                    }
+                                                    ScaffoldMessenger.of(
+                                                      this.context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          lang.tr(
+                                                            'Maps search copied.',
+                                                            '지도 검색 링크 복사됨',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                            icon: const Icon(
+                                              Icons.map_outlined,
+                                            ),
+                                            label: Text(
+                                              lang.tr('Maps', '지도 확인'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
                                       TextField(
                                         controller: requestNoteController,
                                         onChanged: (_) => setDialogState(() {}),
@@ -820,6 +882,32 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     requestPractitionerController.dispose();
     requestLocationController.dispose();
     requestNoteController.dispose();
+  }
+
+  List<String> _clinicLocationSuggestions(String clinicName) {
+    final query = clinicName.toLowerCase();
+    if (query.contains('fort lee')) {
+      return const ['Fort Lee, NJ', 'Palisades Park, NJ'];
+    }
+    if (query.contains('palisades')) {
+      return const ['Palisades Park, NJ', 'Fort Lee, NJ'];
+    }
+    if (query.contains('ny') || query.contains('manhattan')) {
+      return const ['Manhattan, NY', 'Flushing, NY'];
+    }
+    return const ['Fort Lee, NJ', 'Palisades Park, NJ', 'Leonia, NJ'];
+  }
+
+  String _clinicMapsQuery({
+    required String clinicName,
+    required String practitionerName,
+    required String location,
+  }) {
+    return [
+      clinicName,
+      practitionerName,
+      location,
+    ].map((value) => value.trim()).where((value) => value.isNotEmpty).join(' ');
   }
 
   Widget _buildClinicStatusChip(
