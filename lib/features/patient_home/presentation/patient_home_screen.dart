@@ -1546,21 +1546,42 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Text(
-                                  '${lang.tr('Status', 'Status')}: ${(latestRequest['status'] ?? 'pending').toString()}',
-                                ),
-                                Text(
-                                  '${lang.tr('Requested At', '요청 시각')}: ${_formatTimestamp(latestRequest['requestedAt'] as Timestamp?)}',
-                                ),
-                                Text(
-                                  '${lang.tr('Requested Questions', '요청 질문 수')}: ${((latestRequest['selectedQuestions'] as List?) ?? const []).length}',
+                                Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: [
+                                    AppMetricChip(
+                                      icon: Icons.flag_outlined,
+                                      label: lang.tr('Status', '상태'),
+                                      value:
+                                          (latestRequest['status'] ?? 'pending')
+                                              .toString(),
+                                      backgroundColor: AppTheme.surface,
+                                    ),
+                                    AppMetricChip(
+                                      icon: Icons.quiz_outlined,
+                                      label: lang.tr('Questions', '질문'),
+                                      value:
+                                          '${((latestRequest['selectedQuestions'] as List?) ?? const []).length}',
+                                      backgroundColor: AppTheme.surface,
+                                    ),
+                                    AppMetricChip(
+                                      icon: Icons.schedule_outlined,
+                                      label: lang.tr('Requested', '요청'),
+                                      value: _formatTimestamp(
+                                        latestRequest['requestedAt']
+                                            as Timestamp?,
+                                      ),
+                                      backgroundColor: AppTheme.surface,
+                                    ),
+                                  ],
                                 ),
                                 if (((latestRequest['note'] ?? '') as String)
                                     .trim()
                                     .isNotEmpty) ...[
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 12),
                                   Text(
-                                    '${lang.tr('Practitioner Note', '침술사 메모')}: ${latestRequest['note']}',
+                                    '${lang.tr('Note', '메모')}: ${latestRequest['note']}',
                                   ),
                                 ],
                               ],
