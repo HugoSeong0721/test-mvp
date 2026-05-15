@@ -103180,7 +103180,7 @@ s=p}for(;;)switch(s){case 0:f=$.ac()
 e=B.d.N(m.d.a.a)
 d=B.d.N(m.e.a.a)
 m.pv(null)
-if(J.bG(e)===0||J.bG(d)===0){m.pv(f.a===B.c?"Please enter your ID and password.":"\uc544\uc774\ub514\uc640 \ube44\ubc00\ubc88\ud638\ub97c \uc785\ub825\ud574\uc8fc\uc138\uc694.")
+if(J.bG(e)===0||J.bG(d)===0){m.pv(f.a===B.c?"Enter ID and password.":"\uc544\uc774\ub514\uc640 \ube44\ubc00\ubc88\ud638 \ud544\uc694")
 s=1
 break}s=a==="practitioner"?3:4
 break
@@ -103227,12 +103227,12 @@ case 1:return A.t(q,r)
 case 2:return A.r(o.at(-1),r)}})
 return A.u($async$pw,r)},
 TW(a){var s=$.ac()
-switch(a.a){case"invalid-login-id":return s.a===B.c?"Use a simple login ID with at least 3 letters or numbers.":"\ub85c\uadf8\uc778 \uc544\uc774\ub514\ub294 3\uc790 \uc774\uc0c1 \uc601\ubb38/\uc22b\uc790\ub85c \uc785\ub825\ud574\uc8fc\uc138\uc694."
-case"weak-password":return s.a===B.c?"Use a password with at least 4 characters.":"\ube44\ubc00\ubc88\ud638\ub294 4\uc790 \uc774\uc0c1\uc73c\ub85c \uc785\ub825\ud574\uc8fc\uc138\uc694."
-case"missing-display-name":return s.a===B.c?"Please enter the practitioner name.":"\uce68\uc220\uc0ac \uc774\ub984\uc744 \uc785\ub825\ud574\uc8fc\uc138\uc694."
-case"missing-clinic-name":return s.a===B.c?"Please enter the clinic name.":"\ud55c\uc758\uc6d0 \uc774\ub984\uc744 \uc785\ub825\ud574\uc8fc\uc138\uc694."
+switch(a.a){case"invalid-login-id":return s.a===B.c?"ID needs 3+ letters or numbers.":"\uc544\uc774\ub514\ub294 3\uc790 \uc774\uc0c1"
+case"weak-password":return s.a===B.c?"Password needs 4+ characters.":"\ube44\ubc00\ubc88\ud638\ub294 4\uc790 \uc774\uc0c1"
+case"missing-display-name":return s.a===B.c?"Enter practitioner name.":"\uce68\uc220\uc0ac \uc774\ub984 \ud544\uc694"
+case"missing-clinic-name":return s.a===B.c?"Enter clinic name.":"\ud55c\uc758\uc6d0 \uc774\ub984 \ud544\uc694"
 case"login-id-already-in-use":return s.a===B.c?"This practitioner login ID is already being used in this browser.":"\uc774 \uce68\uc220\uc0ac \ub85c\uadf8\uc778 \uc544\uc774\ub514\ub294 \uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0\uc11c \uc774\ubbf8 \uc0ac\uc6a9 \uc911\uc785\ub2c8\ub2e4."
-case"user-not-found":return s.a===B.c?"No saved practitioner account was found. Create an account first.":"\uc800\uc7a5\ub41c \uce68\uc220\uc0ac \uacc4\uc815\uc744 \ucc3e\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \uba3c\uc800 \uacc4\uc815\uc744 \ub9cc\ub4e4\uc5b4\uc8fc\uc138\uc694."
+case"user-not-found":return s.a===B.c?"No saved account. Create first.":"\uc800\uc7a5\ub41c \uacc4\uc815 \uc5c6\uc74c"
 case"wrong-password":return s.a===B.c?"The practitioner password does not match.":"\uce68\uc220\uc0ac \ube44\ubc00\ubc88\ud638\uac00 \uc77c\uce58\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4."
 default:return s.a===B.c?"The practitioner account could not be opened right now.":"\uce68\uc220\uc0ac \uacc4\uc815\uc744 \uc9c0\uae08 \uc5f4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4."}},
 I(a0){var s,r,q,p,o,n,m,l,k,j,i,h,g=this,f=null,e="patient",d={},c=$.ac(),b=A.jS(a0,f,t.X),a=b==null?f:b.c.b
@@ -103257,7 +103257,7 @@ n=A.b([A.f(b,f,f,f,n==null?f:n.fC(B.M),B.c8,f,f)],m)
 if(r){b=c.a===B.c
 k=A.f(b?"Login":"\ub85c\uadf8\uc778",f,f,f,f,f,f,f)
 j=t.Mt
-k=A.b([new A.iW(!1,k,j),new A.iW(!0,A.f(b?"Create Account":"\uacc4\uc815 \ub9cc\ub4e4\uae30",f,f,f,f,f,f,f),j)],t.st)
+k=A.b([new A.iW(!1,k,j),new A.iW(!0,A.f(b?"Create":"\uac00\uc785",f,f,f,f,f,f,f),j)],t.st)
 j=t.y
 i=A.cp([g.y],j)
 B.b.F(n,A.b([B.aM,A.aTP(g.x?f:new A.aBM(g),k,i,j)],m))}b=g.Q
@@ -103292,7 +103292,7 @@ b=d?f:g.garG()
 k=c.a===B.c
 b=A.dP(A.f(k?"Find ID":"\uc544\uc774\ub514 \ucc3e\uae30",f,f,f,f,f,f,f),f,f,b,f,f)
 d=d?f:g.garD()
-n.push(A.cd(B.kP,A.b([b,A.dP(A.f(k?"Reset password":"\ube44\ubc00\ubc88\ud638 \ucc3e\uae30/\uc7ac\uc124\uc815",f,f,f,f,f,f,f),f,f,d,f,f)],m),B.X,8,10))}if(r)n.push(B.a_)
+n.push(A.cd(B.kP,A.b([b,A.dP(A.f(k?"Reset":"\uc7ac\uc124\uc815",f,f,f,f,f,f,f),f,f,d,f,f)],m),B.X,8,10))}if(r)n.push(B.a_)
 n.push(A.VP(B.tw,A.f(c.a===B.c?"Back":"\ub4a4\ub85c",f,f,f,f,f,f,f),new A.aBV(a0)))
 return A.nV(l,f,new A.mV(A.i_(!0,A.eu(A.i1(new A.d3(B.pJ,A.c2(A.a1(n,B.b3,B.f,B.W),f,B.rv),f),B.m2,f,B.a7),f,f),!0,B.af,!0,!0),f),f,!0,f)},
 VI(a,b){var s=null,r=A.n(a).ax.fy,q=r.P(0.1),p=A.aA(14),o=A.bC(r.P(0.45),1),n=A.cF(B.t2,r,s,20),m=A.n(a).ok.z
@@ -103302,7 +103302,7 @@ $0(){return this.a.Q=this.b},
 $S:0}
 A.aBH.prototype={
 $1(a){var s=null,r=this.b,q=A.f(r.a===B.c?"Saved practitioner IDs":"\uc800\uc7a5\ub41c \uce68\uc220\uc0ac \uc544\uc774\ub514",s,s,s,s,s,s,s),p=this.c,o=J.af(p)
-if(o.gag(p))p=A.f(r.a===B.c?"No practitioner account has been saved in this browser yet.":"\uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc800\uc7a5\ub41c \uce68\uc220\uc0ac \uacc4\uc815\uc774 \uc544\uc9c1 \uc5c6\uc2b5\ub2c8\ub2e4.",s,s,s,s,s,s,s)
+if(o.gag(p))p=A.f(r.a===B.c?"No saved account.":"\uc800\uc7a5\ub41c \uacc4\uc815 \uc5c6\uc74c",s,s,s,s,s,s,s)
 else p=A.aYQ(new A.aBE(this.a,p),o.gA(p),new A.aBF(),!0)
 p=A.c7(p,s,420)
 return A.iS(A.b([A.dP(A.f(r.a===B.c?"Close":"\ub2eb\uae30",s,s,s,s,s,s,s),s,s,new A.aBG(a),s,s)],t.p),p,q)},
@@ -103667,9 +103667,9 @@ e=B.d.N(m.f.a.a)
 d=B.d.N(m.r.a.a)
 c=B.d.N(m.e.a.a)
 m.lk(null)
-if(J.bG(e)===0){m.lk(f.a===B.c?"Please enter your email.":"\uc774\uba54\uc77c\uc744 \uc785\ub825\ud574\uc8fc\uc138\uc694.")
+if(J.bG(e)===0){m.lk(f.a===B.c?"Enter email.":"\uc774\uba54\uc77c \ud544\uc694")
 s=1
-break}if(J.bG(d)===0){m.lk(f.a===B.c?"Please enter your password.":"\ube44\ubc00\ubc88\ud638\ub97c \uc785\ub825\ud574\uc8fc\uc138\uc694.")
+break}if(J.bG(d)===0){m.lk(f.a===B.c?"Enter password.":"\ube44\ubc00\ubc88\ud638 \ud544\uc694")
 s=1
 break}i=m.x
 if(i&&J.bG(c)===0){m.lk(f.a===B.c?"A name is required to sign up.":"\ud68c\uc6d0\uac00\uc785\uc5d0\ub294 \uc774\ub984\uc774 \ud544\uc694\ud569\ub2c8\ub2e4.")
@@ -103806,7 +103806,7 @@ if(r==null)return
 r.X(t.q).f.cE(A.cO(s,s,s,s,s,B.y,s,A.f(a,s,s,s,s,s,s,s),s,B.ai,s,s,s,s,s,s,s,s,s,s))},
 TV(a){var s=$.ac()
 switch(a.a){case"email-already-in-use":return s.a===B.c?"This tester email is already saved in this browser. Please log in instead.":"\uc774 \uc774\uba54\uc77c\uc740 \uc774\ubbf8 \uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0 \uc800\uc7a5\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4. \ub85c\uadf8\uc778\uc73c\ub85c \uc9c4\ud589\ud574\uc8fc\uc138\uc694."
-case"invalid-email":return s.a===B.c?"Please enter a valid email address.":"\uc62c\ubc14\ub978 \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc785\ub825\ud574\uc8fc\uc138\uc694."
+case"invalid-email":return s.a===B.c?"Use a valid email.":"\uc62c\ubc14\ub978 \uc774\uba54\uc77c \ud544\uc694"
 case"weak-password":return s.a===B.c?"Please use a password with at least 6 characters.":"\ube44\ubc00\ubc88\ud638\ub294 6\uc790 \uc774\uc0c1\uc73c\ub85c \uc785\ub825\ud574\uc8fc\uc138\uc694."
 case"user-not-found":return s.a===B.c?"No saved tester account was found in this browser yet. Please sign up first.":"\uc774 \ube0c\ub77c\uc6b0\uc800\uc5d0\ub294 \uc544\uc9c1 \uc800\uc7a5\ub41c \uacc4\uc815\uc774 \uc5c6\uc2b5\ub2c8\ub2e4. \uba3c\uc800 \uac00\uc785\ud574\uc8fc\uc138\uc694."
 case"wrong-password":return s.a===B.c?"The saved tester password does not match.":"\uc800\uc7a5\ub41c \ube44\ubc00\ubc88\ud638\uac00 \uc77c\uce58\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4."
@@ -103853,7 +103853,7 @@ o=i?j:k.garF()
 m=b.a===B.c
 o=A.dP(A.f(m?"Find saved email":"\uc800\uc7a5\ub41c \uc774\uba54\uc77c \ucc3e\uae30",j,j,j,j,j,j,j),j,j,o,j,j)
 i=i?j:k.garB()
-n.push(A.cd(B.kP,A.b([o,A.dP(A.f(m?"Reset password":"\ube44\ubc00\ubc88\ud638 \ucc3e\uae30/\uc7ac\uc124\uc815",j,j,j,j,j,j,j),j,j,i,j,j)],s),B.X,8,10))
+n.push(A.cd(B.kP,A.b([o,A.dP(A.f(m?"Reset":"\uc7ac\uc124\uc815",j,j,j,j,j,j,j),j,j,i,j,j)],s),B.X,8,10))
 n.push(B.kr)
 i=k.z?j:new A.aD6(k)
 n.push(A.dP(A.f(p,j,j,j,j,j,j,j),j,j,i,j,j))
@@ -103870,7 +103870,7 @@ p=k.z
 o=p?j:k.garI()
 o=A.d5(B.tu,A.f(r?"Sign out":"\ub85c\uadf8\uc544\uc6c3",j,j,j,j,j,j,j),o,j)
 n=p?j:new A.aCV(k)
-n=A.d5(B.On,A.f(r?"Use another account":"\ub2e4\ub978 \uacc4\uc815 \uc0ac\uc6a9",j,j,j,j,j,j,j),n,j)
+n=A.d5(B.On,A.f(r?"Switch":"\uc804\ud658",j,j,j,j,j,j,j),n,j)
 m=p?j:new A.aCW(k,c)
 m=A.d5(B.NQ,A.f(r?"Reset data":"\ub370\uc774\ud130 \ucd08\uae30\ud654",j,j,j,j,j,j,j),m,j)
 p=p?j:new A.aCX(k,c)
@@ -104145,15 +104145,15 @@ A.aCX.prototype={
 $0(){return this.a.we(this.b)},
 $S:0}
 A.yF.prototype={
-I(a){var s,r="Test MVP",q=null,p=$.ac(),o=p.a===B.c,n=A.BC(B.dj,q,q,q,q,q,q,q,A.f(o?r:"\ud14c\uc2a4\ud2b8 MVP",q,q,q,q,q,q,q))
-o=o?r:"\ud14c\uc2a4\ud2b8 MVP"
+I(a){var s,r=null,q=$.ac(),p=q.a===B.c,o=A.BC(B.dj,r,r,r,r,r,r,r,A.f(p?"Test MVP":"\ud14c\uc2a4\ud2b8 MVP",r,r,r,r,r,r,r))
+p=p?"Portal":"\ud3ec\ud138"
 s=A.n(a).ok.c
-return A.nV(n,q,new A.mV(A.i_(!0,A.eu(A.i1(new A.d3(B.Gj,A.a1(A.b([B.Zn,A.f(o,q,q,q,s==null?q:s.fC(B.M),B.c8,q,q),B.Zo,A.j5(new A.ap4(p))],t.p),B.v,B.f,B.j),q),B.m2,q,B.a7),q,q),!0,B.af,!0,!0),q),q,!0,q)}}
+return A.nV(o,r,new A.mV(A.i_(!0,A.eu(A.i1(new A.d3(B.Gj,A.a1(A.b([B.Zn,A.f(p,r,r,r,s==null?r:s.fC(B.M),B.c8,r,r),B.Zo,A.j5(new A.ap4(q))],t.p),B.v,B.f,B.j),r),B.m2,r,B.a7),r,r),!0,B.af,!0,!0),r),r,!0,r)}}
 A.ap4.prototype={
-$2(a,b){var s,r=this.a.a===B.c,q=r?"Practitioner":"\uce68\uc220\uc0ac",p=r?"Clinic Portal":"\ud074\ub9ac\ub2c9 \ud3ec\ud138",o=r?"Continue as Practitioner":"\uce68\uc220\uc0ac\ub85c \uc2dc\uc791",n=r?"Create Practitioner Account":"\uce68\uc220\uc0ac \ud68c\uc6d0\uac00\uc785",m=A.b0O(B.T,B.aW,o,q,B.Nm,new A.ap1(a),new A.ap2(a),n,p)
+$2(a,b){var s,r=this.a.a===B.c,q=r?"Practitioner":"\uce68\uc220\uc0ac",p=r?"Clinic Portal":"\ud074\ub9ac\ub2c9 \ud3ec\ud138",o=r?"Login":"\ub85c\uadf8\uc778",n=r?"Create":"\uac00\uc785",m=A.b0O(B.T,B.aW,o,q,B.Nm,new A.ap1(a),new A.ap2(a),n,p)
 q=r?"Patient":"\ud658\uc790"
 p=r?"Patient Portal":"\ud658\uc790 \ud3ec\ud138"
-r=r?"Continue as Patient":"\ud658\uc790\ub85c \uc2dc\uc791"
+r=r?"Login":"\ub85c\uadf8\uc778"
 s=A.b0O(B.aV,B.db,r,q,B.t3,new A.ap3(a),null,null,p)
 if(!(b.b>=720))return A.a1(A.b([m,B.P,s],t.p),B.v,B.f,B.j)
 return A.b1(A.b([A.bg(m,1),B.kp,A.bg(s,1)],t.p),B.m,B.f,B.j,0)},

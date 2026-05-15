@@ -84,12 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
         content: SizedBox(
           width: 420,
           child: accounts.isEmpty
-              ? Text(
-                  lang.tr(
-                    'No practitioner account has been saved in this browser yet.',
-                    '이 브라우저에 저장된 침술사 계정이 아직 없습니다.',
-                  ),
-                )
+              ? Text(lang.tr('No saved account.', '저장된 계정 없음'))
               : ListView.separated(
                   shrinkWrap: true,
                   itemCount: accounts.length,
@@ -226,9 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _setFormError(null);
 
     if (id.isEmpty || password.isEmpty) {
-      _setFormError(
-        lang.tr('Please enter your ID and password.', '아이디와 비밀번호를 입력해주세요.'),
-      );
+      _setFormError(lang.tr('Enter ID and password.', '아이디와 비밀번호 필요'));
       return;
     }
 
@@ -277,32 +270,20 @@ class _LoginScreenState extends State<LoginScreen> {
     final lang = AppLanguageController.instance;
     switch (error.code) {
       case 'invalid-login-id':
-        return lang.tr(
-          'Use a simple login ID with at least 3 letters or numbers.',
-          '로그인 아이디는 3자 이상 영문/숫자로 입력해주세요.',
-        );
+        return lang.tr('ID needs 3+ letters or numbers.', '아이디는 3자 이상');
       case 'weak-password':
-        return lang.tr(
-          'Use a password with at least 4 characters.',
-          '비밀번호는 4자 이상으로 입력해주세요.',
-        );
+        return lang.tr('Password needs 4+ characters.', '비밀번호는 4자 이상');
       case 'missing-display-name':
-        return lang.tr(
-          'Please enter the practitioner name.',
-          '침술사 이름을 입력해주세요.',
-        );
+        return lang.tr('Enter practitioner name.', '침술사 이름 필요');
       case 'missing-clinic-name':
-        return lang.tr('Please enter the clinic name.', '한의원 이름을 입력해주세요.');
+        return lang.tr('Enter clinic name.', '한의원 이름 필요');
       case 'login-id-already-in-use':
         return lang.tr(
           'This practitioner login ID is already being used in this browser.',
           '이 침술사 로그인 아이디는 이 브라우저에서 이미 사용 중입니다.',
         );
       case 'user-not-found':
-        return lang.tr(
-          'No saved practitioner account was found. Create an account first.',
-          '저장된 침술사 계정을 찾지 못했습니다. 먼저 계정을 만들어주세요.',
-        );
+        return lang.tr('No saved account. Create first.', '저장된 계정 없음');
       case 'wrong-password':
         return lang.tr(
           'The practitioner password does not match.',
@@ -372,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             ButtonSegment<bool>(
                               value: true,
-                              label: Text(lang.tr('Create Account', '계정 만들기')),
+                              label: Text(lang.tr('Create', '가입')),
                             ),
                           ],
                           selected: {_isPractitionerRegisterMode},
@@ -487,9 +468,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: _isSubmitting
                                   ? null
                                   : _showPractitionerPasswordResetDialog,
-                              child: Text(
-                                lang.tr('Reset password', '비밀번호 찾기/재설정'),
-                              ),
+                              child: Text(lang.tr('Reset', '재설정')),
                             ),
                           ],
                         ),

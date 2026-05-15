@@ -22,15 +22,13 @@ void main() {
     expect(find.text('Patient Portal'), findsOneWidget);
 
     await tester.ensureVisible(
-      find.widgetWithText(FilledButton, 'Continue as Practitioner'),
+      find.widgetWithText(FilledButton, 'Login').first,
     );
-    await tester.tap(
-      find.widgetWithText(FilledButton, 'Continue as Practitioner'),
-    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Login').first);
     await tester.pumpAndSettle();
 
     expect(find.text('Practitioner Login'), findsWidgets);
     expect(find.text('Login'), findsWidgets);
-    expect(find.text('Create Account'), findsOneWidget);
+    expect(find.text('Create'), findsOneWidget);
   });
 }

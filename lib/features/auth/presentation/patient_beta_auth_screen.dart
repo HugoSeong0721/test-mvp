@@ -322,11 +322,11 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     _setFormError(null);
 
     if (email.isEmpty) {
-      _setFormError(lang.tr('Please enter your email.', '이메일을 입력해주세요.'));
+      _setFormError(lang.tr('Enter email.', '이메일 필요'));
       return;
     }
     if (password.isEmpty) {
-      _setFormError(lang.tr('Please enter your password.', '비밀번호를 입력해주세요.'));
+      _setFormError(lang.tr('Enter password.', '비밀번호 필요'));
       return;
     }
     if (_isRegisterMode && name.isEmpty) {
@@ -579,8 +579,8 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         );
       case 'invalid-email':
         return lang.tr(
-          'Please enter a valid email address.',
-          '올바른 이메일 주소를 입력해주세요.',
+          'Use a valid email.',
+          '올바른 이메일 필요',
         );
       case 'weak-password':
         return lang.tr(
@@ -610,10 +610,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
           '이 이메일은 이미 이 브라우저에 저장되어 있습니다. 로그인으로 진행해주세요.',
         );
       case 'invalid-email':
-        return lang.tr(
-          'Please enter a valid email address.',
-          '올바른 이메일 주소를 입력해주세요.',
-        );
+        return lang.tr('Use a valid email.', '올바른 이메일 필요');
       case 'weak-password':
         return lang.tr(
           'Please use a password with at least 6 characters.',
@@ -825,7 +822,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
               ),
               TextButton(
                 onPressed: _loading ? null : _showPatientPasswordResetDialog,
-                child: Text(lang.tr('Reset password', '비밀번호 찾기/재설정')),
+                child: Text(lang.tr('Reset', '재설정')),
               ),
             ],
           ),
@@ -895,7 +892,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                     ? null
                     : () => setState(() => _showAuthFormEvenWithSession = true),
                 icon: const Icon(Icons.switch_account_outlined),
-                label: Text(lang.tr('Use another account', '다른 계정 사용')),
+                label: Text(lang.tr('Switch', '전환')),
               ),
               OutlinedButton.icon(
                 onPressed: _loading

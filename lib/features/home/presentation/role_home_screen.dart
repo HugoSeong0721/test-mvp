@@ -34,7 +34,7 @@ class RoleHomeScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: 24),
                     Text(
-                      lang.tr('Test MVP', '테스트 MVP'),
+                      lang.tr('Portal', '포털'),
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -50,10 +50,7 @@ class RoleHomeScreen extends StatelessWidget {
                           icon: Icons.health_and_safety_outlined,
                           eyebrow: lang.tr('Practitioner', '침술사'),
                           title: lang.tr('Clinic Portal', '클리닉 포털'),
-                          buttonLabel: lang.tr(
-                            'Continue as Practitioner',
-                            '침술사로 시작',
-                          ),
+                          buttonLabel: lang.tr('Login', '로그인'),
                           onPressed: () => Navigator.pushNamed(
                             context,
                             LoginScreen.routeName,
@@ -62,10 +59,7 @@ class RoleHomeScreen extends StatelessWidget {
                               'loginMode': 'default',
                             },
                           ),
-                          secondaryButtonLabel: lang.tr(
-                            'Create Practitioner Account',
-                            '침술사 회원가입',
-                          ),
+                          secondaryButtonLabel: lang.tr('Create', '가입'),
                           onSecondaryPressed: () => Navigator.pushNamed(
                             context,
                             LoginScreen.routeName,
@@ -81,7 +75,7 @@ class RoleHomeScreen extends StatelessWidget {
                           icon: Icons.favorite_outline,
                           eyebrow: lang.tr('Patient', '환자'),
                           title: lang.tr('Patient Portal', '환자 포털'),
-                          buttonLabel: lang.tr('Continue as Patient', '환자로 시작'),
+                          buttonLabel: lang.tr('Login', '로그인'),
                           onPressed: () => Navigator.pushNamed(
                             context,
                             PatientBetaAuthScreen.routeName,
