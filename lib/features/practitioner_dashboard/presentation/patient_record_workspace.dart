@@ -163,7 +163,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr('Unified patient chart', '통합 환자 차트'),
+                              lang.tr('Patient chart', '환자 차트'),
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
                                     color: AppTheme.ink.withValues(alpha: 0.58),
@@ -193,7 +193,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 ),
                                 AppMetricChip(
                                   icon: Icons.history_outlined,
-                                  label: lang.tr('Visits', '방문 수'),
+                                  label: lang.tr('Visits', '방문'),
                                   value: '${history.length}',
                                   backgroundColor: AppTheme.surface,
                                   labelColor: AppTheme.ink.withValues(
@@ -287,10 +287,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  lang.tr(
-                                    'Join request waiting',
-                                    'Join request waiting',
-                                  ),
+                                  lang.tr('Join request', '가입 요청'),
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(fontWeight: FontWeight.w800),
                                 ),
@@ -316,11 +313,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 ),
                                 label: Text(
                                   _isApprovingJoin
-                                      ? lang.tr('Approving...', 'Approving...')
-                                      : lang.tr(
-                                          'Approve + send questions',
-                                          'Approve + send questions',
-                                        ),
+                                      ? lang.tr('Approving...', '승인 중...')
+                                      : lang.tr('Approve', '승인'),
                                 ),
                               ),
                             ],
@@ -359,7 +353,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             },
                           ),
                           ChoiceChip(
-                            label: Text(lang.tr('My Requests', '내 요청')),
+                            label: Text(lang.tr('Requests', '요청')),
                             selected:
                                 _selectedTab == _PatientRecordTab.requests,
                             onSelected: (_) {
@@ -369,7 +363,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             },
                           ),
                           ChoiceChip(
-                            label: Text(lang.tr('Patient Intake', '환자 문진')),
+                            label: Text(lang.tr('Intake', '문진')),
                             selected: _selectedTab == _PatientRecordTab.intake,
                             onSelected: (_) {
                               setState(
@@ -397,7 +391,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr('Profile', 'Profile'),
+                                lang.tr('Profile', '프로필'),
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                               const SizedBox(height: 14),
@@ -481,10 +475,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 controller: _memoController,
                                 maxLines: 3,
                                 decoration: InputDecoration(
-                                  labelText: lang.tr(
-                                    'My standing note about this patient',
-                                    '이 환자에 대한 내 메모',
-                                  ),
+                                  labelText: lang.tr('Note', '이 환자에 대한 내 메모'),
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -492,9 +483,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               FilledButton.icon(
                                 onPressed: _saveProfile,
                                 icon: const Icon(Icons.save_outlined),
-                                label: Text(
-                                  lang.tr('Save patient profile', '환자 정보 저장'),
-                                ),
+                                label: Text(lang.tr('Save', '저장')),
                               ),
                             ],
                           ),
@@ -508,7 +497,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr('Visits', 'Visits'),
+                                lang.tr('Visits', '방문'),
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                               const SizedBox(height: 14),
@@ -560,11 +549,11 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
-                                            '${lang.tr('Visit reason / treatment focus', '내원 이유 / 치료 포인트')}: ${visit.previousTreatmentArea}',
+                                            '${lang.tr('Focus', '포인트')}: ${visit.previousTreatmentArea}',
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${lang.tr('What I documented', '내가 남긴 기록')}: ${visit.previousSessionNote}',
+                                            '${lang.tr('Note', '기록')}: ${visit.previousSessionNote}',
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
@@ -576,7 +565,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                           const SizedBox(height: 10),
                                           Text(
                                             lang.tr(
-                                              'Pre-visit intake answers',
+                                              'Intake answers',
                                               '사전문진 답변',
                                             ),
                                             style: const TextStyle(
@@ -684,7 +673,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr('Requests', 'Requests'),
+                                lang.tr('Requests', '요청'),
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                               const SizedBox(height: 14),
@@ -740,13 +729,13 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            '${lang.tr('Requested for visit time', '대상 방문 시간')}: ${(data['patientTime'] ?? '-').toString()}',
+                                            '${lang.tr('Visit', '방문')}: ${(data['patientTime'] ?? '-').toString()}',
                                           ),
                                           Text(
-                                            '${lang.tr('Reference last visit', '기준 이전 방문')}: ${_formatStoredDateWithWeekday((data['lastVisitDate'] ?? '-').toString())}',
+                                            '${lang.tr('Previous', '이전')}: ${_formatStoredDateWithWeekday((data['lastVisitDate'] ?? '-').toString())}',
                                           ),
                                           Text(
-                                            '${lang.tr('Requested questions', '요청 질문 수')}: $questionCount',
+                                            '${lang.tr('Questions', '질문')}: $questionCount',
                                           ),
                                           if (note.isNotEmpty) ...[
                                             const SizedBox(height: 8),
@@ -803,7 +792,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr('Intake', 'Intake'),
+                                lang.tr('Intake', '문진'),
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                               const SizedBox(height: 14),
@@ -868,30 +857,27 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            '${lang.tr('Visit type', '문진 유형')}: ${_visitTypeLabel((data['visitType'] ?? 'follow_up').toString())}',
+                                            '${lang.tr('Type', '유형')}: ${_visitTypeLabel((data['visitType'] ?? 'follow_up').toString())}',
                                           ),
                                           Text(
-                                            '${lang.tr('Answered questions', '답변한 질문 수')}: ${answers.length}',
+                                            '${lang.tr('Answers', '답변')}: ${answers.length}',
                                           ),
                                           Text(
-                                            '${lang.tr('Completion snapshot', '완료율')}: ${percent.round()}%',
+                                            '${lang.tr('Complete', '완료')}: ${percent.round()}%',
                                           ),
                                           Text(
-                                            '${lang.tr('Marked as main concern', '중요 통증 표시')}: $markedMainPainCount · ${lang.tr('Marked to remember', '기억할 내용 표시')}: $markedRememberCount',
+                                            '${lang.tr('Main', '중요')}: $markedMainPainCount · ${lang.tr('Pinned', '고정')}: $markedRememberCount',
                                           ),
                                           if (extraMemo.isNotEmpty) ...[
                                             const SizedBox(height: 8),
                                             Text(
-                                              '${lang.tr('Extra memo from patient', '환자 추가 메모')}: $extraMemo',
+                                              '${lang.tr('Memo', '메모')}: $extraMemo',
                                             ),
                                           ],
                                           if (answers.isNotEmpty) ...[
                                             const SizedBox(height: 10),
                                             Text(
-                                              lang.tr(
-                                                'Latest saved answers',
-                                                '저장된 답변',
-                                              ),
+                                              lang.tr('Answers', '답변'),
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -907,10 +893,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                               final flags = <String>[
                                                 if (item['markedMainPain'] ==
                                                     true)
-                                                  lang.tr(
-                                                    'Main concern',
-                                                    '중요 통증',
-                                                  ),
+                                                  lang.tr('Main', '중요 통증'),
                                                 if (item['markedRemember'] ==
                                                     true)
                                                   lang.tr('Remember', '기억할 것'),
@@ -960,7 +943,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                lang.tr('Feedback', 'Feedback'),
+                                lang.tr('Feedback', '피드백'),
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                               const SizedBox(height: 14),
@@ -1002,7 +985,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                             '${lang.tr('Status', '상태')}: ${_feedbackStatusLabel((data['status'] ?? 'pending').toString())}',
                                           ),
                                           Text(
-                                            '${lang.tr('Updated', '수정 시각')}: ${_formatTimestamp(data['updatedAt'] as Timestamp?)}',
+                                            '${lang.tr('Updated', '수정')}: ${_formatTimestamp(data['updatedAt'] as Timestamp?)}',
                                           ),
                                           const SizedBox(height: 8),
                                           Container(
