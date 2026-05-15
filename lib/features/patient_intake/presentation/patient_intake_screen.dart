@@ -1701,120 +1701,136 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                     ? submissionDocs.first.data()
                     : null;
 
-                final hero = AppPanel(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        lang.tr('Patient intake workspace', '환자 문진 작업 화면'),
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.58),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        lang.tr(
-                          'Tell your practitioner what changed before the visit',
-                          '방문 전 현재 상태 변화를 바로 전달하세요',
-                        ),
-                        style: theme.textTheme.headlineLarge?.copyWith(
-                          color: AppTheme.ink,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        lang.tr(
-                          'Answer and submit intake updates.',
-                          'Answer and submit intake updates.',
-                        ),
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: AppTheme.ink.withValues(alpha: 0.72),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      PatientClinicContextPanel(
-                        clinic: activeClinic,
-                        onChooseClinic: () => Navigator.pushNamed(
-                          context,
-                          PatientHomeScreen.routeName,
-                        ),
-                      ),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
+                final hero = LayoutBuilder(
+                  builder: (context, heroConstraints) {
+                    final compact = heroConstraints.maxWidth < 520;
+                    return AppPanel(
+                      padding: EdgeInsets.all(compact ? 18 : 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppMetricChip(
-                            icon: Icons.assignment_outlined,
-                            label: lang.tr('Mode', '모드'),
-                            value: modeLabel,
-                            backgroundColor: AppTheme.surface,
-                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                            valueColor: AppTheme.ink,
+                          Text(
+                            lang.tr('Intake', '문진'),
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: AppTheme.ink.withValues(alpha: 0.58),
+                            ),
                           ),
-                          AppMetricChip(
-                            icon: Icons.stacked_line_chart_outlined,
-                            label: lang.tr('Progress', '진행도'),
-                            value:
-                                '$answeredCount / ${_activeQuestions.length}',
-                            backgroundColor: AppTheme.surface,
-                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                            valueColor: AppTheme.ink,
+                          const SizedBox(height: 10),
+                          Text(
+                            lang.tr('Before your visit', '방문 전 상태 전달'),
+                            style:
+                                (compact
+                                        ? theme.textTheme.headlineMedium
+                                        : theme.textTheme.headlineLarge)
+                                    ?.copyWith(color: AppTheme.ink),
                           ),
-                          AppMetricChip(
-                            icon: Icons.mark_email_unread_outlined,
-                            label: lang.tr('Pending', '대기'),
-                            value: '${requestDocs.length}',
-                            backgroundColor: AppTheme.surface,
-                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                            valueColor: AppTheme.ink,
+                          if (!compact) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              lang.tr(
+                                'Answer and submit intake updates.',
+                                'Answer and submit intake updates.',
+                              ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: AppTheme.ink.withValues(alpha: 0.72),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          PatientClinicContextPanel(
+                            clinic: activeClinic,
+                            onChooseClinic: () => Navigator.pushNamed(
+                              context,
+                              PatientHomeScreen.routeName,
+                            ),
                           ),
-                          AppMetricChip(
-                            icon: Icons.verified_user_outlined,
-                            label: lang.tr('Profile', '프로필'),
-                            value: profile.hasRequiredAlertInfo
-                                ? lang.tr('Ready', '준비됨')
-                                : lang.tr('Missing', '누락'),
-                            backgroundColor: AppTheme.surface,
-                            labelColor: AppTheme.ink.withValues(alpha: 0.58),
-                            valueColor: AppTheme.ink,
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              AppMetricChip(
+                                icon: Icons.assignment_outlined,
+                                label: lang.tr('Mode', '모드'),
+                                value: modeLabel,
+                                backgroundColor: AppTheme.surface,
+                                labelColor: AppTheme.ink.withValues(
+                                  alpha: 0.58,
+                                ),
+                                valueColor: AppTheme.ink,
+                              ),
+                              AppMetricChip(
+                                icon: Icons.stacked_line_chart_outlined,
+                                label: lang.tr('Progress', '진행도'),
+                                value:
+                                    '$answeredCount / ${_activeQuestions.length}',
+                                backgroundColor: AppTheme.surface,
+                                labelColor: AppTheme.ink.withValues(
+                                  alpha: 0.58,
+                                ),
+                                valueColor: AppTheme.ink,
+                              ),
+                              AppMetricChip(
+                                icon: Icons.mark_email_unread_outlined,
+                                label: lang.tr('Pending', '대기'),
+                                value: '${requestDocs.length}',
+                                backgroundColor: AppTheme.surface,
+                                labelColor: AppTheme.ink.withValues(
+                                  alpha: 0.58,
+                                ),
+                                valueColor: AppTheme.ink,
+                              ),
+                              AppMetricChip(
+                                icon: Icons.verified_user_outlined,
+                                label: lang.tr('Profile', '프로필'),
+                                value: profile.hasRequiredAlertInfo
+                                    ? lang.tr('Ready', '준비됨')
+                                    : lang.tr('Missing', '누락'),
+                                backgroundColor: AppTheme.surface,
+                                labelColor: AppTheme.ink.withValues(
+                                  alpha: 0.58,
+                                ),
+                                valueColor: AppTheme.ink,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              FilledButton.icon(
+                                onPressed: () => Navigator.pushNamed(
+                                  context,
+                                  PatientRequestsScreen.routeName,
+                                ),
+                                icon: const Icon(
+                                  Icons.mark_email_unread_outlined,
+                                ),
+                                label: Text(lang.tr('Requests', '요청')),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: _openProfileDialog,
+                                icon: const Icon(Icons.account_circle_outlined),
+                                label: Text(lang.tr('Profile', '프로필')),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: () => Navigator.pushNamed(
+                                  context,
+                                  VisitHistoryScreen.routeName,
+                                ),
+                                icon: const Icon(Icons.history),
+                                label: Text(lang.tr('Visits', '방문')),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 18),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          FilledButton.icon(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              PatientRequestsScreen.routeName,
-                            ),
-                            icon: const Icon(Icons.mark_email_unread_outlined),
-                            label: Text(lang.tr('Requests', '요청')),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: _openProfileDialog,
-                            icon: const Icon(Icons.account_circle_outlined),
-                            label: Text(lang.tr('Profile', '프로필')),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              VisitHistoryScreen.routeName,
-                            ),
-                            icon: const Icon(Icons.history),
-                            label: Text(lang.tr('Visits', '방문')),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 );
 
                 final formPanel = AppPanel(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -2518,7 +2534,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1180),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                      padding: EdgeInsets.fromLTRB(
+                        MediaQuery.sizeOf(context).width < 430 ? 12 : 24,
+                        8,
+                        MediaQuery.sizeOf(context).width < 430 ? 12 : 24,
+                        MediaQuery.sizeOf(context).width < 430 ? 16 : 24,
+                      ),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           final wide = constraints.maxWidth >= 980;

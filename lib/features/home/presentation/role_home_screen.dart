@@ -15,6 +15,7 @@ class RoleHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
+    final compact = MediaQuery.sizeOf(context).width < 430;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -26,21 +27,28 @@ class RoleHomeScreen extends StatelessWidget {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+              padding: EdgeInsets.fromLTRB(
+                compact ? 14 : 24,
+                compact ? 8 : 16,
+                compact ? 14 : 24,
+                compact ? 18 : 32,
+              ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 920),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 24),
+                    SizedBox(height: compact ? 10 : 24),
                     Text(
                       lang.tr('Portal', '포털'),
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style:
+                          (compact
+                                  ? Theme.of(context).textTheme.headlineLarge
+                                  : Theme.of(context).textTheme.displaySmall)
+                              ?.copyWith(fontWeight: FontWeight.w700),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 28),
+                    SizedBox(height: compact ? 16 : 28),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final wide = constraints.maxWidth >= 720;
@@ -138,8 +146,9 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 430;
     return AppPanel(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(compact ? 18 : 24),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -150,15 +159,15 @@ class _RoleCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: compact ? 42 : 52,
+            height: compact ? 42 : 52,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, color: accent),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: compact ? 12 : 18),
           Text(
             eyebrow,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -173,7 +182,7 @@ class _RoleCard extends StatelessWidget {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: compact ? 14 : 20),
           if (secondaryButtonLabel != null && onSecondaryPressed != null) ...[
             SizedBox(
               width: double.infinity,
