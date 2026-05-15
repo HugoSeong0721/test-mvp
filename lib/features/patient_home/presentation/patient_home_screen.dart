@@ -1098,9 +1098,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
               title: Text(lang.tr('Book Appointment', '예약하기')),
-              content: SizedBox(
-                width: 460,
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 460),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,

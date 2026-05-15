@@ -2719,9 +2719,13 @@ class _PractitionerDashboardScreenState
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
           title: Text(occupancy.profile.name),
-          content: SizedBox(
-            width: 520,
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -2888,14 +2892,18 @@ class _PractitionerDashboardScreenState
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
           title: Text(
             AppLanguageController.instance.tr(
               'Request Answers from ${profile.name}',
               '${profile.name}님 답변 요청',
             ),
           ),
-          content: SizedBox(
-            width: 520,
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
             child: StatefulBuilder(
               builder: (context, setDialogState) {
                 return SingleChildScrollView(
@@ -3302,14 +3310,18 @@ class _PractitionerDashboardScreenState
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
           title: Text(
             AppLanguageController.instance.tr(
               'Send a note to ${profile.name}',
               '${profile.name}님께 쪽지 보내기',
             ),
           ),
-          content: SizedBox(
-            width: 500,
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -3749,14 +3761,18 @@ class _PractitionerDashboardScreenState
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
               title: Text(
                 AppLanguageController.instance.tr(
                   'Practitioner Dashboard',
                   '침술사 대시보드',
                 ),
               ),
-              content: SizedBox(
-                width: 340,
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 340),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
