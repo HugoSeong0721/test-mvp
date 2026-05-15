@@ -106977,87 +106977,87 @@ p=(l==null||p.fh(l)==null)&&o.length!==0}else p=!1
 if(p)q.vU(B.b.gS(o))}return A.c5(A.jM(new A.axo(q,s,r,n,o)),null,B.bM)},
 $S:706}
 A.axo.prototype={
-$2(a3,a4){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c=this,b=null,a=c.a,a0=a.Q,a1=a0==null?b:a.d.fh(a0),a2=a.Y4()
-a0=c.b
-s=a0.a===B.c
-r=s?"Clinic profile builder":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uc124\uc815"
+$2(a6,a7){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c=this,b=null,a="Clinic name",a0="Practitioner",a1="Patient note",a2=c.a,a3=a2.Q,a4=a3==null?b:a2.d.fh(a3),a5=a2.Y4()
+a3=c.b
+s=a3.a===B.c
+r=s?"Clinic profile":"\ud55c\uc758\uc6d0 \uc815\ubcf4"
 q=c.c.ok
 r=A.bk(A.f(r,b,b,b,q.f,b,b,b),1)
 p=t.p
-r=A.b([A.b3(A.b([r,A.ky(B.NX,A.f(s?"Add clinic":"\ud55c\uc758\uc6d0 \ucd94\uac00",b,b,b,b,b,b,b),a.garY())],p),B.v,B.f,B.j,0)],p)
+r=A.b([A.b3(A.b([r,A.ky(B.NX,A.f(s?"Add clinic":"\ud55c\uc758\uc6d0 \ucd94\uac00",b,b,b,b,b,b,b),a2.garY())],p),B.v,B.f,B.j,0)],p)
 s=c.d
 if(s!=null){o=s.c
 n=o.length===0
 m="Signed in as "+(n?s.b:o)
 s=(n?s.b:o)+" \uacc4\uc815\uc73c\ub85c \ub85c\uadf8\uc778\ub428"
-if(a0.a===B.c)s=m
+if(a3.a===B.c)s=m
 o=q.z
 B.b.F(r,A.b([B.J,A.f(s,b,b,b,o==null?b:o.dE(B.b0,B.M),b,b,b)],p))}r.push(B.L)
-s=a0.a===B.c?"Patients search clinics after login, choose one as their center, and can arrive through the link you generate here. The clinic name saved here is what patients will see.":"\ud658\uc790\ub294 \ub85c\uadf8\uc778 \ud6c4 \uc5ec\uae30 \ub4f1\ub85d\ub41c \ud55c\uc758\uc6d0\uc744 \uac80\uc0c9\ud558\uace0 \uc120\ud0dd\ud569\ub2c8\ub2e4. \uc774 \ud654\uba74\uc5d0\uc11c \ub9cc\ub4e0 \ub9c1\ud06c\ub85c \ubc14\ub85c \ub4e4\uc5b4\uc624\uac8c \ud560 \uc218\ub3c4 \uc788\uace0, \uc5ec\uae30 \uc800\uc7a5\ud55c \ud55c\uc758\uc6d0 \uc774\ub984\uc774 \ud658\uc790 \ud654\uba74\uc5d0 \uadf8\ub300\ub85c \ubcf4\uc785\ub2c8\ub2e4."
+s=a3.a===B.c?"This is what patients see.":"\ud658\uc790\ub294 \ub85c\uadf8\uc778 \ud6c4 \uc5ec\uae30 \ub4f1\ub85d\ub41c \ud55c\uc758\uc6d0\uc744 \uac80\uc0c9\ud558\uace0 \uc120\ud0dd\ud569\ub2c8\ub2e4. \uc774 \ud654\uba74\uc5d0\uc11c \ub9cc\ub4e0 \ub9c1\ud06c\ub85c \ubc14\ub85c \ub4e4\uc5b4\uc624\uac8c \ud560 \uc218\ub3c4 \uc788\uace0, \uc5ec\uae30 \uc800\uc7a5\ud55c \ud55c\uc758\uc6d0 \uc774\ub984\uc774 \ud658\uc790 \ud654\uba74\uc5d0 \uadf8\ub300\ub85c \ubcf4\uc785\ub2c8\ub2e4."
 o=q.y
 n=o==null
 r.push(A.f(s,b,b,b,n?b:o.aB(B.p.P(0.7)),b,b,b))
 r.push(B.aM)
-s=a1==null
-m=s?b:a1.a
-if(m==null)m=a.as||c.e.length===0?b:B.b.gS(c.e).a
-l=A.bx(b,b,b,b,b,b,b,b,!0,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,a0.a===B.c?"Clinic to edit":"\uc218\uc815\ud560 \ud55c\uc758\uc6d0",!0,!0,!1,b,b,b,b,b,b,b,b,b,b,b,b,b,b)
+s=a4==null
+m=s?b:a4.a
+if(m==null)m=a2.as||c.e.length===0?b:B.b.gS(c.e).a
+l=A.bx(b,b,b,b,b,b,b,b,!0,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,a3.a===B.c?"Clinic":"\ud55c\uc758\uc6d0",!0,!0,!1,b,b,b,b,b,b,b,b,b,b,b,b,b,b)
 k=c.e
 j=A.N(k).i("K<1,eK<j>>")
 j=A.S(new A.K(k,new A.axm(),j),j.i("ai.E"))
-k=k.length===0?b:new A.axn(a)
+k=k.length===0?b:new A.axn(a2)
 r.push(A.D2(l,m,j,k,t.N))
 r.push(B.ac)
-k=a.e
-r.push(a.A0(k,a0.a===B.c?"Clinic name":"\ud55c\uc758\uc6d0 \uc774\ub984"))
+k=a2.e
+r.push(a2.A0(k,a3.a===B.c?a:"\ud55c\uc758\uc6d0 \uc774\ub984"))
 r.push(B.C)
-m=a.f
-r.push(a.A0(m,a0.a===B.c?"Practitioner display name":"\uce68\uc220\uc0ac \ud45c\uc2dc \uc774\ub984"))
+m=a2.f
+r.push(a2.A0(m,a3.a===B.c?a0:"\uce68\uc220\uc0ac"))
 r.push(B.C)
-l=a.r
-r.push(a.A0(l,a0.a===B.c?"Location / search label":"\uc704\uce58 / \uac80\uc0c9 \ub77c\ubca8"))
+l=a2.r
+r.push(a2.A0(l,a3.a===B.c?"Location":"\uc704\uce58"))
 r.push(B.C)
-j=a0.a===B.c?"Search keywords":"\uac80\uc0c9 \ud0a4\uc6cc\ub4dc"
-r.push(a.A0(a.w,j))
+j=a3.a===B.c?"Search keywords":"\uac80\uc0c9 \ud0a4\uc6cc\ub4dc"
+r.push(a2.A0(a2.w,j))
 r.push(B.C)
-j=a.x
-r.push(a.RW(j,a0.a===B.c?"Patient-facing note":"\ud658\uc790\uc5d0\uac8c \ubcf4\uc774\ub294 \uba54\ubaa8",6,4))
+j=a2.x
+r.push(a2.RW(j,a3.a===B.c?a1:"\ud658\uc790 \uba54\ubaa8",6,4))
 r.push(B.R)
-i=a0.a===B.c
-h=A.dX(B.js,A.f(i?"Save clinic info":"\ud55c\uc758\uc6d0 \uc815\ubcf4 \uc800\uc7a5",b,b,b,b,b,b,b),a.gaqk(),b)
-r.push(A.cb(B.S,A.b([h,A.d5(B.O0,A.f(i?"Copy link":"\ub9c1\ud06c \ubcf5\uc0ac",b,b,b,b,b,b,b),a.gaeJ(),b)],p),B.W,10,10))
+i=a3.a===B.c
+h=A.dX(B.js,A.f(i?"Save":"\uc800\uc7a5",b,b,b,b,b,b,b),a2.gaqk(),b)
+r.push(A.cb(B.S,A.b([h,A.d5(B.O0,A.f(i?"Copy link":"\ub9c1\ud06c \ubcf5\uc0ac",b,b,b,b,b,b,b),a2.gaeJ(),b)],p),B.W,10,10))
 g=A.a2(r,B.m,B.f,B.j)
-a=A.b([B.k.P(0.92),B.dA.P(0.54)],t.c)
-r=a0.a===B.c?"Patient view preview":"\ud658\uc790 \ud654\uba74 \ubbf8\ub9ac\ubcf4\uae30"
+a2=A.b([B.k.P(0.92),B.dA.P(0.54)],t.c)
+r=a3.a===B.c?"Preview":"\ubbf8\ub9ac\ubcf4\uae30"
 i=q.r
 r=A.f(r,b,b,b,i,b,b,b)
 h=B.k.P(0.82)
 f=A.aC(18)
 e=A.bE(B.Q.P(0.5),1)
 k=B.d.N(k.a.a)
-if(k.length===0)k=a0.a===B.c?"Clinic name preview":"\ud55c\uc758\uc6d0 \uc774\ub984 \ubbf8\ub9ac\ubcf4\uae30"
+if(k.length===0)k=a3.a===B.c?a:"\ud55c\uc758\uc6d0 \uc774\ub984"
 k=A.f(k,b,b,b,i==null?b:i.fC(B.M),b,b,b)
 m=B.d.N(m.a.a)
-if(m.length===0)m=a0.a===B.c?"Practitioner name appears here":"\uce68\uc220\uc0ac \uc774\ub984\uc774 \uc5ec\uae30\uc5d0 \ubcf4\uc785\ub2c8\ub2e4"
+if(m.length===0)m=a3.a===B.c?a0:"\uce68\uc220\uc0ac \uc774\ub984\uc774 \uc5ec\uae30\uc5d0 \ubcf4\uc785\ub2c8\ub2e4"
 o=A.b([k,B.J,A.f(m,b,b,b,n?b:o.aB(B.p.P(0.72)),b,b,b)],p)
 n=B.d.N(l.a.a)
 if(n.length!==0)B.b.F(o,A.b([B.J,A.b3(A.b([B.NL,B.kq,A.bk(A.f(n,b,b,b,b,b,b,b),1)],p),B.v,B.f,B.j,0)],p))
 o.push(B.C)
 n=B.d.N(j.a.a)
-if(n.length===0)n=a0.a===B.c?"Add a short memo about what patients should know before choosing this clinic.":"\ud658\uc790\uac00 \uc774 \ud55c\uc758\uc6d0\uc744 \uc120\ud0dd\ud558\uae30 \uc804\uc5d0 \uc54c\uc544\uc57c \ud560 \uba54\ubaa8\ub97c \uc9e7\uac8c \uc368\ub458 \uc218 \uc788\uc2b5\ub2c8\ub2e4."
+if(n.length===0)n=a3.a===B.c?a1:"\ud658\uc790\uac00 \uc774 \ud55c\uc758\uc6d0\uc744 \uc120\ud0dd\ud558\uae30 \uc804\uc5d0 \uc54c\uc544\uc57c \ud560 \uba54\ubaa8\ub97c \uc9e7\uac8c \uc368\ub458 \uc218 \uc788\uc2b5\ub2c8\ub2e4."
 m=q.z
 l=m==null
 o.push(A.f(n,b,b,b,l?b:m.tC(1.5),b,b,b))
 o=A.aN(b,A.a2(o,B.m,B.f,B.j),B.o,b,new A.az(h,b,e,f,b,b,B.r),b,b,b,B.aD,b,b,1/0)
-n=a0.a===B.c?"Generated patient link":"\uc0dd\uc131\ub41c \ud658\uc790 \ub9c1\ud06c"
+n=a3.a===B.c?"Patient link":"\ud658\uc790 \ub9c1\ud06c"
 k=q.w
 n=A.f(n,b,b,b,k==null?b:k.fC(B.M),b,b,b)
-k=A.aqj(a2,l?b:m.aB(B.b0))
-j=a0.a===B.c?"When a patient opens this link, the portal will arrive with this clinic already selected.":"\ud658\uc790\uac00 \uc774 \ub9c1\ud06c\ub97c \uc5f4\uba74 \uc774 \ud55c\uc758\uc6d0\uc774 \ubbf8\ub9ac \uc120\ud0dd\ub41c \uc0c1\ud0dc\ub85c \ud3ec\ud138\uc5d0 \ub4e4\uc5b4\uc624\uac8c \ub429\ub2c8\ub2e4."
+k=A.aqj(a5,l?b:m.aB(B.b0))
+j=a3.a===B.c?"Opens with this clinic selected.":"\ud658\uc790\uac00 \uc774 \ub9c1\ud06c\ub97c \uc5f4\uba74 \uc774 \ud55c\uc758\uc6d0\uc774 \ubbf8\ub9ac \uc120\ud0dd\ub41c \uc0c1\ud0dc\ub85c \ud3ec\ud138\uc5d0 \ub4e4\uc5b4\uc624\uac8c \ub429\ub2c8\ub2e4."
 r=A.b([r,B.C,o,B.aM,n,B.J,k,B.L,A.f(j,b,b,b,l?b:m.aB(B.p.P(0.68)),b,b,b)],p)
-if(!s){a0=a0.a===B.c?"Current clinic id":"\ud604\uc7ac \ud55c\uc758\uc6d0 ID"
-B.b.F(r,A.b([B.aM,A.f(a0,b,b,b,q.as,b,b,b),B.a_,A.aqj(a1.a,b)],p))}d=A.c5(A.a2(r,B.m,B.f,B.j),new A.eZ(B.bg,B.bH,B.b6,a,b,b),B.bn)
-if(!(a4.b>=980))return A.lT(A.b([g,B.R,d],p),b,b,b,!1)
+if(!s){a3=a3.a===B.c?"Clinic ID":"\ud55c\uc758\uc6d0 ID"
+B.b.F(r,A.b([B.aM,A.f(a3,b,b,b,q.as,b,b,b),B.a_,A.aqj(a4.a,b)],p))}d=A.c5(A.a2(r,B.m,B.f,B.j),new A.eZ(B.bg,B.bH,B.b6,a2,b,b),B.bn)
+if(!(a7.b>=980))return A.lT(A.b([g,B.R,d],p),b,b,b,!1)
 return A.b3(A.b([A.bk(g,11),B.kp,A.bk(d,9)],p),B.m,B.f,B.j,0)},
 $S:283}
 A.axm.prototype={

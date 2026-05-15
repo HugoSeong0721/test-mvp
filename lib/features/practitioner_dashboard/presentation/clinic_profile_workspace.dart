@@ -242,7 +242,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                     children: [
                       Expanded(
                         child: Text(
-                          lang.tr('Clinic profile builder', '한의원 정보 설정'),
+                          lang.tr('Clinic profile', '한의원 정보'),
                           style: theme.textTheme.headlineSmall,
                         ),
                       ),
@@ -269,7 +269,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                   const SizedBox(height: 10),
                   Text(
                     lang.tr(
-                      'Patients search clinics after login, choose one as their center, and can arrive through the link you generate here. The clinic name saved here is what patients will see.',
+                      'This is what patients see.',
                       '환자는 로그인 후 여기 등록된 한의원을 검색하고 선택합니다. 이 화면에서 만든 링크로 바로 들어오게 할 수도 있고, 여기 저장한 한의원 이름이 환자 화면에 그대로 보입니다.',
                     ),
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -284,7 +284,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                             ? null
                             : clinics.first.id),
                     decoration: InputDecoration(
-                      labelText: lang.tr('Clinic to edit', '수정할 한의원'),
+                      labelText: lang.tr('Clinic', '한의원'),
                     ),
                     items: clinics
                         .map(
@@ -317,12 +317,12 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _practitionerController,
-                    label: lang.tr('Practitioner display name', '침술사 표시 이름'),
+                    label: lang.tr('Practitioner', '침술사'),
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _locationController,
-                    label: lang.tr('Location / search label', '위치 / 검색 라벨'),
+                    label: lang.tr('Location', '위치'),
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
@@ -332,7 +332,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                   const SizedBox(height: 12),
                   _buildTextField(
                     controller: _patientNoteController,
-                    label: lang.tr('Patient-facing note', '환자에게 보이는 메모'),
+                    label: lang.tr('Patient note', '환자 메모'),
                     minLines: 4,
                     maxLines: 6,
                   ),
@@ -344,7 +344,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                       FilledButton.icon(
                         onPressed: _saveClinic,
                         icon: const Icon(Icons.save_outlined),
-                        label: Text(lang.tr('Save clinic info', '한의원 정보 저장')),
+                        label: Text(lang.tr('Save', '저장')),
                       ),
                       OutlinedButton.icon(
                         onPressed: _copyShareLink,
@@ -370,7 +370,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lang.tr('Patient view preview', '환자 화면 미리보기'),
+                      lang.tr('Preview', '미리보기'),
                       style: theme.textTheme.titleLarge,
                     ),
                     const SizedBox(height: 12),
@@ -389,7 +389,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                         children: [
                           Text(
                             _nameController.text.trim().isEmpty
-                                ? lang.tr('Clinic name preview', '한의원 이름 미리보기')
+                                ? lang.tr('Clinic name', '한의원 이름')
                                 : _nameController.text.trim(),
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w700,
@@ -398,10 +398,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                           const SizedBox(height: 8),
                           Text(
                             _practitionerController.text.trim().isEmpty
-                                ? lang.tr(
-                                    'Practitioner name appears here',
-                                    '침술사 이름이 여기에 보입니다',
-                                  )
+                                ? lang.tr('Practitioner', '침술사 이름이 여기에 보입니다')
                                 : _practitionerController.text.trim(),
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: AppTheme.ink.withValues(alpha: 0.72),
@@ -427,7 +424,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                           Text(
                             _patientNoteController.text.trim().isEmpty
                                 ? lang.tr(
-                                    'Add a short memo about what patients should know before choosing this clinic.',
+                                    'Patient note',
                                     '환자가 이 한의원을 선택하기 전에 알아야 할 메모를 짧게 써둘 수 있습니다.',
                                   )
                                 : _patientNoteController.text.trim(),
@@ -440,7 +437,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      lang.tr('Generated patient link', '생성된 환자 링크'),
+                      lang.tr('Patient link', '환자 링크'),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -455,7 +452,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                     const SizedBox(height: 10),
                     Text(
                       lang.tr(
-                        'When a patient opens this link, the portal will arrive with this clinic already selected.',
+                        'Opens with this clinic selected.',
                         '환자가 이 링크를 열면 이 한의원이 미리 선택된 상태로 포털에 들어오게 됩니다.',
                       ),
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -465,7 +462,7 @@ class _ClinicProfileWorkspaceState extends State<ClinicProfileWorkspace> {
                     if (currentClinic != null) ...[
                       const SizedBox(height: 18),
                       Text(
-                        lang.tr('Current clinic id', '현재 한의원 ID'),
+                        lang.tr('Clinic ID', '한의원 ID'),
                         style: theme.textTheme.labelLarge,
                       ),
                       const SizedBox(height: 6),
