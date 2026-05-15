@@ -5550,9 +5550,23 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                           final profile = profiles[index];
                           final isSelected = selected?.id == profile.id;
                           final missingFields = <String>[
-                            if (profile.phone.trim().isEmpty) '전화번호',
-                            if (profile.email.trim().isEmpty) '이메일',
+                            if (profile.phone.trim().isEmpty)
+                              AppLanguageController.instance.tr(
+                                'Phone',
+                                '전화번호',
+                              ),
+                            if (profile.email.trim().isEmpty)
+                              AppLanguageController.instance.tr('Email', '이메일'),
                           ];
+                          final missingContactLabel = missingFields.length == 1
+                              ? AppLanguageController.instance.tr(
+                                  '${missingFields.first} missing',
+                                  '${missingFields.first} 없음',
+                                )
+                              : AppLanguageController.instance.tr(
+                                  'Contact missing',
+                                  '연락처 없음',
+                                );
                           return Card(
                             color: isSelected ? const Color(0xFFF4FBFA) : null,
                             child: ListTile(
@@ -5572,10 +5586,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
                                         ),
                                       ),
                                       child: Text(
-                                        AppLanguageController.instance.tr(
-                                          'Missing info',
-                                          '정보 부족',
-                                        ),
+                                        missingContactLabel,
                                         style: TextStyle(
                                           color: Colors.redAccent,
                                           fontSize: 12,

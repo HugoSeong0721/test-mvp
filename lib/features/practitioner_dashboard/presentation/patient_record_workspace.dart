@@ -330,8 +330,8 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                         const SizedBox(height: 12),
                         _MembershipStatusPanel(
                           status: widget.membershipStatus == 'approved'
-                              ? lang.tr('Approved', '승인됨')
-                              : lang.tr('Linked', '연결됨'),
+                              ? lang.tr('Clinic approved', '한의원 승인됨')
+                              : lang.tr('Clinic linked', '한의원 연결됨'),
                         ),
                       ],
                       const SizedBox.shrink(),
