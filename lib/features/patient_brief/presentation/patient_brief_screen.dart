@@ -625,7 +625,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: lang.tr('Current status note', '현재 상태 메모'),
+                    labelText: lang.tr('Status note', '상태 메모'),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -634,7 +634,7 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                   maxLines: 2,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: lang.tr('What to do next', '다음 행동 안내'),
+                    labelText: lang.tr('Next step', '다음 단계'),
                   ),
                 ),
               ],
@@ -666,23 +666,15 @@ class _PatientBriefScreenState extends State<PatientBriefScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lang.tr(
-                          '8. Patient Visit Record Update Request',
-                          '8. 환자 방문기록 수정 요청',
-                        ),
+                        lang.tr('8. Visit feedback', '8. 방문 피드백'),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 8),
                       if (!hasFeedback)
-                        Text(
-                          lang.tr(
-                            'There is no patient correction or follow-up note for this visit yet.',
-                            '아직 이 방문에 대한 환자 수정 요청이나 후속 메모가 없습니다.',
-                          ),
-                        )
+                        Text(lang.tr('No feedback', '피드백 없음'))
                       else ...[
                         Text(
-                          '${lang.tr('Status', '상태')}: ${isReviewed ? lang.tr('Reviewed', '검토 완료') : lang.tr('Pending Review', '검토 대기')}',
+                          '${lang.tr('Status', '상태')}: ${isReviewed ? lang.tr('Reviewed', '검토 완료') : lang.tr('Pending', '대기')}',
                         ),
                         const SizedBox(height: 6),
                         Text(

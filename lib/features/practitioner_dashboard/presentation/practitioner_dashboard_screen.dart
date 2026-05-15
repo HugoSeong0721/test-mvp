@@ -2941,8 +2941,8 @@ class _PractitionerDashboardScreenState
                           children: [
                             Text(
                               AppLanguageController.instance.tr(
-                                'Already Answered Snapshot',
-                                '이미 답한 내용 요약',
+                                'Answered',
+                                '답변됨',
                               ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
@@ -2951,17 +2951,9 @@ class _PractitionerDashboardScreenState
                             const SizedBox(height: 6),
                             Text(
                               AppLanguageController.instance.tr(
-                                '$totalAnsweredCount answered question(s) across $answeredCategoryCount categor${answeredCategoryCount == 1 ? 'y' : 'ies'}',
-                                '$answeredCategoryCount개 카테고리에서 총 $totalAnsweredCount개 질문에 이미 답했습니다',
+                                '$totalAnsweredCount answer(s) · $answeredCategoryCount categor${answeredCategoryCount == 1 ? 'y' : 'ies'}',
+                                '$totalAnsweredCount개 답변 · $answeredCategoryCount개 카테고리',
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              AppLanguageController.instance.tr(
-                                'Use the category sections below to request what is still missing or what needs clarification.',
-                                '아래 카테고리에서 아직 안 물어본 것과 추가 확인이 필요한 것을 골라 요청할 수 있습니다.',
-                              ),
-                              style: const TextStyle(color: Colors.black54),
                             ),
                           ],
                         ),
@@ -2969,8 +2961,8 @@ class _PractitionerDashboardScreenState
                       const SizedBox(height: 10),
                       Text(
                         AppLanguageController.instance.tr(
-                          'Select Questions to Request',
-                          '요청할 질문 선택',
+                          'Request questions',
+                          '질문 요청',
                         ),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
@@ -2998,12 +2990,12 @@ class _PractitionerDashboardScreenState
                                 child: Text(
                                   answeredItems.isEmpty
                                       ? AppLanguageController.instance.tr(
-                                          'No answers yet',
-                                          '아직 답변 없음',
+                                          'None',
+                                          '없음',
                                         )
                                       : AppLanguageController.instance.tr(
-                                          '${answeredItems.length} answered',
-                                          '${answeredItems.length}개 답변됨',
+                                          '${answeredItems.length}',
+                                          '${answeredItems.length}',
                                         ),
                                   style: TextStyle(
                                     fontSize: 12,
@@ -3034,8 +3026,8 @@ class _PractitionerDashboardScreenState
                                   children: [
                                     Text(
                                       AppLanguageController.instance.tr(
-                                        'Already answered in this category',
-                                        '이 카테고리에서 이미 답한 내용',
+                                        'Answered',
+                                        '답변',
                                       ),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w700,
@@ -3069,14 +3061,14 @@ class _PractitionerDashboardScreenState
                                 subtitle: answeredItem == null
                                     ? Text(
                                         AppLanguageController.instance.tr(
-                                          'No answer saved yet',
-                                          '아직 저장된 답변 없음',
+                                          'No answer',
+                                          '답변 없음',
                                         ),
                                       )
                                     : Text(
                                         AppLanguageController.instance.tr(
-                                          'Already answered: ${answeredItem.answer}',
-                                          '이미 답변됨: ${answeredItem.answer}',
+                                          'Answered: ${answeredItem.answer}',
+                                          '답변: ${answeredItem.answer}',
                                         ),
                                       ),
                                 value: selectedQuestions.contains(question),

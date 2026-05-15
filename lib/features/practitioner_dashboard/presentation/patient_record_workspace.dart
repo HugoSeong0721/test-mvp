@@ -182,7 +182,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               children: [
                                 AppMetricChip(
                                   icon: Icons.badge_outlined,
-                                  label: lang.tr('Basic profile', '기본 프로필'),
+                                  label: lang.tr('Profile', '프로필'),
                                   value:
                                       '${profile.sex} · ${profile.ageRange} · ${profile.ethnicity}',
                                   backgroundColor: AppTheme.surface,
@@ -203,7 +203,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 ),
                                 AppMetricChip(
                                   icon: Icons.assignment_turned_in_outlined,
-                                  label: lang.tr('Completed intakes', '완료 문진'),
+                                  label: lang.tr('Intakes', '문진'),
                                   value: '$completedVisits',
                                   backgroundColor: AppTheme.surface,
                                   labelColor: AppTheme.ink.withValues(
@@ -213,7 +213,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 ),
                                 AppMetricChip(
                                   icon: Icons.mark_email_unread_outlined,
-                                  label: lang.tr('Pending feedback', '미확인 피드백'),
+                                  label: lang.tr('Feedback', '피드백'),
                                   value: '$pendingFeedbackCount',
                                   backgroundColor: AppTheme.surface,
                                   labelColor: AppTheme.ink.withValues(
