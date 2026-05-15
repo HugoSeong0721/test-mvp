@@ -311,7 +311,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
         runSpacing: 10,
         children: [
           _MessageFolderChip(
-            label: lang.tr('Needs Reply', '답변 필요'),
+            label: lang.tr('Reply', '답변'),
             count: openCount,
             selected: _selectedFolder == _RequestFolder.needsReply,
             onTap: () =>
@@ -346,7 +346,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
 
         return PatientShell(
           currentItem: PatientNavItem.requests,
-          title: lang.tr('Requests Inbox', '답변 요청함'),
+          title: lang.tr('Requests', '요청함'),
           actions: const [LanguageMenuButton()],
           body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance
@@ -363,8 +363,8 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                       children: [
                         Text(
                           lang.tr(
-                            'Could not load practitioner requests.',
-                            '침술사 요청을 불러오지 못했습니다.',
+                            'Could not load requests.',
+                            '요청을 불러오지 못했습니다.',
                           ),
                           style: const TextStyle(
                             fontSize: 18,
@@ -557,19 +557,19 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   _RequestMetaPill(
                                     icon: Icons.schedule_outlined,
                                     label:
-                                        '${lang.tr('Visit Time', '방문 시간')}: $visitTime',
+                                        '${lang.tr('Visit', '방문')}: $visitTime',
                                   ),
                                   _RequestMetaPill(
                                     icon: Icons.history_toggle_off,
                                     label:
-                                        '${lang.tr('Last Visit', '지난 방문')}: ${_formatStoredDateWithWeekday(lastVisitDate)}',
+                                        '${lang.tr('Last', '지난')}: ${_formatStoredDateWithWeekday(lastVisitDate)}',
                                   ),
                                   _RequestMetaPill(
                                     icon: requestType == 'note'
                                         ? Icons.mail_outline
                                         : Icons.quiz_outlined,
                                     label: requestType == 'note'
-                                        ? lang.tr('Practitioner note', '침술사 쪽지')
+                                        ? lang.tr('Note', '쪽지')
                                         : lang.tr(
                                             '$questionCount question(s)',
                                             '$questionCount개 질문',

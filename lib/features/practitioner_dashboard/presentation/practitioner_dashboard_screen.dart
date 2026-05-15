@@ -452,8 +452,8 @@ class _PractitionerDashboardScreenState
                                               : 'All Patients',
                                           decoration: InputDecoration(
                                             labelText: lang.tr(
-                                              'Patient filter',
-                                              '환자 필터',
+                                              'Patients',
+                                              '환자',
                                             ),
                                           ),
                                           items: [
@@ -505,7 +505,7 @@ class _PractitionerDashboardScreenState
                                     ? _selectedPatientFilter
                                     : 'All Patients',
                                 decoration: InputDecoration(
-                                  labelText: lang.tr('Patient filter', '환자 필터'),
+                                  labelText: lang.tr('Patients', '환자'),
                                 ),
                                 items: [
                                   DropdownMenuItem(
@@ -1306,15 +1306,15 @@ class _PractitionerDashboardScreenState
       case 'All':
         return AppLanguageController.instance.tr('All', '전체');
       case 'Alert Ready':
-        return AppLanguageController.instance.tr('Alert Ready', '알림 가능');
+        return AppLanguageController.instance.tr('Ready', '준비');
       case 'Missing Profile':
-        return AppLanguageController.instance.tr('Missing Profile', '정보 부족');
+        return AppLanguageController.instance.tr('Missing', '부족');
       case 'No Response':
-        return AppLanguageController.instance.tr('No Response', '미응답');
+        return AppLanguageController.instance.tr('No reply', '미응답');
       case 'In Progress':
-        return AppLanguageController.instance.tr('In Progress', '진행중');
+        return AppLanguageController.instance.tr('Active', '진행');
       case 'Complete':
-        return AppLanguageController.instance.tr('Complete', '완료');
+        return AppLanguageController.instance.tr('Done', '완료');
       default:
         return value;
     }

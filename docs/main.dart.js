@@ -106640,7 +106640,7 @@ p=A.cQ(r?B.jq:B.rZ,k,k,k)
 if(r)m=a.a===B.c?"Home":"\ud648"
 else m=a.a===B.c?"Open intake":"\ubb38\uc9c4 \uc5f4\uae30"
 return A.c5(A.b3(A.b([q,B.Ek,o,B.c2,A.dW(p,A.f(m,k,k,k,k,k,k,k),new A.aHe(l,r),k)],n),B.m,B.f,B.j,0),new A.eZ(B.bg,B.bH,B.b6,i,k,k),B.cq)},
-adh(a,b,c,d){var s=this,r=null,q=a.a===B.c,p=q?"Needs Reply":"\ub2f5\ubcc0 \ud544\uc694",o=s.f,n=q?"Completed":"\uc644\ub8cc"
+adh(a,b,c,d){var s=this,r=null,q=a.a===B.c,p=q?"Reply":"\ub2f5\ubcc0",o=s.f,n=q?"Completed":"\uc644\ub8cc"
 q=q?"All":"\uc804\uccb4"
 return A.c5(A.cd(B.T,A.b([new A.Aa(p,c,o===B.im,new A.aHb(s),r),new A.Aa(n,b,o===B.pf,new A.aHc(s),r),new A.Aa(q,d,o===B.Fo,new A.aHd(s),r)],t.p),B.X,10,10),r,B.ba)},
 I(a){return A.ef($.ab(),new A.aHA(this),null)}}
@@ -106710,13 +106710,13 @@ A.aH8.prototype={
 $0(){return this.a.f=B.Fo},
 $S:0}
 A.aHA.prototype={
-$2(a,b){var s=$.ab(),r=this.a,q=r.gWv().a,p=r.d.hE(q),o=s.a===B.c?"Requests Inbox":"\ub2f5\ubcc0 \uc694\uccad\ud568",n=$.bP,m=(n==null?$.bP=$.du():n).dk("[DEFAULT]")
+$2(a,b){var s=$.ab(),r=this.a,q=r.gWv().a,p=r.d.hE(q),o=s.a===B.c?"Requests":"\uc694\uccad\ud568",n=$.bP,m=(n==null?$.bP=$.du():n).dk("[DEFAULT]")
 A.cj(m,$.dB(),!0)
 return A.T0(B.di,A.hg(new A.aHz(r,s,p),A.fa(new A.cO(m)).by("answer_requests").iu(0,"patientId",q).f_(),t._C),B.zE,o)},
 $S:152}
 A.aHz.prototype={
 $2(a,b){var s,r,q,p,o,n,m,l,k=this,j=null,i=b.c
-if(i!=null)return A.eu(new A.af(B.dg,A.a2(A.b([A.f(k.b.a===B.c?"Could not load practitioner requests.":"\uce68\uc220\uc0ac \uc694\uccad\uc744 \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4.",j,j,j,B.cw,B.c8,j,j),B.I,A.f(A.w(i),j,j,j,A.ea(j,j,B.dz,j,j,j,j,j,j,j,j,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j),B.c8,j,j)],t.p),B.v,B.f,B.W),j),j,j)
+if(i!=null)return A.eu(new A.af(B.dg,A.a2(A.b([A.f(k.b.a===B.c?"Could not load requests.":"\uc694\uccad\uc744 \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4.",j,j,j,B.cw,B.c8,j,j),B.I,A.f(A.w(i),j,j,j,A.ea(j,j,B.dz,j,j,j,j,j,j,j,j,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j),B.c8,j,j)],t.p),B.v,B.f,B.W),j),j,j)
 i=A.b([],t.xE)
 s=b.b
 s=s==null?j:s.gdO()
@@ -106790,12 +106790,12 @@ if(k)k=g.a===B.c?"Completed":"\ud655\uc778 \uc644\ub8cc"
 else k=g.a===B.c?"Pending":"\ub300\uae30 \uc911"
 k=A.b3(A.b([h,B.c2,A.ls(A.f(k,a0,a0,a0,a0,a0,a0,a0),a0)],i),B.m,B.f,B.j,0)
 h=g.a===B.c
-f=h?"Visit Time":"\ubc29\ubb38 \uc2dc\uac04"
-h=h?"Last Visit":"\uc9c0\ub09c \ubc29\ubb38"
+f=h?"Visit":"\ubc29\ubb38"
+h=h?"Last":"\uc9c0\ub09c"
 a2=a2.aox(m)
 e=s==="note"
 d=e?B.mM:B.tg
-if(e)c=g.a===B.c?"Practitioner note":"\uce68\uc220\uc0ac \ucabd\uc9c0"
+if(e)c=g.a===B.c?"Note":"\ucabd\uc9c0"
 else{c=""+l
 b=c+" question(s)"
 c+="\uac1c \uc9c8\ubb38"
@@ -107807,11 +107807,11 @@ B.b.F(r,A.b([B.on,A.fu(l,l,l,B.Oj,l,l,new A.aIr(m),l,l,l,p,l)],n))}return A.c5(A
 t6(a){var s=null,r=this.cx
 return A.C5(A.f(this.as1(a),s,s,s,s,s,s,s),new A.aK3(this,a),r===a)},
 as1(a){switch(a){case"All":return $.ab().a===B.c?"All":"\uc804\uccb4"
-case"Alert Ready":return $.ab().a===B.c?"Alert Ready":"\uc54c\ub9bc \uac00\ub2a5"
-case"Missing Profile":return $.ab().a===B.c?"Missing Profile":"\uc815\ubcf4 \ubd80\uc871"
-case"No Response":return $.ab().a===B.c?"No Response":"\ubbf8\uc751\ub2f5"
-case"In Progress":return $.ab().a===B.c?"In Progress":"\uc9c4\ud589\uc911"
-case"Complete":return $.ab().a===B.c?"Complete":"\uc644\ub8cc"
+case"Alert Ready":return $.ab().a===B.c?"Ready":"\uc900\ube44"
+case"Missing Profile":return $.ab().a===B.c?"Missing":"\ubd80\uc871"
+case"No Response":return $.ab().a===B.c?"No reply":"\ubbf8\uc751\ub2f5"
+case"In Progress":return $.ab().a===B.c?"Active":"\uc9c4\ud589"
+case"Complete":return $.ab().a===B.c?"Done":"\uc644\ub8cc"
 default:return a}},
 amD(a){switch(this.cx){case"Alert Ready":return a.a.giL()
 case"Missing Profile":return!a.a.giL()
@@ -108603,7 +108603,7 @@ A.aKj.prototype={
 $0(){return this.a.kx(B.fM)},
 $S:0}
 A.aKk.prototype={
-$2(a,b){var s,r,q,p,o,n,m,l,k=this,j=null,i="All Patients",h="Patient filter",g=b.b>=780,f=g?B.F2:B.T,e=t.p,d=A.b([],e),c=k.b
+$2(a,b){var s,r,q,p,o,n,m,l,k=this,j=null,i="All Patients",h="Patients",g=b.b>=780,f=g?B.F2:B.T,e=t.p,d=A.b([],e),c=k.b
 if(c!=null){s=B.b2.P(0.16)
 r=A.aC(999)
 q=A.bE(B.Q.P(0.75),1)
@@ -108624,7 +108624,7 @@ if(g){d=A.bk(A.a2(A.b([A.f(d,j,j,j,r.e,j,j,j)],e),B.m,B.f,B.j),1)
 r=k.f
 q=B.b.n(r,c.CW)||c.CW==="All Patients"?c.CW:i
 p=s.a===B.c
-n=A.bx(j,j,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,p?h:"\ud658\uc790 \ud544\ud130",!0,!0,!1,j,j,j,j,j,j,j,j,j,j,j,j,j,j)
+n=A.bx(j,j,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,p?h:"\ud658\uc790",!0,!0,!1,j,j,j,j,j,j,j,j,j,j,j,j,j,j)
 m=t.N
 l=A.b([A.rP(A.f(p?i:"\uc804\uccb4 \ud658\uc790",j,j,j,j,j,j,j),i,m)],t.FG)
 B.b.F(l,new A.K(r,new A.aKa(),A.N(r).i("K<1,eK<j>>")))
@@ -108632,7 +108632,7 @@ f.push(A.b3(A.b([d,B.om,A.a2(A.b([o,B.D,A.c7(A.D2(n,q,l,new A.aKb(c),m),j,240)],
 r=k.f
 q=B.b.n(r,c.CW)||c.CW==="All Patients"?c.CW:i
 p=s.a===B.c
-n=A.bx(j,j,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,p?h:"\ud658\uc790 \ud544\ud130",!0,!0,!1,j,j,j,j,j,j,j,j,j,j,j,j,j,j)
+n=A.bx(j,j,j,j,j,j,j,j,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,p?h:"\ud658\uc790",!0,!0,!1,j,j,j,j,j,j,j,j,j,j,j,j,j,j)
 m=t.N
 l=A.b([A.rP(A.f(p?i:"\uc804\uccb4 \ud658\uc790",j,j,j,j,j,j,j),i,m)],t.FG)
 B.b.F(l,new A.K(r,new A.aKc(),A.N(r).i("K<1,eK<j>>")))
