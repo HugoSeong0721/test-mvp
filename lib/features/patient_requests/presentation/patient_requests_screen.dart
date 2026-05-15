@@ -636,14 +636,8 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                     ),
                                     label: Text(
                                       requestType == 'note'
-                                          ? lang.tr(
-                                              'Return to home',
-                                              '홈으로 돌아가기',
-                                            )
-                                          : lang.tr(
-                                              'Answer in Intake Form',
-                                              '문진 화면에서 답하기',
-                                            ),
+                                          ? lang.tr('Home', '홈')
+                                          : lang.tr('Answer', '답하기'),
                                     ),
                                   ),
                                   OutlinedButton.icon(
@@ -652,12 +646,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                       VisitHistoryScreen.routeName,
                                     ),
                                     icon: const Icon(Icons.history),
-                                    label: Text(
-                                      lang.tr(
-                                        'Review visit history',
-                                        '방문 기록 보기',
-                                      ),
-                                    ),
+                                    label: Text(lang.tr('History', '기록')),
                                   ),
                                 ],
                               ),

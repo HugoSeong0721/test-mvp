@@ -773,20 +773,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             ),
             const SizedBox(height: 12),
           ],
-          _buildFieldHintCard(
-            context,
-            accent: AppTheme.copper,
-            message: _isRegisterMode
-                ? lang.tr(
-                    'Use the email address you want to keep using for this patient account.',
-                    '이 환자 계정에서 계속 사용할 이메일 주소를 입력해주세요.',
-                  )
-                : lang.tr(
-                    'Enter the email address you used when you signed up.',
-                    '가입할 때 사용한 이메일 주소를 입력해주세요.',
-                  ),
-          ),
-          const SizedBox(height: 10),
           TextField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
@@ -807,9 +793,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             onSubmitted: (_) => _submit(),
             decoration: InputDecoration(
               labelText: lang.tr('Password', '비밀번호'),
-              helperText: _isRegisterMode
-                  ? lang.tr('At least 6 characters', '최소 6자 이상')
-                  : null,
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 onPressed: () => setState(() => _showPassword = !_showPassword),
@@ -945,20 +928,14 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            lang.tr(
-              'This browser already has a saved patient session.',
-              '이 브라우저에는 이미 저장된 환자 세션이 있습니다.',
-            ),
+            lang.tr('Signed in', '로그인됨'),
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           Text(
-            lang.tr(
-              'Use Continue to reopen the saved portal, or sign out first if you want to use a different patient account.',
-              '저장된 포털로 다시 들어가려면 Continue를 누르고, 다른 환자 계정을 쓰려면 먼저 Sign out 해주세요.',
-            ),
+            lang.tr('Continue or switch account.', '계속하거나 계정 변경'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppTheme.ink.withValues(alpha: 0.72),
             ),
@@ -988,39 +965,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: errorColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFieldHintCard(
-    BuildContext context, {
-    required Color accent,
-    required String message,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: accent.withValues(alpha: 0.16)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline, color: accent, size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.ink.withValues(alpha: 0.72),
-                height: 1.4,
                 fontWeight: FontWeight.w600,
               ),
             ),

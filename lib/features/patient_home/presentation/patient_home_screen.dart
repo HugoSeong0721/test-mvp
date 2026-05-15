@@ -387,13 +387,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      lang.tr(
-                        'Search or continue with a clinic.',
-                        '검색하거나 이 한의원으로 계속하세요.',
-                      ),
-                    ),
-                    const SizedBox(height: 14),
                     TextField(
                       controller: searchController,
                       decoration: InputDecoration(
@@ -606,8 +599,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       SnackBar(
                                                         content: Text(
                                                           lang.tr(
-                                                            '${clinic.name} will open by default after login.',
-                                                            '${clinic.name} 이(가) 다음 로그인부터 기본 한의원으로 열립니다.',
+                                                            'Default set.',
+                                                            '기본값 저장됨',
                                                           ),
                                                         ),
                                                       ),
@@ -617,10 +610,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               Icons.push_pin_outlined,
                                             ),
                                             label: Text(
-                                              lang.tr(
-                                                'Set as default',
-                                                '기본 한의원으로 저장',
-                                              ),
+                                              lang.tr('Default', '기본값'),
                                             ),
                                           ),
                                         ],
@@ -719,8 +709,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           ),
                                           child: Text(
                                             lang.tr(
-                                              '$sentClinicOpenRequestName was added to new clinic requests. Practitioners can review it from Appointment Inbox.',
-                                              '$sentClinicOpenRequestName 요청이 새 클리닉 요청에 추가되었습니다. 침술사 화면의 Appointment Inbox에서 확인할 수 있습니다.',
+                                              '$sentClinicOpenRequestName request sent.',
+                                              '$sentClinicOpenRequestName 요청 완료',
                                             ),
                                             style: Theme.of(context)
                                                 .textTheme
@@ -773,12 +763,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 });
                                                 final message = didSave
                                                     ? lang.tr(
-                                                        'Request sent. We will keep it visible for clinic onboarding.',
-                                                        'Request sent. We will keep it visible for clinic onboarding.',
+                                                        'Request sent.',
+                                                        '요청 완료',
                                                       )
                                                     : lang.tr(
-                                                        'Enter a clinic name before sending the request.',
-                                                        'Enter a clinic name before sending the request.',
+                                                        'Enter clinic name.',
+                                                        '한의원 이름 필요',
                                                       );
                                                 ScaffoldMessenger.of(
                                                   this.context,

@@ -1382,12 +1382,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   Text(
                     _isFirstVisitPreview
                         ? lang.tr(
-                            'Use the 10-category intake structure for a first-time patient.',
-                            '처음 방문한 환자처럼 10가지 카테고리를 전체적으로 확인하는 흐름입니다.',
+                            'Full intake',
+                            '전체 문진',
                           )
                         : lang.tr(
-                            'Use focused follow-up questions based on the last visit and practitioner advice.',
-                            '지난 방문 기록과 침술사 조언을 바탕으로 추적 질문을 확인하는 흐름입니다.',
+                            'Focused follow-up',
+                            '추적 문진',
                           ),
                   ),
                 ],
