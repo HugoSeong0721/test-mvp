@@ -514,105 +514,100 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         spacing: 8,
                                         runSpacing: 8,
                                         children: [
-                                          FilledButton.tonalIcon(
-                                            onPressed:
-                                                isCurrent || isPendingApproval
-                                                ? null
-                                                : () async {
-                                                    await _store
-                                                        .selectClinicForPatient(
-                                                          patientId: patientId,
-                                                          clinicId: clinic.id,
-                                                        );
-                                                    await _store
-                                                        .continueWithClinicForPatient(
-                                                          patientId: patientId,
-                                                          clinicId: clinic.id,
-                                                        );
-                                                    if (!context.mounted) {
-                                                      return;
-                                                    }
-                                                    if (!mounted) {
-                                                      return;
-                                                    }
-                                                    setDialogState(() {});
-                                                    ScaffoldMessenger.of(
-                                                      this.context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          lang.tr(
-                                                            'Request sent.',
-                                                            '요청 완료',
-                                                          ),
-                                                        ),
-                                                      ),
+                                          if (!isCurrent && !isPendingApproval)
+                                            FilledButton.tonalIcon(
+                                              onPressed: () async {
+                                                await _store
+                                                    .selectClinicForPatient(
+                                                      patientId: patientId,
+                                                      clinicId: clinic.id,
                                                     );
-                                                  },
-                                            icon: const Icon(
-                                              Icons.outgoing_mail,
-                                            ),
-                                            label: Text(
-                                              isDeclined
-                                                  ? lang.tr('Again', '다시')
-                                                  : lang.tr('Join', '가입'),
-                                            ),
-                                          ),
-                                          OutlinedButton.icon(
-                                            onPressed:
-                                                isCurrent || isPendingApproval
-                                                ? () async {
-                                                    await _store
-                                                        .continueWithClinicForPatient(
-                                                          patientId: patientId,
-                                                          clinicId: clinic.id,
-                                                        );
-                                                    if (!context.mounted) {
-                                                      return;
-                                                    }
-                                                    Navigator.pop(context);
-                                                  }
-                                                : null,
-                                            icon: const Icon(
-                                              Icons.arrow_forward,
-                                            ),
-                                            label: Text(
-                                              lang.tr('Continue', '여기로 계속하기'),
-                                            ),
-                                          ),
-                                          OutlinedButton.icon(
-                                            onPressed: isDefault || !isCurrent
-                                                ? null
-                                                : () async {
-                                                    await _store
-                                                        .setDefaultClinicForPatient(
-                                                          patientId: patientId,
-                                                          clinicId: clinic.id,
-                                                        );
-                                                    if (!mounted) {
-                                                      return;
-                                                    }
-                                                    setDialogState(() {});
-                                                    ScaffoldMessenger.of(
-                                                      this.context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          lang.tr(
-                                                            'Default set.',
-                                                            '기본값 저장됨',
-                                                          ),
-                                                        ),
-                                                      ),
+                                                await _store
+                                                    .continueWithClinicForPatient(
+                                                      patientId: patientId,
+                                                      clinicId: clinic.id,
                                                     );
-                                                  },
-                                            icon: const Icon(
-                                              Icons.push_pin_outlined,
+                                                if (!context.mounted) {
+                                                  return;
+                                                }
+                                                if (!mounted) {
+                                                  return;
+                                                }
+                                                setDialogState(() {});
+                                                ScaffoldMessenger.of(
+                                                  this.context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      lang.tr(
+                                                        'Request sent.',
+                                                        '요청 완료',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(
+                                                Icons.outgoing_mail,
+                                              ),
+                                              label: Text(
+                                                isDeclined
+                                                    ? lang.tr('Again', '다시')
+                                                    : lang.tr('Join', '가입'),
+                                              ),
                                             ),
-                                            label: Text(
-                                              lang.tr('Default', '기본값'),
+                                          if (isCurrent || isPendingApproval)
+                                            FilledButton.icon(
+                                              onPressed: () async {
+                                                await _store
+                                                    .continueWithClinicForPatient(
+                                                      patientId: patientId,
+                                                      clinicId: clinic.id,
+                                                    );
+                                                if (!context.mounted) {
+                                                  return;
+                                                }
+                                                Navigator.pop(context);
+                                              },
+                                              icon: const Icon(
+                                                Icons.arrow_forward,
+                                              ),
+                                              label: Text(
+                                                lang.tr('Continue', '여기로 계속하기'),
+                                              ),
                                             ),
-                                          ),
+                                          if (isCurrent && !isDefault)
+                                            OutlinedButton.icon(
+                                              onPressed: () async {
+                                                await _store
+                                                    .setDefaultClinicForPatient(
+                                                      patientId: patientId,
+                                                      clinicId: clinic.id,
+                                                    );
+                                                if (!mounted) {
+                                                  return;
+                                                }
+                                                setDialogState(() {});
+                                                ScaffoldMessenger.of(
+                                                  this.context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      lang.tr(
+                                                        'Default set.',
+                                                        '기본값 저장됨',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              icon: const Icon(
+                                                Icons.push_pin_outlined,
+                                              ),
+                                              label: Text(
+                                                lang.tr('Default', '기본값'),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     ],
@@ -969,35 +964,39 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     ),
                   ),
                   if (activeClinic != null)
-                    OutlinedButton.icon(
-                      onPressed: defaultClinic?.id == activeClinic.id
-                          ? null
-                          : () async {
-                              await _store.setDefaultClinicForPatient(
-                                patientId: profile.id,
-                                clinicId: activeClinic.id,
-                              );
-                              if (!context.mounted) {
-                                return;
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    lang.tr(
-                                      '${activeClinic.name} is now your default clinic.',
-                                      '${activeClinic.name} 이(가) 기본 한의원으로 저장되었습니다.',
-                                    ),
-                                  ),
+                    if (defaultClinic?.id == activeClinic.id)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: _buildClinicStatusChip(
+                          context,
+                          lang.tr('Default', '기본 한의원'),
+                          accent: AppTheme.copper,
+                        ),
+                      )
+                    else
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          await _store.setDefaultClinicForPatient(
+                            patientId: profile.id,
+                            clinicId: activeClinic.id,
+                          );
+                          if (!context.mounted) {
+                            return;
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                lang.tr(
+                                  '${activeClinic.name} is now your default clinic.',
+                                  '${activeClinic.name} 이(가) 기본 한의원으로 저장되었습니다.',
                                 ),
-                              );
-                            },
-                      icon: const Icon(Icons.push_pin_outlined),
-                      label: Text(
-                        defaultClinic?.id == activeClinic.id
-                            ? lang.tr('Default saved', '기본 저장됨')
-                            : lang.tr('Set as default', '기본 한의원 저장'),
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.push_pin_outlined),
+                        label: Text(lang.tr('Set as default', '기본 한의원 저장')),
                       ),
-                    ),
                 ],
               );
               if (compact) {

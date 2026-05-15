@@ -19,27 +19,38 @@ class TesterFeedbackLauncher extends StatelessWidget {
         }
 
         final lang = AppLanguageController.instance;
+        final compact = MediaQuery.sizeOf(context).width < 640;
         return SafeArea(
-          minimum: const EdgeInsets.all(18),
+          minimum: EdgeInsets.all(compact ? 10 : 18),
           child: Align(
             alignment: Alignment.bottomRight,
-            child: FilledButton.icon(
-              onPressed: () => _openFeedbackSheet(context),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.pine,
-                foregroundColor: Colors.white,
-                elevation: 10,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ),
-              icon: const Icon(Icons.rate_review_outlined, size: 18),
-              label: Text(lang.tr('Feedback', '피드백')),
-            ),
+            child: compact
+                ? IconButton.filled(
+                    onPressed: () => _openFeedbackSheet(context),
+                    tooltip: lang.tr('Feedback', '피드백'),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppTheme.pine,
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.rate_review_outlined, size: 18),
+                  )
+                : FilledButton.icon(
+                    onPressed: () => _openFeedbackSheet(context),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.pine,
+                      foregroundColor: Colors.white,
+                      elevation: 10,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    icon: const Icon(Icons.rate_review_outlined, size: 18),
+                    label: Text(lang.tr('Feedback', '피드백')),
+                  ),
           ),
         );
       },

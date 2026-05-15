@@ -272,8 +272,12 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 ? PatientHomeScreen.routeName
                 : PatientIntakeScreen.routeName,
           ),
-          icon: Icon(isNote ? Icons.home_outlined : Icons.arrow_forward),
-          label: Text(isNote ? lang.tr('Home', '홈') : lang.tr('Intake', '문진')),
+          icon: Icon(
+            isNote ? Icons.local_hospital_outlined : Icons.arrow_forward,
+          ),
+          label: Text(
+            isNote ? lang.tr('Clinic', '한의원') : lang.tr('Intake', '문진'),
+          ),
         );
 
         return AppPanel(
@@ -649,12 +653,12 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                     ),
                                     icon: Icon(
                                       requestType == 'note'
-                                          ? Icons.home_outlined
+                                          ? Icons.local_hospital_outlined
                                           : Icons.edit_note,
                                     ),
                                     label: Text(
                                       requestType == 'note'
-                                          ? lang.tr('Home', '홈')
+                                          ? lang.tr('Clinic', '한의원')
                                           : lang.tr('Answer', '답하기'),
                                     ),
                                   ),
