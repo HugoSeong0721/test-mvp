@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const Color ink = Color(0xFF1F2523);
   static const Color pine = Color(0xFF145245);
   static const Color jade = Color(0xFF2F6B5D);
-  static const Color mint = Color(0xFFE6F0EC);
-  static const Color cream = Color(0xFFF7F5F0);
-  static const Color surface = Color(0xFFFFFCF8);
-  static const Color surfaceSoft = Color(0xFFF2EFE8);
+  static const Color mint = Color(0xFFF4FAF8);
+  static const Color cream = Colors.white;
+  static const Color surface = Colors.white;
+  static const Color surfaceSoft = Color(0xFFF7F8F7);
   static const Color copper = Color(0xFF9A6A3F);
-  static const Color blush = Color(0xFFEDE4D8);
-  static const Color border = Color(0xFFDCD6CC);
+  static const Color blush = Color(0xFFFAF7F4);
+  static const Color border = Color(0xFFE1E4E2);
+  static const String appFontFamily = 'Calibri';
 
   static ThemeData light() {
     const colorScheme = ColorScheme(
@@ -34,64 +34,79 @@ class AppTheme {
       inversePrimary: mint,
     );
 
-    final baseBody = GoogleFonts.ibmPlexSansTextTheme();
+    final baseBody = ThemeData.light().textTheme.apply(
+      fontFamily: appFontFamily,
+      bodyColor: ink,
+      displayColor: ink,
+    );
     final textTheme = baseBody.copyWith(
-      displayLarge: GoogleFonts.ibmPlexSans(
+      displayLarge: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 48,
         fontWeight: FontWeight.w700,
         height: 1.05,
         color: ink,
       ),
-      displayMedium: GoogleFonts.ibmPlexSans(
+      displayMedium: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 38,
         fontWeight: FontWeight.w700,
         height: 1.08,
         color: ink,
       ),
-      displaySmall: GoogleFonts.ibmPlexSans(
+      displaySmall: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 30,
         fontWeight: FontWeight.w700,
         height: 1.12,
         color: ink,
       ),
-      headlineLarge: GoogleFonts.ibmPlexSans(
+      headlineLarge: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 28,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      headlineMedium: GoogleFonts.ibmPlexSans(
+      headlineMedium: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 23,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      titleLarge: GoogleFonts.ibmPlexSans(
+      titleLarge: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 21,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      titleMedium: GoogleFonts.ibmPlexSans(
+      titleMedium: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      bodyLarge: GoogleFonts.ibmPlexSans(
+      bodyLarge: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 1.5,
         color: ink,
       ),
-      bodyMedium: GoogleFonts.ibmPlexSans(
+      bodyMedium: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.5,
         color: ink,
       ),
-      labelLarge: GoogleFonts.ibmPlexSans(
+      labelLarge: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: ink,
       ),
-      labelMedium: GoogleFonts.ibmPlexSans(
+      labelMedium: const TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w700,
         color: ink,
@@ -106,7 +121,8 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: const Color(0xFFF6F4EF),
+      fontFamily: appFontFamily,
+      scaffoldBackgroundColor: Colors.white,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -118,7 +134,7 @@ class AppTheme {
         toolbarHeight: 68,
       ),
       cardTheme: CardThemeData(
-        color: surface,
+        color: Colors.white,
         shadowColor: Colors.black.withValues(alpha: 0.03),
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
@@ -126,13 +142,13 @@ class AppTheme {
         shape: shape,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: surface,
+        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         shape: shape,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.82),
+        fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,

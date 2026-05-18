@@ -12,15 +12,7 @@ class AppBackdrop extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFF7F5F0), Color(0xFFF1F4EF)],
-            ),
-          ),
-        ),
+        const DecoratedBox(decoration: BoxDecoration(color: Colors.white)),
         Positioned.fill(child: child),
       ],
     );
@@ -49,8 +41,7 @@ class AppPanel extends StatelessWidget {
     return Container(
       padding: compact ? const EdgeInsets.all(16) : padding,
       decoration: BoxDecoration(
-        gradient: gradient,
-        color: gradient == null ? Colors.white.withValues(alpha: 0.94) : null,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
           color: borderColor ?? AppTheme.border.withValues(alpha: 0.78),
@@ -58,8 +49,8 @@ class AppPanel extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.025),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
