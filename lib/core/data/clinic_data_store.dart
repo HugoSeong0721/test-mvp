@@ -845,6 +845,32 @@ class ClinicDataStore extends ChangeNotifier {
     await _persistClinicState();
   }
 
+  Future<void> mergeAppointmentRequestsFromMaps(
+    Iterable<Map<String, dynamic>> items,
+  ) async {
+    var changed = false;
+    for (final data in items) {
+      final request = AppointmentRequest.fromMap(data);
+      if (request.id.trim().isEmpty) {
+        continue;
+      }
+      final index = _appointmentRequests.indexWhere(
+        (item) => item.id == request.id,
+      );
+      if (index >= 0) {
+        _appointmentRequests[index] = request;
+      } else {
+        _appointmentRequests.add(request);
+      }
+      changed = true;
+    }
+    if (!changed) {
+      return;
+    }
+    notifyListeners();
+    await _persistClinicState();
+  }
+
   PatientClinicMembershipRequest? membershipRequestForPatientClinic({
     required String patientId,
     required String clinicId,
@@ -1185,19 +1211,19 @@ class ClinicDataStore extends ChangeNotifier {
       return;
     }
 
-    _appointmentRequests.add(
-      AppointmentRequest(
-        id: 'appointment_request_${DateTime.now().millisecondsSinceEpoch}',
-        patientId: patientId,
-        clinicId: clinicId,
-        date: date,
-        time: time,
-        requestedAt: DateTime.now(),
-        status: AppointmentRequestStatus.pending,
-      ),
+    final request = AppointmentRequest(
+      id: 'appointment_request_${DateTime.now().millisecondsSinceEpoch}',
+      patientId: patientId,
+      clinicId: clinicId,
+      date: date,
+      time: time,
+      requestedAt: DateTime.now(),
+      status: AppointmentRequestStatus.pending,
     );
+    _appointmentRequests.add(request);
     notifyListeners();
     unawaited(_persistClinicState());
+    unawaited(AppFirestoreService.saveAppointmentRequest(request.toMap()));
   }
 
   void cancelAppointmentRequest(String requestId) {
@@ -1215,6 +1241,11 @@ class ClinicDataStore extends ChangeNotifier {
     );
     notifyListeners();
     unawaited(_persistClinicState());
+    unawaited(
+      AppFirestoreService.saveAppointmentRequest(
+        _appointmentRequests[index].toMap(),
+      ),
+    );
   }
 
   void confirmAppointmentRequest(String requestId) {
@@ -1230,6 +1261,11 @@ class ClinicDataStore extends ChangeNotifier {
     _appointmentRequests[index] = request.copyWith(
       status: AppointmentRequestStatus.confirmed,
       reviewedAt: DateTime.now(),
+    );
+    unawaited(
+      AppFirestoreService.saveAppointmentRequest(
+        _appointmentRequests[index].toMap(),
+      ),
     );
     addAppointment(
       patientId: request.patientId,
@@ -1255,6 +1291,11 @@ class ClinicDataStore extends ChangeNotifier {
     );
     notifyListeners();
     unawaited(_persistClinicState());
+    unawaited(
+      AppFirestoreService.saveAppointmentRequest(
+        _appointmentRequests[index].toMap(),
+      ),
+    );
   }
 
   void setSlotOpen({
@@ -1736,6 +1777,10 @@ class ClinicDataStore extends ChangeNotifier {
         patientId: patientId,
         clinicId: linkedClinicId,
       );
+      await continueWithClinicForPatient(
+        patientId: patientId,
+        clinicId: linkedClinicId,
+      );
       return;
     }
 
@@ -2042,6 +2087,10 @@ class ClinicDataStore extends ChangeNotifier {
           _patientClinicMembershipRequests.add(request);
         }
       }
+
+      final remoteAppointmentRequests =
+          await AppFirestoreService.fetchAppointmentRequests();
+      await mergeAppointmentRequestsFromMaps(remoteAppointmentRequests);
     } catch (_) {
       // Keep the demo usable offline or when Firestore rules are still being tuned.
     }

@@ -30,6 +30,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   final ClinicDataStore _store = ClinicDataStore.instance;
   Timer? _loadTimeoutTimer;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+  _appointmentRequestSubscription;
   PatientProfile? _sessionBackedProfile;
   PatientSession? _activeSession;
   bool _sessionResolved = false;
@@ -83,6 +85,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   void initState() {
     super.initState();
     _startLoadTimer();
+    _appointmentRequestSubscription = FirebaseFirestore.instance
+        .collection('appointment_requests')
+        .snapshots()
+        .listen((snapshot) async {
+          await _store.mergeAppointmentRequestsFromMaps(
+            snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
+          );
+        });
     unawaited(_initializeProfile());
   }
 
@@ -214,6 +224,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   @override
   void dispose() {
     _loadTimeoutTimer?.cancel();
+    _appointmentRequestSubscription?.cancel();
     super.dispose();
   }
 
@@ -1370,11 +1381,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   .where((doc) => matchesActiveClinic(doc.data()))
                   .toList();
 
-              final pendingRequests = scopedRequestDocs
-                  .where(
-                    (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
-                  )
-                  .toList();
+              final pendingRequests = scopedRequestDocs.where((doc) {
+                final data = doc.data();
+                final status = (data['status'] ?? 'pending').toString();
+                final requestType = (data['requestType'] ?? 'answer_request')
+                    .toString();
+                return status == 'pending' && requestType != 'note';
+              }).toList();
               final latestRequest = scopedRequestDocs.isNotEmpty
                   ? scopedRequestDocs.first.data()
                   : null;

@@ -85,6 +85,8 @@ class _PractitionerDashboardScreenState
   _intakeSubmissionSubscription;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
   _membershipRequestSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+  _appointmentRequestSubscription;
   Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
       <String, Map<String, dynamic>>{};
 
@@ -133,12 +135,21 @@ class _PractitionerDashboardScreenState
             snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
           );
         });
+    _appointmentRequestSubscription = FirebaseFirestore.instance
+        .collection('appointment_requests')
+        .snapshots()
+        .listen((snapshot) async {
+          await _store.mergeAppointmentRequestsFromMaps(
+            snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
+          );
+        });
   }
 
   @override
   void dispose() {
     _intakeSubmissionSubscription?.cancel();
     _membershipRequestSubscription?.cancel();
+    _appointmentRequestSubscription?.cancel();
     _patientFilterController.dispose();
     _scrollController.dispose();
     super.dispose();

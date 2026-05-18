@@ -1671,9 +1671,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   0;
               return bTime.compareTo(aTime);
             });
-            requestDocs.removeWhere(
-              (doc) => !_matchesActiveClinicDoc(doc.data()),
-            );
+            requestDocs.removeWhere((doc) {
+              final data = doc.data();
+              final requestType = (data['requestType'] ?? 'answer_request')
+                  .toString();
+              return !_matchesActiveClinicDoc(data) || requestType == 'note';
+            });
 
             return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance

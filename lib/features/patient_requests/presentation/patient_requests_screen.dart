@@ -175,9 +175,13 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
   ) {
     switch (folder) {
       case _RequestFolder.needsReply:
-        return docs
-            .where((doc) => (doc.data()['status'] ?? 'pending') != 'completed')
-            .toList();
+        return docs.where((doc) {
+          final data = doc.data();
+          final status = (data['status'] ?? 'pending').toString();
+          final requestType = (data['requestType'] ?? 'answer_request')
+              .toString();
+          return status != 'completed' && requestType != 'note';
+        }).toList();
       case _RequestFolder.completed:
         return docs
             .where((doc) => (doc.data()['status'] ?? 'pending') == 'completed')

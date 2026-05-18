@@ -43,6 +43,13 @@ class AppFirestoreService {
     }).toList();
   }
 
+  static Future<List<Map<String, dynamic>>> fetchAppointmentRequests() async {
+    final snapshot = await _db.collection('appointment_requests').get();
+    return snapshot.docs.map((doc) {
+      return {'id': doc.id, ...doc.data()};
+    }).toList();
+  }
+
   static Future<void> saveClinicCenter(Map<String, dynamic> clinic) async {
     final id = (clinic['id'] ?? '').toString().trim();
     if (id.isEmpty) {
@@ -112,6 +119,19 @@ class AppFirestoreService {
       return;
     }
     await _db.collection('patient_clinic_membership_requests').doc(id).set({
+      ...request,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> saveAppointmentRequest(
+    Map<String, dynamic> request,
+  ) async {
+    final id = (request['id'] ?? '').toString().trim();
+    if (id.isEmpty) {
+      return;
+    }
+    await _db.collection('appointment_requests').doc(id).set({
       ...request,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
