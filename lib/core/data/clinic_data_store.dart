@@ -1422,11 +1422,67 @@ class ClinicDataStore extends ChangeNotifier {
     if (index < 0) {
       return;
     }
+    final visit = _visits[index];
     _visits[index] = _visits[index].copyWith(
       visitStatus: noShow ? 'no_show' : 'booked',
     );
+    _normalizeVisitTrailForPatientClinic(
+      patientId: visit.patientId,
+      clinicId: visit.clinicId,
+    );
     notifyListeners();
     unawaited(_persistClinicState());
+  }
+
+  void _normalizeVisitTrailForPatientClinic({
+    required String patientId,
+    required String clinicId,
+  }) {
+    final indexedVisits =
+        <({int index, PatientVisit visit})>[
+          for (var index = 0; index < _visits.length; index++)
+            if (_visits[index].patientId == patientId &&
+                _visits[index].clinicId == clinicId)
+              (index: index, visit: _visits[index]),
+        ]..sort((a, b) {
+          final dateCompare = a.visit.date.compareTo(b.visit.date);
+          if (dateCompare != 0) {
+            return dateCompare;
+          }
+          return a.visit.time.compareTo(b.visit.time);
+        });
+
+    PatientVisit? lastAttendedVisit;
+    var scheduledSinceLast = 0;
+    var noShowSinceLast = 0;
+    for (final item in indexedVisits) {
+      final visit = item.visit;
+      final lastVisitDate = lastAttendedVisit?.date ?? visit.date;
+      final daysAgo = lastAttendedVisit == null
+          ? 0
+          : (DateTime.tryParse(visit.date) ?? DateTime.now())
+                .difference(
+                  DateTime.tryParse(lastAttendedVisit.date) ?? DateTime.now(),
+                )
+                .inDays
+                .clamp(0, 9999);
+
+      _visits[item.index] = visit.copyWith(
+        lastVisitDate: lastVisitDate,
+        daysAgo: daysAgo,
+        scheduledSinceLast: scheduledSinceLast,
+        noShowSinceLast: noShowSinceLast,
+      );
+
+      if (visit.isNoShow) {
+        scheduledSinceLast += 1;
+        noShowSinceLast += 1;
+      } else {
+        lastAttendedVisit = _visits[item.index];
+        scheduledSinceLast = 0;
+        noShowSinceLast = 0;
+      }
+    }
   }
 
   void addAppointment({
@@ -1469,6 +1525,10 @@ class ClinicDataStore extends ChangeNotifier {
     );
 
     _visits.add(visit);
+    _normalizeVisitTrailForPatientClinic(
+      patientId: patientId,
+      clinicId: clinicId,
+    );
     _visits.sort((a, b) {
       final dateCompare = a.date.compareTo(b.date);
       if (dateCompare != 0) {
