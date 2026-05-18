@@ -143,6 +143,7 @@ class PatientVisit {
     required this.previousTreatmentArea,
     required this.previousSessionNote,
     required this.qaList,
+    this.visitStatus = 'booked',
   });
 
   final String id;
@@ -158,6 +159,44 @@ class PatientVisit {
   final String previousTreatmentArea;
   final String previousSessionNote;
   final List<QaItem> qaList;
+  final String visitStatus;
+
+  bool get isNoShow => visitStatus == 'no_show';
+
+  PatientVisit copyWith({
+    String? id,
+    String? patientId,
+    String? clinicId,
+    String? date,
+    String? time,
+    String? lastVisitDate,
+    int? daysAgo,
+    int? scheduledSinceLast,
+    int? noShowSinceLast,
+    IntakeStatus? intakeStatus,
+    String? previousTreatmentArea,
+    String? previousSessionNote,
+    List<QaItem>? qaList,
+    String? visitStatus,
+  }) {
+    return PatientVisit(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      clinicId: clinicId ?? this.clinicId,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      lastVisitDate: lastVisitDate ?? this.lastVisitDate,
+      daysAgo: daysAgo ?? this.daysAgo,
+      scheduledSinceLast: scheduledSinceLast ?? this.scheduledSinceLast,
+      noShowSinceLast: noShowSinceLast ?? this.noShowSinceLast,
+      intakeStatus: intakeStatus ?? this.intakeStatus,
+      previousTreatmentArea:
+          previousTreatmentArea ?? this.previousTreatmentArea,
+      previousSessionNote: previousSessionNote ?? this.previousSessionNote,
+      qaList: qaList ?? this.qaList,
+      visitStatus: visitStatus ?? this.visitStatus,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -174,6 +213,7 @@ class PatientVisit {
       'previousTreatmentArea': previousTreatmentArea,
       'previousSessionNote': previousSessionNote,
       'qaList': qaList.map((item) => item.toMap()).toList(),
+      'visitStatus': visitStatus,
     };
   }
 
@@ -208,6 +248,7 @@ class PatientVisit {
       previousTreatmentArea: (data['previousTreatmentArea'] ?? '').toString(),
       previousSessionNote: (data['previousSessionNote'] ?? '').toString(),
       qaList: qaList,
+      visitStatus: (data['visitStatus'] ?? 'booked').toString(),
     );
   }
 }
@@ -1372,6 +1413,18 @@ class ClinicDataStore extends ChangeNotifier {
       }
       return a.time.compareTo(b.time);
     });
+    notifyListeners();
+    unawaited(_persistClinicState());
+  }
+
+  void setVisitNoShow(String visitId, {required bool noShow}) {
+    final index = _visits.indexWhere((visit) => visit.id == visitId);
+    if (index < 0) {
+      return;
+    }
+    _visits[index] = _visits[index].copyWith(
+      visitStatus: noShow ? 'no_show' : 'booked',
+    );
     notifyListeners();
     unawaited(_persistClinicState());
   }

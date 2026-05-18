@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
@@ -89,6 +90,7 @@ class _PractitionerDashboardScreenState
   _appointmentRequestSubscription;
   Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
       <String, Map<String, dynamic>>{};
+  final Set<String> _dismissedNewPatientIds = <String>{};
 
   late String _selectedDate;
   String _selectedPatientFilter = 'All Patients';
@@ -108,6 +110,34 @@ class _PractitionerDashboardScreenState
 
   void _selectSubView(_DashboardSubView view) {
     setState(() => _subView = _subView == view ? _DashboardSubView.main : view);
+  }
+
+  String get _dismissedNewPatientsKey =>
+      'dismissed_new_patients_v1_${_currentClinicId ?? 'all'}';
+
+  Future<void> _loadDismissedNewPatients() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _dismissedNewPatientIds
+        ..clear()
+        ..addAll(prefs.getStringList(_dismissedNewPatientsKey) ?? const []);
+    });
+  }
+
+  void _dismissNewPatient(String patientId) {
+    setState(() => _dismissedNewPatientIds.add(patientId));
+    unawaited(_persistDismissedNewPatients());
+  }
+
+  Future<void> _persistDismissedNewPatients() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _dismissedNewPatientsKey,
+      _dismissedNewPatientIds.toList()..sort(),
+    );
   }
 
   @override
@@ -143,6 +173,7 @@ class _PractitionerDashboardScreenState
             snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
           );
         });
+    unawaited(_loadDismissedNewPatients());
   }
 
   @override
@@ -196,6 +227,7 @@ class _PractitionerDashboardScreenState
                   .historyForPatient(profile.id, clinicId: _currentClinicId)
                   .isEmpty,
             )
+            .where((profile) => !_dismissedNewPatientIds.contains(profile.id))
             .toList();
         final titleLabel = _selectedDateRange == null
             ? lang.tr(
@@ -659,11 +691,14 @@ class _PractitionerDashboardScreenState
                     Text(profile.name, style: theme.textTheme.labelLarge),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () => _openPatientManagement(
-                        context,
-                        initialProfileId: profile.id,
-                      ),
-                      child: Text(lang.tr('Open', 'Open')),
+                      onPressed: () {
+                        _dismissNewPatient(profile.id);
+                        _openPatientManagement(
+                          context,
+                          initialProfileId: profile.id,
+                        );
+                      },
+                      child: Text(lang.tr('Confirm', '확인')),
                     ),
                   ],
                 ),
@@ -1097,10 +1132,7 @@ class _PractitionerDashboardScreenState
     if (picked == null || !mounted) {
       return;
     }
-    setState(() {
-      _selectedDateRange = picked;
-      _selectedDate = _formatDate(picked.end);
-    });
+    _applySelectedDateRange(picked);
   }
 
   Widget _buildDateSelectorPanel() {
@@ -1355,6 +1387,7 @@ class _PractitionerDashboardScreenState
   ) {
     final profile = scheduledVisit.profile;
     final visit = scheduledVisit.visit;
+    final isNoShow = visit.isNoShow;
     final firstQa = visit.qaList.isEmpty
         ? AppLanguageController.instance.tr('No intake', '문진 없음')
         : '${visit.qaList.first.question} / ${visit.qaList.first.answer}';
@@ -1428,7 +1461,21 @@ class _PractitionerDashboardScreenState
                     ],
                   ),
                 ),
-                Chip(label: Text(visit.intakeStatus.label)),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    if (isNoShow)
+                      Chip(
+                        avatar: const Icon(Icons.block_outlined, size: 16),
+                        label: Text(
+                          AppLanguageController.instance.tr('No-show', '안 옴'),
+                        ),
+                      ),
+                    Chip(label: Text(visit.intakeStatus.label)),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -1454,6 +1501,21 @@ class _PractitionerDashboardScreenState
                   onPressed: () => _sendPatientNote(context, scheduledVisit),
                   icon: const Icon(Icons.mail_outline),
                   label: Text(AppLanguageController.instance.tr('Note', '쪽지')),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () =>
+                      _store.setVisitNoShow(visit.id, noShow: !isNoShow),
+                  icon: Icon(
+                    isNoShow ? Icons.undo_outlined : Icons.person_off_outlined,
+                  ),
+                  label: Text(
+                    isNoShow
+                        ? AppLanguageController.instance.tr(
+                            'Undo no-show',
+                            '안 옴 취소',
+                          )
+                        : AppLanguageController.instance.tr('No-show', '안 옴'),
+                  ),
                 ),
                 FilledButton.icon(
                   onPressed: () {
@@ -3486,7 +3548,7 @@ class _PractitionerDashboardScreenState
     );
     final lang = AppLanguageController.instance;
     final theme = Theme.of(context);
-    final picked = await showDialog<DateTime>(
+    final picked = await showDialog<Object>(
       context: context,
       builder: (dialogContext) {
         return StatefulBuilder(
@@ -3629,6 +3691,43 @@ class _PractitionerDashboardScreenState
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
+                              OutlinedButton.icon(
+                                onPressed: () async {
+                                  final initial =
+                                      _selectedDateRange ??
+                                      DateTimeRange(
+                                        start: selectedDate.subtract(
+                                          const Duration(days: 6),
+                                        ),
+                                        end: selectedDate,
+                                      );
+                                  final range = await showDateRangePicker(
+                                    context: context,
+                                    initialDateRange: initial,
+                                    firstDate: DateTime(2020, 1, 1),
+                                    lastDate: DateTime(
+                                      now.year + 10,
+                                      now.month,
+                                      now.day,
+                                    ),
+                                    helpText: lang.tr(
+                                      'Pick date range',
+                                      '기간 선택',
+                                    ),
+                                    saveText: lang.tr('Apply', '적용'),
+                                    cancelText: lang.tr('Cancel', '취소'),
+                                  );
+                                  if (range != null && dialogContext.mounted) {
+                                    Navigator.pop(dialogContext, range);
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.date_range_outlined,
+                                  size: 18,
+                                ),
+                                label: Text(lang.tr('Range', '기간')),
+                              ),
+                              const Spacer(),
                               TextButton(
                                 onPressed: () => Navigator.pop(dialogContext),
                                 child: Text(lang.tr('Cancel', '취소')),
@@ -3672,7 +3771,13 @@ class _PractitionerDashboardScreenState
       return;
     }
 
-    _applySelectedDate(picked);
+    if (picked is DateTimeRange) {
+      _applySelectedDateRange(picked);
+      return;
+    }
+    if (picked is DateTime) {
+      _applySelectedDate(picked);
+    }
   }
 
   int _bookedPatientCountForDate(String date) {
@@ -3712,13 +3817,36 @@ class _PractitionerDashboardScreenState
   }
 
   int _actualVisitCountForDate(String date) {
-    return _store.visitsForDate(date, clinicId: _currentClinicId).length;
+    return _store
+        .visitsForDate(date, clinicId: _currentClinicId)
+        .where((visit) => !visit.visit.isNoShow)
+        .length;
   }
 
   void _applySelectedDate(DateTime picked) {
     setState(() {
       _selectedDate = _formatDate(picked);
       _selectedDateRange = null;
+      _selectedPatientFilter = 'All Patients';
+      _selectedStatusFilter = 'All';
+      _patientFilterController.clear();
+    });
+  }
+
+  void _applySelectedDateRange(DateTimeRange picked) {
+    setState(() {
+      _selectedDateRange = DateTimeRange(
+        start: DateTime(
+          picked.start.year,
+          picked.start.month,
+          picked.start.day,
+        ),
+        end: DateTime(picked.end.year, picked.end.month, picked.end.day),
+      );
+      _selectedDate = _formatDate(_selectedDateRange!.end);
+      _selectedRangeDays =
+          _selectedDateRange!.end.difference(_selectedDateRange!.start).inDays +
+          1;
       _selectedPatientFilter = 'All Patients';
       _selectedStatusFilter = 'All';
       _patientFilterController.clear();
