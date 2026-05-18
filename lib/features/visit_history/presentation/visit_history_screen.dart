@@ -366,7 +366,7 @@ class _VisitHistoryScreenState extends State<VisitHistoryScreen> {
                                 const SizedBox(height: 4),
                                 Text(visit.previousSessionNote),
                                 const SizedBox(height: 12),
-                                _VisitTreatmentPointPreview(visitId: visit.id),
+                                _VisitTreatmentPointPreview(visit: visit),
                                 const SizedBox(height: 12),
                                 Text(
                                   lang.tr('Q&A', '질문 / 답변 요약'),
@@ -558,9 +558,9 @@ class _HistorySummaryChip extends StatelessWidget {
 }
 
 class _VisitTreatmentPointPreview extends StatefulWidget {
-  const _VisitTreatmentPointPreview({required this.visitId});
+  const _VisitTreatmentPointPreview({required this.visit});
 
-  final String visitId;
+  final PatientVisit visit;
 
   @override
   State<_VisitTreatmentPointPreview> createState() =>
@@ -572,7 +572,12 @@ class _VisitTreatmentPointPreviewState
   double _rotation = -0.28;
 
   List<_TreatmentPoint> get _points {
-    final seed = widget.visitId.codeUnits.fold<int>(
+    final matched = _pointsForTreatmentArea(widget.visit.previousTreatmentArea);
+    if (matched.isNotEmpty) {
+      return matched;
+    }
+
+    final seed = widget.visit.id.codeUnits.fold<int>(
       0,
       (total, value) => total + value,
     );
@@ -581,6 +586,78 @@ class _VisitTreatmentPointPreviewState
       _treatmentPoints[(seed + 2) % _treatmentPoints.length],
       _treatmentPoints[(seed + 5) % _treatmentPoints.length],
     ];
+  }
+
+  List<_TreatmentPoint> _pointsForTreatmentArea(String rawArea) {
+    final area = rawArea.toLowerCase();
+    final points = <_TreatmentPoint>[];
+
+    void add(String code) {
+      for (final point in _treatmentPoints) {
+        if (point.code == code && !points.contains(point)) {
+          points.add(point);
+          return;
+        }
+      }
+    }
+
+    if (area.contains('neck') ||
+        area.contains('cervical') ||
+        area.contains('occiput') ||
+        area.contains('base') ||
+        area.contains('목') ||
+        area.contains('경추')) {
+      add('GB20');
+    }
+    if (area.contains('trap') ||
+        area.contains('shoulder') ||
+        area.contains('scapular') ||
+        area.contains('upper back') ||
+        area.contains('어깨') ||
+        area.contains('견갑') ||
+        area.contains('승모')) {
+      add('GB21');
+      add('LI11');
+    }
+    if (area.contains('forearm') ||
+        area.contains('wrist') ||
+        area.contains('arm') ||
+        area.contains('elbow') ||
+        area.contains('팔') ||
+        area.contains('손목') ||
+        area.contains('팔꿈치')) {
+      add('PC6');
+      add('LI11');
+    }
+    if (area.contains('abdomen') ||
+        area.contains('digest') ||
+        area.contains('stomach') ||
+        area.contains('복부') ||
+        area.contains('소화') ||
+        area.contains('위장')) {
+      add('REN12');
+      add('ST36');
+    }
+    if (area.contains('back') ||
+        area.contains('lumbar') ||
+        area.contains('low back') ||
+        area.contains('lower back') ||
+        area.contains('허리') ||
+        area.contains('요추') ||
+        area.contains('등')) {
+      add('BL23');
+    }
+    if (area.contains('leg') ||
+        area.contains('knee') ||
+        area.contains('shin') ||
+        area.contains('lower leg') ||
+        area.contains('다리') ||
+        area.contains('무릎') ||
+        area.contains('정강')) {
+      add('ST36');
+    }
+
+    return points.take(4).toList();
   }
 
   @override
