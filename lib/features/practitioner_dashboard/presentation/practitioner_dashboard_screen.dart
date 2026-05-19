@@ -610,7 +610,7 @@ class _PractitionerDashboardScreenState
                 const SizedBox(height: 16),
                 _buildConnectedPatientsPanel(connectedPatientsWithoutVisit),
               ],
-              if (filteredVisits.isEmpty)
+              if (_subView == _DashboardSubView.main && filteredVisits.isEmpty)
                 AppPanel(
                   padding: const EdgeInsets.all(20),
                   child: Column(
