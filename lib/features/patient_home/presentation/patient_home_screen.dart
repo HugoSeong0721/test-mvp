@@ -1201,10 +1201,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            final compact = MediaQuery.sizeOf(context).width < 430;
+            final slotsForSelectedDate = availableSlots
+                .where((slot) => slot.date == selectedDate)
+                .toList();
             return AlertDialog(
-              insetPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 16,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: compact ? 8 : 12,
+                vertical: compact ? 8 : 16,
               ),
               title: Text(lang.tr('Book Appointment', '예약하기')),
               content: ConstrainedBox(
@@ -1245,26 +1249,41 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       },
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedTime,
-                      decoration: InputDecoration(
-                        labelText: lang.tr('Time', '시간'),
-                        border: const OutlineInputBorder(),
-                      ),
-                      items: availableSlots
-                          .where((slot) => slot.date == selectedDate)
-                          .map(
-                            (slot) => DropdownMenuItem<String>(
-                              value: slot.time,
-                              child: Text(slot.time),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setDialogState(() => selectedTime = value);
-                      },
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: slotsForSelectedDate.map((slot) {
+                        return ChoiceChip(
+                          label: Text(slot.time),
+                          selected: selectedTime == slot.time,
+                          onSelected: (_) {
+                            setDialogState(() => selectedTime = slot.time);
+                          },
+                        );
+                      }).toList(),
                     ),
+                    const SizedBox(height: 12),
+                    if (!compact)
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedTime,
+                        decoration: InputDecoration(
+                          labelText: lang.tr('Time', '시간'),
+                          border: const OutlineInputBorder(),
+                        ),
+                        items: availableSlots
+                            .where((slot) => slot.date == selectedDate)
+                            .map(
+                              (slot) => DropdownMenuItem<String>(
+                                value: slot.time,
+                                child: Text(slot.time),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setDialogState(() => selectedTime = value);
+                        },
+                      ),
                   ],
                 ),
               ),
