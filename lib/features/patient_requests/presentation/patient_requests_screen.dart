@@ -516,23 +516,30 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                     )
                   else
                     ...filteredDocs.map((doc) {
+                      final compact = MediaQuery.sizeOf(context).width < 430;
                       final data = doc.data();
                       final status = (data['status'] ?? 'pending').toString();
                       final requestType =
                           (data['requestType'] ?? 'answer_request').toString();
-                      final selectedQuestions = _safeStringList(
+                      final rawSelectedQuestions = _safeStringList(
                         data['selectedQuestions'],
                       );
-                      final customByCategory = _safeQuestionMap(
+                      final rawCustomByCategory = _safeQuestionMap(
                         data['customQuestionsByCategory'],
                       );
+                      final selectedQuestions = compact
+                          ? rawSelectedQuestions.take(3).toList()
+                          : rawSelectedQuestions;
+                      final customByCategory = compact
+                          ? const <String, List<String>>{}
+                          : rawCustomByCategory;
                       final note = (data['note'] ?? '').toString().trim();
                       final visitTime = (data['patientTime'] ?? '-').toString();
                       final lastVisitDate = (data['lastVisitDate'] ?? '-')
                           .toString();
                       final questionCount = _questionCount(
-                        selectedQuestions,
-                        customByCategory,
+                        rawSelectedQuestions,
+                        rawCustomByCategory,
                       );
 
                       return Padding(
@@ -603,35 +610,53 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 14),
-                              Text(
-                                lang.tr('Questions', '질문'),
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 8),
-                              if (selectedQuestions.isEmpty &&
-                                  customByCategory.isEmpty)
+                              if (requestType != 'note') ...[
+                                const SizedBox(height: 14),
                                 Text(
-                                  lang.tr(
-                                    'No questions',
-                                    '이 스레드에는 저장된 세부 질문이 없습니다.',
+                                  lang.tr('Questions', '질문'),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 8),
+                                if (selectedQuestions.isEmpty &&
+                                    customByCategory.isEmpty)
+                                  Text(
+                                    lang.tr(
+                                      'No questions',
+                                      '이 스레드에는 저장된 세부 질문이 없습니다.',
+                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium,
                                   ),
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ...selectedQuestions.map(
-                                (question) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  child: Text('- $question'),
-                                ),
-                              ),
-                              ...customByCategory.entries.expand(
-                                (entry) => entry.value.map(
+                                ...selectedQuestions.map(
                                   (question) => Padding(
                                     padding: const EdgeInsets.only(bottom: 6),
-                                    child: Text('- [${entry.key}] $question'),
+                                    child: Text('- $question'),
                                   ),
                                 ),
-                              ),
+                                ...customByCategory.entries.expand(
+                                  (entry) => entry.value.map(
+                                    (question) => Padding(
+                                      padding: const EdgeInsets.only(bottom: 6),
+                                      child: Text('- [${entry.key}] $question'),
+                                    ),
+                                  ),
+                                ),
+                                if (compact &&
+                                    questionCount > selectedQuestions.length)
+                                  Text(
+                                    lang.tr(
+                                      '+${questionCount - selectedQuestions.length} more',
+                                      '+${questionCount - selectedQuestions.length}개 더',
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(color: AppTheme.pine),
+                                  ),
+                              ],
                               if (note.isNotEmpty) ...[
                                 const SizedBox(height: 14),
                                 Text(
