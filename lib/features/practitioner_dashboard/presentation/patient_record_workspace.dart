@@ -88,6 +88,28 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
     super.dispose();
   }
 
+  Widget _buildApproveJoinButton(AppLanguageController lang) {
+    return FilledButton.icon(
+      onPressed: _isApprovingJoin || widget.onApproveJoin == null
+          ? null
+          : () async {
+              setState(() => _isApprovingJoin = true);
+              await widget.onApproveJoin?.call();
+              if (mounted) {
+                setState(() => _isApprovingJoin = false);
+              }
+            },
+      icon: Icon(
+        _isApprovingJoin ? Icons.hourglass_top : Icons.check_circle_outline,
+      ),
+      label: Text(
+        _isApprovingJoin
+            ? lang.tr('Approving...', '승인 중...')
+            : lang.tr('Approve + intake', '승인 + 문진 보내기'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
@@ -281,89 +303,37 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               Colors.white.withValues(alpha: 0.94),
                             ],
                           ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.person_add_alt_1,
-                                color: AppTheme.pine,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                          child: compact
+                              ? Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: [
-                                    Text(
-                                      lang.tr('Join request', '가입 요청'),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w800,
-                                          ),
+                                    _JoinRequestSummary(
+                                      request: widget.pendingJoinRequest!,
+                                      dateLabel: _formatDateWithWeekday(
+                                        widget.pendingJoinRequest!.requestedAt,
+                                      ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      [
-                                            widget
-                                                .pendingJoinRequest!
-                                                .patientEmail,
-                                            _formatDateWithWeekday(
-                                              widget
-                                                  .pendingJoinRequest!
-                                                  .requestedAt,
-                                            ),
-                                            widget
-                                                .pendingJoinRequest!
-                                                .clinicName,
-                                          ]
-                                          .where(
-                                            (item) => item.trim().isNotEmpty,
-                                          )
-                                          .join(' · '),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: AppTheme.ink.withValues(
-                                              alpha: 0.68,
-                                            ),
-                                          ),
+                                    const SizedBox(height: 12),
+                                    _buildApproveJoinButton(lang),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Expanded(
+                                      child: _JoinRequestSummary(
+                                        request: widget.pendingJoinRequest!,
+                                        dateLabel: _formatDateWithWeekday(
+                                          widget
+                                              .pendingJoinRequest!
+                                              .requestedAt,
+                                        ),
+                                      ),
                                     ),
+                                    const SizedBox(width: 12),
+                                    _buildApproveJoinButton(lang),
                                   ],
                                 ),
-                              ),
-                              FilledButton.icon(
-                                onPressed:
-                                    _isApprovingJoin ||
-                                        widget.onApproveJoin == null
-                                    ? null
-                                    : () async {
-                                        setState(() => _isApprovingJoin = true);
-                                        await widget.onApproveJoin?.call();
-                                        if (mounted) {
-                                          setState(
-                                            () => _isApprovingJoin = false,
-                                          );
-                                        }
-                                      },
-                                icon: Icon(
-                                  _isApprovingJoin
-                                      ? Icons.hourglass_top
-                                      : Icons.check_circle_outline,
-                                ),
-                                label: Text(
-                                  _isApprovingJoin
-                                      ? lang.tr('Approving...', '승인 중...')
-                                      : lang.tr(
-                                          'Approve + intake',
-                                          '승인 + 문진 보내기',
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
                       ] else ...[
                         const SizedBox(height: 12),
@@ -1236,6 +1206,55 @@ class _ResponsiveFieldGroup extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _JoinRequestSummary extends StatelessWidget {
+  const _JoinRequestSummary({required this.request, required this.dateLabel});
+
+  final PatientClinicMembershipRequest request;
+  final String dateLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    final details = [
+      request.patientEmail,
+      dateLabel,
+      request.clinicName,
+    ].where((item) => item.trim().isNotEmpty).join(' · ');
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(Icons.person_add_alt_1, color: AppTheme.pine),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                lang.tr('Join request', '가입 요청'),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              if (details.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  details,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppTheme.ink.withValues(alpha: 0.68),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
