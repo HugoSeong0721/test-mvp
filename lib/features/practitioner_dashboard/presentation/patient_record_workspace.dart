@@ -152,13 +152,14 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                     feedbackByVisitId[visitId] = data;
                   }
                 }
+                final compact = MediaQuery.sizeOf(context).width < 430;
 
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppPanel(
-                        padding: const EdgeInsets.all(22),
+                        padding: EdgeInsets.all(compact ? 16 : 22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -177,20 +178,21 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             ),
                             const SizedBox(height: 14),
                             Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
+                              spacing: compact ? 8 : 12,
+                              runSpacing: compact ? 8 : 12,
                               children: [
-                                AppMetricChip(
-                                  icon: Icons.badge_outlined,
-                                  label: lang.tr('Profile', '프로필'),
-                                  value:
-                                      '${profile.sex} · ${profile.ageRange} · ${profile.ethnicity}',
-                                  backgroundColor: AppTheme.surface,
-                                  labelColor: AppTheme.ink.withValues(
-                                    alpha: 0.58,
+                                if (!compact)
+                                  AppMetricChip(
+                                    icon: Icons.badge_outlined,
+                                    label: lang.tr('Profile', '프로필'),
+                                    value:
+                                        '${profile.sex} · ${profile.ageRange} · ${profile.ethnicity}',
+                                    backgroundColor: AppTheme.surface,
+                                    labelColor: AppTheme.ink.withValues(
+                                      alpha: 0.58,
+                                    ),
+                                    valueColor: AppTheme.ink,
                                   ),
-                                  valueColor: AppTheme.ink,
-                                ),
                                 AppMetricChip(
                                   icon: Icons.history_outlined,
                                   label: lang.tr('Visits', '방문'),
@@ -226,7 +228,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                             const SizedBox(height: 16),
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(16),
+                              padding: EdgeInsets.all(compact ? 12 : 16),
                               decoration: BoxDecoration(
                                 color: AppTheme.surface,
                                 borderRadius: BorderRadius.circular(24),
@@ -252,14 +254,15 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    '${lang.tr('Note', '메모')}: ${profile.memo.trim().isEmpty ? '-' : profile.memo.trim()}',
-                                    style: TextStyle(
-                                      color: AppTheme.ink.withValues(
-                                        alpha: 0.78,
+                                  if (!compact)
+                                    Text(
+                                      '${lang.tr('Note', '메모')}: ${profile.memo.trim().isEmpty ? '-' : profile.memo.trim()}',
+                                      style: TextStyle(
+                                        color: AppTheme.ink.withValues(
+                                          alpha: 0.78,
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),
