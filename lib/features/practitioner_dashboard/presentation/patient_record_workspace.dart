@@ -40,6 +40,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
   late TextEditingController _sexController;
   late TextEditingController _ethnicityController;
   late TextEditingController _memoController;
+  late TextEditingController _tongueNoteController;
   _PatientRecordTab _selectedTab = _PatientRecordTab.overview;
   bool _isApprovingJoin = false;
 
@@ -70,6 +71,9 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
       text: widget.profile.ethnicity,
     );
     _memoController = TextEditingController(text: widget.profile.memo);
+    _tongueNoteController = TextEditingController(
+      text: widget.profile.tongueNote,
+    );
   }
 
   void _disposeControllers() {
@@ -80,6 +84,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
     _sexController.dispose();
     _ethnicityController.dispose();
     _memoController.dispose();
+    _tongueNoteController.dispose();
   }
 
   @override
@@ -285,6 +290,16 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                         ),
                                       ),
                                     ),
+                                  if (!compact &&
+                                      profile.tongueNote.trim().isNotEmpty)
+                                    Text(
+                                      '${lang.tr('Tongue', '혀')}: ${profile.tongueNote.trim()}',
+                                      style: TextStyle(
+                                        color: AppTheme.ink.withValues(
+                                          alpha: 0.78,
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -469,6 +484,23 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 maxLines: 3,
                                 decoration: InputDecoration(
                                   labelText: lang.tr('Note', '이 환자에 대한 내 메모'),
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextField(
+                                controller: _tongueNoteController,
+                                minLines: 2,
+                                maxLines: 4,
+                                decoration: InputDecoration(
+                                  labelText: lang.tr(
+                                    'Tongue observation',
+                                    '혀 관찰 기록',
+                                  ),
+                                  hintText: lang.tr(
+                                    'Color, coat, moisture, shape',
+                                    '색, 태, 습윤, 모양',
+                                  ),
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -1035,6 +1067,7 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
           ? widget.profile.ethnicity
           : _ethnicityController.text.trim(),
       memo: _memoController.text.trim(),
+      tongueNote: _tongueNoteController.text.trim(),
     );
     widget.onSave(updated);
     ScaffoldMessenger.of(context).showSnackBar(

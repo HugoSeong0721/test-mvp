@@ -55,6 +55,7 @@ class PatientProfile {
     required this.sex,
     required this.ethnicity,
     required this.memo,
+    this.tongueNote = '',
   });
 
   final String id;
@@ -65,6 +66,7 @@ class PatientProfile {
   final String sex;
   final String ethnicity;
   final String memo;
+  final String tongueNote;
 
   bool get hasContactInfo => phone.trim().isNotEmpty || email.trim().isNotEmpty;
   bool get hasRequiredAlertInfo =>
@@ -88,6 +90,7 @@ class PatientProfile {
     String? sex,
     String? ethnicity,
     String? memo,
+    String? tongueNote,
   }) {
     return PatientProfile(
       id: id ?? this.id,
@@ -98,6 +101,7 @@ class PatientProfile {
       sex: sex ?? this.sex,
       ethnicity: ethnicity ?? this.ethnicity,
       memo: memo ?? this.memo,
+      tongueNote: tongueNote ?? this.tongueNote,
     );
   }
 
@@ -111,6 +115,7 @@ class PatientProfile {
       'sex': sex,
       'ethnicity': ethnicity,
       'memo': memo,
+      'tongueNote': tongueNote,
     };
   }
 
@@ -124,6 +129,7 @@ class PatientProfile {
       sex: (data['sex'] ?? 'Not entered').toString(),
       ethnicity: (data['ethnicity'] ?? 'Not entered').toString(),
       memo: (data['memo'] ?? '').toString(),
+      tongueNote: (data['tongueNote'] ?? '').toString(),
     );
   }
 }
