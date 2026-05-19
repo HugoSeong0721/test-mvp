@@ -5617,6 +5617,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
     final activeClinicId = PractitionerSessionService.currentSession?.clinicId;
     final profiles = _store.profilesForClinic(activeClinicId);
     PatientProfile? selected;
@@ -5765,6 +5766,47 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         ],
       ),
     );
+    final compactPatientPicker = profiles.isEmpty
+        ? AppPanel(
+            padding: const EdgeInsets.all(14),
+            child: Text(
+              lang.tr('No patients', '환자 없음'),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.ink.withValues(alpha: 0.68),
+              ),
+            ),
+          )
+        : DropdownButtonFormField<String>(
+            initialValue: selected?.id,
+            isExpanded: true,
+            decoration: InputDecoration(
+              labelText: lang.tr('Patient', '환자'),
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+            ),
+            items: profiles.map((profile) {
+              final missingPhone = profile.phone.trim().isEmpty;
+              return DropdownMenuItem<String>(
+                value: profile.id,
+                child: Text(
+                  missingPhone
+                      ? '${profile.name} · ${lang.tr('Phone missing', '전화번호 없음')}'
+                      : profile.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value == null) {
+                return;
+              }
+              setState(() => _selectedProfileId = value);
+            },
+          );
     final patientEditor = selected == null
         ? Center(
             child: Text(
@@ -5802,7 +5844,7 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 220, child: patientList),
+              compactPatientPicker,
               const SizedBox(height: 12),
               Expanded(child: patientEditor),
             ],
