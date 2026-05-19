@@ -289,10 +289,49 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: Text(
-                                  lang.tr('Join request', '가입 요청'),
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      lang.tr('Join request', '가입 요청'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      [
+                                            widget
+                                                .pendingJoinRequest!
+                                                .patientEmail,
+                                            _formatDateWithWeekday(
+                                              widget
+                                                  .pendingJoinRequest!
+                                                  .requestedAt,
+                                            ),
+                                            widget
+                                                .pendingJoinRequest!
+                                                .clinicName,
+                                          ]
+                                          .where(
+                                            (item) => item.trim().isNotEmpty,
+                                          )
+                                          .join(' · '),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: AppTheme.ink.withValues(
+                                              alpha: 0.68,
+                                            ),
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               FilledButton.icon(
@@ -317,7 +356,10 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                                 label: Text(
                                   _isApprovingJoin
                                       ? lang.tr('Approving...', '승인 중...')
-                                      : lang.tr('Approve', '승인'),
+                                      : lang.tr(
+                                          'Approve + intake',
+                                          '승인 + 문진 보내기',
+                                        ),
                                 ),
                               ),
                             ],

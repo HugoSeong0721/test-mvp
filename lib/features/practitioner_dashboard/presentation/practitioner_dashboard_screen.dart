@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
@@ -90,8 +89,6 @@ class _PractitionerDashboardScreenState
   _appointmentRequestSubscription;
   Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
       <String, Map<String, dynamic>>{};
-  final Set<String> _dismissedNewPatientIds = <String>{};
-
   late String _selectedDate;
   String _selectedPatientFilter = 'All Patients';
   String _selectedStatusFilter = 'All';
@@ -110,34 +107,6 @@ class _PractitionerDashboardScreenState
 
   void _selectSubView(_DashboardSubView view) {
     setState(() => _subView = _subView == view ? _DashboardSubView.main : view);
-  }
-
-  String get _dismissedNewPatientsKey =>
-      'dismissed_new_patients_v1_${_currentClinicId ?? 'all'}';
-
-  Future<void> _loadDismissedNewPatients() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _dismissedNewPatientIds
-        ..clear()
-        ..addAll(prefs.getStringList(_dismissedNewPatientsKey) ?? const []);
-    });
-  }
-
-  void _dismissNewPatient(String patientId) {
-    setState(() => _dismissedNewPatientIds.add(patientId));
-    unawaited(_persistDismissedNewPatients());
-  }
-
-  Future<void> _persistDismissedNewPatients() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _dismissedNewPatientsKey,
-      _dismissedNewPatientIds.toList()..sort(),
-    );
   }
 
   @override
@@ -173,7 +142,6 @@ class _PractitionerDashboardScreenState
             snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
           );
         });
-    unawaited(_loadDismissedNewPatients());
   }
 
   @override
@@ -227,7 +195,6 @@ class _PractitionerDashboardScreenState
                   .historyForPatient(profile.id, clinicId: _currentClinicId)
                   .isEmpty,
             )
-            .where((profile) => !_dismissedNewPatientIds.contains(profile.id))
             .toList();
         final titleLabel = _selectedDateRange == null
             ? lang.tr(
@@ -690,15 +657,15 @@ class _PractitionerDashboardScreenState
                     const SizedBox(width: 8),
                     Text(profile.name, style: theme.textTheme.labelLarge),
                     const SizedBox(width: 8),
-                    TextButton(
+                    TextButton.icon(
                       onPressed: () {
-                        _dismissNewPatient(profile.id);
                         _openPatientManagement(
                           context,
                           initialProfileId: profile.id,
                         );
                       },
-                      child: Text(lang.tr('Confirm', '확인')),
+                      icon: const Icon(Icons.open_in_new, size: 16),
+                      label: Text(lang.tr('Open', '열기')),
                     ),
                   ],
                 ),
