@@ -5839,7 +5839,9 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
 
     final body = LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 720;
+        final compact =
+            MediaQuery.sizeOf(context).width < 720 ||
+            constraints.maxWidth < 720;
         if (compact) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
