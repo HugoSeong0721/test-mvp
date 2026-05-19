@@ -393,15 +393,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               practitionerName: requestPractitionerController.text,
               location: requestLocationController.text,
             );
+            final screenSize = MediaQuery.sizeOf(context);
+            final compact = screenSize.width < 430;
             if (requestClinicNameController.text.trim().isEmpty &&
                 query.trim().isNotEmpty) {
               requestClinicNameController.text = query.trim();
             }
 
             return AlertDialog(
-              insetPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 16,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: compact ? 8 : 12,
+                vertical: compact ? 8 : 16,
               ),
               title: Text(lang.tr('Choose clinic', '한의원 선택')),
               content: ConstrainedBox(
@@ -421,7 +423,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     ),
                     const SizedBox(height: 14),
                     SizedBox(
-                      height: MediaQuery.sizeOf(context).height * 0.58,
+                      height: screenSize.height * (compact ? 0.7 : 0.58),
                       child: SingleChildScrollView(
                         child: Column(
                           children:
@@ -440,7 +442,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     membershipRequest?.status == 'declined';
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.all(16),
+                                  padding: EdgeInsets.all(compact ? 12 : 16),
                                   decoration: BoxDecoration(
                                     color: isCurrent
                                         ? AppTheme.mint.withValues(alpha: 0.2)
@@ -470,6 +472,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   .titleLarge
                                                   ?.copyWith(
                                                     fontWeight: FontWeight.w700,
+                                                    fontSize: compact
+                                                        ? 20
+                                                        : null,
                                                   ),
                                             ),
                                           ),
@@ -509,8 +514,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             ),
                                       ),
                                       if (clinic.patientNote
-                                          .trim()
-                                          .isNotEmpty) ...[
+                                              .trim()
+                                              .isNotEmpty &&
+                                          !compact) ...[
                                         const SizedBox(height: 10),
                                         Text(
                                           clinic.patientNote,
