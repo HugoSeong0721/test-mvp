@@ -607,72 +607,116 @@ class _PractitionerDashboardScreenState
     final theme = Theme.of(context);
     return AppPanel(
       padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 560;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.person_add_alt_1, color: AppTheme.pine),
-              const SizedBox(width: 8),
-              Text(
-                lang.tr('New patients', 'New patients'),
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppTheme.pine.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  '${profiles.length}',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: AppTheme.pine,
-                    fontWeight: FontWeight.w800,
+              Row(
+                children: [
+                  const Icon(Icons.person_add_alt_1, color: AppTheme.pine),
+                  const SizedBox(width: 8),
+                  Text(
+                    lang.tr('New patients', 'New patients'),
+                    style: theme.textTheme.titleMedium,
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.pine.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      '${profiles.length}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: AppTheme.pine,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: profiles.map((profile) {
+                  return SizedBox(
+                    width: compact ? double.infinity : null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                      child: compact
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.person_outline, size: 18),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        profile.name,
+                                        style: theme.textTheme.labelLarge,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    _openPatientManagement(
+                                      context,
+                                      initialProfileId: profile.id,
+                                    );
+                                  },
+                                  icon: const Icon(Icons.open_in_new, size: 16),
+                                  label: Text(lang.tr('Open', '열기')),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.person_outline, size: 18),
+                                const SizedBox(width: 8),
+                                Text(
+                                  profile.name,
+                                  style: theme.textTheme.labelLarge,
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    _openPatientManagement(
+                                      context,
+                                      initialProfileId: profile.id,
+                                    );
+                                  },
+                                  icon: const Icon(Icons.open_in_new, size: 16),
+                                  label: Text(lang.tr('Open', '열기')),
+                                ),
+                              ],
+                            ),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: profiles.map((profile) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppTheme.border),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.person_outline, size: 18),
-                    const SizedBox(width: 8),
-                    Text(profile.name, style: theme.textTheme.labelLarge),
-                    const SizedBox(width: 8),
-                    TextButton.icon(
-                      onPressed: () {
-                        _openPatientManagement(
-                          context,
-                          initialProfileId: profile.id,
-                        );
-                      },
-                      icon: const Icon(Icons.open_in_new, size: 16),
-                      label: Text(lang.tr('Open', '열기')),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
