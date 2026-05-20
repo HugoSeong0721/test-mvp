@@ -667,7 +667,7 @@ class ClinicCenter {
 
 class ClinicDataStore extends ChangeNotifier {
   ClinicDataStore._() {
-    _restoreClinicState();
+    _restoreFuture = _restoreClinicState();
   }
 
   static final ClinicDataStore instance = ClinicDataStore._();
@@ -803,6 +803,7 @@ class ClinicDataStore extends ChangeNotifier {
   final Set<String> _patientPortalRegisteredIds = <String>{};
   final Map<String, String> _practitionerClinicIds = <String, String>{};
   SharedPreferences? _prefs;
+  late final Future<void> _restoreFuture;
   bool _clinicStateReady = false;
 
   List<PatientProfile> get profiles => List.unmodifiable(_profiles);
@@ -898,7 +899,9 @@ class ClinicDataStore extends ChangeNotifier {
     var changed = false;
     for (final data in items) {
       final request = AppointmentRequest.fromMap(data);
-      if (request.id.trim().isEmpty) {
+      if (request.id.trim().isEmpty ||
+          request.patientId.trim().isEmpty ||
+          request.clinicId.trim().isEmpty) {
         continue;
       }
       final index = _appointmentRequests.indexWhere(
@@ -949,6 +952,8 @@ class ClinicDataStore extends ChangeNotifier {
   }
 
   bool get clinicStateReady => _clinicStateReady;
+
+  Future<void> ready() => _restoreFuture;
 
   List<String> get allDates {
     final dates = _visits.map((visit) => visit.date).toSet().toList()..sort();
@@ -1394,11 +1399,20 @@ class ClinicDataStore extends ChangeNotifier {
     unawaited(_persistClinicState());
   }
 
-  void resetTestingStateForPatient(String patientId) {
+  void resetTestingStateForPatient(String patientId, {String? clinicId}) {
+    final normalizedClinicId = clinicId?.trim();
+    final shouldResetClinic =
+        normalizedClinicId == null || normalizedClinicId.isEmpty;
     _appointmentRequests.removeWhere(
-      (request) => request.patientId == patientId,
+      (request) =>
+          request.patientId == patientId &&
+          (shouldResetClinic || request.clinicId == normalizedClinicId),
     );
-    _visits.removeWhere((visit) => visit.patientId == patientId);
+    _visits.removeWhere(
+      (visit) =>
+          visit.patientId == patientId &&
+          (shouldResetClinic || visit.clinicId == normalizedClinicId),
+    );
     notifyListeners();
     unawaited(_persistClinicState());
   }
@@ -1408,6 +1422,7 @@ class ClinicDataStore extends ChangeNotifier {
     _visits.removeWhere(
       (item) =>
           item.patientId == visit.patientId &&
+          item.clinicId == visit.clinicId &&
           item.date == visit.date &&
           item.time == visit.time,
     );

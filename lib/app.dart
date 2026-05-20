@@ -3,6 +3,7 @@ import 'package:iottie_automation/features/patient_requests/presentation/patient
 import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
 
 import 'core/navigation/current_route_tracker.dart';
+import 'core/data/clinic_data_store.dart';
 import 'core/services/beta_session_service.dart';
 import 'core/services/practitioner_session_service.dart';
 import 'core/settings/app_language_controller.dart';
@@ -51,15 +52,12 @@ class TestMvpApp extends StatelessWidget {
             PatientBetaAuthScreen.routeName: (_) =>
                 const PatientBetaAuthScreen(),
             PatientHomeScreen.routeName: (_) => const _PatientHomeEntry(),
-            PatientIntakeScreen.routeName: (_) => const _PatientRouteGuard(
-              child: PatientIntakeScreen(),
-            ),
-            PatientRequestsScreen.routeName: (_) => const _PatientRouteGuard(
-              child: PatientRequestsScreen(),
-            ),
-            VisitHistoryScreen.routeName: (_) => const _PatientRouteGuard(
-              child: VisitHistoryScreen(),
-            ),
+            PatientIntakeScreen.routeName: (_) =>
+                const _PatientRouteGuard(child: PatientIntakeScreen()),
+            PatientRequestsScreen.routeName: (_) =>
+                const _PatientRouteGuard(child: PatientRequestsScreen()),
+            VisitHistoryScreen.routeName: (_) =>
+                const _PatientRouteGuard(child: VisitHistoryScreen()),
             PractitionerDashboardScreen.routeName: (_) =>
                 const _PractitionerRouteGuard(
                   child: PractitionerDashboardScreen(),
@@ -109,7 +107,10 @@ class TestMvpApp extends StatelessWidget {
                 );
               case '/patient':
                 return MaterialPageRoute<void>(
-                  settings: RouteSettings(name: '/patient', arguments: routeArgs),
+                  settings: RouteSettings(
+                    name: '/patient',
+                    arguments: routeArgs,
+                  ),
                   builder: (_) => const PatientBetaAuthScreen(),
                 );
             }
@@ -141,6 +142,7 @@ class _PatientRouteGuardState extends State<_PatientRouteGuard> {
   }
 
   Future<void> _initializeGuard() async {
+    await ClinicDataStore.instance.ready();
     await BetaSessionService.initialize();
     if (!mounted) {
       return;
@@ -157,9 +159,9 @@ class _PatientRouteGuardState extends State<_PatientRouteGuard> {
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pushReplacementNamed(
-        PatientBetaAuthScreen.routeName,
-      );
+      Navigator.of(
+        context,
+      ).pushReplacementNamed(PatientBetaAuthScreen.routeName);
     });
   }
 
@@ -222,7 +224,8 @@ class _PractitionerRouteGuard extends StatefulWidget {
   final Widget child;
 
   @override
-  State<_PractitionerRouteGuard> createState() => _PractitionerRouteGuardState();
+  State<_PractitionerRouteGuard> createState() =>
+      _PractitionerRouteGuardState();
 }
 
 class _PractitionerRouteGuardState extends State<_PractitionerRouteGuard> {
@@ -236,6 +239,7 @@ class _PractitionerRouteGuardState extends State<_PractitionerRouteGuard> {
   }
 
   Future<void> _initializeGuard() async {
+    await ClinicDataStore.instance.ready();
     await PractitionerSessionService.initialize();
     if (!mounted) {
       return;

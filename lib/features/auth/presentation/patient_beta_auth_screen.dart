@@ -244,6 +244,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     try {
       await TesterFlowService.resetPortalData(
         patientId: session.id,
+        clinicId: _clinicIdForTesterSession(session),
       ).timeout(_authTimeout);
       _showMessage(
         lang.tr('Tester flow data was reset.', '테스터 흐름 데이터가 초기화되었습니다.'),
@@ -264,6 +265,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
       final profile = await _loadTesterProfile(session).timeout(_authTimeout);
       await TesterFlowService.resetAndSeedPortalData(
         profile: profile,
+        clinicId: _clinicIdForTesterSession(session),
       ).timeout(_authTimeout);
       _showMessage(
         lang.tr('Tester sample data was reloaded.', '테스터 샘플 데이터가 다시 채워졌습니다.'),
@@ -280,6 +282,15 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         setState(() => _loading = false);
       }
     }
+  }
+
+  String? _clinicIdForTesterSession(PatientSession session) {
+    final linkedClinicId = _linkedClinicId?.trim();
+    return _store.activeClinicForPatient(session.id)?.id ??
+        (linkedClinicId == null || linkedClinicId.isEmpty
+            ? null
+            : linkedClinicId) ??
+        _store.defaultClinicIdForPatient(session.id);
   }
 
   Future<PatientProfile> _loadTesterProfile(PatientSession session) async {
@@ -680,8 +691,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                                   session: activeSession,
                                 ),
                                 const SizedBox(height: 16),
-                                _buildSignedInHintCard(context, lang),
-                                const SizedBox(height: 16),
                               ],
                               if (activeSession == null ||
                                   _showAuthFormEvenWithSession)
@@ -909,26 +918,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                 label: Text(lang.tr('Reload', '다시 불러오기')),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSignedInHintCard(
-    BuildContext context,
-    AppLanguageController lang,
-  ) {
-    return AppPanel(
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            lang.tr('Signed in', '로그인됨'),
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),

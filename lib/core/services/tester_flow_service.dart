@@ -9,11 +9,16 @@ class TesterFlowService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
   static final ClinicDataStore _store = ClinicDataStore.instance;
 
-  static Future<void> resetPortalData({required String patientId}) async {
+  static Future<void> resetPortalData({
+    required String patientId,
+    String? clinicId,
+  }) async {
     final batch = _db.batch();
+    final normalizedClinicId = clinicId?.trim();
 
     for (final collectionName in const [
       'answer_requests',
+      'appointment_requests',
       'intake_submissions',
       'visit_record_feedback',
     ]) {
@@ -22,27 +27,36 @@ class TesterFlowService {
           .where('patientId', isEqualTo: patientId)
           .get();
       for (final doc in snapshot.docs) {
+        if (normalizedClinicId != null && normalizedClinicId.isNotEmpty) {
+          final docClinicId = (doc.data()['clinicId'] ?? '').toString();
+          if (docClinicId != normalizedClinicId) {
+            continue;
+          }
+        }
         batch.delete(doc.reference);
       }
     }
 
     await batch.commit();
-    _store.resetTestingStateForPatient(patientId);
+    _store.resetTestingStateForPatient(patientId, clinicId: normalizedClinicId);
   }
 
   static Future<void> resetAndSeedPortalData({
     required PatientProfile profile,
+    String? clinicId,
   }) async {
-    await resetPortalData(patientId: profile.id);
-
-    final clinicId =
-        _store.activeClinicForPatient(profile.id)?.id ??
-        _store.defaultClinicIdForPatient(profile.id) ??
-        'seong_acupuncture_center';
+    final requestedClinicId = clinicId?.trim();
+    final effectiveClinicId =
+        requestedClinicId != null && requestedClinicId.isNotEmpty
+        ? requestedClinicId
+        : _store.activeClinicForPatient(profile.id)?.id ??
+              _store.defaultClinicIdForPatient(profile.id) ??
+              'seong_acupuncture_center';
+    await resetPortalData(patientId: profile.id, clinicId: effectiveClinicId);
 
     final availableSlots = _store.availableSlotsForPatient(
       profile.id,
-      clinicId: clinicId,
+      clinicId: effectiveClinicId,
     );
     final sampleSlot = _pickSampleSlot(availableSlots);
     final seededFollowUpDate = sampleSlot == null
@@ -56,9 +70,9 @@ class TesterFlowService {
     );
 
     final baselineVisit = PatientVisit(
-      id: 'beta_seed_visit_baseline_${profile.id}',
+      id: 'beta_seed_visit_baseline_${profile.id}_$effectiveClinicId',
       patientId: profile.id,
-      clinicId: clinicId,
+      clinicId: effectiveClinicId,
       date: _formatDate(seededBaselineDate),
       time: '4:00 PM',
       lastVisitDate: _formatDate(seededEarlierDate),
@@ -84,9 +98,9 @@ class TesterFlowService {
       ],
     );
     final followUpVisit = PatientVisit(
-      id: 'beta_seed_visit_follow_up_${profile.id}',
+      id: 'beta_seed_visit_follow_up_${profile.id}_$effectiveClinicId',
       patientId: profile.id,
-      clinicId: clinicId,
+      clinicId: effectiveClinicId,
       date: _formatDate(seededFollowUpDate),
       time: '3:30 PM',
       lastVisitDate: baselineVisit.date,
@@ -130,7 +144,7 @@ class TesterFlowService {
     if (sampleSlot != null) {
       _store.requestAppointment(
         patientId: profile.id,
-        clinicId: clinicId,
+        clinicId: effectiveClinicId,
         date: sampleSlot.date,
         time: sampleSlot.time,
       );
@@ -139,7 +153,7 @@ class TesterFlowService {
     final now = DateTime.now();
     await _db.collection('answer_requests').add({
       'patientId': profile.id,
-      'clinicId': clinicId,
+      'clinicId': effectiveClinicId,
       'patientName': profile.name,
       'patientPhone': profile.phone,
       'patientEmail': profile.email,
@@ -165,7 +179,7 @@ class TesterFlowService {
 
     await _db.collection('intake_submissions').add({
       'patientId': profile.id,
-      'clinicId': clinicId,
+      'clinicId': effectiveClinicId,
       'patientName': profile.name,
       'visitType': 'follow_up',
       'answers': const [
@@ -219,7 +233,7 @@ class TesterFlowService {
         )
         .set({
           'patientId': profile.id,
-          'clinicId': clinicId,
+          'clinicId': effectiveClinicId,
           'patientName': profile.name,
           'visitId': followUpVisit.id,
           'visitDate': followUpVisit.date,

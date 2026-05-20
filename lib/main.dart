@@ -1,8 +1,9 @@
-﻿import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import 'app.dart';
+import 'core/data/clinic_data_store.dart';
 import 'core/services/beta_session_service.dart';
 import 'core/services/practitioner_session_service.dart';
 import 'core/settings/app_language_controller.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
+    await ClinicDataStore.instance.ready();
     await BetaSessionService.initialize();
     await PractitionerSessionService.initialize();
     runApp(const TestMvpApp());
@@ -30,10 +32,7 @@ Future<void> main() async {
 }
 
 class _BootstrapErrorApp extends StatelessWidget {
-  const _BootstrapErrorApp({
-    required this.error,
-    required this.stackTrace,
-  });
+  const _BootstrapErrorApp({required this.error, required this.stackTrace});
 
   final Object error;
   final StackTrace stackTrace;
