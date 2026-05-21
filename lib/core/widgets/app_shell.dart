@@ -41,7 +41,8 @@ class AppPanel extends StatelessWidget {
     return Container(
       padding: compact ? const EdgeInsets.all(16) : padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: gradient == null ? Colors.white : null,
+        gradient: gradient,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
           color: borderColor ?? AppTheme.border.withValues(alpha: 0.78),

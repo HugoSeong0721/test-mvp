@@ -36,19 +36,65 @@ class RoleHomeScreen extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 920),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: compact ? 10 : 24),
-                    Text(
-                      lang.tr('Portal', '포털'),
-                      style:
-                          (compact
-                                  ? Theme.of(context).textTheme.headlineLarge
-                                  : Theme.of(context).textTheme.displaySmall)
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                      textAlign: TextAlign.center,
+                    SizedBox(height: compact ? 6 : 16),
+                    AppPanel(
+                      padding: EdgeInsets.all(compact ? 18 : 26),
+                      radius: 16,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTheme.mint.withValues(alpha: 0.95),
+                          Colors.white,
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lang.tr(
+                              'Clinic work, patient prep, and beta testing in one place.',
+                              '클리닉 업무, 환자 준비, 베타 테스트를 한 곳에서 시작합니다.',
+                            ),
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(fontWeight: FontWeight.w800),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            lang.tr(
+                              'Choose the workspace you need. The clinic portal is for daily operations; the patient portal is for intake, requests, booking, and visit records.',
+                              '필요한 작업 공간을 선택하세요. 클리닉 포털은 운영 업무, 환자 포털은 문진, 요청, 예약, 방문 기록을 위한 공간입니다.',
+                            ),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
+                                  color: AppTheme.ink.withValues(alpha: 0.72),
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _StatusPill(
+                                icon: Icons.event_available_outlined,
+                                label: lang.tr('Schedule', '예약'),
+                              ),
+                              _StatusPill(
+                                icon: Icons.assignment_outlined,
+                                label: lang.tr('Intake', '문진'),
+                              ),
+                              _StatusPill(
+                                icon: Icons.mark_email_unread_outlined,
+                                label: lang.tr('Requests', '요청'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: compact ? 16 : 28),
+                    SizedBox(height: compact ? 14 : 18),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final wide = constraints.maxWidth >= 720;
@@ -58,6 +104,10 @@ class RoleHomeScreen extends StatelessWidget {
                           icon: Icons.health_and_safety_outlined,
                           eyebrow: lang.tr('Practitioner', '침술사'),
                           title: lang.tr('Clinic Portal', '클리닉 포털'),
+                          description: lang.tr(
+                            'Review today, manage patients, send intake requests, and keep the schedule clinic-scoped.',
+                            '오늘 업무를 확인하고, 환자 관리, 문진 요청, 클리닉별 예약을 처리합니다.',
+                          ),
                           buttonLabel: lang.tr('Login', '로그인'),
                           onPressed: () => Navigator.pushNamed(
                             context,
@@ -83,6 +133,10 @@ class RoleHomeScreen extends StatelessWidget {
                           icon: Icons.favorite_outline,
                           eyebrow: lang.tr('Patient', '환자'),
                           title: lang.tr('Patient Portal', '환자 포털'),
+                          description: lang.tr(
+                            'Continue intake, answer practitioner requests, book a slot, and review visit records.',
+                            '문진을 이어가고, 침술사 요청에 답하고, 예약과 방문 기록을 확인합니다.',
+                          ),
                           buttonLabel: lang.tr('Login', '로그인'),
                           onPressed: () => Navigator.pushNamed(
                             context,
@@ -128,6 +182,7 @@ class _RoleCard extends StatelessWidget {
     required this.icon,
     required this.eyebrow,
     required this.title,
+    required this.description,
     required this.buttonLabel,
     required this.onPressed,
     this.secondaryButtonLabel,
@@ -139,6 +194,7 @@ class _RoleCard extends StatelessWidget {
   final IconData icon;
   final String eyebrow;
   final String title;
+  final String description;
   final String buttonLabel;
   final VoidCallback onPressed;
   final String? secondaryButtonLabel;
@@ -182,6 +238,13 @@ class _RoleCard extends StatelessWidget {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.68),
+            ),
+          ),
           SizedBox(height: compact ? 14 : 20),
           if (secondaryButtonLabel != null && onSecondaryPressed != null) ...[
             SizedBox(
@@ -200,6 +263,38 @@ class _RoleCard extends StatelessWidget {
               style: FilledButton.styleFrom(backgroundColor: accent),
               child: Text(buttonLabel),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: AppTheme.pine),
+          const SizedBox(width: 7),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
         ],
       ),
