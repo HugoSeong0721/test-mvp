@@ -1328,6 +1328,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       animation: Listenable.merge([AppLanguageController.instance, _store]),
       builder: (context, _) {
         final lang = AppLanguageController.instance;
+        final compact = MediaQuery.sizeOf(context).width < 720;
 
         if (_waitingForRealProfile) {
           return PatientShell(
@@ -1515,33 +1516,35 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                   ),
                                   valueColor: AppTheme.ink,
                                 ),
-                                AppMetricChip(
-                                  icon: Icons.event_available_outlined,
-                                  label: lang.tr('Next visit', '다음 방문'),
-                                  value: nextVisit != null
-                                      ? _formatVisitSlot(
-                                          nextVisit.date,
-                                          nextVisit.time,
-                                        )
-                                      : lang.tr('None', '없음'),
-                                  backgroundColor: AppTheme.surface,
-                                  labelColor: AppTheme.ink.withValues(
-                                    alpha: 0.58,
+                                if (!compact) ...[
+                                  AppMetricChip(
+                                    icon: Icons.event_available_outlined,
+                                    label: lang.tr('Next visit', '다음 방문'),
+                                    value: nextVisit != null
+                                        ? _formatVisitSlot(
+                                            nextVisit.date,
+                                            nextVisit.time,
+                                          )
+                                        : lang.tr('None', '없음'),
+                                    backgroundColor: AppTheme.surface,
+                                    labelColor: AppTheme.ink.withValues(
+                                      alpha: 0.58,
+                                    ),
+                                    valueColor: AppTheme.ink,
                                   ),
-                                  valueColor: AppTheme.ink,
-                                ),
-                                AppMetricChip(
-                                  icon: Icons.verified_user_outlined,
-                                  label: lang.tr('Profile', '프로필'),
-                                  value: profile.hasRequiredAlertInfo
-                                      ? lang.tr('Ready', '준비됨')
-                                      : lang.tr('Missing', '누락'),
-                                  backgroundColor: AppTheme.surface,
-                                  labelColor: AppTheme.ink.withValues(
-                                    alpha: 0.58,
+                                  AppMetricChip(
+                                    icon: Icons.verified_user_outlined,
+                                    label: lang.tr('Profile', '프로필'),
+                                    value: profile.hasRequiredAlertInfo
+                                        ? lang.tr('Ready', '준비됨')
+                                        : lang.tr('Missing', '누락'),
+                                    backgroundColor: AppTheme.surface,
+                                    labelColor: AppTheme.ink.withValues(
+                                      alpha: 0.58,
+                                    ),
+                                    valueColor: AppTheme.ink,
                                   ),
-                                  valueColor: AppTheme.ink,
-                                ),
+                                ],
                               ],
                             ),
                             const SizedBox(height: 18),
@@ -1722,293 +1725,312 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             ),
                           ),
                         ),
-                      if (latestRequest != null) const SizedBox(height: 16),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      lang.tr('Requests', '예약 요청'),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  FilledButton.tonalIcon(
-                                    onPressed: _openAppointmentDialog,
-                                    icon: const Icon(Icons.add),
-                                    label: Text(lang.tr('Book', '예약')),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              if (appointmentRequests.isEmpty)
-                                Text(lang.tr('No requests', '신청 없음'))
-                              else
-                                ...appointmentRequests.map((request) {
-                                  final canCancel =
-                                      request.status ==
-                                      AppointmentRequestStatus.pending;
-                                  final statusText = switch (request.status) {
-                                    AppointmentRequestStatus.pending => lang.tr(
-                                      'Pending',
-                                      '대기',
-                                    ),
-                                    AppointmentRequestStatus.confirmed =>
-                                      lang.tr('Booked', '예약됨'),
-                                    AppointmentRequestStatus.declined =>
-                                      lang.tr('Declined', '거절'),
-                                    AppointmentRequestStatus
-                                        .canceledByPatient =>
-                                      lang.tr('Canceled', '취소'),
-                                  };
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade50,
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: Colors.grey.shade200,
+                      if (!compact) ...[
+                        if (latestRequest != null) const SizedBox(height: 16),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        lang.tr('Requests', '예약 요청'),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  _formatVisitSlot(
-                                                    request.date,
-                                                    request.time,
-                                                  ),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w700,
+                                    ),
+                                    FilledButton.tonalIcon(
+                                      onPressed: _openAppointmentDialog,
+                                      icon: const Icon(Icons.add),
+                                      label: Text(lang.tr('Book', '예약')),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                if (appointmentRequests.isEmpty)
+                                  Text(lang.tr('No requests', '신청 없음'))
+                                else
+                                  ...appointmentRequests.map((request) {
+                                    final canCancel =
+                                        request.status ==
+                                        AppointmentRequestStatus.pending;
+                                    final statusText = switch (request.status) {
+                                      AppointmentRequestStatus.pending =>
+                                        lang.tr('Pending', '대기'),
+                                      AppointmentRequestStatus.confirmed =>
+                                        lang.tr('Booked', '예약됨'),
+                                      AppointmentRequestStatus.declined =>
+                                        lang.tr('Declined', '거절'),
+                                      AppointmentRequestStatus
+                                          .canceledByPatient =>
+                                        lang.tr('Canceled', '취소'),
+                                    };
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 10,
+                                      ),
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    _formatVisitSlot(
+                                                      request.date,
+                                                      request.time,
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              Chip(label: Text(statusText)),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${lang.tr('Requested', '신청')}: '
-                                            '${_formatDateTime(request.requestedAt)}',
-                                          ),
-                                          if (request.reviewedAt != null)
-                                            Text(
-                                              '${lang.tr('Reviewed At', '확인 시각')}: '
-                                              '${_formatDateTime(request.reviewedAt!)}',
+                                                Chip(label: Text(statusText)),
+                                              ],
                                             ),
-                                          const SizedBox(height: 6),
-                                          if (canCancel) ...[
-                                            TextButton.icon(
-                                              onPressed: () {
-                                                _store.cancelAppointmentRequest(
-                                                  request.id,
-                                                );
-                                              },
-                                              icon: const Icon(
-                                                Icons.cancel_outlined,
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${lang.tr('Requested', '신청')}: '
+                                              '${_formatDateTime(request.requestedAt)}',
+                                            ),
+                                            if (request.reviewedAt != null)
+                                              Text(
+                                                '${lang.tr('Reviewed At', '확인 시각')}: '
+                                                '${_formatDateTime(request.reviewedAt!)}',
                                               ),
-                                              label: Text(
-                                                lang.tr('Cancel', '취소'),
+                                            const SizedBox(height: 6),
+                                            if (canCancel) ...[
+                                              TextButton.icon(
+                                                onPressed: () {
+                                                  _store
+                                                      .cancelAppointmentRequest(
+                                                        request.id,
+                                                      );
+                                                },
+                                                icon: const Icon(
+                                                  Icons.cancel_outlined,
+                                                ),
+                                                label: Text(
+                                                  lang.tr('Cancel', '취소'),
+                                                ),
                                               ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        lang.tr('Confirmed', '확정'),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    FilledButton.tonalIcon(
+                                      onPressed: _openAppointmentDialog,
+                                      icon: const Icon(Icons.add),
+                                      label: Text(
+                                        lang.tr('Request', '다른 시간 신청'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                if (upcomingVisits.isEmpty)
+                                  Text(
+                                    lang.tr('No confirmed visits', '확정 예약 없음'),
+                                  )
+                                else
+                                  ...upcomingVisits.map((scheduledVisit) {
+                                    final visit = scheduledVisit.visit;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 10,
+                                      ),
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _formatVisitSlot(
+                                                visit.date,
+                                                visit.time,
+                                              ),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${lang.tr('Intake', '문진')}: ${visit.intakeStatus.label}',
                                             ),
                                           ],
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      lang.tr('Confirmed', '확정'),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  FilledButton.tonalIcon(
-                                    onPressed: _openAppointmentDialog,
-                                    icon: const Icon(Icons.add),
-                                    label: Text(lang.tr('Request', '다른 시간 신청')),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              if (upcomingVisits.isEmpty)
-                                Text(lang.tr('No confirmed visits', '확정 예약 없음'))
-                              else
-                                ...upcomingVisits.map((scheduledVisit) {
-                                  final visit = scheduledVisit.visit;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade50,
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: Colors.grey.shade200,
                                         ),
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            _formatVisitSlot(
-                                              visit.date,
-                                              visit.time,
-                                            ),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${lang.tr('Intake', '문진')}: ${visit.intakeStatus.label}',
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      lang.tr('Visits', '방문'),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pushNamed(
-                                      context,
-                                      VisitHistoryScreen.routeName,
-                                    ),
-                                    child: Text(lang.tr('Open', '열기')),
-                                  ),
-                                ],
-                              ),
-                              if (latestVisit == null)
-                                Text(lang.tr('No visits', '방문 없음'))
-                              else ...[
-                                Text(
-                                  '${lang.tr('Last', '최근')}: ${_formatVisitSlot(latestVisit.date, latestVisit.time)}',
-                                ),
-                                Text(
-                                  '${lang.tr('Focus', '부위')}: ${latestVisit.previousTreatmentArea}',
-                                ),
-                                Text(
-                                  '${lang.tr('Note', '메모')}: ${latestVisit.previousSessionNote}',
-                                ),
+                                    );
+                                  }),
                               ],
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                lang.tr('Submissions', '최근 제출 활동'),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              if (submissionDocs.isEmpty)
-                                Text(lang.tr('No submissions', '제출 없음'))
-                              else
-                                ...submissionDocs.take(3).map((doc) {
-                                  final data = doc.data();
-                                  final answers =
-                                      (data['answers'] as List?) ?? const [];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade50,
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: Colors.grey.shade200,
+                        const SizedBox(height: 16),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        lang.tr('Visits', '방문'),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            _formatTimestamp(
-                                              data['submittedAt'] as Timestamp?,
-                                            ),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${lang.tr('Type', '유형')}: ${data['visitType'] ?? '-'}',
-                                          ),
-                                          Text(
-                                            '${lang.tr('Answers', '답변')}: ${answers.length}',
-                                          ),
-                                        ],
-                                      ),
                                     ),
-                                  );
-                                }),
-                            ],
+                                    TextButton(
+                                      onPressed: () => Navigator.pushNamed(
+                                        context,
+                                        VisitHistoryScreen.routeName,
+                                      ),
+                                      child: Text(lang.tr('Open', '열기')),
+                                    ),
+                                  ],
+                                ),
+                                if (latestVisit == null)
+                                  Text(lang.tr('No visits', '방문 없음'))
+                                else ...[
+                                  Text(
+                                    '${lang.tr('Last', '최근')}: ${_formatVisitSlot(latestVisit.date, latestVisit.time)}',
+                                  ),
+                                  Text(
+                                    '${lang.tr('Focus', '부위')}: ${latestVisit.previousTreatmentArea}',
+                                  ),
+                                  Text(
+                                    '${lang.tr('Note', '메모')}: ${latestVisit.previousSessionNote}',
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  lang.tr('Submissions', '최근 제출 활동'),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                if (submissionDocs.isEmpty)
+                                  Text(lang.tr('No submissions', '제출 없음'))
+                                else
+                                  ...submissionDocs.take(3).map((doc) {
+                                    final data = doc.data();
+                                    final answers =
+                                        (data['answers'] as List?) ?? const [];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 10,
+                                      ),
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _formatTimestamp(
+                                                data['submittedAt']
+                                                    as Timestamp?,
+                                              ),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${lang.tr('Type', '유형')}: ${data['visitType'] ?? '-'}',
+                                            ),
+                                            Text(
+                                              '${lang.tr('Answers', '답변')}: ${answers.length}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   );
                 },

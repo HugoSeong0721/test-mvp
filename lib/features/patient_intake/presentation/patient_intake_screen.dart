@@ -1751,16 +1751,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                             spacing: 12,
                             runSpacing: 12,
                             children: [
-                              AppMetricChip(
-                                icon: Icons.assignment_outlined,
-                                label: lang.tr('Mode', '모드'),
-                                value: modeLabel,
-                                backgroundColor: AppTheme.surface,
-                                labelColor: AppTheme.ink.withValues(
-                                  alpha: 0.58,
+                              if (!compact)
+                                AppMetricChip(
+                                  icon: Icons.assignment_outlined,
+                                  label: lang.tr('Mode', '모드'),
+                                  value: modeLabel,
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
+                                  ),
+                                  valueColor: AppTheme.ink,
                                 ),
-                                valueColor: AppTheme.ink,
-                              ),
                               AppMetricChip(
                                 icon: Icons.stacked_line_chart_outlined,
                                 label: lang.tr('Progress', '진행도'),
@@ -1782,50 +1783,55 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 ),
                                 valueColor: AppTheme.ink,
                               ),
-                              AppMetricChip(
-                                icon: Icons.verified_user_outlined,
-                                label: lang.tr('Profile', '프로필'),
-                                value: profile.hasRequiredAlertInfo
-                                    ? lang.tr('Ready', '준비됨')
-                                    : lang.tr('Missing', '누락'),
-                                backgroundColor: AppTheme.surface,
-                                labelColor: AppTheme.ink.withValues(
-                                  alpha: 0.58,
+                              if (!compact)
+                                AppMetricChip(
+                                  icon: Icons.verified_user_outlined,
+                                  label: lang.tr('Profile', '프로필'),
+                                  value: profile.hasRequiredAlertInfo
+                                      ? lang.tr('Ready', '준비됨')
+                                      : lang.tr('Missing', '누락'),
+                                  backgroundColor: AppTheme.surface,
+                                  labelColor: AppTheme.ink.withValues(
+                                    alpha: 0.58,
+                                  ),
+                                  valueColor: AppTheme.ink,
                                 ),
-                                valueColor: AppTheme.ink,
-                              ),
                             ],
                           ),
-                          const SizedBox(height: 18),
-                          Wrap(
-                            spacing: 12,
-                            runSpacing: 12,
-                            children: [
-                              FilledButton.icon(
-                                onPressed: () => Navigator.pushNamed(
-                                  context,
-                                  PatientRequestsScreen.routeName,
+                          if (!compact) ...[
+                            const SizedBox(height: 18),
+                            Wrap(
+                              spacing: 12,
+                              runSpacing: 12,
+                              children: [
+                                FilledButton.icon(
+                                  onPressed: () => Navigator.pushNamed(
+                                    context,
+                                    PatientRequestsScreen.routeName,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.mark_email_unread_outlined,
+                                  ),
+                                  label: Text(lang.tr('Requests', '요청')),
                                 ),
-                                icon: const Icon(
-                                  Icons.mark_email_unread_outlined,
+                                OutlinedButton.icon(
+                                  onPressed: _openProfileDialog,
+                                  icon: const Icon(
+                                    Icons.account_circle_outlined,
+                                  ),
+                                  label: Text(lang.tr('Profile', '프로필')),
                                 ),
-                                label: Text(lang.tr('Requests', '요청')),
-                              ),
-                              OutlinedButton.icon(
-                                onPressed: _openProfileDialog,
-                                icon: const Icon(Icons.account_circle_outlined),
-                                label: Text(lang.tr('Profile', '프로필')),
-                              ),
-                              OutlinedButton.icon(
-                                onPressed: () => Navigator.pushNamed(
-                                  context,
-                                  VisitHistoryScreen.routeName,
+                                OutlinedButton.icon(
+                                  onPressed: () => Navigator.pushNamed(
+                                    context,
+                                    VisitHistoryScreen.routeName,
+                                  ),
+                                  icon: const Icon(Icons.history),
+                                  label: Text(lang.tr('Visits', '방문')),
                                 ),
-                                icon: const Icon(Icons.history),
-                                label: Text(lang.tr('Visits', '방문')),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     );

@@ -330,25 +330,30 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
     required int completedCount,
     required int totalCount,
   }) {
+    final compact = MediaQuery.sizeOf(context).width < 430;
     return AppPanel(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(compact ? 14 : 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            lang.tr('Request inbox', '요청함'),
+            openCount > 0
+                ? lang.tr('$openCount to answer', '$openCount개 답변 필요')
+                : lang.tr('Inbox clear', '새 요청 없음'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 6),
-          Text(
-            lang.tr(
-              'Practitioner notes and follow-up questions appear here. Start with anything marked Reply.',
-              '침술사 메모와 후속 질문이 여기에 표시됩니다. 답변이 필요한 항목부터 시작하세요.',
+          if (!compact) ...[
+            const SizedBox(height: 6),
+            Text(
+              lang.tr(
+                'Practitioner notes and follow-up questions appear here. Start with anything marked Reply.',
+                '침술사 메모와 후속 질문이 여기에 표시됩니다. 답변이 필요한 항목부터 시작하세요.',
+              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.ink.withValues(alpha: 0.68),
+              ),
             ),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.ink.withValues(alpha: 0.68),
-            ),
-          ),
+          ],
           const SizedBox(height: 14),
           Wrap(
             spacing: 10,
@@ -361,20 +366,23 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                 onTap: () =>
                     setState(() => _selectedFolder = _RequestFolder.needsReply),
               ),
-              _MessageFolderChip(
-                label: lang.tr('Done', '완료'),
-                count: completedCount,
-                selected: _selectedFolder == _RequestFolder.completed,
-                onTap: () =>
-                    setState(() => _selectedFolder = _RequestFolder.completed),
-              ),
-              _MessageFolderChip(
-                label: lang.tr('All', '전체'),
-                count: totalCount,
-                selected: _selectedFolder == _RequestFolder.all,
-                onTap: () =>
-                    setState(() => _selectedFolder = _RequestFolder.all),
-              ),
+              if (!compact) ...[
+                _MessageFolderChip(
+                  label: lang.tr('Done', '완료'),
+                  count: completedCount,
+                  selected: _selectedFolder == _RequestFolder.completed,
+                  onTap: () => setState(
+                    () => _selectedFolder = _RequestFolder.completed,
+                  ),
+                ),
+                _MessageFolderChip(
+                  label: lang.tr('All', '전체'),
+                  count: totalCount,
+                  selected: _selectedFolder == _RequestFolder.all,
+                  onTap: () =>
+                      setState(() => _selectedFolder = _RequestFolder.all),
+                ),
+              ],
             ],
           ),
         ],
