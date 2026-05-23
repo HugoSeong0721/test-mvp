@@ -2557,13 +2557,16 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           final wide = constraints.maxWidth >= 980;
+                          final compact = constraints.maxWidth < 720;
 
                           final mainColumn = Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               formPanel,
-                              const SizedBox(height: 16),
-                              checklistPanel,
+                              if (!compact) ...[
+                                const SizedBox(height: 16),
+                                checklistPanel,
+                              ],
                             ],
                           );
 
@@ -2598,8 +2601,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 )
                               else ...[
                                 mainColumn,
-                                const SizedBox(height: 16),
-                                sideColumn,
+                                if (!compact) ...[
+                                  const SizedBox(height: 16),
+                                  sideColumn,
+                                ],
                               ],
                             ],
                           );

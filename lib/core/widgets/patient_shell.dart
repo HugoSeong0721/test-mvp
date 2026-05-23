@@ -95,7 +95,7 @@ class _Header extends StatelessWidget {
     final compact = MediaQuery.sizeOf(context).width < 430;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(compact ? 12 : 20, 10, 8, 8),
+      padding: EdgeInsets.fromLTRB(compact ? 12 : 20, compact ? 6 : 10, 8, 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.85),
         border: Border(
@@ -127,9 +127,11 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style:
+                      (compact
+                              ? theme.textTheme.titleMedium
+                              : theme.textTheme.titleLarge)
+                          ?.copyWith(fontWeight: FontWeight.w700),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -160,6 +162,9 @@ class _Header extends StatelessWidget {
           ],
           IconButton(
             tooltip: lang.tr('Sign out', '로그아웃'),
+            visualDensity: compact
+                ? VisualDensity.compact
+                : VisualDensity.standard,
             onPressed: () => Navigator.of(
               context,
             ).pushNamedAndRemoveUntil('/', (_) => false),
@@ -178,6 +183,7 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 430;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.6),
@@ -187,7 +193,7 @@ class _TabBar extends StatelessWidget {
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: EdgeInsets.symmetric(horizontal: compact ? 6 : 12),
         child: Row(
           children: [
             for (final spec in kPatientNavSpecs)
@@ -222,8 +228,8 @@ class _TabButton extends StatelessWidget {
             : () => Navigator.of(context).pushReplacementNamed(spec.routeName),
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: compact ? 16 : 14,
-            vertical: 12,
+            horizontal: compact ? 18 : 14,
+            vertical: compact ? 9 : 12,
           ),
           decoration: BoxDecoration(
             border: Border(
