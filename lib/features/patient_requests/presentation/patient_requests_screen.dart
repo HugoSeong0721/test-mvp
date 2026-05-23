@@ -398,6 +398,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
         final lang = AppLanguageController.instance;
         final profile = _currentProfile;
         final activeClinic = _store.activeClinicForPatient(profile.id);
+        final compact = MediaQuery.sizeOf(context).width < 430;
 
         return PatientShell(
           currentItem: PatientNavItem.requests,
@@ -475,18 +476,20 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  PatientClinicContextPanel(
-                    clinic: activeClinic,
-                    onChooseClinic: () => Navigator.pushNamed(
-                      context,
-                      PatientHomeScreen.routeName,
+                  if (!compact || activeClinic == null) ...[
+                    PatientClinicContextPanel(
+                      clinic: activeClinic,
+                      onChooseClinic: () => Navigator.pushNamed(
+                        context,
+                        PatientHomeScreen.routeName,
+                      ),
                     ),
-                  ),
-                  if (needsReplyDocs.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildNextActionPanel(lang, needsReplyDocs.first),
                   ],
-                  const SizedBox(height: 16),
+                  if (needsReplyDocs.isNotEmpty) ...[
+                    _buildNextActionPanel(lang, needsReplyDocs.first),
+                    const SizedBox(height: 16),
+                  ],
                   _buildMessageHeader(
                     lang,
                     openCount: openCount,

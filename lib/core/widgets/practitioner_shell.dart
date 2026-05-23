@@ -493,7 +493,7 @@ class _TopBar extends StatelessWidget {
               ],
             ),
           ),
-          if (actions.isNotEmpty) ...[
+          if (!compact && actions.isNotEmpty) ...[
             SizedBox(width: compact ? 4 : 12),
             Flexible(
               child: Wrap(

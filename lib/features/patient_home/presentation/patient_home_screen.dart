@@ -1480,8 +1480,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   return ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      _buildClinicSelectionPanel(context, profile: profile),
-                      const SizedBox(height: 16),
+                      if (!compact || activeClinic == null) ...[
+                        _buildClinicSelectionPanel(context, profile: profile),
+                        const SizedBox(height: 16),
+                      ],
                       AppPanel(
                         padding: const EdgeInsets.all(22),
                         child: Column(
@@ -1667,8 +1669,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           ],
                         ),
                       ),
-                      if (latestRequest != null) const SizedBox(height: 16),
-                      if (latestRequest != null)
+                      if (!compact && latestRequest != null)
+                        const SizedBox(height: 16),
+                      if (!compact && latestRequest != null)
                         Card(
                           child: Padding(
                             padding: const EdgeInsets.all(16),
