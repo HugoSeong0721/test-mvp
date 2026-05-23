@@ -55,7 +55,7 @@ class RoleHomeScreen extends StatelessWidget {
                         children: [
                           Text(
                             lang.tr(
-                              'Clinic work, patient prep, and beta testing in one place.',
+                              'Simple patient-practitioner communication for TCM care.',
                               '클리닉 업무, 환자 준비, 베타 테스트를 한 곳에서 시작합니다.',
                             ),
                             style: Theme.of(context).textTheme.headlineMedium
@@ -64,7 +64,7 @@ class RoleHomeScreen extends StatelessWidget {
                           const SizedBox(height: 10),
                           Text(
                             lang.tr(
-                              'Choose the workspace you need. The clinic portal is for daily operations; the patient portal is for intake, requests, booking, and visit records.',
+                              'New patients receive baseline questions, reply from the portal, and each answer helps the practitioner refine the care picture over time.',
                               '필요한 작업 공간을 선택하세요. 클리닉 포털은 운영 업무, 환자 포털은 문진, 요청, 예약, 방문 기록을 위한 공간입니다.',
                             ),
                             style: Theme.of(context).textTheme.bodyLarge
@@ -105,7 +105,7 @@ class RoleHomeScreen extends StatelessWidget {
                           eyebrow: lang.tr('Practitioner', '침술사'),
                           title: lang.tr('Clinic Portal', '클리닉 포털'),
                           description: lang.tr(
-                            'Review today, manage patients, send intake requests, and keep the schedule clinic-scoped.',
+                            'Send focused questions, review answers, and build a clearer TCM picture by patient.',
                             '오늘 업무를 확인하고, 환자 관리, 문진 요청, 클리닉별 예약을 처리합니다.',
                           ),
                           buttonLabel: lang.tr('Login', '로그인'),
@@ -134,7 +134,7 @@ class RoleHomeScreen extends StatelessWidget {
                           eyebrow: lang.tr('Patient', '환자'),
                           title: lang.tr('Patient Portal', '환자 포털'),
                           description: lang.tr(
-                            'Continue intake, answer practitioner requests, book a slot, and review visit records.',
+                            'Receive questions, answer simply, and keep your practitioner updated between visits.',
                             '문진을 이어가고, 침술사 요청에 답하고, 예약과 방문 기록을 확인합니다.',
                           ),
                           buttonLabel: lang.tr('Login', '로그인'),

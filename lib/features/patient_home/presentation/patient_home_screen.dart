@@ -1445,9 +1445,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   final needsRequestsFirst = pendingRequests.isNotEmpty;
                   final needsProfileFirst = !profile.hasRequiredAlertInfo;
                   final needsIntakeFirst = latestSubmission == null;
-                  final needsAppointmentFirst =
-                      nextVisit == null && pendingAppointmentRequests.isEmpty;
-
                   late final String nextStepTitle;
                   late final String nextStepButton;
                   late final VoidCallback nextStepAction;
@@ -1470,16 +1467,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       context,
                       PatientIntakeScreen.routeName,
                     );
-                  } else if (needsAppointmentFirst) {
-                    nextStepTitle = lang.tr('Book next visit', '다음 예약 신청하기');
-                    nextStepButton = lang.tr('Book', '예약');
-                    nextStepAction = _openAppointmentDialog;
                   } else {
-                    nextStepTitle = lang.tr('All set', '지금은 할 일을 거의 마쳤어요');
-                    nextStepButton = lang.tr('History', '기록');
+                    nextStepTitle = lang.tr('All caught up', '지금은 새 요청이 없습니다');
+                    nextStepButton = lang.tr('Open inbox', '요청함 열기');
                     nextStepAction = () => Navigator.pushNamed(
                       context,
-                      VisitHistoryScreen.routeName,
+                      PatientRequestsScreen.routeName,
                     );
                   }
 
@@ -1599,64 +1592,70 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         icon: const Icon(Icons.arrow_forward),
                                         label: Text(nextStepButton),
                                       ),
-                                      OutlinedButton.icon(
-                                        onPressed: () => Navigator.pushNamed(
-                                          context,
-                                          PatientRequestsScreen.routeName,
-                                        ),
-                                        icon: const Icon(
-                                          Icons.mark_email_unread_outlined,
-                                        ),
-                                        label: Text(
-                                          lang.tr('Requests', '요청함'),
-                                          style: const TextStyle(
-                                            color: AppTheme.ink,
+                                      if (MediaQuery.sizeOf(context).width >=
+                                          720)
+                                        OutlinedButton.icon(
+                                          onPressed: () => Navigator.pushNamed(
+                                            context,
+                                            PatientRequestsScreen.routeName,
+                                          ),
+                                          icon: const Icon(
+                                            Icons.mark_email_unread_outlined,
+                                          ),
+                                          label: Text(
+                                            lang.tr('Requests', '요청함'),
+                                            style: const TextStyle(
+                                              color: AppTheme.ink,
+                                            ),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(
+                                              color: AppTheme.border,
+                                            ),
+                                            foregroundColor: AppTheme.ink,
                                           ),
                                         ),
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(
-                                            color: AppTheme.border,
+                                      if (MediaQuery.sizeOf(context).width >=
+                                          720)
+                                        OutlinedButton.icon(
+                                          onPressed: () => Navigator.pushNamed(
+                                            context,
+                                            PatientIntakeScreen.routeName,
                                           ),
-                                          foregroundColor: AppTheme.ink,
-                                        ),
-                                      ),
-                                      OutlinedButton.icon(
-                                        onPressed: () => Navigator.pushNamed(
-                                          context,
-                                          PatientIntakeScreen.routeName,
-                                        ),
-                                        icon: const Icon(Icons.edit_note),
-                                        label: Text(
-                                          lang.tr('Intake', '문진'),
-                                          style: const TextStyle(
-                                            color: AppTheme.ink,
+                                          icon: const Icon(Icons.edit_note),
+                                          label: Text(
+                                            lang.tr('Intake', '문진'),
+                                            style: const TextStyle(
+                                              color: AppTheme.ink,
+                                            ),
                                           ),
-                                        ),
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(
-                                            color: AppTheme.border,
-                                          ),
-                                          foregroundColor: AppTheme.ink,
-                                        ),
-                                      ),
-                                      OutlinedButton.icon(
-                                        onPressed: _openAppointmentDialog,
-                                        icon: const Icon(
-                                          Icons.event_available_outlined,
-                                        ),
-                                        label: Text(
-                                          lang.tr('Book', '예약'),
-                                          style: const TextStyle(
-                                            color: AppTheme.ink,
+                                          style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(
+                                              color: AppTheme.border,
+                                            ),
+                                            foregroundColor: AppTheme.ink,
                                           ),
                                         ),
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(
-                                            color: AppTheme.border,
+                                      if (MediaQuery.sizeOf(context).width >=
+                                          720)
+                                        OutlinedButton.icon(
+                                          onPressed: _openAppointmentDialog,
+                                          icon: const Icon(
+                                            Icons.event_available_outlined,
                                           ),
-                                          foregroundColor: AppTheme.ink,
+                                          label: Text(
+                                            lang.tr('Book', '예약'),
+                                            style: const TextStyle(
+                                              color: AppTheme.ink,
+                                            ),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(
+                                              color: AppTheme.border,
+                                            ),
+                                            foregroundColor: AppTheme.ink,
+                                          ),
                                         ),
-                                      ),
                                     ],
                                   ),
                                 ],

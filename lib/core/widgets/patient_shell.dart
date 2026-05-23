@@ -44,13 +44,6 @@ const List<PatientNavSpec> kPatientNavSpecs = [
     labelKo: 'Inbox',
     routeName: '/patient-requests',
   ),
-  PatientNavSpec(
-    item: PatientNavItem.history,
-    icon: Icons.event_note_outlined,
-    labelEn: 'Visits',
-    labelKo: 'Visits',
-    routeName: '/patient-history',
-  ),
 ];
 
 class PatientShell extends StatelessWidget {

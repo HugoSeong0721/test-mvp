@@ -5,6 +5,19 @@ class AppFirestoreService {
 
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static const List<String> initialTcmIntakeQuestions = [
+    'What is the main reason you want care right now?',
+    'How long has this concern been present, and what makes it better or worse?',
+    'How has your sleep been, including waking, dreams, or night sweats?',
+    'How is your energy through the day, and when is fatigue strongest?',
+    'How are appetite, thirst, and temperature preference?',
+    'How is digestion, including bloating, reflux, gas, or nausea?',
+    'How are bowel movements, including frequency, form, constipation, or diarrhea?',
+    'How is urination, including frequency, urgency, color, or nighttime urination?',
+    'How have stress, mood, irritability, anxiety, or frustration been lately?',
+    'What habits should your practitioner know, such as work posture, exercise, caffeine, alcohol, or screen time?',
+  ];
+
   static Future<List<Map<String, dynamic>>> fetchClinicCenters() async {
     final snapshot = await _db.collection('clinic_centers').get();
     return snapshot.docs.map((doc) {
@@ -255,6 +268,81 @@ class AppFirestoreService {
     }
 
     return doc.id;
+  }
+
+  static Future<String?> ensureInitialTcmIntakeRequest({
+    required String patientId,
+    required String clinicId,
+    required String patientName,
+    required String patientPhone,
+    required String patientEmail,
+    required int birthYear,
+    required String sex,
+    required String ethnicity,
+  }) async {
+    final normalizedPatientId = patientId.trim();
+    final normalizedClinicId = clinicId.trim();
+    if (normalizedPatientId.isEmpty || normalizedClinicId.isEmpty) {
+      return null;
+    }
+
+    final docId = 'initial_tcm_${normalizedPatientId}_$normalizedClinicId';
+    final ref = _db.collection('answer_requests').doc(docId);
+    final existing = await ref.get();
+    if (existing.exists) {
+      return docId;
+    }
+
+    await ref.set({
+      'patientId': normalizedPatientId,
+      'clinicId': normalizedClinicId,
+      'patientName': patientName,
+      'patientPhone': patientPhone,
+      'patientEmail': patientEmail,
+      'patientTime': 'New patient onboarding',
+      'lastVisitDate': 'Not yet visited',
+      'intakeStatus': 'Initial TCM baseline requested',
+      'selectedQuestions': initialTcmIntakeQuestions,
+      'customQuestionsByCategory': const {},
+      'note':
+          'Please answer these first questions so your practitioner can understand your age, sex, habits, symptoms, and TCM pattern direction over time.',
+      'requestType': 'answer_request',
+      'status': 'pending',
+      'source': 'initial_tcm_onboarding',
+      'tcmContextSeed': {
+        'birthYear': birthYear,
+        'sex': sex,
+        'ethnicity': ethnicity,
+        'focus': [
+          'chief concern',
+          'sleep',
+          'energy',
+          'temperature',
+          'digestion',
+          'urination',
+          'bowel movement',
+          'emotion',
+          'daily habits',
+        ],
+      },
+      'requestedAt': FieldValue.serverTimestamp(),
+    });
+
+    if (patientEmail.trim().isNotEmpty) {
+      await _queuePortalEmail(
+        patientName: patientName,
+        patientEmail: patientEmail,
+        patientTime: 'New patient onboarding',
+        lastVisitDate: 'Not yet visited',
+        selectedQuestions: initialTcmIntakeQuestions,
+        customQuestionsByCategory: const {},
+        note:
+            'Your first TCM baseline questions are ready. Answer them in the portal so your practitioner can start building your care picture.',
+        requestType: 'answer_request',
+      );
+    }
+
+    return docId;
   }
 
   static Future<String> sendPractitionerNote({

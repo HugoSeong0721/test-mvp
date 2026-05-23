@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/services/app_firestore_service.dart';
 import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/services/tester_flow_service.dart';
@@ -418,7 +419,47 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         session,
         nameHint: name,
       ).timeout(_authTimeout);
+      await _store.applyPreferredClinicForPatient(
+        patientId: session.id,
+        linkedClinicId: _linkedClinicId,
+      );
+      final profile = await _loadTesterProfile(session).timeout(_authTimeout);
+      _store.saveProfile(profile);
+      _store.setCurrentPatientProfile(profile.id);
+      final clinicId = await _ensureClinicForNewPatient(profile);
+      if (clinicId != null) {
+        await AppFirestoreService.ensureInitialTcmIntakeRequest(
+          patientId: profile.id,
+          clinicId: clinicId,
+          patientName: profile.name,
+          patientPhone: profile.phone,
+          patientEmail: profile.email,
+          birthYear: profile.birthYear,
+          sex: profile.sex,
+          ethnicity: profile.ethnicity,
+        ).timeout(_authTimeout);
+      }
     } catch (_) {}
+  }
+
+  Future<String?> _ensureClinicForNewPatient(PatientProfile profile) async {
+    final activeClinicId = _store.activeClinicForPatient(profile.id)?.id;
+    if (activeClinicId != null && activeClinicId.isNotEmpty) {
+      return activeClinicId;
+    }
+
+    final fallbackClinic = _store.patientVisibleClinicCenters.isNotEmpty
+        ? _store.patientVisibleClinicCenters.first
+        : (_store.clinicCenters.isNotEmpty ? _store.clinicCenters.first : null);
+    if (fallbackClinic == null) {
+      return null;
+    }
+
+    await _store.continueWithClinicForPatient(
+      patientId: profile.id,
+      clinicId: fallbackClinic.id,
+    );
+    return fallbackClinic.id;
   }
 
   Future<void> _logInTester({
