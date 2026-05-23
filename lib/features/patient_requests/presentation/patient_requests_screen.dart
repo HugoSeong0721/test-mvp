@@ -520,14 +520,15 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                 icon: const Icon(Icons.edit_note),
                                 label: Text(lang.tr('Intake', '문진')),
                               ),
-                              OutlinedButton.icon(
-                                onPressed: () => Navigator.pushNamed(
-                                  context,
-                                  VisitHistoryScreen.routeName,
+                              if (MediaQuery.sizeOf(context).width >= 430)
+                                OutlinedButton.icon(
+                                  onPressed: () => Navigator.pushNamed(
+                                    context,
+                                    VisitHistoryScreen.routeName,
+                                  ),
+                                  icon: const Icon(Icons.history),
+                                  label: Text(lang.tr('History', '기록')),
                                 ),
-                                icon: const Icon(Icons.history),
-                                label: Text(lang.tr('History', '기록')),
-                              ),
                             ],
                           ),
                         ],
@@ -723,14 +724,15 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                           : lang.tr('Answer', '답하기'),
                                     ),
                                   ),
-                                  OutlinedButton.icon(
-                                    onPressed: () => Navigator.pushNamed(
-                                      context,
-                                      VisitHistoryScreen.routeName,
+                                  if (!compact)
+                                    OutlinedButton.icon(
+                                      onPressed: () => Navigator.pushNamed(
+                                        context,
+                                        VisitHistoryScreen.routeName,
+                                      ),
+                                      icon: const Icon(Icons.history),
+                                      label: Text(lang.tr('History', '기록')),
                                     ),
-                                    icon: const Icon(Icons.history),
-                                    label: Text(lang.tr('History', '기록')),
-                                  ),
                                 ],
                               ),
                             ],

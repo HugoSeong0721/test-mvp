@@ -154,7 +154,7 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          if (actions.isNotEmpty) ...[
+          if (!compact && actions.isNotEmpty) ...[
             const SizedBox(width: 8),
             Flexible(
               child: Wrap(
@@ -216,37 +216,46 @@ class _TabButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
     final label = lang.tr(spec.labelEn, spec.labelKo);
+    final compact = MediaQuery.sizeOf(context).width < 430;
     final fg = selected
         ? AppTheme.copper
         : AppTheme.ink.withValues(alpha: 0.62);
 
-    return InkWell(
-      onTap: selected
-          ? null
-          : () => Navigator.of(context).pushReplacementNamed(spec.routeName),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: selected ? AppTheme.copper : Colors.transparent,
-              width: 2.5,
-            ),
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: selected
+            ? null
+            : () => Navigator.of(context).pushReplacementNamed(spec.routeName),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 16 : 14,
+            vertical: 12,
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(spec.icon, size: 16, color: fg),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: fg,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: selected ? AppTheme.copper : Colors.transparent,
+                width: 2.5,
               ),
             ),
-          ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(spec.icon, size: 17, color: fg),
+              if (!compact) ...[
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: fg,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

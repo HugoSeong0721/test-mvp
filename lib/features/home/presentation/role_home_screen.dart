@@ -246,7 +246,9 @@ class _RoleCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: compact ? 14 : 20),
-          if (secondaryButtonLabel != null && onSecondaryPressed != null) ...[
+          if (!compact &&
+              secondaryButtonLabel != null &&
+              onSecondaryPressed != null) ...[
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
