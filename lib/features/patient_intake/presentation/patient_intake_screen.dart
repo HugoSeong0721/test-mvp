@@ -1703,6 +1703,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 final latestSubmission = submissionDocs.isNotEmpty
                     ? submissionDocs.first.data()
                     : null;
+                final formCompact = MediaQuery.sizeOf(context).width < 520;
 
                 final hero = LayoutBuilder(
                   builder: (context, heroConstraints) {
@@ -1739,14 +1740,16 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               ),
                             ),
                           ],
-                          const SizedBox(height: 16),
-                          PatientClinicContextPanel(
-                            clinic: activeClinic,
-                            onChooseClinic: () => Navigator.pushNamed(
-                              context,
-                              PatientHomeScreen.routeName,
+                          if (!compact || activeClinic == null) ...[
+                            const SizedBox(height: 16),
+                            PatientClinicContextPanel(
+                              clinic: activeClinic,
+                              onChooseClinic: () => Navigator.pushNamed(
+                                context,
+                                PatientHomeScreen.routeName,
+                              ),
                             ),
-                          ),
+                          ],
                           Wrap(
                             spacing: 12,
                             runSpacing: 12,
@@ -1839,7 +1842,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 );
 
                 final formPanel = AppPanel(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(formCompact ? 16 : 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1948,76 +1951,78 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _extraMemoController,
-                              minLines: 2,
-                              maxLines: 4,
-                              decoration: InputDecoration(
-                                hintText: lang.tr(
-                                  'Extra note',
-                                  '침술사에게 추가로 남길 메모',
+                            if (!formCompact) ...[
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _extraMemoController,
+                                minLines: 2,
+                                maxLines: 4,
+                                decoration: InputDecoration(
+                                  hintText: lang.tr(
+                                    'Extra note',
+                                    '침술사에게 추가로 남길 메모',
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                FilterChip(
-                                  selected: _activeMainPainQuestionIndexes
-                                      .contains(_currentQuestionIndex),
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      if (selected) {
-                                        _activeMainPainQuestionIndexes.add(
+                              const SizedBox(height: 14),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: [
+                                  FilterChip(
+                                    selected: _activeMainPainQuestionIndexes
+                                        .contains(_currentQuestionIndex),
+                                    onSelected: (selected) {
+                                      setState(() {
+                                        if (selected) {
+                                          _activeMainPainQuestionIndexes.add(
+                                            _currentQuestionIndex,
+                                          );
+                                        } else {
+                                          _activeMainPainQuestionIndexes.remove(
+                                            _currentQuestionIndex,
+                                          );
+                                        }
+                                      });
+                                    },
+                                    avatar:
+                                        _activeMainPainQuestionIndexes.contains(
                                           _currentQuestionIndex,
-                                        );
-                                      } else {
-                                        _activeMainPainQuestionIndexes.remove(
-                                          _currentQuestionIndex,
-                                        );
-                                      }
-                                    });
-                                  },
-                                  avatar:
-                                      _activeMainPainQuestionIndexes.contains(
-                                        _currentQuestionIndex,
-                                      )
-                                      ? const Icon(
-                                          Icons.local_fire_department,
-                                          size: 18,
                                         )
-                                      : null,
-                                  label: Text(lang.tr('Main pain', '메인 통증')),
-                                ),
-                                FilterChip(
-                                  selected: _activeRememberQuestionIndexes
-                                      .contains(_currentQuestionIndex),
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      if (selected) {
-                                        _activeRememberQuestionIndexes.add(
+                                        ? const Icon(
+                                            Icons.local_fire_department,
+                                            size: 18,
+                                          )
+                                        : null,
+                                    label: Text(lang.tr('Main pain', '메인 통증')),
+                                  ),
+                                  FilterChip(
+                                    selected: _activeRememberQuestionIndexes
+                                        .contains(_currentQuestionIndex),
+                                    onSelected: (selected) {
+                                      setState(() {
+                                        if (selected) {
+                                          _activeRememberQuestionIndexes.add(
+                                            _currentQuestionIndex,
+                                          );
+                                        } else {
+                                          _activeRememberQuestionIndexes.remove(
+                                            _currentQuestionIndex,
+                                          );
+                                        }
+                                      });
+                                    },
+                                    avatar:
+                                        _activeRememberQuestionIndexes.contains(
                                           _currentQuestionIndex,
-                                        );
-                                      } else {
-                                        _activeRememberQuestionIndexes.remove(
-                                          _currentQuestionIndex,
-                                        );
-                                      }
-                                    });
-                                  },
-                                  avatar:
-                                      _activeRememberQuestionIndexes.contains(
-                                        _currentQuestionIndex,
-                                      )
-                                      ? const Icon(Icons.push_pin, size: 18)
-                                      : null,
-                                  label: Text(lang.tr('Remember', '기억')),
-                                ),
-                              ],
-                            ),
+                                        )
+                                        ? const Icon(Icons.push_pin, size: 18)
+                                        : null,
+                                    label: Text(lang.tr('Remember', '기억')),
+                                  ),
+                                ],
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             LayoutBuilder(
                               builder: (context, buttonConstraints) {
