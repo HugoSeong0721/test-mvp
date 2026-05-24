@@ -94,7 +94,9 @@ class _PractitionerDashboardScreenState
   String _selectedStatusFilter = 'All';
   int _selectedRangeDays = 7;
   DateTimeRange? _selectedDateRange;
-  _DashboardSubView _subView = _DashboardSubView.main;
+  _DashboardSubView _subView = _DashboardSubView.inbox;
+
+  bool get _showDeferredBookingUi => false;
 
   String? get _currentClinicId =>
       PractitionerSessionService.currentSession?.clinicId;
@@ -167,7 +169,7 @@ class _PractitionerDashboardScreenState
         final pendingMembershipRequests = _store
             .pendingMembershipRequestsForClinic(_currentClinicId);
         final pendingAppointmentInboxCount =
-            _pendingAppointmentRequestCount() +
+            (_showDeferredBookingUi ? _pendingAppointmentRequestCount() : 0) +
             pendingMembershipRequests.length;
         final visibleVisits = _visibleVisits();
         final summaryVisits = _summaryWindowVisits();
@@ -223,11 +225,6 @@ class _PractitionerDashboardScreenState
           actions: [
             _buildCompactTopInboxAction(pendingAppointmentInboxCount),
             IconButton(
-              tooltip: lang.tr('Pick date range', '날짜 범위 선택'),
-              onPressed: _pickDateRange,
-              icon: const Icon(Icons.calendar_month_outlined),
-            ),
-            IconButton(
               tooltip: 'Clinic settings',
               onPressed: () => _selectSubView(_DashboardSubView.clinicProfile),
               icon: const Icon(Icons.domain_add_outlined),
@@ -243,13 +240,6 @@ class _PractitionerDashboardScreenState
               onTap: () => _selectSubView(_DashboardSubView.patientManagement),
             ),
             PractitionerToolItem(
-              icon: Icons.dashboard_outlined,
-              labelEn: 'Today Summary',
-              labelKo: '오늘 요약',
-              active: _subView == _DashboardSubView.opsHub,
-              onTap: () => _selectSubView(_DashboardSubView.opsHub),
-            ),
-            PractitionerToolItem(
               icon: Icons.mark_email_unread_outlined,
               labelEn: 'Inbox',
               labelKo: 'Inbox',
@@ -258,17 +248,10 @@ class _PractitionerDashboardScreenState
             ),
             PractitionerToolItem(
               icon: Icons.query_stats_outlined,
-              labelEn: 'Visit Insights',
-              labelKo: 'Visit Insights',
+              labelEn: 'TCM View',
+              labelKo: 'TCM View',
               active: _subView == _DashboardSubView.visitInsights,
               onTap: () => _selectSubView(_DashboardSubView.visitInsights),
-            ),
-            PractitionerToolItem(
-              icon: Icons.event_available_outlined,
-              labelEn: 'Schedule',
-              labelKo: 'Schedule',
-              active: _subView == _DashboardSubView.schedule,
-              onTap: () => _selectSubView(_DashboardSubView.schedule),
             ),
             PractitionerToolItem(
               icon: Icons.domain_add_outlined,
@@ -1940,8 +1923,8 @@ class _PractitionerDashboardScreenState
             const SizedBox(height: 6),
             Text(
               AppLanguageController.instance.tr(
-                'Check patient-sent appointment requests, visit-record updates, and recent intake submissions in one place.',
-                '환자가 보낸 예약 신청, 방문기록 수정 요청, 최근 문진 제출을 여기서 한 번에 확인합니다.',
+                'Check patient messages, visit-record updates, and recent intake submissions in one place.',
+                '환자 답변, 방문기록 수정 요청, 최근 문진 제출을 여기서 한 번에 확인합니다.',
               ),
               style: const TextStyle(color: Colors.black54),
             ),
@@ -1984,12 +1967,13 @@ class _PractitionerDashboardScreenState
                       spacing: 10,
                       runSpacing: 10,
                       children: [
-                        AppMetricChip(
-                          icon: Icons.calendar_today_outlined,
-                          label: lang.tr('Appointment requests', '예약 신청'),
-                          value: '${requests.length}',
-                          onTap: _scrollToAppointmentRequestsSection,
-                        ),
+                        if (_showDeferredBookingUi)
+                          AppMetricChip(
+                            icon: Icons.calendar_today_outlined,
+                            label: lang.tr('Appointment requests', '예약 신청'),
+                            value: '${requests.length}',
+                            onTap: _scrollToAppointmentRequestsSection,
+                          ),
                         AppMetricChip(
                           icon: Icons.mark_email_unread_outlined,
                           label: lang.tr('Record updates', '수정 요청'),
@@ -2008,106 +1992,108 @@ class _PractitionerDashboardScreenState
                 );
               },
             ),
-            const SizedBox(height: 16),
-            KeyedSubtree(
-              key: _appointmentRequestsSectionKey,
-              child: Text(
-                lang.tr('Appointments', '예약'),
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            const SizedBox(height: 6),
-            if (requests.isEmpty)
-              Text(
-                AppLanguageController.instance.tr(
-                  'No appointment requests',
-                  '예약 신청 없음',
+            if (_showDeferredBookingUi) ...[
+              const SizedBox(height: 16),
+              KeyedSubtree(
+                key: _appointmentRequestsSectionKey,
+                child: Text(
+                  lang.tr('Appointments', '예약'),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              )
-            else
-              ...requests.map((request) {
-                final profile = _store.profileById(request.patientId);
-                if (profile == null) {
-                  return const SizedBox.shrink();
-                }
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${profile.name} · ${_formatStoredDateWithWeekday(request.date)} ${request.time}',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${AppLanguageController.instance.tr('Requested', '신청')}: '
-                          '${_formatDateTimeValue(request.requestedAt)}',
-                        ),
-                        Text(
-                          '${AppLanguageController.instance.tr('Contact', '연락처')}: '
-                          '${profile.phone.isEmpty ? AppLanguageController.instance.tr('Missing', '미입력') : profile.phone}'
-                          ' / '
-                          '${profile.email.isEmpty ? AppLanguageController.instance.tr('Email missing', '이메일 미입력') : profile.email}',
-                        ),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            FilledButton.icon(
-                              onPressed: () {
-                                _store.confirmAppointmentRequest(request.id);
-                              },
-                              icon: const Icon(Icons.check_circle_outline),
-                              label: Text(
-                                AppLanguageController.instance.tr(
-                                  'Confirm',
-                                  '확정하기',
-                                ),
-                              ),
-                            ),
-                            OutlinedButton.icon(
-                              onPressed: () {
-                                _store.declineAppointmentRequest(request.id);
-                              },
-                              icon: const Icon(Icons.cancel_outlined),
-                              label: Text(
-                                AppLanguageController.instance.tr(
-                                  'Decline',
-                                  '거절하기',
-                                ),
-                              ),
-                            ),
-                            OutlinedButton.icon(
-                              onPressed: () =>
-                                  _openLatestPatientBriefForProfile(profile),
-                              icon: const Icon(Icons.history_outlined),
-                              label: Text(lang.tr('History', '기록')),
-                            ),
-                            OutlinedButton.icon(
-                              onPressed: () => _openPatientManagement(
-                                context,
-                                initialProfileId: profile.id,
-                              ),
-                              icon: const Icon(Icons.person_outline),
-                              label: Text(lang.tr('Patient', '환자')),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+              ),
+              const SizedBox(height: 6),
+              if (requests.isEmpty)
+                Text(
+                  AppLanguageController.instance.tr(
+                    'No appointment requests',
+                    '예약 신청 없음',
                   ),
-                );
-              }),
+                )
+              else
+                ...requests.map((request) {
+                  final profile = _store.profileById(request.patientId);
+                  if (profile == null) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${profile.name} · ${_formatStoredDateWithWeekday(request.date)} ${request.time}',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${AppLanguageController.instance.tr('Requested', '신청')}: '
+                            '${_formatDateTimeValue(request.requestedAt)}',
+                          ),
+                          Text(
+                            '${AppLanguageController.instance.tr('Contact', '연락처')}: '
+                            '${profile.phone.isEmpty ? AppLanguageController.instance.tr('Missing', '미입력') : profile.phone}'
+                            ' / '
+                            '${profile.email.isEmpty ? AppLanguageController.instance.tr('Email missing', '이메일 미입력') : profile.email}',
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              FilledButton.icon(
+                                onPressed: () {
+                                  _store.confirmAppointmentRequest(request.id);
+                                },
+                                icon: const Icon(Icons.check_circle_outline),
+                                label: Text(
+                                  AppLanguageController.instance.tr(
+                                    'Confirm',
+                                    '확정하기',
+                                  ),
+                                ),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  _store.declineAppointmentRequest(request.id);
+                                },
+                                icon: const Icon(Icons.cancel_outlined),
+                                label: Text(
+                                  AppLanguageController.instance.tr(
+                                    'Decline',
+                                    '거절하기',
+                                  ),
+                                ),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    _openLatestPatientBriefForProfile(profile),
+                                icon: const Icon(Icons.history_outlined),
+                                label: Text(lang.tr('History', '기록')),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: () => _openPatientManagement(
+                                  context,
+                                  initialProfileId: profile.id,
+                                ),
+                                icon: const Icon(Icons.person_outline),
+                                label: Text(lang.tr('Patient', '환자')),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+            ],
             const SizedBox(height: 16),
             StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance

@@ -42,6 +42,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   String? _lastClinicSyncKey;
   String? _lastAutoPromptedClinicPatientId;
 
+  bool get _showDeferredBookingUi => false;
+
   PatientProfile get _currentProfile {
     if (_sessionBackedProfile != null) {
       return _sessionBackedProfile!;
@@ -1360,11 +1362,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         final appointmentRequests = activeClinicId == null
             ? const <AppointmentRequest>[]
             : _store.requestsForPatient(profile.id, clinicId: activeClinicId);
-        final pendingAppointmentRequests = appointmentRequests
-            .where(
-              (request) => request.status == AppointmentRequestStatus.pending,
-            )
-            .toList();
         final nextVisit = upcomingVisits.isNotEmpty
             ? upcomingVisits.first.visit
             : null;
@@ -1510,15 +1507,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 AppMetricChip(
                                   icon: Icons.notifications_active_outlined,
                                   label: lang.tr('Pending', '대기'),
-                                  value:
-                                      '${pendingRequests.length + pendingAppointmentRequests.length}',
+                                  value: '${pendingRequests.length}',
                                   backgroundColor: AppTheme.surface,
                                   labelColor: AppTheme.ink.withValues(
                                     alpha: 0.58,
                                   ),
                                   valueColor: AppTheme.ink,
                                 ),
-                                if (!compact) ...[
+                                if (_showDeferredBookingUi && !compact) ...[
                                   AppMetricChip(
                                     icon: Icons.event_available_outlined,
                                     label: lang.tr('Next visit', '다음 방문'),
@@ -1641,26 +1637,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             foregroundColor: AppTheme.ink,
                                           ),
                                         ),
-                                      if (MediaQuery.sizeOf(context).width >=
-                                          720)
-                                        OutlinedButton.icon(
-                                          onPressed: _openAppointmentDialog,
-                                          icon: const Icon(
-                                            Icons.event_available_outlined,
-                                          ),
-                                          label: Text(
-                                            lang.tr('Book', '예약'),
-                                            style: const TextStyle(
-                                              color: AppTheme.ink,
-                                            ),
-                                          ),
-                                          style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(
-                                              color: AppTheme.border,
-                                            ),
-                                            foregroundColor: AppTheme.ink,
-                                          ),
-                                        ),
                                     ],
                                   ),
                                 ],
@@ -1728,7 +1704,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             ),
                           ),
                         ),
-                      if (!compact) ...[
+                      if (_showDeferredBookingUi && !compact) ...[
                         if (latestRequest != null) const SizedBox(height: 16),
                         Card(
                           child: Padding(

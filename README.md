@@ -23,6 +23,27 @@ Web-first MVP for an acupuncture clinic portal and patient workflow.
 4. Open the Intake tab, complete the form, and submit it.
 5. Use the green `Feedback` button in the lower-right corner if anything is broken or confusing.
 
+## Current MVP Focus
+
+The current product focus is patient-practitioner conversation for acupuncture care:
+
+- A new patient signs up and is sent the baseline TCM intake questions.
+- The patient replies from the portal.
+- The practitioner reviews answers, patient age, sex/gender, habits, and follow-up replies.
+- The patient's TCM-oriented view should become richer over time as more answers arrive.
+
+### Deferred For Later
+
+Scheduling and booking confirmation are intentionally removed from the primary UI for now so the MVP can stay focused on conversation.
+
+Keep these for a later database-backed phase:
+
+- Patient appointment booking requests.
+- Practitioner availability / schedule board.
+- Booking confirmation and decline workflow.
+- Appointment request inbox metrics.
+- Visit date confirmation and reminder workflow.
+
 ## Patient-Visible Clinic List
 
 ## Currently Open Clinics
@@ -38,7 +59,7 @@ Notes:
 
 - Patients use `Patient Home` -> `Change clinic` / `Search clinic` to choose one of these clinics.
 - The live app currently stores clinic visibility in browser-local demo storage, so the exact picker list can still differ by browser/device until the backend clinic registry is connected.
-- If a patient cannot find their clinic, they can use `Request to open`; those requests appear in the practitioner `Appointment Inbox`.
+- If a patient cannot find their clinic, they can use `Request to open`; those requests appear in the practitioner `Inbox`.
 
 ## Bundled Clinic Templates
 
@@ -71,7 +92,7 @@ Use this table as Hugo's mediator/outreach list. When a patient asks to open a c
 Where requests appear:
 
 - Patient side: `Patient Home` -> `Change clinic` / `Search clinic` -> `Request to open`
-- Practitioner side: `Practitioner Dashboard` -> `Appointment Inbox` -> `Patient clinic open requests`
+- Practitioner side: `Practitioner Dashboard` -> `Inbox` -> `Patient clinic open requests`
 
 Current demo behavior:
 
@@ -83,7 +104,7 @@ Current demo behavior:
 Suggested outreach workflow:
 
 1. Open `Practitioner portal`.
-2. Go to `Appointment Inbox`.
+2. Go to `Inbox`.
 3. Review `Patient clinic open requests`.
 4. Copy real clinic leads into the README table above.
 5. Contact the clinic and update `Status` / `Next Action`.

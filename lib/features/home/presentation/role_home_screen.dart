@@ -78,10 +78,6 @@ class RoleHomeScreen extends StatelessWidget {
                             runSpacing: 8,
                             children: [
                               _StatusPill(
-                                icon: Icons.event_available_outlined,
-                                label: lang.tr('Schedule', '예약'),
-                              ),
-                              _StatusPill(
                                 icon: Icons.assignment_outlined,
                                 label: lang.tr('Intake', '문진'),
                               ),
