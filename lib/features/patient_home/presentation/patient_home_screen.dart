@@ -1485,7 +1485,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         const SizedBox(height: 16),
                       ],
                       AppPanel(
-                        padding: const EdgeInsets.all(22),
+                        padding: EdgeInsets.all(compact ? 16 : 22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

@@ -572,7 +572,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                         data['customQuestionsByCategory'],
                       );
                       final selectedQuestions = compact
-                          ? rawSelectedQuestions.take(3).toList()
+                          ? rawSelectedQuestions.take(1).toList()
                           : rawSelectedQuestions;
                       final customByCategory = compact
                           ? const <String, List<String>>{}
@@ -589,7 +589,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: AppPanel(
-                          padding: const EdgeInsets.all(18),
+                          padding: EdgeInsets.all(compact ? 14 : 18),
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -626,43 +626,45 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   Chip(label: Text(_statusLabel(status, lang))),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                children: [
-                                  _RequestMetaPill(
-                                    icon: Icons.schedule_outlined,
-                                    label:
-                                        '${lang.tr('Visit', '방문')}: $visitTime',
-                                  ),
-                                  _RequestMetaPill(
-                                    icon: Icons.history_toggle_off,
-                                    label:
-                                        '${lang.tr('Last', '지난')}: ${_formatStoredDateWithWeekday(lastVisitDate)}',
-                                  ),
-                                  _RequestMetaPill(
-                                    icon: requestType == 'note'
-                                        ? Icons.mail_outline
-                                        : Icons.quiz_outlined,
-                                    label: requestType == 'note'
-                                        ? lang.tr('Note', '쪽지')
-                                        : lang.tr(
-                                            '$questionCount question(s)',
-                                            '$questionCount개 질문',
-                                          ),
-                                  ),
-                                ],
-                              ),
-                              if (requestType != 'note') ...[
-                                const SizedBox(height: 14),
-                                Text(
-                                  lang.tr('Questions', '질문'),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
+                              if (!compact) const SizedBox(height: 12),
+                              if (!compact)
+                                Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: [
+                                    _RequestMetaPill(
+                                      icon: Icons.schedule_outlined,
+                                      label:
+                                          '${lang.tr('Visit', '방문')}: $visitTime',
+                                    ),
+                                    _RequestMetaPill(
+                                      icon: Icons.history_toggle_off,
+                                      label:
+                                          '${lang.tr('Last', '지난')}: ${_formatStoredDateWithWeekday(lastVisitDate)}',
+                                    ),
+                                    _RequestMetaPill(
+                                      icon: requestType == 'note'
+                                          ? Icons.mail_outline
+                                          : Icons.quiz_outlined,
+                                      label: requestType == 'note'
+                                          ? lang.tr('Note', '쪽지')
+                                          : lang.tr(
+                                              '$questionCount question(s)',
+                                              '$questionCount개 질문',
+                                            ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
+                              if (requestType != 'note') ...[
+                                SizedBox(height: compact ? 8 : 14),
+                                if (!compact)
+                                  Text(
+                                    lang.tr('Questions', '질문'),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                if (!compact) const SizedBox(height: 8),
                                 if (selectedQuestions.isEmpty &&
                                     customByCategory.isEmpty)
                                   Text(
@@ -677,17 +679,24 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                 ...selectedQuestions.map(
                                   (question) => Padding(
                                     padding: const EdgeInsets.only(bottom: 6),
-                                    child: Text('- $question'),
-                                  ),
-                                ),
-                                ...customByCategory.entries.expand(
-                                  (entry) => entry.value.map(
-                                    (question) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 6),
-                                      child: Text('- [${entry.key}] $question'),
+                                    child: Text(
+                                      compact ? question : '- $question',
                                     ),
                                   ),
                                 ),
+                                if (!compact)
+                                  ...customByCategory.entries.expand(
+                                    (entry) => entry.value.map(
+                                      (question) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 6,
+                                        ),
+                                        child: Text(
+                                          '- [${entry.key}] $question',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 if (compact &&
                                     questionCount > selectedQuestions.length)
                                   Text(
@@ -701,7 +710,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                         ?.copyWith(color: AppTheme.pine),
                                   ),
                               ],
-                              if (note.isNotEmpty) ...[
+                              if (!compact && note.isNotEmpty) ...[
                                 const SizedBox(height: 14),
                                 Text(
                                   lang.tr('Practitioner Note', '침술사 메모'),
