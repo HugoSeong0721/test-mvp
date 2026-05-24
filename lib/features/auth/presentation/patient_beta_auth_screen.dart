@@ -6,7 +6,6 @@ import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
 import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
-import '../../../core/services/tester_flow_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_shell.dart';
@@ -239,61 +238,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
   }
 
-  Future<void> _resetTesterPortalData(PatientSession session) async {
-    final lang = AppLanguageController.instance;
-    setState(() => _loading = true);
-    try {
-      await TesterFlowService.resetPortalData(
-        patientId: session.id,
-        clinicId: _clinicIdForTesterSession(session),
-      ).timeout(_authTimeout);
-      _showMessage(
-        lang.tr('Tester flow data was reset.', '테스터 흐름 데이터가 초기화되었습니다.'),
-      );
-    } catch (_) {
-      _showMessage(lang.tr('Could not reset right now.', '지금 초기화할 수 없습니다.'));
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
-    }
-  }
-
-  Future<void> _reloadTesterPortalData(PatientSession session) async {
-    final lang = AppLanguageController.instance;
-    setState(() => _loading = true);
-    try {
-      final profile = await _loadTesterProfile(session).timeout(_authTimeout);
-      await TesterFlowService.resetAndSeedPortalData(
-        profile: profile,
-        clinicId: _clinicIdForTesterSession(session),
-      ).timeout(_authTimeout);
-      _showMessage(
-        lang.tr('Tester sample data was reloaded.', '테스터 샘플 데이터가 다시 채워졌습니다.'),
-      );
-    } catch (_) {
-      _showMessage(
-        lang.tr(
-          'Could not reload sample data right now.',
-          '지금 샘플 데이터를 다시 채울 수 없습니다.',
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
-    }
-  }
-
-  String? _clinicIdForTesterSession(PatientSession session) {
-    final linkedClinicId = _linkedClinicId?.trim();
-    return _store.activeClinicForPatient(session.id)?.id ??
-        (linkedClinicId == null || linkedClinicId.isEmpty
-            ? null
-            : linkedClinicId) ??
-        _store.defaultClinicIdForPatient(session.id);
-  }
-
   Future<PatientProfile> _loadTesterProfile(PatientSession session) async {
     final localProfile = await PatientProfileService.loadLocalProfile(
       session.id,
@@ -477,55 +421,6 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     } catch (_) {}
   }
 
-  Future<void> _showSavedPatientAccounts() async {
-    final lang = AppLanguageController.instance;
-    final accounts = await BetaSessionService.localAccountSummaries();
-    if (!mounted) {
-      return;
-    }
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        title: Text(lang.tr('Saved patient emails', '저장된 환자 이메일')),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: accounts.isEmpty
-              ? Text(
-                  lang.tr('No saved account.', '이 브라우저에 저장된 환자 계정이 아직 없습니다.'),
-                )
-              : ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: accounts.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final account = accounts[index];
-                    return ListTile(
-                      title: Text(account.email),
-                      subtitle: Text(account.displayName),
-                      onTap: () {
-                        _emailController.text = account.email;
-                        Navigator.pop(context);
-                        setState(() {
-                          _isRegisterMode = false;
-                          _showAuthFormEvenWithSession = true;
-                          _formError = null;
-                        });
-                      },
-                    );
-                  },
-                ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(lang.tr('Close', '닫기')),
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _showPatientPasswordResetDialog() async {
     final lang = AppLanguageController.instance;
     final emailController = TextEditingController(
@@ -698,20 +593,26 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         final linkedClinic = _linkedClinicId == null
             ? null
             : _store.clinicById(_linkedClinicId!);
+        final compact = MediaQuery.sizeOf(context).width < 430;
 
         return Scaffold(
-          extendBodyBehindAppBar: true,
           appBar: AppBar(
-            title: Text(lang.tr('Patient Login', '환자 로그인')),
+            title: Text(lang.tr('Patient Portal', '환자 포털')),
             actions: const [LanguageMenuButton()],
           ),
           body: AppBackdrop(
             child: SafeArea(
-              child: Center(
+              child: Align(
+                alignment: compact ? Alignment.topCenter : Alignment.center,
                 child: !_sessionReady
                     ? const CircularProgressIndicator()
                     : SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                        padding: EdgeInsets.fromLTRB(
+                          compact ? 16 : 24,
+                          compact ? 18 : 16,
+                          compact ? 16 : 24,
+                          32,
+                        ),
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 420),
                           child: Column(
@@ -736,17 +637,19 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                               if (activeSession == null ||
                                   _showAuthFormEvenWithSession)
                                 _buildAuthCard(context, lang),
-                              const SizedBox(height: 12),
-                              TextButton.icon(
-                                onPressed: _loading
-                                    ? null
-                                    : () => Navigator.pushReplacementNamed(
-                                        context,
-                                        RoleHomeScreen.routeName,
-                                      ),
-                                icon: const Icon(Icons.arrow_back, size: 16),
-                                label: Text(lang.tr('Back', '뒤로')),
-                              ),
+                              if (!compact) ...[
+                                const SizedBox(height: 12),
+                                TextButton.icon(
+                                  onPressed: _loading
+                                      ? null
+                                      : () => Navigator.pushReplacementNamed(
+                                          context,
+                                          RoleHomeScreen.routeName,
+                                        ),
+                                  icon: const Icon(Icons.arrow_back, size: 16),
+                                  label: Text(lang.tr('Back', '뒤로')),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -761,17 +664,17 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
 
   Widget _buildAuthCard(BuildContext context, AppLanguageController lang) {
     final title = _isRegisterMode
-        ? lang.tr('Sign up', '회원가입')
-        : lang.tr('Log in', '로그인');
+        ? lang.tr('Start care chat', '대화 시작')
+        : lang.tr('Welcome back', '다시 시작');
     final submitLabel = _isRegisterMode
-        ? lang.tr('Create', '가입')
-        : lang.tr('Login', '로그인');
+        ? lang.tr('Create and get questions', '가입하고 질문 받기')
+        : lang.tr('Continue', '계속');
     final toggleLabel = _isRegisterMode
         ? lang.tr('Use existing account', '기존 계정 사용')
         : lang.tr('Create account', '계정 만들기');
 
     return AppPanel(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -782,6 +685,17 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            lang.tr(
+              'Your acupuncturist will use your answers to understand your care picture.',
+              '답변은 침술사가 환자 상태를 이해하는 데 사용됩니다.',
+            ),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.66),
+            ),
           ),
           const SizedBox(height: 18),
           SegmentedButton<bool>(
@@ -860,31 +774,26 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
             ),
             label: Text(_loading ? lang.tr('Working...', '처리 중') : submitLabel),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
           Wrap(
             alignment: WrapAlignment.center,
-            spacing: 10,
-            runSpacing: 8,
+            spacing: 6,
+            runSpacing: 2,
             children: [
               TextButton(
-                onPressed: _loading ? null : _showSavedPatientAccounts,
-                child: Text(lang.tr('Find email', '이메일 찾기')),
+                onPressed: _loading
+                    ? null
+                    : () => setState(() {
+                        _isRegisterMode = !_isRegisterMode;
+                        _formError = null;
+                      }),
+                child: Text(toggleLabel),
               ),
               TextButton(
                 onPressed: _loading ? null : _showPatientPasswordResetDialog,
-                child: Text(lang.tr('Reset', '재설정')),
+                child: Text(lang.tr('Reset password', '비밀번호 재설정')),
               ),
             ],
-          ),
-          const SizedBox(height: 2),
-          TextButton(
-            onPressed: _loading
-                ? null
-                : () => setState(() {
-                    _isRegisterMode = !_isRegisterMode;
-                    _formError = null;
-                  }),
-            child: Text(toggleLabel),
           ),
         ],
       ),
@@ -908,55 +817,45 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            lang.tr('Signed in', '로그인됨'),
-            style: Theme.of(context).textTheme.titleMedium,
+            lang.tr('Ready to continue', '계속할 준비 완료'),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 6),
           Text(
-            session.email.isNotEmpty
-                ? session.email
-                : (session.displayName.isNotEmpty
-                      ? session.displayName
-                      : session.id),
+            lang.tr(
+              'Answer your clinic questions and keep the conversation moving.',
+              '한의원 질문에 답하고 대화를 이어가세요.',
+            ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppTheme.ink.withValues(alpha: 0.7),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _continueToPatientHome,
+              icon: const Icon(Icons.arrow_circle_right_outlined),
+              label: Text(lang.tr('Continue care chat', '대화 계속하기')),
+            ),
+          ),
+          const SizedBox(height: 8),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            spacing: 2,
+            runSpacing: 0,
             children: [
-              FilledButton.tonalIcon(
-                onPressed: _continueToPatientHome,
-                icon: const Icon(Icons.arrow_circle_right_outlined),
-                label: Text(lang.tr('Continue', '계속')),
-              ),
-              OutlinedButton.icon(
+              TextButton(
                 onPressed: _loading ? null : _signOutTester,
-                icon: const Icon(Icons.logout),
-                label: Text(lang.tr('Sign out', '로그아웃')),
+                child: Text(lang.tr('Sign out', '로그아웃')),
               ),
-              OutlinedButton.icon(
+              TextButton(
                 onPressed: _loading
                     ? null
                     : () => setState(() => _showAuthFormEvenWithSession = true),
-                icon: const Icon(Icons.switch_account_outlined),
-                label: Text(lang.tr('Switch', '전환')),
-              ),
-              OutlinedButton.icon(
-                onPressed: _loading
-                    ? null
-                    : () => _resetTesterPortalData(session),
-                icon: const Icon(Icons.restart_alt),
-                label: Text(lang.tr('Reset data', '데이터 초기화')),
-              ),
-              OutlinedButton.icon(
-                onPressed: _loading
-                    ? null
-                    : () => _reloadTesterPortalData(session),
-                icon: const Icon(Icons.refresh),
-                label: Text(lang.tr('Reload', '다시 불러오기')),
+                child: Text(lang.tr('Switch account', '계정 전환')),
               ),
             ],
           ),

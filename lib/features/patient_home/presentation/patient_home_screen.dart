@@ -1335,7 +1335,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         if (_waitingForRealProfile) {
           return PatientShell(
             currentItem: PatientNavItem.home,
-            title: lang.tr('Patient Home', '환자 홈'),
+            title: lang.tr('Care Chat', 'Care Chat'),
             actions: const [LanguageMenuButton()],
             body: _buildLoadingOrErrorBody(context, lang),
           );
@@ -1368,7 +1368,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
         return PatientShell(
           currentItem: PatientNavItem.home,
-          title: lang.tr('Patient Home', '환자 홈'),
+          title: lang.tr('Care Chat', 'Care Chat'),
           actions: [
             IconButton(
               tooltip: lang.tr('Search clinic', '한의원 검색'),
@@ -1487,7 +1487,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr('Today', 'Today'),
+                              lang.tr(
+                                'Your care conversation',
+                                'Your care conversation',
+                              ),
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
                                     color: AppTheme.ink.withValues(alpha: 0.58),
@@ -1563,7 +1566,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          lang.tr('Next', '다음'),
+                                          lang.tr('Next step', 'Next step'),
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge

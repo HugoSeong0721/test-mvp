@@ -241,7 +241,9 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              isNote ? lang.tr('New note', '새 메모') : lang.tr('Reply', '답변'),
+              isNote
+                  ? lang.tr('Message from clinic', '클리닉 메시지')
+                  : lang.tr('Questions to answer', '답변할 질문'),
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: AppTheme.ink,
                 fontWeight: FontWeight.w800,
@@ -280,7 +282,9 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
             isNote ? Icons.local_hospital_outlined : Icons.arrow_forward,
           ),
           label: Text(
-            isNote ? lang.tr('Clinic', '한의원') : lang.tr('Intake', '문진'),
+            isNote
+                ? lang.tr('Home', 'Home')
+                : lang.tr('Answer now', 'Answer now'),
           ),
         );
 
@@ -338,8 +342,11 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
         children: [
           Text(
             openCount > 0
-                ? lang.tr('$openCount to answer', '$openCount개 답변 필요')
-                : lang.tr('Inbox clear', '새 요청 없음'),
+                ? lang.tr(
+                    '$openCount message needs reply',
+                    '$openCount message needs reply',
+                  )
+                : lang.tr('No new questions', 'No new questions'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
           if (!compact) ...[
@@ -402,7 +409,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
 
         return PatientShell(
           currentItem: PatientNavItem.requests,
-          title: lang.tr('Requests', '요청함'),
+          title: lang.tr('Messages', 'Messages'),
           actions: const [LanguageMenuButton()],
           body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance
@@ -504,7 +511,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lang.tr('No requests', '요청 없음'),
+                            lang.tr('No messages yet', 'No messages yet'),
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 6),
@@ -529,7 +536,12 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
                                   PatientIntakeScreen.routeName,
                                 ),
                                 icon: const Icon(Icons.edit_note),
-                                label: Text(lang.tr('Intake', '문진')),
+                                label: Text(
+                                  lang.tr(
+                                    'Answer questions',
+                                    'Answer questions',
+                                  ),
+                                ),
                               ),
                               if (MediaQuery.sizeOf(context).width >= 430)
                                 OutlinedButton.icon(

@@ -1641,7 +1641,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
 
     return PatientShell(
       currentItem: PatientNavItem.intake,
-      title: lang.tr('Patient Intake', '환자 사전 문진'),
+      title: lang.tr('Questions', 'Questions'),
       actions: [
         IconButton(
           tooltip: lang.tr('Edit profile', '프로필 수정'),
@@ -1714,14 +1714,17 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lang.tr('Intake', '문진'),
+                            lang.tr('Clinic questions', 'Clinic questions'),
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: AppTheme.ink.withValues(alpha: 0.58),
                             ),
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            lang.tr('Before your visit', '방문 전 상태 전달'),
+                            lang.tr(
+                              'Answer one question at a time',
+                              'Answer one question at a time',
+                            ),
                             style:
                                 (compact
                                         ? theme.textTheme.headlineMedium
@@ -1846,32 +1849,34 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        lang.tr('Form', '문진'),
-                        style: theme.textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        lang.tr('Mode', '모드'),
-                        style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 10),
-                      SegmentedButton<bool>(
-                        segments: [
-                          ButtonSegment<bool>(
-                            value: false,
-                            label: Text(lang.tr('Follow-Up', '재진')),
-                          ),
-                          ButtonSegment<bool>(
-                            value: true,
-                            label: Text(lang.tr('Initial Visit', '초진')),
-                          ),
-                        ],
-                        selected: {_isFirstVisitPreview},
-                        onSelectionChanged: (selection) =>
-                            _switchQuestionMode(selection.first),
-                      ),
-                      const SizedBox(height: 18),
+                      if (!formCompact) ...[
+                        Text(
+                          lang.tr('Question form', 'Question form'),
+                          style: theme.textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          lang.tr('Mode', '모드'),
+                          style: theme.textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 10),
+                        SegmentedButton<bool>(
+                          segments: [
+                            ButtonSegment<bool>(
+                              value: false,
+                              label: Text(lang.tr('Follow-Up', '재진')),
+                            ),
+                            ButtonSegment<bool>(
+                              value: true,
+                              label: Text(lang.tr('Initial Visit', '초진')),
+                            ),
+                          ],
+                          selected: {_isFirstVisitPreview},
+                          onSelectionChanged: (selection) =>
+                              _switchQuestionMode(selection.first),
+                        ),
+                        const SizedBox(height: 18),
+                      ],
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
@@ -1882,11 +1887,13 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              lang.tr('Progress', '진행'),
-                              style: theme.textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 10),
+                            if (!formCompact) ...[
+                              Text(
+                                lang.tr('Progress', '진행'),
+                                style: theme.textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 10),
+                            ],
                             LinearProgressIndicator(
                               value: progress,
                               minHeight: 10,
@@ -2042,7 +2049,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                         child: Text(lang.tr('Previous', '이전')),
                                       ),
                                       const SizedBox(height: 12),
-                                      OutlinedButton(
+                                      FilledButton(
                                         onPressed:
                                             _currentQuestionIndex ==
                                                 _activeQuestions.length - 1
@@ -2050,7 +2057,12 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                             : () => _changeQuestion(
                                                 _currentQuestionIndex + 1,
                                               ),
-                                        child: Text(lang.tr('Next', '다음')),
+                                        child: Text(
+                                          lang.tr(
+                                            'Next question',
+                                            'Next question',
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   );
@@ -2085,22 +2097,26 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 );
                               },
                             ),
-                            const SizedBox(height: 14),
-                            FilledButton.icon(
-                              onPressed: _isSubmitting
-                                  ? null
-                                  : _submitCurrentIntake,
-                              icon: Icon(
-                                _isSubmitting
-                                    ? Icons.hourglass_top
-                                    : Icons.task_alt,
+                            if (!formCompact ||
+                                _currentQuestionIndex ==
+                                    _activeQuestions.length - 1) ...[
+                              const SizedBox(height: 14),
+                              FilledButton.icon(
+                                onPressed: _isSubmitting
+                                    ? null
+                                    : _submitCurrentIntake,
+                                icon: Icon(
+                                  _isSubmitting
+                                      ? Icons.hourglass_top
+                                      : Icons.task_alt,
+                                ),
+                                label: Text(
+                                  _isSubmitting
+                                      ? lang.tr('Submitting...', '제출 중...')
+                                      : lang.tr('Send answers', 'Send answers'),
+                                ),
                               ),
-                              label: Text(
-                                _isSubmitting
-                                    ? lang.tr('Submitting...', '제출 중...')
-                                    : lang.tr('Submit', '제출'),
-                              ),
-                            ),
+                            ],
                             if (!profile.hasRequiredAlertInfo) ...[
                               const SizedBox(height: 12),
                               Text(
@@ -2588,8 +2604,10 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              hero,
-                              const SizedBox(height: 16),
+                              if (!compact) ...[
+                                hero,
+                                const SizedBox(height: 16),
+                              ],
                               if (wide)
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,

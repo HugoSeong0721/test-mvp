@@ -26,22 +26,22 @@ const List<PatientNavSpec> kPatientNavSpecs = [
   PatientNavSpec(
     item: PatientNavItem.home,
     icon: Icons.home_outlined,
-    labelEn: 'Clinic',
-    labelKo: 'Clinic',
+    labelEn: 'Home',
+    labelKo: 'Home',
     routeName: '/patient-home',
   ),
   PatientNavSpec(
     item: PatientNavItem.intake,
     icon: Icons.assignment_outlined,
-    labelEn: 'Intake',
-    labelKo: 'Intake',
+    labelEn: 'Questions',
+    labelKo: 'Questions',
     routeName: '/intake',
   ),
   PatientNavSpec(
     item: PatientNavItem.requests,
     icon: Icons.mail_outline,
-    labelEn: 'Inbox',
-    labelKo: 'Inbox',
+    labelEn: 'Messages',
+    labelKo: 'Messages',
     routeName: '/patient-requests',
   ),
 ];
@@ -160,16 +160,15 @@ class _Header extends StatelessWidget {
             ),
             const SizedBox(width: 4),
           ],
-          IconButton(
-            tooltip: lang.tr('Sign out', '로그아웃'),
-            visualDensity: compact
-                ? VisualDensity.compact
-                : VisualDensity.standard,
-            onPressed: () => Navigator.of(
-              context,
-            ).pushNamedAndRemoveUntil('/', (_) => false),
-            icon: const Icon(Icons.logout),
-          ),
+          if (!compact)
+            IconButton(
+              tooltip: lang.tr('Sign out', '로그아웃'),
+              visualDensity: VisualDensity.standard,
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil('/', (_) => false),
+              icon: const Icon(Icons.logout),
+            ),
         ],
       ),
     );
@@ -193,7 +192,7 @@ class _TabBar extends StatelessWidget {
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: compact ? 6 : 12),
+        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12),
         child: Row(
           children: [
             for (final spec in kPatientNavSpecs)
@@ -227,9 +226,10 @@ class _TabButton extends StatelessWidget {
             ? null
             : () => Navigator.of(context).pushReplacementNamed(spec.routeName),
         child: Container(
+          width: compact ? 110 : null,
           padding: EdgeInsets.symmetric(
-            horizontal: compact ? 18 : 14,
-            vertical: compact ? 9 : 12,
+            horizontal: compact ? 8 : 14,
+            vertical: compact ? 8 : 12,
           ),
           decoration: BoxDecoration(
             border: Border(
@@ -239,22 +239,41 @@ class _TabButton extends StatelessWidget {
               ),
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(spec.icon, size: 17, color: fg),
-              if (!compact) ...[
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: fg,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  ),
+          child: compact
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(spec.icon, size: 18, color: fg),
+                    const SizedBox(height: 3),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: fg,
+                        fontWeight: selected
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(spec.icon, size: 17, color: fg),
+                    const SizedBox(width: 8),
+                    Text(
+                      label,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: fg,
+                        fontWeight: selected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ],
-          ),
         ),
       ),
     );
