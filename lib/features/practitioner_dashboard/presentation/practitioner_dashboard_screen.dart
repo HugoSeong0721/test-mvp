@@ -189,13 +189,24 @@ class _PractitionerDashboardScreenState
                   .where((v) => v.profile.name.toLowerCase().contains(keyword))
                   .toList();
         final summary = _visitWindowSummary(summaryVisits);
-        final connectedPatientsWithoutVisit = connectedProfiles
-            .where(
-              (profile) => _store
-                  .historyForPatient(profile.id, clinicId: _currentClinicId)
-                  .isEmpty,
-            )
-            .toList();
+        final connectedPatientsWithoutVisit = connectedProfiles.where((
+          profile,
+        ) {
+          final clinicId = _currentClinicId;
+          if (clinicId == null || clinicId.isEmpty) {
+            return false;
+          }
+          final request = _store.membershipRequestForPatientClinic(
+            patientId: profile.id,
+            clinicId: clinicId,
+          );
+          if (request?.status != 'pending') {
+            return false;
+          }
+          return _store
+              .historyForPatient(profile.id, clinicId: clinicId)
+              .isEmpty;
+        }).toList();
         final titleLabel = _selectedDateRange == null
             ? lang.tr(
                 '${_formatStoredDateWithWeekday(_selectedDate)} Patients ${filteredVisits.length}',
