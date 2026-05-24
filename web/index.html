@@ -33,19 +33,29 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <noscript>This app needs JavaScript enabled.</noscript>
+  <div id="app-loader" style="font-family: Arial, sans-serif; padding: 24px; color: #1f2a27;">
+    Loading Test MVP...
+  </div>
   <script>
     (async function () {
+      const refreshKey = 'test-mvp-sw-refresh-v2';
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
-          for (const registration of registrations) {
+        for (const registration of registrations) {
           await registration.unregister();
-          }
+        }
+        if (navigator.serviceWorker.controller && sessionStorage.getItem(refreshKey) !== 'done') {
+          sessionStorage.setItem(refreshKey, 'done');
+          window.location.reload();
+          return;
+        }
       }
       if ('caches' in window) {
         const keys = await caches.keys();
-          for (const key of keys) {
+        for (const key of keys) {
           await caches.delete(key);
-          }
+        }
       }
       const script = document.createElement('script');
       script.src = 'flutter_bootstrap.js?v=' + Date.now();
