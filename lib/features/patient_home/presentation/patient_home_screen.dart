@@ -535,7 +535,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                 if (!mounted) {
                                                   return;
                                                 }
-                                                setDialogState(() {});
+                                                Navigator.pop(context);
                                                 ScaffoldMessenger.of(
                                                   this.context,
                                                 ).showSnackBar(
