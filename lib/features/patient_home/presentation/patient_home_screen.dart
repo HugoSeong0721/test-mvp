@@ -7,6 +7,7 @@ import 'package:iottie_automation/features/patient_requests/presentation/patient
 import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/services/app_firestore_service.dart';
 import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/settings/app_language_controller.dart';
@@ -223,6 +224,24 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     });
   }
 
+  Future<void> _ensureStarterQuestionsForClinic({
+    required PatientProfile profile,
+    required String clinicId,
+  }) async {
+    try {
+      await AppFirestoreService.ensureInitialTcmIntakeRequest(
+        patientId: profile.id,
+        clinicId: clinicId,
+        patientName: profile.name,
+        patientPhone: profile.phone,
+        patientEmail: profile.email,
+        birthYear: profile.birthYear,
+        sex: profile.sex,
+        ethnicity: profile.ethnicity,
+      ).timeout(const Duration(seconds: 6));
+    } catch (_) {}
+  }
+
   @override
   void dispose() {
     _loadTimeoutTimer?.cancel();
@@ -369,6 +388,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   Future<void> _openClinicPicker({bool autoPrompt = false}) async {
     final lang = AppLanguageController.instance;
+    final profile = _currentProfile;
     final patientId = _currentProfile.id;
     final searchController = TextEditingController();
     final requestClinicNameController = TextEditingController();
@@ -529,6 +549,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       patientId: patientId,
                                                       clinicId: clinic.id,
                                                     );
+                                                await _ensureStarterQuestionsForClinic(
+                                                  profile: profile,
+                                                  clinicId: clinic.id,
+                                                );
                                                 if (!context.mounted) {
                                                   return;
                                                 }
@@ -567,6 +591,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                       patientId: patientId,
                                                       clinicId: clinic.id,
                                                     );
+                                                await _ensureStarterQuestionsForClinic(
+                                                  profile: profile,
+                                                  clinicId: clinic.id,
+                                                );
                                                 if (!context.mounted) {
                                                   return;
                                                 }

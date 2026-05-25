@@ -391,19 +391,7 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     if (activeClinicId != null && activeClinicId.isNotEmpty) {
       return activeClinicId;
     }
-
-    final fallbackClinic = _store.patientVisibleClinicCenters.isNotEmpty
-        ? _store.patientVisibleClinicCenters.first
-        : (_store.clinicCenters.isNotEmpty ? _store.clinicCenters.first : null);
-    if (fallbackClinic == null) {
-      return null;
-    }
-
-    await _store.continueWithClinicForPatient(
-      patientId: profile.id,
-      clinicId: fallbackClinic.id,
-    );
-    return fallbackClinic.id;
+    return null;
   }
 
   Future<void> _logInTester({
