@@ -14,17 +14,11 @@ class PatientRecordWorkspace extends StatefulWidget {
     required this.profile,
     required this.onSave,
     this.clinicId,
-    this.membershipStatus,
-    this.pendingJoinRequest,
-    this.onApproveJoin,
   });
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
   final String? clinicId;
-  final String? membershipStatus;
-  final PatientClinicMembershipRequest? pendingJoinRequest;
-  final Future<void> Function()? onApproveJoin;
 
   @override
   State<PatientRecordWorkspace> createState() => _PatientRecordWorkspaceState();
@@ -42,8 +36,6 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
   late TextEditingController _memoController;
   late TextEditingController _tongueNoteController;
   _PatientRecordTab _selectedTab = _PatientRecordTab.overview;
-  bool _isApprovingJoin = false;
-
   @override
   void initState() {
     super.initState();
@@ -91,28 +83,6 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
   void dispose() {
     _disposeControllers();
     super.dispose();
-  }
-
-  Widget _buildApproveJoinButton(AppLanguageController lang) {
-    return FilledButton.icon(
-      onPressed: _isApprovingJoin || widget.onApproveJoin == null
-          ? null
-          : () async {
-              setState(() => _isApprovingJoin = true);
-              await widget.onApproveJoin?.call();
-              if (mounted) {
-                setState(() => _isApprovingJoin = false);
-              }
-            },
-      icon: Icon(
-        _isApprovingJoin ? Icons.hourglass_top : Icons.check_circle_outline,
-      ),
-      label: Text(
-        _isApprovingJoin
-            ? lang.tr('Approving...', '승인 중...')
-            : lang.tr('Approve + intake', '승인 + 문진 보내기'),
-      ),
-    );
   }
 
   @override
@@ -306,58 +276,6 @@ class _PatientRecordWorkspaceState extends State<PatientRecordWorkspace> {
                           ],
                         ),
                       ),
-                      if (widget.pendingJoinRequest != null) ...[
-                        const SizedBox(height: 12),
-                        AppPanel(
-                          padding: const EdgeInsets.all(18),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppTheme.mint.withValues(alpha: 0.72),
-                              Colors.white.withValues(alpha: 0.94),
-                            ],
-                          ),
-                          child: compact
-                              ? Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    _JoinRequestSummary(
-                                      request: widget.pendingJoinRequest!,
-                                      dateLabel: _formatDateWithWeekday(
-                                        widget.pendingJoinRequest!.requestedAt,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    _buildApproveJoinButton(lang),
-                                  ],
-                                )
-                              : Row(
-                                  children: [
-                                    Expanded(
-                                      child: _JoinRequestSummary(
-                                        request: widget.pendingJoinRequest!,
-                                        dateLabel: _formatDateWithWeekday(
-                                          widget
-                                              .pendingJoinRequest!
-                                              .requestedAt,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    _buildApproveJoinButton(lang),
-                                  ],
-                                ),
-                        ),
-                      ] else ...[
-                        const SizedBox(height: 12),
-                        _MembershipStatusPanel(
-                          status: widget.membershipStatus == 'approved'
-                              ? lang.tr('Clinic approved', '한의원 승인됨')
-                              : lang.tr('Clinic linked', '한의원 연결됨'),
-                        ),
-                      ],
                       const SizedBox.shrink(),
                       Wrap(
                         spacing: 10,
@@ -1243,6 +1161,7 @@ class _ResponsiveFieldGroup extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _JoinRequestSummary extends StatelessWidget {
   const _JoinRequestSummary({required this.request, required this.dateLabel});
 
@@ -1292,6 +1211,7 @@ class _JoinRequestSummary extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _MembershipStatusPanel extends StatelessWidget {
   const _MembershipStatusPanel({required this.status});
 

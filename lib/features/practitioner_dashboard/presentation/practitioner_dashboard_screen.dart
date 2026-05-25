@@ -84,8 +84,6 @@ class _PractitionerDashboardScreenState
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
   _intakeSubmissionSubscription;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-  _membershipRequestSubscription;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
   _appointmentRequestSubscription;
   Map<String, Map<String, dynamic>> _latestPatientIntakeByPatient =
       <String, Map<String, dynamic>>{};
@@ -128,14 +126,6 @@ class _PractitionerDashboardScreenState
             );
           });
         });
-    _membershipRequestSubscription = FirebaseFirestore.instance
-        .collection('patient_clinic_membership_requests')
-        .snapshots()
-        .listen((snapshot) async {
-          await _store.mergePatientClinicMembershipRequestsFromMaps(
-            snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
-          );
-        });
     _appointmentRequestSubscription = FirebaseFirestore.instance
         .collection('appointment_requests')
         .snapshots()
@@ -149,7 +139,6 @@ class _PractitionerDashboardScreenState
   @override
   void dispose() {
     _intakeSubmissionSubscription?.cancel();
-    _membershipRequestSubscription?.cancel();
     _appointmentRequestSubscription?.cancel();
     _patientFilterController.dispose();
     _scrollController.dispose();
@@ -166,11 +155,9 @@ class _PractitionerDashboardScreenState
         final activeClinic = _currentClinicId == null
             ? null
             : _store.clinicById(_currentClinicId!);
-        final pendingMembershipRequests = _store
-            .pendingMembershipRequestsForClinic(_currentClinicId);
-        final pendingAppointmentInboxCount =
-            (_showDeferredBookingUi ? _pendingAppointmentRequestCount() : 0) +
-            pendingMembershipRequests.length;
+        final pendingAppointmentInboxCount = _showDeferredBookingUi
+            ? _pendingAppointmentRequestCount()
+            : 0;
         final visibleVisits = _visibleVisits();
         final summaryVisits = _summaryWindowVisits();
         final connectedProfiles = _store.profilesForClinic(_currentClinicId);
@@ -196,13 +183,6 @@ class _PractitionerDashboardScreenState
         ) {
           final clinicId = _currentClinicId;
           if (clinicId == null || clinicId.isEmpty) {
-            return false;
-          }
-          final request = _store.membershipRequestForPatientClinic(
-            patientId: profile.id,
-            clinicId: clinicId,
-          );
-          if (request?.status != 'pending') {
             return false;
           }
           return _store
@@ -315,11 +295,6 @@ class _PractitionerDashboardScreenState
                 const SizedBox(height: 12),
               ],
               if (_subView == _DashboardSubView.main)
-                if (pendingMembershipRequests.isNotEmpty) ...[
-                  _buildMembershipRequestAlertPanel(pendingMembershipRequests),
-                  const SizedBox(height: 12),
-                ],
-              if (_subView == _DashboardSubView.main)
                 KeyedSubtree(
                   key: _dateSelectorKey,
                   child: _buildDateSelectorPanel(),
@@ -346,10 +321,7 @@ class _PractitionerDashboardScreenState
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
                     height: 720,
-                    child: _PatientManagementDialog(
-                      embedded: true,
-                      onApproveJoin: _approveMembershipAndSendQuestionTree,
-                    ),
+                    child: _PatientManagementDialog(embedded: true),
                   ),
                 ),
               ],
@@ -4088,162 +4060,8 @@ class _PractitionerDashboardScreenState
     );
   }
 
-  Map<String, List<String>> _defaultOnboardingFollowUpTree() {
-    return {
-      for (final entry in _questionLibraryByCategory.entries)
-        entry.key: [
-          if (entry.value.length > 1) entry.value[1],
-          'If yes, when did it start and what makes it better or worse?',
-          'How often does this happen, and how much does it affect daily life?',
-        ],
-    };
-  }
-
-  Future<void> _approveMembershipAndSendQuestionTree(
-    PatientClinicMembershipRequest request,
-  ) async {
-    final profile = _store.profileById(request.patientId);
-    final selectedQuestions = _questionLibraryByCategory.values
-        .where((questions) => questions.isNotEmpty)
-        .map((questions) => questions.first)
-        .toList();
-    final followUpTree = _defaultOnboardingFollowUpTree();
-
-    var approved = false;
-    try {
-      await _store.approvePatientClinicMembership(request.id);
-      approved = true;
-      await AppFirestoreService.sendAnswerRequest(
-        patientId: request.patientId,
-        clinicId: request.clinicId,
-        patientName: profile?.name ?? request.patientName,
-        patientPhone: profile?.phone ?? '',
-        patientEmail: profile?.email ?? request.patientEmail,
-        patientTime: 'Membership onboarding',
-        lastVisitDate: 'New patient',
-        intakeStatus: 'initial',
-        selectedQuestions: selectedQuestions,
-        customQuestionsByCategory: followUpTree,
-        note:
-            'Your clinic approved your account. Please start with this intake question tree so the practitioner can understand your baseline before the first visit.',
-        requestType: 'membership_onboarding',
-      );
-
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLanguageController.instance.tr(
-              '${request.patientName} approved.',
-              '${request.patientName} 승인됨',
-            ),
-          ),
-        ),
-      );
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            approved
-                ? AppLanguageController.instance.tr(
-                    'Patient was approved, but the starter questions could not be sent. Please try sending questions again.',
-                    'Patient was approved, but the starter questions could not be sent. Please try sending questions again.',
-                  )
-                : AppLanguageController.instance.tr(
-                    'The approval button could not finish. Please try again.',
-                    'The approval button could not finish. Please try again.',
-                  ),
-          ),
-        ),
-      );
-    }
-  }
-
-  Widget _buildMembershipRequestAlertPanel(
-    List<PatientClinicMembershipRequest> requests,
-  ) {
-    final lang = AppLanguageController.instance;
-    final next = requests.first;
-    return AppPanel(
-      padding: const EdgeInsets.all(18),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppTheme.copper.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.person_add_alt_1, color: AppTheme.pine),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  lang.tr(
-                    '${requests.length} join request${requests.length == 1 ? '' : 's'}',
-                    '${requests.length} join request${requests.length == 1 ? '' : 's'}',
-                  ),
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  lang.tr(
-                    '${next.patientName} · ${next.clinicName}',
-                    '${next.patientName} · ${next.clinicName}',
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.ink.withValues(alpha: 0.72),
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    FilledButton.icon(
-                      onPressed: () =>
-                          _approveMembershipAndSendQuestionTree(next),
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: Text(lang.tr('Approve + questions', '승인 + 질문')),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () => _selectSubView(_DashboardSubView.inbox),
-                      icon: const Icon(Icons.inbox_outlined),
-                      label: Text(lang.tr('Inbox', '요청함')),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildClinicOpenRequestsPanel() {
     final lang = AppLanguageController.instance;
-    final membershipRequests = _store.pendingMembershipRequestsForClinic(
-      _currentClinicId,
-    );
-    final recentMembershipRequests = _store
-        .membershipRequestsForClinic(
-          _currentClinicId,
-          statuses: {'approved', 'declined'},
-        )
-        .take(8)
-        .toList();
     final requests = _isPlatformAdmin
         ? _store.pendingClinicOpenRequests
         : const <ClinicOpenRequest>[];
@@ -4256,133 +4074,17 @@ class _PractitionerDashboardScreenState
             lang.tr('Inbox', 'Inbox'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 12),
-          Text(
-            lang.tr('Joins', '가입'),
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
           const SizedBox(height: 8),
-          if (membershipRequests.isEmpty)
-            Text(lang.tr('No joins', '가입 없음'))
-          else
-            ...membershipRequests.map((request) {
-              return Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppTheme.mint.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppTheme.border.withValues(alpha: 0.72),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      request.patientName,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${lang.tr('Clinic', 'Clinic')}: ${request.clinicName}',
-                    ),
-                    if (request.patientEmail.trim().isNotEmpty)
-                      Text(
-                        '${lang.tr('Email', 'Email')}: ${request.patientEmail}',
-                      ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        FilledButton.icon(
-                          onPressed: () =>
-                              _approveMembershipAndSendQuestionTree(request),
-                          icon: const Icon(Icons.check_circle_outline),
-                          label: Text(
-                            lang.tr('Approve + questions', '승인 + 질문'),
-                          ),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              _store.declinePatientClinicMembership(request.id),
-                          icon: const Icon(Icons.cancel_outlined),
-                          label: Text(lang.tr('Decline', 'Decline')),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            }),
-          if (recentMembershipRequests.isNotEmpty) ...[
-            const SizedBox(height: 18),
-            Text(
-              lang.tr('Recent joins', '최근 가입'),
-              style: Theme.of(context).textTheme.titleMedium,
+          Text(
+            lang.tr(
+              'Patients connect directly from the patient portal. New answers and intake submissions appear below.',
+              'Patients connect directly from the patient portal. New answers and intake submissions appear below.',
             ),
-            const SizedBox(height: 8),
-            ...recentMembershipRequests.map((request) {
-              final profile = _store.profileById(request.patientId);
-              final isApproved = request.status == 'approved';
-              return Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppTheme.border.withValues(alpha: 0.72),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      isApproved
-                          ? Icons.check_circle_outline
-                          : Icons.cancel_outlined,
-                      color: isApproved ? AppTheme.pine : AppTheme.copper,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            request.patientName,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          if (request.patientEmail.trim().isNotEmpty)
-                            Text(
-                              request.patientEmail,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      isApproved
-                          ? lang.tr('Clinic approved', '한의원 승인됨')
-                          : lang.tr('Declined', '거절됨'),
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    const SizedBox(width: 8),
-                    if (profile != null)
-                      OutlinedButton(
-                        onPressed: () => _openPatientManagement(
-                          context,
-                          initialProfileId: profile.id,
-                        ),
-                        child: Text(lang.tr('Open', 'Open')),
-                      ),
-                  ],
-                ),
-              );
-            }),
-          ],
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.ink.withValues(alpha: 0.68),
+              height: 1.4,
+            ),
+          ),
           if (_isPlatformAdmin) ...[
             const SizedBox(height: 18),
             Text(
@@ -4602,10 +4304,8 @@ class _PractitionerDashboardScreenState
   }) async {
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => _PatientManagementDialog(
-        initialProfileId: initialProfileId,
-        onApproveJoin: _approveMembershipAndSendQuestionTree,
-      ),
+      builder: (dialogContext) =>
+          _PatientManagementDialog(initialProfileId: initialProfileId),
     );
   }
 
@@ -5598,13 +5298,10 @@ class _PatientManagementDialog extends StatefulWidget {
   const _PatientManagementDialog({
     this.initialProfileId,
     this.embedded = false,
-    this.onApproveJoin,
   });
 
   final String? initialProfileId;
   final bool embedded;
-  final Future<void> Function(PatientClinicMembershipRequest request)?
-  onApproveJoin;
 
   @override
   State<_PatientManagementDialog> createState() =>
@@ -5640,14 +5337,6 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
       }
       selected ??= profiles.isNotEmpty ? profiles.first : null;
     }
-    final pendingJoinRequest =
-        selected == null || activeClinicId == null || activeClinicId.isEmpty
-        ? null
-        : _store.membershipRequestForPatientClinic(
-            patientId: selected.id,
-            clinicId: activeClinicId,
-          );
-
     final patientList = SizedBox(
       width: 280,
       child: Column(
@@ -5827,18 +5516,6 @@ class _PatientManagementDialogState extends State<_PatientManagementDialog> {
         : _PatientProfileEditor(
             profile: selected,
             clinicId: PractitionerSessionService.currentSession?.clinicId,
-            membershipStatus: pendingJoinRequest?.status,
-            pendingJoinRequest: pendingJoinRequest?.status == 'pending'
-                ? pendingJoinRequest
-                : null,
-            onApproveJoin: pendingJoinRequest?.status == 'pending'
-                ? () async {
-                    await widget.onApproveJoin?.call(pendingJoinRequest!);
-                    if (mounted) {
-                      setState(() => _selectedProfileId = selected!.id);
-                    }
-                  }
-                : null,
             onSave: (updated) {
               _store.saveProfile(updated);
               setState(() => _selectedProfileId = updated.id);
@@ -5901,17 +5578,11 @@ class _PatientProfileEditor extends StatefulWidget {
     required this.profile,
     required this.onSave,
     this.clinicId,
-    this.membershipStatus,
-    this.pendingJoinRequest,
-    this.onApproveJoin,
   });
 
   final PatientProfile profile;
   final ValueChanged<PatientProfile> onSave;
   final String? clinicId;
-  final String? membershipStatus;
-  final PatientClinicMembershipRequest? pendingJoinRequest;
-  final Future<void> Function()? onApproveJoin;
 
   @override
   State<_PatientProfileEditor> createState() => _PatientProfileEditorState();
@@ -5976,9 +5647,6 @@ class _PatientProfileEditorState extends State<_PatientProfileEditor> {
     return PatientRecordWorkspace(
       profile: widget.profile,
       clinicId: widget.clinicId,
-      membershipStatus: widget.membershipStatus,
-      pendingJoinRequest: widget.pendingJoinRequest,
-      onApproveJoin: widget.onApproveJoin,
       onSave: widget.onSave,
     );
     /*

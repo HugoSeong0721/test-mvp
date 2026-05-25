@@ -433,15 +433,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 final isCurrent =
                                     currentClinic?.id == clinic.id;
                                 final isDefault = defaultClinicId == clinic.id;
-                                final membershipRequest = _store
-                                    .membershipRequestForPatientClinic(
-                                      patientId: patientId,
-                                      clinicId: clinic.id,
-                                    );
-                                final isPendingApproval =
-                                    membershipRequest?.status == 'pending';
-                                final isDeclined =
-                                    membershipRequest?.status == 'declined';
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: EdgeInsets.all(compact ? 12 : 16),
@@ -485,14 +476,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               context,
                                               lang.tr('Current', '현재 선택'),
                                             ),
-                                          if (isPendingApproval) ...[
-                                            const SizedBox(width: 8),
-                                            _buildClinicStatusChip(
-                                              context,
-                                              lang.tr('Pending', '승인 대기'),
-                                              accent: AppTheme.copper,
-                                            ),
-                                          ],
                                           if (isDefault) ...[
                                             const SizedBox(width: 8),
                                             _buildClinicStatusChip(
@@ -533,7 +516,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         spacing: 8,
                                         runSpacing: 8,
                                         children: [
-                                          if (!isCurrent && !isPendingApproval)
+                                          if (!isCurrent)
                                             FilledButton.tonalIcon(
                                               onPressed: () async {
                                                 await _store
@@ -559,23 +542,24 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   SnackBar(
                                                     content: Text(
                                                       lang.tr(
-                                                        'Request sent.',
-                                                        '요청 완료',
+                                                        'Clinic connected.',
+                                                        'Clinic connected.',
                                                       ),
                                                     ),
                                                   ),
                                                 );
                                               },
                                               icon: const Icon(
-                                                Icons.outgoing_mail,
+                                                Icons.check_circle_outline,
                                               ),
                                               label: Text(
-                                                isDeclined
-                                                    ? lang.tr('Again', '다시')
-                                                    : lang.tr('Join', '가입'),
+                                                lang.tr(
+                                                  'Use clinic',
+                                                  'Use clinic',
+                                                ),
                                               ),
                                             ),
-                                          if (isCurrent || isPendingApproval)
+                                          if (isCurrent)
                                             FilledButton.icon(
                                               onPressed: () async {
                                                 await _store

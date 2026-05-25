@@ -1750,37 +1750,16 @@ class ClinicDataStore extends ChangeNotifier {
     if (clinic == null || patient == null) {
       return;
     }
-    final existingIndex = _patientClinicMembershipRequests.indexWhere(
-      (request) =>
-          request.patientId == patientId && request.clinicId == clinicId,
-    );
-    final request = existingIndex >= 0
-        ? _patientClinicMembershipRequests[existingIndex].copyWith(
-            patientName: patient.name,
-            patientEmail: patient.email,
-            clinicName: clinic.name,
-            requestedAt: DateTime.now(),
-            status: 'pending',
-          )
-        : PatientClinicMembershipRequest(
-            id: 'membership_${patientId}_$clinicId',
-            patientId: patientId,
-            patientName: patient.name,
-            patientEmail: patient.email,
-            clinicId: clinicId,
-            clinicName: clinic.name,
-            requestedAt: DateTime.now(),
-          );
-    if (existingIndex >= 0) {
-      _patientClinicMembershipRequests[existingIndex] = request;
-    } else {
-      _patientClinicMembershipRequests.add(request);
-    }
+    _patientSelectedClinicIds[patientId] = clinicId;
+    _patientDefaultClinicIds.putIfAbsent(patientId, () => clinicId);
+    _patientPortalRegisteredIds.add(patientId);
     notifyListeners();
     await _persistClinicState();
     try {
-      await AppFirestoreService.savePatientClinicMembershipRequest(
-        request.toMap(),
+      await AppFirestoreService.savePatientClinicLink(
+        patientId: patientId,
+        selectedClinicId: clinicId,
+        defaultClinicId: _patientDefaultClinicIds[patientId],
       );
     } catch (_) {}
   }
