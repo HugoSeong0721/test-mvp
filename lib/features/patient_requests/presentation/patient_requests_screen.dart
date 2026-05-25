@@ -409,7 +409,7 @@ class _PatientRequestsScreenState extends State<PatientRequestsScreen> {
 
         return PatientShell(
           currentItem: PatientNavItem.requests,
-          title: lang.tr('Messages', 'Messages'),
+          title: lang.tr('Questions', 'Questions'),
           actions: const [LanguageMenuButton()],
           body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance

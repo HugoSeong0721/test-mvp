@@ -213,18 +213,18 @@ class _PractitionerDashboardScreenState
           ],
           tools: [
             PractitionerToolItem(
+              icon: Icons.forum_outlined,
+              labelEn: 'Questions',
+              labelKo: 'Questions',
+              active: _subView == _DashboardSubView.inbox,
+              onTap: () => _selectSubView(_DashboardSubView.inbox),
+            ),
+            PractitionerToolItem(
               icon: Icons.people_outline,
               labelEn: 'Patients',
               labelKo: 'Patients',
               active: _subView == _DashboardSubView.patientManagement,
               onTap: () => _selectSubView(_DashboardSubView.patientManagement),
-            ),
-            PractitionerToolItem(
-              icon: Icons.mark_email_unread_outlined,
-              labelEn: 'Inbox',
-              labelKo: 'Inbox',
-              active: _subView == _DashboardSubView.inbox,
-              onTap: () => _selectSubView(_DashboardSubView.inbox),
             ),
             PractitionerToolItem(
               icon: Icons.query_stats_outlined,
@@ -301,6 +301,8 @@ class _PractitionerDashboardScreenState
                 ),
               if (_subView == _DashboardSubView.inbox) ...[
                 const SizedBox(height: 4),
+                _buildQuestionCenterPanel(connectedProfiles),
+                const SizedBox(height: 12),
                 _buildClinicOpenRequestsPanel(),
                 const SizedBox(height: 12),
                 KeyedSubtree(
@@ -680,6 +682,251 @@ class _PractitionerDashboardScreenState
                   );
                 }).toList(),
               ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildQuestionCenterPanel(List<PatientProfile> profiles) {
+    final lang = AppLanguageController.instance;
+    final theme = Theme.of(context);
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
+            .collection('answer_requests')
+            .snapshots(),
+        builder: (context, snapshot) {
+          final requestDocs = [...?snapshot.data?.docs].where((doc) {
+            final clinicId = (doc.data()['clinicId'] ?? '').toString();
+            return _currentClinicId != null &&
+                _currentClinicId!.isNotEmpty &&
+                clinicId == _currentClinicId;
+          }).toList();
+          final pendingCount = requestDocs
+              .where((doc) => (doc.data()['status'] ?? 'pending') == 'pending')
+              .length;
+          final completedCount = requestDocs
+              .where(
+                (doc) => (doc.data()['status'] ?? 'pending') == 'completed',
+              )
+              .length;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact = constraints.maxWidth < 640;
+                  final title = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang.tr('Questions', 'Questions'),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        lang.tr(
+                          'Send the next TCM questions and read patient replies here.',
+                          'Send the next TCM questions and read patient replies here.',
+                        ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.ink.withValues(alpha: 0.68),
+                        ),
+                      ),
+                    ],
+                  );
+                  final metrics = Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      AppMetricChip(
+                        icon: Icons.pending_actions_outlined,
+                        label: lang.tr('Waiting', 'Waiting'),
+                        value: '$pendingCount',
+                        backgroundColor: AppTheme.surface,
+                      ),
+                      AppMetricChip(
+                        icon: Icons.check_circle_outline,
+                        label: lang.tr('Answered', 'Answered'),
+                        value: '$completedCount',
+                        backgroundColor: AppTheme.surface,
+                      ),
+                    ],
+                  );
+                  if (compact) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [title, const SizedBox(height: 12), metrics],
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: title),
+                      const SizedBox(width: 12),
+                      metrics,
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              if (profiles.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSoft.withValues(alpha: 0.62),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: Text(
+                    lang.tr(
+                      'No patients connected to this clinic yet.',
+                      'No patients connected to this clinic yet.',
+                    ),
+                  ),
+                )
+              else
+                ...profiles.map((profile) {
+                  final patientRequests =
+                      requestDocs.where((doc) {
+                        return (doc.data()['patientId'] ?? '').toString() ==
+                            profile.id;
+                      }).toList()..sort((a, b) {
+                        final aTime =
+                            (a.data()['requestedAt'] as Timestamp?)
+                                ?.millisecondsSinceEpoch ??
+                            0;
+                        final bTime =
+                            (b.data()['requestedAt'] as Timestamp?)
+                                ?.millisecondsSinceEpoch ??
+                            0;
+                        return bTime.compareTo(aTime);
+                      });
+                  final latest = patientRequests.isNotEmpty
+                      ? patientRequests.first.data()
+                      : null;
+                  final latestStatus = (latest?['status'] ?? 'No question')
+                      .toString();
+                  final latestQuestionCount =
+                      ((latest?['selectedQuestions'] as List?) ?? const [])
+                          .length;
+                  final latestRequestedAt =
+                      (latest?['requestedAt'] as Timestamp?)?.toDate();
+                  final latestRequestedLabel = latestRequestedAt == null
+                      ? lang.tr('Just now', 'Just now')
+                      : _formatDateTimeValue(latestRequestedAt);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final compact = constraints.maxWidth < 680;
+                          final info = Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profile.name,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                latest == null
+                                    ? lang.tr(
+                                        'No questions sent yet',
+                                        'No questions sent yet',
+                                      )
+                                    : lang.tr(
+                                        '$latestStatus · $latestQuestionCount questions · $latestRequestedLabel',
+                                        '$latestStatus · $latestQuestionCount questions · $latestRequestedLabel',
+                                      ),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: AppTheme.ink.withValues(alpha: 0.64),
+                                ),
+                              ),
+                            ],
+                          );
+                          final actions = Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              FilledButton.icon(
+                                onPressed: _currentClinicId == null
+                                    ? null
+                                    : () => _sendStarterQuestionsToPatient(
+                                        context,
+                                        profile,
+                                      ),
+                                icon: const Icon(Icons.playlist_add_check),
+                                label: Text(
+                                  lang.tr('Send basic 10', 'Send basic 10'),
+                                ),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: _currentClinicId == null
+                                    ? null
+                                    : () => _sendQuestionsToPatient(
+                                        context,
+                                        profile,
+                                      ),
+                                icon: const Icon(Icons.add_comment_outlined),
+                                label: Text(
+                                  lang.tr('Custom question', 'Custom question'),
+                                ),
+                              ),
+                              if (!compact)
+                                IconButton(
+                                  tooltip: lang.tr(
+                                    'Patient chart',
+                                    'Patient chart',
+                                  ),
+                                  onPressed: () => _openPatientManagement(
+                                    context,
+                                    initialProfileId: profile.id,
+                                  ),
+                                  icon: const Icon(Icons.folder_open_outlined),
+                                ),
+                            ],
+                          );
+                          if (compact) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                info,
+                                const SizedBox(height: 12),
+                                actions,
+                              ],
+                            );
+                          }
+                          return Row(
+                            children: [
+                              Expanded(child: info),
+                              const SizedBox(width: 12),
+                              actions,
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }),
             ],
           );
         },
@@ -2908,6 +3155,232 @@ class _PractitionerDashboardScreenState
         '${_formatDateWithWeekday(start)} ~ ${_formatDateWithWeekday(selected)} ${visibleVisits.length}명',
       ),
     );
+  }
+
+  Future<void> _sendStarterQuestionsToPatient(
+    BuildContext context,
+    PatientProfile profile,
+  ) async {
+    final clinicId = _currentClinicId;
+    if (clinicId == null || clinicId.isEmpty) {
+      return;
+    }
+    try {
+      await AppFirestoreService.ensureInitialTcmIntakeRequest(
+        patientId: profile.id,
+        clinicId: clinicId,
+        patientName: profile.name,
+        patientPhone: profile.phone,
+        patientEmail: profile.email,
+        birthYear: profile.birthYear,
+        sex: profile.sex,
+        ethnicity: profile.ethnicity,
+      );
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLanguageController.instance.tr(
+              'Basic TCM questions are ready for ${profile.name}.',
+              'Basic TCM questions are ready for ${profile.name}.',
+            ),
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLanguageController.instance.tr(
+              'Failed to send questions: $error',
+              'Failed to send questions: $error',
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _sendQuestionsToPatient(
+    BuildContext context,
+    PatientProfile profile,
+  ) async {
+    final clinicId = _currentClinicId;
+    if (clinicId == null || clinicId.isEmpty) {
+      return;
+    }
+    final selectedQuestions = <String>{};
+    final noteController = TextEditingController();
+    final customController = TextEditingController();
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 16,
+          ),
+          title: Text(
+            AppLanguageController.instance.tr(
+              'Send questions to ${profile.name}',
+              'Send questions to ${profile.name}',
+            ),
+          ),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: StatefulBuilder(
+              builder: (context, setDialogState) {
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLanguageController.instance.tr(
+                          'Choose common TCM questions or add one plain-language question.',
+                          'Choose common TCM questions or add one plain-language question.',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ..._questionLibraryByCategory.entries.map((entry) {
+                        return ExpansionTile(
+                          dense: true,
+                          tilePadding: EdgeInsets.zero,
+                          title: Text(entry.key),
+                          children: entry.value.map((question) {
+                            return CheckboxListTile(
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(question),
+                              value: selectedQuestions.contains(question),
+                              onChanged: (checked) {
+                                setDialogState(() {
+                                  if (checked == true) {
+                                    selectedQuestions.add(question);
+                                  } else {
+                                    selectedQuestions.remove(question);
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
+                        );
+                      }),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: customController,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: AppLanguageController.instance.tr(
+                            'Custom question',
+                            'Custom question',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: noteController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: AppLanguageController.instance.tr(
+                            'Short note to patient',
+                            'Short note to patient',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                AppLanguageController.instance.tr('Cancel', 'Cancel'),
+              ),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final customQuestion = customController.text.trim();
+                if (selectedQuestions.isEmpty && customQuestion.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLanguageController.instance.tr(
+                          'Pick or write at least one question.',
+                          'Pick or write at least one question.',
+                        ),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                try {
+                  await AppFirestoreService.sendAnswerRequest(
+                    patientId: profile.id,
+                    clinicId: clinicId,
+                    patientName: profile.name,
+                    patientPhone: profile.phone,
+                    patientEmail: profile.email,
+                    patientTime: '-',
+                    lastVisitDate: '-',
+                    intakeStatus: IntakeStatus.notStarted.name,
+                    selectedQuestions: selectedQuestions.toList()..sort(),
+                    customQuestionsByCategory: customQuestion.isEmpty
+                        ? const {}
+                        : {
+                            'Follow-up': [customQuestion],
+                          },
+                    note: noteController.text.trim(),
+                  );
+                  if (!context.mounted || !dialogContext.mounted) {
+                    return;
+                  }
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLanguageController.instance.tr(
+                          'Questions sent to ${profile.name}.',
+                          'Questions sent to ${profile.name}.',
+                        ),
+                      ),
+                    ),
+                  );
+                } catch (error) {
+                  if (!context.mounted) {
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLanguageController.instance.tr(
+                          'Failed to send questions: $error',
+                          'Failed to send questions: $error',
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Text(AppLanguageController.instance.tr('Send', 'Send')),
+            ),
+          ],
+        );
+      },
+    );
+
+    noteController.dispose();
+    customController.dispose();
   }
 
   String _visitTrailLabel(PatientVisit visit) {

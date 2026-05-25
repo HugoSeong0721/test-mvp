@@ -1460,8 +1460,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   late final VoidCallback nextStepAction;
 
                   if (needsRequestsFirst) {
-                    nextStepTitle = lang.tr('Reply needed', '먼저 침술사 요청에 답하기');
-                    nextStepButton = lang.tr('Requests', '요청함');
+                    nextStepTitle = lang.tr(
+                      'Answer the clinic questions',
+                      'Answer the clinic questions',
+                    );
+                    nextStepButton = lang.tr(
+                      'Answer questions',
+                      'Answer questions',
+                    );
                     nextStepAction = () => Navigator.pushNamed(
                       context,
                       PatientRequestsScreen.routeName,
@@ -1499,10 +1505,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              lang.tr(
-                                'Your care conversation',
-                                'Your care conversation',
-                              ),
+                              lang.tr('Care conversation', 'Care conversation'),
                               style: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
                                     color: AppTheme.ink.withValues(alpha: 0.58),
@@ -1578,7 +1581,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          lang.tr('Next step', 'Next step'),
+                                          lang.tr(
+                                            'What to do now',
+                                            'What to do now',
+                                          ),
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge

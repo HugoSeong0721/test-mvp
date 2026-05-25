@@ -31,17 +31,10 @@ const List<PatientNavSpec> kPatientNavSpecs = [
     routeName: '/patient-home',
   ),
   PatientNavSpec(
-    item: PatientNavItem.intake,
-    icon: Icons.assignment_outlined,
+    item: PatientNavItem.requests,
+    icon: Icons.forum_outlined,
     labelEn: 'Questions',
     labelKo: 'Questions',
-    routeName: '/intake',
-  ),
-  PatientNavSpec(
-    item: PatientNavItem.requests,
-    icon: Icons.mail_outline,
-    labelEn: 'Messages',
-    labelKo: 'Messages',
     routeName: '/patient-requests',
   ),
 ];
