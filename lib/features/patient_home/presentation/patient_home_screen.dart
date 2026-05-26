@@ -95,7 +95,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           await _store.mergeAppointmentRequestsFromMaps(
             snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}),
           );
-        });
+        }, onError: (_) {});
     unawaited(_initializeProfile());
   }
 
@@ -119,6 +119,24 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       setState(() => _sessionBackedProfile = null);
       return;
     }
+
+    final fallbackProfile = PatientProfile(
+      id: session.id,
+      name: session.displayName.isNotEmpty
+          ? session.displayName
+          : (session.email.isNotEmpty
+                ? session.email.split('@').first
+                : 'New Patient'),
+      phone: '',
+      email: session.email,
+      birthYear: 1990,
+      sex: 'Not entered',
+      ethnicity: 'Not entered',
+      memo: 'Profile created from local patient session',
+    );
+    _store.saveProfile(fallbackProfile);
+    _store.setCurrentPatientProfile(fallbackProfile.id);
+    unawaited(_store.markPatientPortalRegistered(fallbackProfile.id));
 
     try {
       final localProfile = await PatientProfileService.loadLocalProfile(
@@ -191,6 +209,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   }
 
   Future<void> _syncClinicContextForProfile(PatientProfile profile) async {
+    _store.saveProfile(profile);
+    _store.setCurrentPatientProfile(profile.id);
     await _store.applyPreferredClinicForPatient(
       patientId: profile.id,
       linkedClinicId: _linkedClinicId,
@@ -539,6 +559,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           if (!isCurrent)
                                             FilledButton.tonalIcon(
                                               onPressed: () async {
+                                                _store.saveProfile(profile);
+                                                _store.setCurrentPatientProfile(
+                                                  profile.id,
+                                                );
                                                 await _store
                                                     .selectClinicForPatient(
                                                       patientId: patientId,
@@ -586,6 +610,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           if (isCurrent)
                                             FilledButton.icon(
                                               onPressed: () async {
+                                                _store.saveProfile(profile);
+                                                _store.setCurrentPatientProfile(
+                                                  profile.id,
+                                                );
                                                 await _store
                                                     .continueWithClinicForPatient(
                                                       patientId: patientId,
@@ -1400,6 +1428,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 .where('patientId', isEqualTo: profile.id)
                 .snapshots(),
             builder: (context, requestSnapshot) {
+              final questionStreamBlocked = requestSnapshot.hasError;
               final requestDocs = [...?requestSnapshot.data?.docs];
               requestDocs.sort((a, b) {
                 final aTime =
@@ -1433,6 +1462,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     .where('patientId', isEqualTo: profile.id)
                     .snapshots(),
                 builder: (context, submissionSnapshot) {
+                  final intakeStreamBlocked = submissionSnapshot.hasError;
                   final submissionDocs = [...?submissionSnapshot.data?.docs];
                   submissionDocs.sort((a, b) {
                     final aTime =
@@ -1495,6 +1525,30 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   return ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
+                      if (questionStreamBlocked || intakeStreamBlocked) ...[
+                        AppPanel(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.cloud_off_outlined,
+                                color: AppTheme.copper,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  lang.tr(
+                                    'Live clinic data is temporarily unavailable. You can still choose a clinic and continue from this phone.',
+                                    'Live clinic data is temporarily unavailable. You can still choose a clinic and continue from this phone.',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       if (!compact || activeClinic == null) ...[
                         _buildClinicSelectionPanel(context, profile: profile),
                         const SizedBox(height: 16),

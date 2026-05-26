@@ -409,6 +409,59 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     } catch (_) {}
   }
 
+  Future<void> _showSavedPatientAccounts() async {
+    final lang = AppLanguageController.instance;
+    final accounts = await BetaSessionService.localAccountSummaries();
+    if (!mounted) {
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        title: Text(lang.tr('Find patient ID', 'Find patient ID')),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: accounts.isEmpty
+              ? Text(
+                  lang.tr(
+                    'No saved patient account on this device.',
+                    'No saved patient account on this device.',
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: accounts.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final account = accounts[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.account_circle_outlined),
+                      title: Text(account.email),
+                      subtitle: Text(account.displayName),
+                      onTap: () {
+                        _emailController.text = account.email;
+                        Navigator.pop(context);
+                        setState(() {
+                          _isRegisterMode = false;
+                          _formError = null;
+                        });
+                      },
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(lang.tr('Close', 'Close')),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _showPatientPasswordResetDialog() async {
     final lang = AppLanguageController.instance;
     final emailController = TextEditingController(
@@ -776,6 +829,10 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
                         _formError = null;
                       }),
                 child: Text(toggleLabel),
+              ),
+              TextButton(
+                onPressed: _loading ? null : _showSavedPatientAccounts,
+                child: Text(lang.tr('Find ID', 'Find ID')),
               ),
               TextButton(
                 onPressed: _loading ? null : _showPatientPasswordResetDialog,
