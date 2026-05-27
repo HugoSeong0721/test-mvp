@@ -262,6 +262,20 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     } catch (_) {}
   }
 
+  void _continueAfterProfileSave(PatientProfile profile) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !profile.hasRequiredAlertInfo) {
+        return;
+      }
+      final activeClinic = _store.activeClinicForPatient(profile.id);
+      if (activeClinic == null) {
+        unawaited(_openClinicPicker(autoPrompt: true));
+        return;
+      }
+      Navigator.pushNamed(context, PatientRequestsScreen.routeName);
+    });
+  }
+
   @override
   void dispose() {
     _loadTimeoutTimer?.cancel();
@@ -377,18 +391,27 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   memo: memoController.text.trim(),
                 );
 
-                if (_activeSession != null) {
-                  await PatientProfileService.saveProfile(updated);
-                } else {
+                try {
+                  if (_activeSession != null) {
+                    await PatientProfileService.saveProfile(updated);
+                  } else {
+                    _store.saveProfile(updated);
+                    _store.setCurrentPatientProfile(updated.id);
+                  }
+                } catch (_) {
                   _store.saveProfile(updated);
                   _store.setCurrentPatientProfile(updated.id);
-                  setState(() {});
                 }
+
+                _store.saveProfile(updated);
+                _store.setCurrentPatientProfile(updated.id);
+                setState(() => _sessionBackedProfile = updated);
 
                 if (!context.mounted) {
                   return;
                 }
                 Navigator.pop(context);
+                _continueAfterProfileSave(updated);
               },
               child: Text(lang.tr('Save', '저장')),
             ),
