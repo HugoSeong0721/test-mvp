@@ -348,6 +348,54 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
     }
   }
 
+  Future<void> _continueWithEmailOnly() async {
+    final lang = AppLanguageController.instance;
+    final email = _emailController.text.trim();
+    final name = _nameController.text.trim();
+
+    _setFormError(null);
+    if (email.isEmpty) {
+      _setFormError(lang.tr('Enter email.', 'ì´ë©”ì¼ í•„ìš”'));
+      return;
+    }
+
+    setState(() => _loading = true);
+    try {
+      final session = await BetaSessionService.continueWithEmailLocally(
+        email: email,
+        name: name,
+      ).timeout(_authTimeout);
+      await _preparePatientPortalContext(session).timeout(_authTimeout);
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          settings: RouteSettings(
+            name: PatientHomeScreen.routeName,
+            arguments: {
+              if (_linkedClinicId != null) 'clinicId': _linkedClinicId,
+            },
+          ),
+          builder: (_) => const PatientHomeScreen(),
+        ),
+      );
+    } on LocalBetaAuthException catch (error) {
+      _setFormError(_friendlyLocalAuthMessage(error));
+    } catch (error) {
+      _setFormError(
+        lang.tr(
+          'Could not continue with email: $error',
+          'Could not continue with email: $error',
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
   Future<void> _registerTester({
     required String name,
     required String email,
@@ -814,6 +862,12 @@ class _PatientBetaAuthScreenState extends State<PatientBetaAuthScreen> {
               _isRegisterMode ? Icons.arrow_circle_right_outlined : Icons.login,
             ),
             label: Text(_loading ? lang.tr('Working...', '처리 중') : submitLabel),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _loading ? null : _continueWithEmailOnly,
+            icon: const Icon(Icons.mail_outline),
+            label: Text(lang.tr('Continue with email', 'Continue with email')),
           ),
           const SizedBox(height: 2),
           Wrap(

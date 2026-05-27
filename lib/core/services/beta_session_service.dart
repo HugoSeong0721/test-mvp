@@ -145,6 +145,53 @@ class BetaSessionService {
     return _localSession!;
   }
 
+  static Future<PatientSession> continueWithEmailLocally({
+    required String email,
+    String? name,
+  }) async {
+    await _ensureInitialized();
+
+    final normalizedEmail = _normalizeEmail(email);
+    final trimmedName = name?.trim() ?? '';
+    if (!_looksLikeEmail(normalizedEmail)) {
+      throw const LocalBetaAuthException('invalid-email');
+    }
+
+    final accounts = _readLocalAccounts();
+    final now = DateTime.now().toIso8601String();
+    final index = accounts.indexWhere(
+      (account) => account.email == normalizedEmail,
+    );
+    late final _LocalBetaAccount account;
+    if (index >= 0) {
+      account = accounts[index].copyWith(
+        name: trimmedName.isEmpty ? accounts[index].name : trimmedName,
+        lastLoginAtIso: now,
+      );
+      accounts[index] = account;
+    } else {
+      account = _LocalBetaAccount(
+        id: _localUserIdForEmail(normalizedEmail),
+        email: normalizedEmail,
+        passwordHash: '',
+        name: trimmedName.isEmpty
+            ? normalizedEmail.split('@').first
+            : trimmedName,
+        createdAtIso: now,
+        lastLoginAtIso: now,
+      );
+      accounts.add(account);
+    }
+    await _saveLocalAccounts(accounts);
+
+    _localSession = account.toSession();
+    await _preferences().then(
+      (prefs) => prefs.setString(_sessionEmailKey, normalizedEmail),
+    );
+    _emitSession();
+    return _localSession!;
+  }
+
   static Future<void> signOut() async {
     await _ensureInitialized();
     _localSession = null;
