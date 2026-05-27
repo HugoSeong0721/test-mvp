@@ -448,10 +448,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 vertical: compact ? 8 : 16,
               ),
               title: Text(lang.tr('Choose clinic', '한의원 선택')),
-              content: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 720),
+              content: SizedBox(
+                width: 720,
+                height: compact
+                    ? screenSize.height * 0.54
+                    : screenSize.height * 0.58,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextField(
@@ -464,8 +466,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           setDialogState(() => query = value.trim()),
                     ),
                     const SizedBox(height: 14),
-                    SizedBox(
-                      height: screenSize.height * (compact ? 0.52 : 0.58),
+                    Expanded(
                       child: SingleChildScrollView(
                         child: Column(
                           children:
