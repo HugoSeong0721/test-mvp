@@ -262,6 +262,29 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     } catch (_) {}
   }
 
+  Future<void> _connectClinicInBackground({
+    required PatientProfile profile,
+    required String clinicId,
+    required bool makeDefault,
+  }) async {
+    _store.saveProfile(profile);
+    _store.setCurrentPatientProfile(profile.id);
+    if (makeDefault) {
+      await _store.selectClinicForPatient(
+        patientId: profile.id,
+        clinicId: clinicId,
+      );
+    }
+    await _store.continueWithClinicForPatient(
+      patientId: profile.id,
+      clinicId: clinicId,
+    );
+    await _ensureStarterQuestionsForClinic(
+      profile: profile,
+      clinicId: clinicId,
+    );
+  }
+
   void _continueAfterProfileSave(PatientProfile profile) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !profile.hasRequiredAlertInfo) {
@@ -552,7 +575,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                                   ),
                                             ),
                                           ),
-                                          if (isCurrent)
+                                          if (isCurrent &&
+                                              isDefault &&
+                                              !isDefault)
                                             _buildClinicStatusChip(
                                               context,
                                               lang.tr('Current', '현재 선택'),
@@ -599,32 +624,18 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         children: [
                                           if (!isCurrent)
                                             FilledButton.tonalIcon(
-                                              onPressed: () async {
-                                                _store.saveProfile(profile);
-                                                _store.setCurrentPatientProfile(
-                                                  profile.id,
+                                              onPressed: () {
+                                                unawaited(
+                                                  _connectClinicInBackground(
+                                                    profile: profile,
+                                                    clinicId: clinic.id,
+                                                    makeDefault: true,
+                                                  ),
                                                 );
-                                                await _store
-                                                    .selectClinicForPatient(
-                                                      patientId: patientId,
-                                                      clinicId: clinic.id,
-                                                    );
-                                                await _store
-                                                    .continueWithClinicForPatient(
-                                                      patientId: patientId,
-                                                      clinicId: clinic.id,
-                                                    );
-                                                await _ensureStarterQuestionsForClinic(
-                                                  profile: profile,
-                                                  clinicId: clinic.id,
-                                                );
-                                                if (!context.mounted) {
-                                                  return;
-                                                }
+                                                Navigator.pop(context);
                                                 if (!mounted) {
                                                   return;
                                                 }
-                                                Navigator.pop(context);
                                                 ScaffoldMessenger.of(
                                                   this.context,
                                                 ).showSnackBar(
@@ -649,6 +660,27 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                               ),
                                             ),
                                           if (isCurrent)
+                                            FilledButton.icon(
+                                              onPressed: () {
+                                                unawaited(
+                                                  _connectClinicInBackground(
+                                                    profile: profile,
+                                                    clinicId: clinic.id,
+                                                    makeDefault: false,
+                                                  ),
+                                                );
+                                                Navigator.pop(context);
+                                              },
+                                              icon: const Icon(
+                                                Icons.arrow_forward,
+                                              ),
+                                              label: Text(
+                                                lang.tr('Continue', 'Continue'),
+                                              ),
+                                            ),
+                                          if (isCurrent &&
+                                              isDefault &&
+                                              !isDefault)
                                             FilledButton.icon(
                                               onPressed: () async {
                                                 _store.saveProfile(profile);
