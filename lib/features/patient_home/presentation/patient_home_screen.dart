@@ -465,7 +465,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     ),
                     const SizedBox(height: 14),
                     SizedBox(
-                      height: screenSize.height * (compact ? 0.7 : 0.58),
+                      height: screenSize.height * (compact ? 0.52 : 0.58),
                       child: SingleChildScrollView(
                         child: Column(
                           children:

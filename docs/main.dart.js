@@ -103887,7 +103887,7 @@ k=a6.r
 j=k.a===B.d
 i=A.f(j?"Choose clinic":"\ud55c\uc758\uc6d0 \uc120\ud0dd",a7,a7,a7,a7,a7,a7,a7)
 h=A.bJ(!1,a6.w,A.bw(a7,a7,a7,a7,a7,a7,a7,a7,!0,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,j?"Search clinic":"\ud55c\uc758\uc6d0 \uac80\uc0c9",!0,!0,!1,a7,B.mV,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7),a7,a7,1,a7,!1,new A.aD9(b3,b6),a7,a7)
-j=l?0.7:0.58
+j=l?0.52:0.58
 g=A.P(b4).i("M<1,kn>")
 b0=A.R(new A.M(b4,new A.aDa(a8,b1,b2,l,b5,k,a6.x,b0,b6),g),g.i("ah.E"))
 g=B.dx.N(0.2)
