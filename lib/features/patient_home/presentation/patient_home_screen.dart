@@ -450,6 +450,23 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             final currentClinic = _store.activeClinicForPatient(patientId);
             final defaultClinicId = _store.defaultClinicIdForPatient(patientId);
             final results = _store.searchClinics(query);
+            final clinicNameQuery = requestClinicNameController.text
+                .trim()
+                .toLowerCase();
+            final suggestedClinics = clinicNameQuery.isEmpty
+                ? const <ClinicCenter>[]
+                : _store.patientVisibleClinicCenters
+                      .where((clinic) {
+                        final haystack = [
+                          clinic.name,
+                          clinic.practitionerName,
+                          clinic.location,
+                          clinic.searchKeywords,
+                        ].join(' ').toLowerCase();
+                        return haystack.contains(clinicNameQuery);
+                      })
+                      .take(4)
+                      .toList();
             final canRequestClinic =
                 requestClinicNameController.text.trim().isNotEmpty &&
                 !isSendingClinicOpenRequest;
@@ -733,6 +750,42 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                           ),
                                         ),
                                       ),
+                                      if (suggestedClinics.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
+                                            children: [
+                                              for (final clinic
+                                                  in suggestedClinics)
+                                                ActionChip(
+                                                  avatar: const Icon(
+                                                    Icons
+                                                        .local_hospital_outlined,
+                                                    size: 16,
+                                                  ),
+                                                  label: Text(clinic.name),
+                                                  onPressed: () {
+                                                    requestClinicNameController
+                                                            .text =
+                                                        clinic.name;
+                                                    requestPractitionerController
+                                                            .text =
+                                                        clinic.practitionerName;
+                                                    requestLocationController
+                                                            .text =
+                                                        clinic.location;
+                                                    requestNoteController.text =
+                                                        clinic.patientNote;
+                                                    setDialogState(() {});
+                                                  },
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                       const SizedBox(height: 8),
                                       TextField(
                                         controller:
