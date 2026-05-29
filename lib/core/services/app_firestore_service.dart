@@ -288,10 +288,6 @@ class AppFirestoreService {
 
     final docId = 'initial_tcm_${normalizedPatientId}_$normalizedClinicId';
     final ref = _db.collection('answer_requests').doc(docId);
-    final existing = await ref.get();
-    if (existing.exists) {
-      return docId;
-    }
 
     await ref.set({
       'patientId': normalizedPatientId,
@@ -326,20 +322,24 @@ class AppFirestoreService {
         ],
       },
       'requestedAt': FieldValue.serverTimestamp(),
-    });
+    }, SetOptions(merge: true));
 
     if (patientEmail.trim().isNotEmpty) {
-      await _queuePortalEmail(
-        patientName: patientName,
-        patientEmail: patientEmail,
-        patientTime: 'New patient onboarding',
-        lastVisitDate: 'Not yet visited',
-        selectedQuestions: initialTcmIntakeQuestions,
-        customQuestionsByCategory: const {},
-        note:
-            'Your first TCM baseline questions are ready. Answer them in the portal so your practitioner can start building your care picture.',
-        requestType: 'answer_request',
-      );
+      try {
+        await _queuePortalEmail(
+          patientName: patientName,
+          patientEmail: patientEmail,
+          patientTime: 'New patient onboarding',
+          lastVisitDate: 'Not yet visited',
+          selectedQuestions: initialTcmIntakeQuestions,
+          customQuestionsByCategory: const {},
+          note:
+              'Your first TCM baseline questions are ready. Answer them in the portal so your practitioner can start building your care picture.',
+          requestType: 'answer_request',
+        );
+      } catch (_) {
+        // The in-app request is the source of truth; email queueing is best-effort.
+      }
     }
 
     return docId;

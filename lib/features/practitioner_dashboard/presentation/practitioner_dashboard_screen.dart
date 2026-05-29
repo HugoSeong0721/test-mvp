@@ -3189,7 +3189,7 @@ class _PractitionerDashboardScreenState
           ),
         ),
       );
-    } catch (error) {
+    } catch (_) {
       if (!context.mounted) {
         return;
       }
@@ -3197,8 +3197,8 @@ class _PractitionerDashboardScreenState
         SnackBar(
           content: Text(
             AppLanguageController.instance.tr(
-              'Failed to send questions: $error',
-              'Failed to send questions: $error',
+              'Could not send questions right now. Refresh and try again.',
+              'Could not send questions right now. Refresh and try again.',
             ),
           ),
         ),
@@ -3356,7 +3356,7 @@ class _PractitionerDashboardScreenState
                       ),
                     ),
                   );
-                } catch (error) {
+                } catch (_) {
                   if (!context.mounted) {
                     return;
                   }
@@ -3364,8 +3364,8 @@ class _PractitionerDashboardScreenState
                     SnackBar(
                       content: Text(
                         AppLanguageController.instance.tr(
-                          'Failed to send questions: $error',
-                          'Failed to send questions: $error',
+                          'Could not send questions right now. Refresh and try again.',
+                          'Could not send questions right now. Refresh and try again.',
                         ),
                       ),
                     ),
