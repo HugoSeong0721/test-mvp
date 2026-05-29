@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+
+import '../../firebase_options.dart';
 
 class AppFirestoreService {
   AppFirestoreService._();
 
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static const String _databaseId = '(default)';
 
   static const List<String> initialTcmIntakeQuestions = [
     'What is the main reason you want care right now?',
@@ -236,7 +242,7 @@ class AppFirestoreService {
     required String note,
     String requestType = 'answer_request',
   }) async {
-    final doc = await _db.collection('answer_requests').add({
+    final payload = {
       'patientId': patientId,
       'clinicId': clinicId,
       'patientName': patientName,
@@ -252,22 +258,43 @@ class AppFirestoreService {
       'status': 'pending',
       'source': 'practitioner_dashboard',
       'requestedAt': FieldValue.serverTimestamp(),
-    });
+    };
 
-    if (patientEmail.trim().isNotEmpty) {
-      await _queuePortalEmail(
-        patientName: patientName,
-        patientEmail: patientEmail,
-        patientTime: patientTime,
-        lastVisitDate: lastVisitDate,
-        selectedQuestions: selectedQuestions,
-        customQuestionsByCategory: customQuestionsByCategory,
-        note: note,
-        requestType: requestType,
+    late final String docId;
+    try {
+      final doc = await _db.collection('answer_requests').add(payload);
+      docId = doc.id;
+    } catch (_) {
+      docId =
+          'answer_${DateTime.now().microsecondsSinceEpoch}_${patientId.hashCode.abs()}';
+      await _setDocumentViaRest(
+        collection: 'answer_requests',
+        docId: docId,
+        data: {
+          ...payload,
+          'requestedAt': DateTime.now().toUtc().toIso8601String(),
+        },
       );
     }
 
-    return doc.id;
+    if (patientEmail.trim().isNotEmpty) {
+      try {
+        await _queuePortalEmail(
+          patientName: patientName,
+          patientEmail: patientEmail,
+          patientTime: patientTime,
+          lastVisitDate: lastVisitDate,
+          selectedQuestions: selectedQuestions,
+          customQuestionsByCategory: customQuestionsByCategory,
+          note: note,
+          requestType: requestType,
+        );
+      } catch (_) {
+        // Email queueing should not block the in-app question request.
+      }
+    }
+
+    return docId;
   }
 
   static Future<String?> ensureInitialTcmIntakeRequest({
@@ -289,7 +316,7 @@ class AppFirestoreService {
     final docId = 'initial_tcm_${normalizedPatientId}_$normalizedClinicId';
     final ref = _db.collection('answer_requests').doc(docId);
 
-    await ref.set({
+    final payload = {
       'patientId': normalizedPatientId,
       'clinicId': normalizedClinicId,
       'patientName': patientName,
@@ -322,7 +349,20 @@ class AppFirestoreService {
         ],
       },
       'requestedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    };
+
+    try {
+      await ref.set(payload, SetOptions(merge: true));
+    } catch (_) {
+      await _setDocumentViaRest(
+        collection: 'answer_requests',
+        docId: docId,
+        data: {
+          ...payload,
+          'requestedAt': DateTime.now().toUtc().toIso8601String(),
+        },
+      );
+    }
 
     if (patientEmail.trim().isNotEmpty) {
       try {
@@ -343,6 +383,67 @@ class AppFirestoreService {
     }
 
     return docId;
+  }
+
+  static Future<void> _setDocumentViaRest({
+    required String collection,
+    required String docId,
+    required Map<String, dynamic> data,
+  }) async {
+    final options = DefaultFirebaseOptions.web;
+    final encodedDocId = Uri.encodeComponent(docId);
+    final uri = Uri.parse(
+      'https://firestore.googleapis.com/v1/projects/'
+      '${options.projectId}/databases/$_databaseId/documents/'
+      '$collection/$encodedDocId?key=${options.apiKey}',
+    );
+    final response = await http.patch(
+      uri,
+      headers: const {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'fields': data.map(
+          (key, value) => MapEntry(key, _firestoreRestValue(value)),
+        ),
+      }),
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw StateError('Firestore REST write failed: ${response.statusCode}');
+    }
+  }
+
+  static Map<String, dynamic> _firestoreRestValue(Object? value) {
+    if (value is FieldValue) {
+      return {'timestampValue': DateTime.now().toUtc().toIso8601String()};
+    }
+    if (value is DateTime) {
+      return {'timestampValue': value.toUtc().toIso8601String()};
+    }
+    if (value is bool) {
+      return {'booleanValue': value};
+    }
+    if (value is int) {
+      return {'integerValue': value.toString()};
+    }
+    if (value is double) {
+      return {'doubleValue': value};
+    }
+    if (value is Iterable) {
+      return {
+        'arrayValue': {
+          'values': value.map((item) => _firestoreRestValue(item)).toList(),
+        },
+      };
+    }
+    if (value is Map) {
+      return {
+        'mapValue': {
+          'fields': value.map(
+            (key, item) => MapEntry(key.toString(), _firestoreRestValue(item)),
+          ),
+        },
+      };
+    }
+    return {'stringValue': value?.toString() ?? ''};
   }
 
   static Future<String> sendPractitionerNote({

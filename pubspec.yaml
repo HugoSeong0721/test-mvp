@@ -38,6 +38,7 @@ dependencies:
   cloud_firestore: ^6.3.0
   firebase_auth: ^6.4.0
   google_fonts: ^6.3.2
+  http: ^1.6.0
   shared_preferences: ^2.5.3
   crypto: ^3.0.6
 
