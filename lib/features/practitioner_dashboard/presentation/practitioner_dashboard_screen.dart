@@ -3800,7 +3800,7 @@ class _PractitionerDashboardScreenState
                             ),
                           ),
                         );
-                      } catch (error) {
+                      } catch (_) {
                         if (!mounted || !dialogContext.mounted) {
                           return;
                         }
@@ -3808,8 +3808,8 @@ class _PractitionerDashboardScreenState
                           SnackBar(
                             content: Text(
                               AppLanguageController.instance.tr(
-                                'Failed to save answer request: $error',
-                                '답변 요청 저장 실패: $error',
+                                'Could not save the answer request right now. Refresh and try again.',
+                                'Could not save the answer request right now. Refresh and try again.',
                               ),
                             ),
                           ),
@@ -3966,7 +3966,7 @@ class _PractitionerDashboardScreenState
                       ),
                     ),
                   );
-                } catch (error) {
+                } catch (_) {
                   if (!mounted || !dialogContext.mounted) {
                     return;
                   }
@@ -3974,8 +3974,8 @@ class _PractitionerDashboardScreenState
                     SnackBar(
                       content: Text(
                         AppLanguageController.instance.tr(
-                          'Failed to save the patient note: $error',
-                          '환자 쪽지 저장 실패: $error',
+                          'Could not save the patient note right now. Refresh and try again.',
+                          'Could not save the patient note right now. Refresh and try again.',
                         ),
                       ),
                     ),

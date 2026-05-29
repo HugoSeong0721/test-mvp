@@ -39,7 +39,7 @@
   </div>
   <script>
     (async function () {
-      const refreshKey = 'test-mvp-sw-refresh-v2';
+      const refreshKey = 'test-mvp-cache-refresh-v3';
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
@@ -58,7 +58,7 @@
         }
       }
       const script = document.createElement('script');
-      script.src = 'flutter_bootstrap.js?v=' + Date.now();
+      script.src = 'flutter_bootstrap.js?build=20260529-1505-' + Date.now();
       script.async = true;
       document.body.appendChild(script);
     })();
