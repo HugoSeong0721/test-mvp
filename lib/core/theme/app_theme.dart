@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color ink = Color(0xFF1F2523);
-  static const Color pine = Color(0xFF145245);
-  static const Color jade = Color(0xFF2F6B5D);
-  static const Color mint = Color(0xFFF4FAF8);
-  static const Color cream = Colors.white;
-  static const Color surface = Colors.white;
-  static const Color surfaceSoft = Color(0xFFF7F8F7);
-  static const Color copper = Color(0xFF9A6A3F);
-  static const Color blush = Color(0xFFFAF7F4);
-  static const Color border = Color(0xFFE1E4E2);
-  static const String appFontFamily = 'Calibri';
+  static const Color ink = Color(0xFF17211F);
+  static const Color pine = Color(0xFF0F5D4F);
+  static const Color jade = Color(0xFF247A69);
+  static const Color mint = Color(0xFFE6F6EF);
+  static const Color cream = Color(0xFFFFFCF4);
+  static const Color surface = Color(0xFFFFFDF8);
+  static const Color surfaceSoft = Color(0xFFF2F7F3);
+  static const Color copper = Color(0xFFF16B4F);
+  static const Color blush = Color(0xFFFFF0EA);
+  static const Color sun = Color(0xFFFFD166);
+  static const Color sky = Color(0xFF256D85);
+  static const Color lilac = Color(0xFFF2EDFF);
+  static const Color border = Color(0xFFE0D8C8);
+  static const String appFontFamily = 'Arial';
 
   static ThemeData light() {
     const colorScheme = ColorScheme(
@@ -42,47 +45,47 @@ class AppTheme {
     final textTheme = baseBody.copyWith(
       displayLarge: const TextStyle(
         fontFamily: appFontFamily,
-        fontSize: 48,
-        fontWeight: FontWeight.w700,
+        fontSize: 52,
+        fontWeight: FontWeight.w800,
         height: 1.05,
         color: ink,
       ),
       displayMedium: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 38,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         height: 1.08,
         color: ink,
       ),
       displaySmall: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 30,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         height: 1.12,
         color: ink,
       ),
       headlineLarge: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 28,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: ink,
       ),
       headlineMedium: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 23,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: ink,
       ),
       titleLarge: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 21,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: ink,
       ),
       titleMedium: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 16,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: ink,
       ),
       bodyLarge: const TextStyle(
@@ -102,7 +105,7 @@ class AppTheme {
       labelLarge: const TextStyle(
         fontFamily: appFontFamily,
         fontSize: 14,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: ink,
       ),
       labelMedium: const TextStyle(
@@ -114,7 +117,7 @@ class AppTheme {
     );
 
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(8),
       side: const BorderSide(color: border),
     );
 
@@ -122,7 +125,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       fontFamily: appFontFamily,
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: cream,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -131,38 +134,38 @@ class AppTheme {
         scrolledUnderElevation: 0,
         foregroundColor: ink,
         titleTextStyle: textTheme.titleLarge,
-        toolbarHeight: 68,
+        toolbarHeight: 64,
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
-        shadowColor: Colors.black.withValues(alpha: 0.03),
+        color: surface,
+        shadowColor: ink.withValues(alpha: 0.08),
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
-        elevation: 0,
+        elevation: 0.5,
         shape: shape,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: Colors.white,
+        backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
         shape: shape,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Colors.white.withValues(alpha: 0.86),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: pine, width: 1.4),
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(
@@ -180,7 +183,7 @@ class AppTheme {
             EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           ),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
         ),
@@ -193,7 +196,7 @@ class AppTheme {
             EdgeInsets.symmetric(horizontal: 18, vertical: 15),
           ),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
         ),
@@ -221,7 +224,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: ink,
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: Colors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       listTileTheme: const ListTileThemeData(
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),

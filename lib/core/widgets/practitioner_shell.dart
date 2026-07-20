@@ -25,25 +25,25 @@ class PractitionerNavSpec {
 
 const PractitionerNavSpec _dashboardNavSpec = PractitionerNavSpec(
   item: PractitionerNavItem.dashboard,
-  icon: Icons.space_dashboard_outlined,
-  labelEn: 'Dashboard',
-  labelKo: '대시보드',
+  icon: Icons.forum_rounded,
+  labelEn: 'Questions',
+  labelKo: 'Questions',
   routeName: '/dashboard',
 );
 
 const List<PractitionerNavSpec> _analyticsNavSpecs = [
   PractitionerNavSpec(
     item: PractitionerNavItem.insights,
-    icon: Icons.insights_outlined,
+    icon: Icons.auto_graph_rounded,
     labelEn: 'Insights',
-    labelKo: '인사이트',
+    labelKo: 'Insights',
     routeName: '/insights',
   ),
   PractitionerNavSpec(
     item: PractitionerNavItem.symptomTrend,
-    icon: Icons.show_chart,
-    labelEn: 'Symptom Trends',
-    labelKo: '증상 추세',
+    icon: Icons.show_chart_rounded,
+    labelEn: 'Trends',
+    labelKo: 'Trends',
     routeName: '/symptom-trend',
   ),
 ];
@@ -87,7 +87,7 @@ class PractitionerShell extends StatefulWidget {
   final List<PractitionerToolItem> tools;
   final Widget body;
 
-  static const double _sidebarWidth = 232;
+  static const double _sidebarWidth = 236;
   static const double _wideBreakpoint = 1100;
   static const Duration _animationDuration = Duration(milliseconds: 220);
 
@@ -110,7 +110,7 @@ class _PractitionerShellState extends State<PractitionerShell> {
       drawer: wide
           ? null
           : Drawer(
-              backgroundColor: AppTheme.pine,
+              backgroundColor: AppTheme.ink,
               child: SafeArea(
                 child: _Sidebar(
                   currentItem: widget.currentItem,
@@ -176,46 +176,50 @@ class _Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lang = AppLanguageController.instance;
-
     return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.pine,
-        border: Border(right: BorderSide(color: Color(0x33000000))),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.ink, AppTheme.pine, AppTheme.sky],
+        ),
+        border: Border(
+          right: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const _SidebarBrand(),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
+            padding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.checklist_rtl_rounded,
+                    color: AppTheme.sun,
+                    size: 20,
                   ),
-                  child: const Icon(
-                    Icons.spa_outlined,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    lang.tr('Test MVP', '테스트 MVP'),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Send basic 10. Read replies. Refine TCM view.',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        height: 1.25,
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const Divider(height: 1, color: Color(0x22FFFFFF)),
@@ -229,25 +233,69 @@ class _Sidebar extends StatelessWidget {
                   selected: _dashboardNavSpec.item == currentItem,
                 ),
                 if (tools.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  _SidebarSectionLabel(
-                    label: AppLanguageController.instance.tr('Tools', '도구'),
-                  ),
+                  const SizedBox(height: 16),
+                  const _SidebarSectionLabel(label: 'Work'),
                   for (final tool in tools) _ToolTile(tool: tool),
                 ],
-                const SizedBox(height: 14),
-                _SidebarSectionLabel(
-                  label: AppLanguageController.instance.tr('Analytics', '분석'),
-                ),
+                const SizedBox(height: 16),
+                const _SidebarSectionLabel(label: 'Later'),
                 for (final spec in _analyticsNavSpecs)
                   _NavTile(spec: spec, selected: spec.item == currentItem),
               ],
             ),
           ),
           const Divider(height: 1, color: Color(0x22FFFFFF)),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 14),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(10, 8, 10, 14),
             child: _SignOutTile(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SidebarBrand extends StatelessWidget {
+  const _SidebarBrand();
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppTheme.sun,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.spa_rounded, color: AppTheme.ink),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  lang.tr('Care Chat', 'Care Chat'),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Practitioner',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.66),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -265,18 +313,15 @@ class _NavTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
     final label = lang.tr(spec.labelEn, spec.labelKo);
-    final fg = Colors.white;
-    final bg = selected
-        ? Colors.white.withValues(alpha: 0.16)
-        : Colors.transparent;
+    final fg = selected ? AppTheme.ink : Colors.white;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Material(
-        color: bg,
-        borderRadius: BorderRadius.circular(10),
+        color: selected ? AppTheme.sun : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           onTap: selected
               ? null
               : () {
@@ -287,7 +332,7 @@ class _NavTile extends StatelessWidget {
                   Navigator.of(context).pushReplacementNamed(spec.routeName);
                 },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Row(
               children: [
                 Icon(spec.icon, size: 18, color: fg),
@@ -297,7 +342,7 @@ class _NavTile extends StatelessWidget {
                     label,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: fg,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -324,7 +369,8 @@ class _SidebarSectionLabel extends StatelessWidget {
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: Colors.white.withValues(alpha: 0.55),
-          letterSpacing: 0.6,
+          letterSpacing: 0,
+          fontWeight: FontWeight.w900,
         ),
       ),
     );
@@ -339,18 +385,15 @@ class _ToolTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
-    final fg = Colors.white;
-    final bg = tool.active
-        ? Colors.white.withValues(alpha: 0.16)
-        : Colors.transparent;
+    final fg = tool.active ? AppTheme.ink : Colors.white;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1),
       child: Material(
-        color: bg,
-        borderRadius: BorderRadius.circular(10),
+        color: tool.active ? AppTheme.sun : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           onTap: () {
             if (Scaffold.of(context).hasDrawer &&
                 Scaffold.of(context).isDrawerOpen) {
@@ -362,16 +405,16 @@ class _ToolTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
-                Icon(tool.icon, size: 17, color: fg.withValues(alpha: 0.9)),
+                Icon(tool.icon, size: 17, color: fg),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     lang.tr(tool.labelEn, tool.labelKo),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: fg.withValues(alpha: 0.92),
+                      color: fg,
                       fontWeight: tool.active
-                          ? FontWeight.w700
-                          : FontWeight.w500,
+                          ? FontWeight.w900
+                          : FontWeight.w700,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -394,9 +437,9 @@ class _SignOutTile extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(8),
       child: InkWell(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         onTap: () async {
           await PractitionerSessionService.signOut();
           if (!context.mounted) {
@@ -408,13 +451,14 @@ class _SignOutTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
           child: Row(
             children: [
-              const Icon(Icons.logout, size: 18, color: Colors.white),
+              const Icon(Icons.logout_rounded, size: 18, color: Colors.white),
               const SizedBox(width: 12),
               Text(
-                lang.tr('Sign out', '로그아웃'),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                lang.tr('Sign out', 'Sign out'),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -445,66 +489,80 @@ class _TopBar extends StatelessWidget {
     final lang = AppLanguageController.instance;
     final compact = MediaQuery.sizeOf(context).width < 430;
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 6 : 12,
-        vertical: compact ? 8 : 10,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 10 : 16,
+        compact ? 10 : 16,
+        compact ? 10 : 16,
+        compact ? 8 : 10,
       ),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.78),
-        border: Border(
-          bottom: BorderSide(color: AppTheme.border.withValues(alpha: 0.6)),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 8 : 12,
+          vertical: compact ? 8 : 10,
         ),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: onToggleSidebar,
-            icon: Icon(sidebarVisible ? Icons.menu_open : Icons.menu),
-            tooltip: sidebarVisible
-                ? lang.tr('Hide menu', '메뉴 숨기기')
-                : lang.tr('Show menu', '메뉴 표시'),
-          ),
-          if (!compact) const SizedBox(width: 4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (subtitle != null && subtitle!.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+        decoration: BoxDecoration(
+          color: AppTheme.surface.withValues(alpha: 0.94),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppTheme.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.ink.withValues(alpha: 0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              onPressed: onToggleSidebar,
+              icon: Icon(sidebarVisible ? Icons.menu_open : Icons.menu),
+              tooltip: sidebarVisible
+                  ? lang.tr('Hide menu', 'Hide menu')
+                  : lang.tr('Show menu', 'Show menu'),
+            ),
+            if (!compact) const SizedBox(width: 4),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
-                    subtitle!,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: AppTheme.ink.withValues(alpha: 0.62),
+                    title,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (subtitle != null && subtitle!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.62),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ),
-          if (!compact && actions.isNotEmpty) ...[
-            SizedBox(width: compact ? 4 : 12),
-            Flexible(
-              child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 2,
-                runSpacing: 2,
-                children: actions,
               ),
             ),
+            if (!compact && actions.isNotEmpty) ...[
+              const SizedBox(width: 12),
+              Flexible(
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: actions,
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

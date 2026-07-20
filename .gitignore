@@ -43,6 +43,7 @@ migrate_working_dir/
 docs/route-captures/
 web/route-captures/
 docs/patient-swiftshader-test.png
+docs/redesign-home-mobile.png
 
 # Symbolication related
 app.*.symbols

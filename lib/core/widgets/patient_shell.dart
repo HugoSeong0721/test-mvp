@@ -25,14 +25,14 @@ class PatientNavSpec {
 const List<PatientNavSpec> kPatientNavSpecs = [
   PatientNavSpec(
     item: PatientNavItem.home,
-    icon: Icons.home_outlined,
+    icon: Icons.home_rounded,
     labelEn: 'Home',
     labelKo: 'Home',
     routeName: '/patient-home',
   ),
   PatientNavSpec(
     item: PatientNavItem.requests,
-    icon: Icons.forum_outlined,
+    icon: Icons.chat_bubble_rounded,
     labelEn: 'Questions',
     labelKo: 'Questions',
     routeName: '/patient-requests',
@@ -63,9 +63,13 @@ class PatientShell extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Header(title: title, subtitle: subtitle, actions: actions),
-              _TabBar(currentItem: currentItem),
+              _PatientHeader(
+                title: title,
+                subtitle: subtitle,
+                actions: actions,
+              ),
               Expanded(child: body),
+              _PatientBottomNav(currentItem: currentItem),
             ],
           ),
         ),
@@ -74,8 +78,12 @@ class PatientShell extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.title, required this.actions, this.subtitle});
+class _PatientHeader extends StatelessWidget {
+  const _PatientHeader({
+    required this.title,
+    required this.actions,
+    this.subtitle,
+  });
 
   final String title;
   final String? subtitle;
@@ -86,110 +94,135 @@ class _Header extends StatelessWidget {
     final theme = Theme.of(context);
     final lang = AppLanguageController.instance;
     final compact = MediaQuery.sizeOf(context).width < 430;
+    final visibleActions = compact ? actions.take(2).toList() : actions;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(compact ? 12 : 20, compact ? 6 : 10, 8, 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
-        border: Border(
-          bottom: BorderSide(color: AppTheme.border.withValues(alpha: 0.4)),
-        ),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 12 : 20,
+        compact ? 10 : 16,
+        compact ? 12 : 20,
+        compact ? 8 : 12,
       ),
-      child: Row(
-        children: [
-          if (!compact)
+      child: Container(
+        padding: EdgeInsets.all(compact ? 12 : 16),
+        decoration: BoxDecoration(
+          color: AppTheme.surface.withValues(alpha: 0.94),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppTheme.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.ink.withValues(alpha: 0.08),
+              blurRadius: 22,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
             Container(
-              width: 32,
-              height: 32,
+              width: compact ? 42 : 50,
+              height: compact ? 42 : 50,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppTheme.copper.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
-                Icons.favorite_outline,
+                Icons.favorite_rounded,
                 color: AppTheme.copper,
-                size: 18,
+                size: 24,
               ),
             ),
-          if (!compact) const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style:
-                      (compact
-                              ? theme.textTheme.titleMedium
-                              : theme.textTheme.titleLarge)
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (subtitle != null && subtitle!.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+            SizedBox(width: compact ? 10 : 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
-                    subtitle!,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: AppTheme.ink.withValues(alpha: 0.62),
-                    ),
+                    title,
+                    style:
+                        (compact
+                                ? theme.textTheme.titleMedium
+                                : theme.textTheme.titleLarge)
+                            ?.copyWith(fontWeight: FontWeight.w900),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (subtitle != null && subtitle!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.62),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ),
-          if (!compact && actions.isNotEmpty) ...[
-            const SizedBox(width: 8),
-            Flexible(
-              child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 2,
-                children: actions,
               ),
             ),
-            const SizedBox(width: 4),
-          ],
-          if (!compact)
+            if (visibleActions.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              Flexible(
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 4,
+                  children: visibleActions,
+                ),
+              ),
+            ],
             IconButton(
-              tooltip: lang.tr('Sign out', '로그아웃'),
-              visualDensity: VisualDensity.standard,
+              tooltip: lang.tr('Sign out', 'Sign out'),
               onPressed: () => Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil('/', (_) => false),
-              icon: const Icon(Icons.logout),
+              icon: const Icon(Icons.logout_rounded),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _TabBar extends StatelessWidget {
-  const _TabBar({required this.currentItem});
+class _PatientBottomNav extends StatelessWidget {
+  const _PatientBottomNav({required this.currentItem});
 
   final PatientNavItem currentItem;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 430;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.6),
-        border: Border(
-          bottom: BorderSide(color: AppTheme.border.withValues(alpha: 0.4)),
-        ),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 12 : 20,
+        4,
+        compact ? 12 : 20,
+        compact ? 10 : 16,
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.ink,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.ink.withValues(alpha: 0.14),
+              blurRadius: 22,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
         child: Row(
           children: [
             for (final spec in kPatientNavSpecs)
-              _TabButton(spec: spec, selected: spec.item == currentItem),
+              Expanded(
+                child: _NavButton(
+                  spec: spec,
+                  selected: spec.item == currentItem,
+                ),
+              ),
           ],
         ),
       ),
@@ -197,8 +230,8 @@ class _TabBar extends StatelessWidget {
   }
 }
 
-class _TabButton extends StatelessWidget {
-  const _TabButton({required this.spec, required this.selected});
+class _NavButton extends StatelessWidget {
+  const _NavButton({required this.spec, required this.selected});
 
   final PatientNavSpec spec;
   final bool selected;
@@ -207,66 +240,41 @@ class _TabButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
     final label = lang.tr(spec.labelEn, spec.labelKo);
-    final compact = MediaQuery.sizeOf(context).width < 430;
-    final fg = selected
-        ? AppTheme.copper
-        : AppTheme.ink.withValues(alpha: 0.62);
+    final fg = selected ? AppTheme.ink : Colors.white.withValues(alpha: 0.74);
 
-    return Tooltip(
-      message: label,
-      child: InkWell(
-        onTap: selected
-            ? null
-            : () => Navigator.of(context).pushReplacementNamed(spec.routeName),
-        child: Container(
-          width: compact ? 110 : null,
-          padding: EdgeInsets.symmetric(
-            horizontal: compact ? 8 : 14,
-            vertical: compact ? 8 : 12,
-          ),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: selected ? AppTheme.copper : Colors.transparent,
-                width: 2.5,
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: selected
+              ? null
+              : () =>
+                    Navigator.of(context).pushReplacementNamed(spec.routeName),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 52),
+            decoration: BoxDecoration(
+              color: selected ? AppTheme.sun : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(spec.icon, size: 20, color: fg),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: fg,
+                    fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
-          child: compact
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(spec.icon, size: 18, color: fg),
-                    const SizedBox(height: 3),
-                    Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: fg,
-                        fontWeight: selected
-                            ? FontWeight.w800
-                            : FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(spec.icon, size: 17, color: fg),
-                    const SizedBox(width: 8),
-                    Text(
-                      label,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: fg,
-                        fontWeight: selected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
         ),
       ),
     );

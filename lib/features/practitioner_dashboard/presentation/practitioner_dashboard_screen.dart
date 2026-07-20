@@ -201,7 +201,11 @@ class _PractitionerDashboardScreenState
 
         return PractitionerShell(
           currentItem: PractitionerNavItem.dashboard,
-          title: lang.tr('Practitioner Dashboard', '침술사 대시보드'),
+          title: lang.tr('Questions', 'Questions'),
+          subtitle: lang.tr(
+            'Send basic 10, read replies, and refine the TCM picture.',
+            'Send basic 10, read replies, and refine the TCM picture.',
+          ),
           actions: [
             _buildCompactTopInboxAction(pendingAppointmentInboxCount),
             IconButton(

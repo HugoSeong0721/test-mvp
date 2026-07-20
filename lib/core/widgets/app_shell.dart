@@ -12,11 +12,43 @@ class AppBackdrop extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        const DecoratedBox(decoration: BoxDecoration(color: Colors.white)),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppTheme.cream,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.cream,
+                AppTheme.mint.withValues(alpha: 0.55),
+                AppTheme.lilac.withValues(alpha: 0.55),
+              ],
+            ),
+          ),
+        ),
+        Positioned.fill(child: CustomPaint(painter: _DotGridPainter())),
         Positioned.fill(child: child),
       ],
     );
   }
+}
+
+class _DotGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppTheme.pine.withValues(alpha: 0.08)
+      ..style = PaintingStyle.fill;
+    const step = 32.0;
+    for (double x = 14; x < size.width; x += step) {
+      for (double y = 18; y < size.height; y += step) {
+        canvas.drawCircle(Offset(x, y), 1.4, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class AppPanel extends StatelessWidget {
@@ -41,17 +73,19 @@ class AppPanel extends StatelessWidget {
     return Container(
       padding: compact ? const EdgeInsets.all(16) : padding,
       decoration: BoxDecoration(
-        color: gradient == null ? Colors.white : null,
+        color: gradient == null
+            ? AppTheme.surface.withValues(alpha: 0.94)
+            : null,
         gradient: gradient,
-        borderRadius: BorderRadius.circular(radius),
+        borderRadius: BorderRadius.circular(radius > 8 ? 8 : radius),
         border: Border.all(
           color: borderColor ?? AppTheme.border.withValues(alpha: 0.78),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: AppTheme.ink.withValues(alpha: 0.08),
+            blurRadius: 22,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -96,7 +130,7 @@ class AppMetricChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: backgroundColor ?? Colors.white.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppTheme.border.withValues(alpha: 0.85)),
       ),
       child: Row(
@@ -159,7 +193,7 @@ class AppMetricChip extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(8),
         child: content,
       ),
     );
@@ -201,7 +235,7 @@ class AppGuideStep extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: border),
       ),
       child: Row(

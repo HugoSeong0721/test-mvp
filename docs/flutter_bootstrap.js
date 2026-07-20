@@ -40,11 +40,13 @@ _flutter.loader.load({
   onEntrypointLoaded: async function(engineInitializer) {
     try {
       const appRunner = await engineInitializer.initializeEngine();
-      await appRunner.runApp();
-      const loader = document.getElementById('app-loader');
-      if (loader) {
-        loader.remove();
-      }
+      appRunner.runApp();
+      window.setTimeout(function () {
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+          loader.remove();
+        }
+      }, 300);
     } catch (error) {
       const loader = document.getElementById('app-loader');
       if (loader) {
