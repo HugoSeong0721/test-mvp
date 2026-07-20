@@ -35,7 +35,11 @@
 <body>
   <noscript>This app needs JavaScript enabled.</noscript>
   <div id="app-loader" style="font-family: Arial, sans-serif; padding: 24px; color: #1f2a27;">
-    Loading Test MVP...
+    <strong>Loading Test MVP...</strong>
+    <div id="app-loader-help" style="display:none; margin-top:12px; line-height:1.5;">
+      If the app does not open, use the
+      <a href="mvp-ui-flow-board.html" style="color:#145245; font-weight:700;">visual UI flow board</a>.
+    </div>
   </div>
   <script>
     (async function () {
@@ -61,6 +65,12 @@
       script.src = 'flutter_bootstrap.js?build=20260529-1505-' + Date.now();
       script.async = true;
       document.body.appendChild(script);
+      window.setTimeout(function () {
+        const help = document.getElementById('app-loader-help');
+        if (help) {
+          help.style.display = 'block';
+        }
+      }, 4500);
     })();
   </script>
   <!--
