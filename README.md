@@ -38,6 +38,8 @@ Scheduling and booking confirmation are intentionally removed from the primary U
 
 See [`MVP_UI_AUDIT.md`](MVP_UI_AUDIT.md) for the current full-screen map, connection map, deferred feature list, and rebuild checklist.
 
+For a visual board, open [`docs/mvp-ui-flow-board.html`](docs/mvp-ui-flow-board.html).
+
 Keep these for a later database-backed phase:
 
 - Patient appointment booking requests.

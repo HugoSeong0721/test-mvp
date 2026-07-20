@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MVP UI Flow Board</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1f2523;
+      --muted: #64716d;
+      --line: #dfe5e2;
+      --paper: #ffffff;
+      --soft: #f6faf8;
+      --pine: #145245;
+      --copper: #9a6a3f;
+      --danger: #b42318;
+      --warning: #a15c07;
+      --blue: #22577a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Calibri, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f8fbfa 0%, #eef5f2 100%);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 18px clamp(16px, 3vw, 34px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      max-width: 980px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    main {
+      padding: 22px clamp(14px, 2vw, 28px) 36px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      padding: 8px 11px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--pine);
+    }
+
+    .dot.deferred {
+      background: var(--warning);
+    }
+
+    .dot.broken {
+      background: var(--danger);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .lane {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .lane-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 4px;
+    }
+
+    .lane-title h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .screen {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      padding: 14px;
+      box-shadow: 0 10px 28px rgba(20, 82, 69, 0.07);
+    }
+
+    .screen::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -17px;
+      width: 2px;
+      height: 17px;
+      background: var(--line);
+    }
+
+    .screen:last-child::after {
+      display: none;
+    }
+
+    .screen-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .screen h3 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .route {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status {
+      width: fit-content;
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--pine);
+      background: #e8f3ef;
+    }
+
+    .status.deferred {
+      color: var(--warning);
+      background: #fff4df;
+    }
+
+    .status.broken {
+      color: var(--danger);
+      background: #fff0ee;
+    }
+
+    .mock {
+      overflow: hidden;
+      border: 1px solid #d9e1dd;
+      border-radius: 24px;
+      background: #f7faf8;
+      min-height: 228px;
+    }
+
+    .phone-top {
+      height: 36px;
+      background: #1f2523;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mock-body {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar {
+      height: 34px;
+      border-radius: 10px;
+      background: white;
+      border: 1px solid #dfe5e2;
+    }
+
+    .line {
+      height: 12px;
+      border-radius: 999px;
+      background: #dce6e2;
+    }
+
+    .line.short {
+      width: 58%;
+    }
+
+    .line.mid {
+      width: 74%;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      height: 34px;
+      border-radius: 999px;
+      background: var(--pine);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .mini-btn.secondary {
+      color: var(--ink);
+      background: white;
+      border: 1px solid #dfe5e2;
+    }
+
+    .question-card {
+      border: 1px solid #dfe5e2;
+      border-radius: 14px;
+      background: white;
+      padding: 12px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .alert {
+      border-left: 4px solid var(--danger);
+      padding: 8px 10px;
+      background: #fff6f5;
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .notes {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .notes li + li {
+      margin-top: 4px;
+    }
+
+    .cross-link {
+      display: grid;
+      place-items: center;
+      min-height: 76px;
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .cross-link span {
+      border: 1px dashed var(--blue);
+      border-radius: 999px;
+      background: rgba(34, 87, 122, 0.06);
+      padding: 9px 12px;
+    }
+
+    .batch {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      padding: 16px;
+    }
+
+    .batch h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .batch-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .task {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--soft);
+    }
+
+    .task strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    @media (max-width: 860px) {
+      .board {
+        grid-template-columns: 1fr;
+      }
+
+      .batch-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MVP UI Flow Board</h1>
+    <p class="subtitle">A visual map for rebuilding the app around patient-practitioner questions, answers, and TCM follow-up.</p>
+  </header>
+
+  <main>
+    <div class="legend" aria-label="Legend">
+      <span class="pill"><span class="dot"></span>Keep / simplify</span>
+      <span class="pill"><span class="dot deferred"></span>Defer from primary UI</span>
+      <span class="pill"><span class="dot broken"></span>Currently blocking capture or flow</span>
+    </div>
+
+    <section class="board">
+      <div class="lane">
+        <div class="lane-title">
+          <h2>Patient Flow</h2>
+          <span class="status">Target path</span>
+        </div>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>1. Patient auth</h3>
+              <div class="route">/patient, /patient-beta-auth</div>
+            </div>
+            <span class="status">Keep</span>
+          </div>
+          <div class="mock" aria-label="Patient auth screen sketch">
+            <div class="phone-top">Patient Portal</div>
+            <div class="mock-body">
+              <div class="line mid"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="button-row">
+                <span class="mini-btn">Sign up</span>
+                <span class="mini-btn secondary">Login</span>
+              </div>
+              <div class="line short"></div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>After login, route should be obvious: choose clinic or answer questions.</li>
+            <li>Find ID and reset password stay, but secondary.</li>
+          </ul>
+        </article>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>2. Clinic choice</h3>
+              <div class="route">currently modal inside /patient-home</div>
+            </div>
+            <span class="status deferred">Simplify</span>
+          </div>
+          <div class="mock" aria-label="Clinic choice screen sketch">
+            <div class="phone-top">Choose clinic</div>
+            <div class="mock-body">
+              <div class="bar"></div>
+              <div class="question-card">
+                <div class="line mid"></div>
+                <div class="line short"></div>
+                <span class="mini-btn">Use clinic</span>
+              </div>
+              <div class="question-card">
+                <div class="line mid"></div>
+                <div class="button-row">
+                  <span class="mini-btn secondary">Choose later</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>Should be full page or bottom sheet, not a heavy modal.</li>
+            <li>Hide clinic-open request from the main path.</li>
+          </ul>
+        </article>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>3. Questions home</h3>
+              <div class="route">/patient-requests</div>
+            </div>
+            <span class="status">Primary</span>
+          </div>
+          <div class="mock" aria-label="Patient questions screen sketch">
+            <div class="phone-top">Questions</div>
+            <div class="mock-body">
+              <div class="question-card">
+                <div class="line mid"></div>
+                <div class="line"></div>
+                <div class="button-row">
+                  <span class="mini-btn">Answer now</span>
+                </div>
+              </div>
+              <div class="question-card">
+                <div class="line short"></div>
+                <span class="mini-btn secondary">Answered history</span>
+              </div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>No booking cards, visit calendar, or appointment request status.</li>
+            <li>One next action at the top.</li>
+          </ul>
+        </article>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>4. Answer questions</h3>
+              <div class="route">/intake</div>
+            </div>
+            <span class="status">Rename visible UI</span>
+          </div>
+          <div class="mock" aria-label="Answer questions screen sketch">
+            <div class="phone-top">Answer</div>
+            <div class="mock-body">
+              <div class="line short"></div>
+              <div class="question-card">
+                <div class="line mid"></div>
+                <div class="bar" style="height: 96px"></div>
+              </div>
+              <div class="button-row">
+                <span class="mini-btn secondary">Back</span>
+                <span class="mini-btn">Next</span>
+              </div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>Keep internal route, but patient should see "Questions" or "Answer".</li>
+            <li>Submit returns to Questions with sent/completed state.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="lane">
+        <div class="lane-title">
+          <h2>Practitioner Flow</h2>
+          <span class="status">Target path</span>
+        </div>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>1. Practitioner auth</h3>
+              <div class="route">/clinic, /login</div>
+            </div>
+            <span class="status">Keep</span>
+          </div>
+          <div class="mock" aria-label="Practitioner login screen sketch">
+            <div class="phone-top">Clinic Portal</div>
+            <div class="mock-body">
+              <div class="line mid"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="button-row">
+                <span class="mini-btn">Login</span>
+                <span class="mini-btn secondary">Create</span>
+              </div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>Keep account flow separate from patient flow.</li>
+          </ul>
+        </article>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>2. Questions dashboard</h3>
+              <div class="route">/dashboard</div>
+            </div>
+            <span class="status">Primary</span>
+          </div>
+          <div class="mock" aria-label="Practitioner questions dashboard sketch">
+            <div class="phone-top">Practitioner Dashboard</div>
+            <div class="mock-body">
+              <div class="line short"></div>
+              <div class="button-row">
+                <span class="mini-btn secondary">Waiting 0</span>
+                <span class="mini-btn secondary">Answered 0</span>
+              </div>
+              <div class="question-card">
+                <div class="line mid"></div>
+                <span class="mini-btn">Send basic 10</span>
+                <span class="mini-btn secondary">Custom question</span>
+              </div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>This should be the first screen after login.</li>
+            <li>Date filters, visits, and appointment inbox should not compete here.</li>
+          </ul>
+        </article>
+
+        <div class="cross-link"><span>Send basic/custom questions -> patient Questions</span></div>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>3. Patient conversation detail</h3>
+              <div class="route">dashboard detail / brief</div>
+            </div>
+            <span class="status">Build next</span>
+          </div>
+          <div class="mock" aria-label="Patient detail sketch">
+            <div class="phone-top">Patient Detail</div>
+            <div class="mock-body">
+              <div class="question-card">
+                <div class="line mid"></div>
+                <div class="line short"></div>
+              </div>
+              <div class="question-card">
+                <div class="line"></div>
+                <div class="line mid"></div>
+                <span class="mini-btn secondary">TCM note</span>
+              </div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>Show profile basics, question history, answers, and TCM pattern notes.</li>
+          </ul>
+        </article>
+
+        <article class="screen">
+          <div class="screen-header">
+            <div>
+              <h3>4. Current blocker</h3>
+              <div class="route">GitHub Pages boot/capture</div>
+            </div>
+            <span class="status broken">Blocking screenshots</span>
+          </div>
+          <div class="mock" aria-label="Current loading blocker">
+            <div class="phone-top">Live capture</div>
+            <div class="mock-body">
+              <div class="alert">Loading Test MVP... remains visible in automated capture.</div>
+              <div class="line mid"></div>
+              <div class="line short"></div>
+            </div>
+          </div>
+          <ul class="notes">
+            <li>Before replacing sketches with real screenshots, fix or bypass the capture boot issue.</li>
+            <li>The board itself can still guide the UI rebuild now.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="batch">
+      <h2>Next Build Batch</h2>
+      <div class="batch-grid">
+        <div class="task">
+          <strong>1. Practitioner first</strong>
+          Make Questions the default dashboard and hide appointment/date noise.
+        </div>
+        <div class="task">
+          <strong>2. Patient first action</strong>
+          Patient home becomes choose clinic, answer questions, or wait.
+        </div>
+        <div class="task">
+          <strong>3. Answer naming</strong>
+          Replace visible Intake labels with Questions/Answer.
+        </div>
+        <div class="task">
+          <strong>4. Screenshot pass</strong>
+          Replace sketches with real captures after boot/capture is stable.
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

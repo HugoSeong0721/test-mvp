@@ -169,3 +169,8 @@ Run this after each batch on mobile width:
 7. Practitioner sees answered state and can open the answers.
 8. No booking, approval, or schedule UI blocks the path.
 
+## Visual Board
+
+Open `docs/mvp-ui-flow-board.html` in a browser to see the page-by-page flow as connected mobile screen cards.
+
+The first version uses structured screen sketches because the current GitHub Pages app can hang at `Loading Test MVP...` in automated capture. Replace those sketches with real screenshots after the boot/capture path is stable.
