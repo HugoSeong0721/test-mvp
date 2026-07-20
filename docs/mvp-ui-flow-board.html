@@ -302,6 +302,44 @@
       line-height: 1.45;
     }
 
+    .outcomes {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .outcomes-title {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .outcome {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3px;
+      border: 1px solid #dbe3df;
+      border-left: 4px solid var(--green);
+      border-radius: 8px;
+      background: #f8fbf9;
+      padding: 9px 10px;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.3;
+      text-decoration: none;
+    }
+
+    .outcome strong {
+      color: var(--green);
+    }
+
+    .outcome span {
+      color: var(--muted);
+    }
+
     .route-link {
       color: var(--green);
       font-weight: 800;
@@ -423,6 +461,12 @@
               <a class="button ghost" href="index.html#/patient-beta-auth">Use existing account</a>
               <a class="button ghost" href="index.html#/patient-beta-auth">Find ID</a>
             </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/patient-home"><strong>Create and get questions -> Patient Home</strong><span>After account creation, patient should land on next action.</span></a>
+              <a class="outcome" href="index.html#/patient-beta-auth"><strong>Use existing account -> Login mode</strong><span>Same portal, existing account flow.</span></a>
+              <a class="outcome" href="index.html#/patient-beta-auth"><strong>Find ID -> Find patient ID modal</strong><span>Stays on portal and opens recovery help.</span></a>
+            </div>
             <p class="caption">First screen should explain the promise by action, not text: create account and get questions.</p>
           </div>
         </article>
@@ -437,6 +481,10 @@
               <div class="row"><strong>iSaw Acu</strong><br>Hugo Seong &middot; Fort Lee, NJ</div>
               <div class="row"><strong>Seong Acupuncture Center</strong><br>Suggested result</div>
               <a class="button" href="index.html#/patient-home">Use clinic</a>
+            </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/patient-home"><strong>Use clinic -> Patient Home</strong><span>Picker closes, selected clinic remains, questions become the next action.</span></a>
             </div>
             <p class="caption">If the patient has no clinic, show this as a full page or simple sheet, then close immediately after selection.</p>
           </div>
@@ -453,6 +501,10 @@
               <div class="row">Waiting: 10</div>
               <div class="row">Answered: 0</div>
             </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/patient-requests"><strong>Answer now -> Patient Questions</strong><span>Shows waiting questions and answer entry point.</span></a>
+            </div>
             <p class="caption">Patient should never land on an empty dashboard. It should always show the next action or waiting state.</p>
           </div>
         </article>
@@ -468,6 +520,11 @@
               <a class="button" href="index.html#/intake">Next</a>
               <a class="button ghost" href="index.html#/patient-home">Save for later</a>
             </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/intake"><strong>Next -> Intake question page</strong><span>Continue to the next unanswered question.</span></a>
+              <a class="outcome" href="index.html#/patient-home"><strong>Save for later -> Patient Home</strong><span>Returns to home with questions still waiting.</span></a>
+            </div>
             <p class="caption">One question at a time is better on mobile. Progress should be impossible to miss.</p>
           </div>
         </article>
@@ -482,6 +539,10 @@
               <div class="row">Answered: 10</div>
               <div class="row">Next: wait for follow-up</div>
             </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/patient-home"><strong>Done / back -> Patient Home</strong><span>Home changes to waiting-for-review state.</span></a>
+            </div>
             <p class="caption">After contact info or answers are updated, patient needs a clear destination: done, waiting, or answer next.</p>
           </div>
         </article>
@@ -495,6 +556,10 @@
               <div class="message"><strong>Practitioner</strong><br>Any bloating after meals?</div>
               <div class="answer"><strong>Patient</strong><br>Mostly after dinner, especially late meals.</div>
               <a class="button" href="index.html#/patient-requests">Reply</a>
+            </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/patient-requests"><strong>Reply -> Patient Questions</strong><span>Opens the current follow-up question thread.</span></a>
             </div>
             <p class="caption">This is the product core: every reply should enrich age, sex/gender, habits, symptoms, and TCM notes.</p>
           </div>
@@ -519,6 +584,10 @@
               <div class="field">Password</div>
               <a class="button" href="index.html#/clinic">Login</a>
             </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/dashboard"><strong>Login -> Questions Dashboard</strong><span>Practitioner starts where patient conversation work happens.</span></a>
+            </div>
             <p class="caption">No approval workflow in the MVP. Login should go straight to questions.</p>
           </div>
         </article>
@@ -532,6 +601,11 @@
               <div class="row"><strong>Mingyu</strong><br>No questions sent yet</div>
               <a class="button" href="index.html#/dashboard">Send basic 10</a>
               <a class="button ghost" href="index.html#/dashboard">Custom question</a>
+            </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/dashboard"><strong>Send basic 10 -> Same dashboard</strong><span>Patient row changes to waiting / sent state.</span></a>
+              <a class="outcome" href="index.html#/dashboard"><strong>Custom question -> Composer</strong><span>Stays on dashboard and opens custom question entry.</span></a>
             </div>
             <p class="caption">This should be the main practitioner screen. Not schedule, not inbox, not analytics.</p>
           </div>
@@ -547,6 +621,10 @@
               <div class="answer"><strong>Digestion</strong><br>Bloating after late meals.</div>
               <a class="button" href="index.html#/brief">Add follow-up</a>
             </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/brief"><strong>Add follow-up -> Patient brief</strong><span>Opens follow-up composer in the patient detail context.</span></a>
+            </div>
             <p class="caption">Answers should be grouped so the practitioner can respond quickly.</p>
           </div>
         </article>
@@ -560,6 +638,10 @@
               <div class="message"><strong>Signals</strong><br>Sleep disruption, late meals, digestion pattern.</div>
               <div class="message"><strong>Context</strong><br>Age, sex/gender, habits, prior replies.</div>
               <a class="button" href="index.html#/brief">Send follow-up</a>
+            </div>
+            <div class="outcomes">
+              <div class="outcomes-title">Button destinations</div>
+              <a class="outcome" href="index.html#/brief"><strong>Send follow-up -> Patient brief</strong><span>Adds the next question from the evolving TCM view.</span></a>
             </div>
             <p class="caption">This view gets smarter over time as questions and replies accumulate.</p>
           </div>
