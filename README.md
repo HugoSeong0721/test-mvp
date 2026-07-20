@@ -36,6 +36,8 @@ The current product focus is patient-practitioner conversation for acupuncture c
 
 Scheduling and booking confirmation are intentionally removed from the primary UI for now so the MVP can stay focused on conversation.
 
+See [`MVP_UI_AUDIT.md`](MVP_UI_AUDIT.md) for the current full-screen map, connection map, deferred feature list, and rebuild checklist.
+
 Keep these for a later database-backed phase:
 
 - Patient appointment booking requests.
