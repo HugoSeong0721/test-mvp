@@ -3,19 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Patient Flow Storyboard</title>
+  <title>Patient Flow Map</title>
   <style>
     :root {
-      --ink: #222826;
+      --ink: #202624;
       --muted: #66736f;
       --green: #145245;
-      --soft: #f6f4ef;
-      --paper: #fffdf9;
-      --line: #ded8cb;
       --blue: #22577a;
-      --amber: #8a5a22;
-      --red: #b42318;
-      --shadow: 0 12px 30px rgba(34, 40, 38, 0.12);
+      --line: #ddd7ca;
+      --paper: #fffdf9;
+      --soft: #f6f4ef;
+      --focus: #fff0bd;
+      --shadow: 0 10px 24px rgba(34, 40, 38, 0.11);
     }
 
     * {
@@ -27,8 +26,8 @@
       color: var(--ink);
       font-family: Arial, sans-serif;
       background:
-        linear-gradient(rgba(20, 82, 69, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(20, 82, 69, 0.04) 1px, transparent 1px),
+        linear-gradient(rgba(20, 82, 69, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 82, 69, 0.045) 1px, transparent 1px),
         #fbfaf6;
       background-size: 28px 28px;
     }
@@ -40,16 +39,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      padding: 18px clamp(16px, 3vw, 34px);
+      gap: 18px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 253, 249, 0.96);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 253, 249, 0.97);
+      padding: 18px 28px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(24px, 4vw, 38px);
+      font-size: 36px;
       letter-spacing: 0;
     }
 
@@ -57,53 +55,54 @@
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 15px;
-      line-height: 1.4;
     }
 
     .links {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-end;
       gap: 8px;
+      justify-content: flex-end;
     }
 
-    .links a {
-      min-height: 36px;
+    .links a,
+    .open-actual {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      min-height: 34px;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: white;
       color: var(--green);
       padding: 0 12px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 800;
       text-decoration: none;
       white-space: nowrap;
     }
 
     main {
-      padding: 24px clamp(14px, 3vw, 34px) 48px;
+      padding: 22px 28px 54px;
     }
 
-    .notice {
-      max-width: 1180px;
-      margin: 0 0 18px;
-      border: 1px solid rgba(180, 35, 24, 0.24);
-      border-left: 5px solid var(--red);
+    .note {
+      max-width: 1200px;
+      border: 1px solid #e7b8b4;
+      border-left: 5px solid #b42318;
       border-radius: 8px;
       background: #fff8f7;
       padding: 14px 16px;
       line-height: 1.45;
     }
 
-    .hint {
-      max-width: 1180px;
-      margin: 0 0 20px;
+    .how {
+      max-width: 1200px;
+      margin: 14px 0 22px;
       color: var(--muted);
       line-height: 1.45;
     }
 
-    .hint strong {
+    .how strong {
       color: var(--green);
     }
 
@@ -111,9 +110,9 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 24px 0 12px;
-      font-size: 20px;
-      font-weight: 800;
+      margin: 26px 0 12px;
+      font-size: 22px;
+      font-weight: 900;
     }
 
     .pill {
@@ -125,40 +124,40 @@
       color: var(--green);
       padding: 0 10px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .rail-wrap {
       overflow-x: auto;
-      padding: 10px 0 24px;
+      padding: 8px 0 30px;
     }
 
     .rail {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: 270px;
-      align-items: stretch;
-      gap: 30px;
+      grid-auto-columns: 278px;
+      gap: 32px;
       min-width: max-content;
-      padding: 8px 6px 18px;
+      align-items: stretch;
+      padding: 8px 8px 18px;
     }
 
     .page {
       position: relative;
-      min-height: 520px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--paper);
       box-shadow: var(--shadow);
       overflow: hidden;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
     }
 
     .page::after {
       content: "";
       position: absolute;
-      top: 50%;
-      right: -27px;
-      width: 22px;
+      top: 58px;
+      right: -28px;
+      width: 24px;
       height: 2px;
       background: var(--green);
     }
@@ -166,8 +165,8 @@
     .page::before {
       content: "";
       position: absolute;
-      top: calc(50% - 5px);
-      right: -30px;
+      top: 53px;
+      right: -31px;
       width: 10px;
       height: 10px;
       border-top: 2px solid var(--green);
@@ -180,32 +179,25 @@
       display: none;
     }
 
+    .page.is-target {
+      border-color: #b88b00;
+      background: var(--focus);
+      transform: translateY(-4px);
+    }
+
     .page-head {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid var(--line);
       background: #1f2a27;
       color: white;
       padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
-    .open-screen {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 30px;
-      border: 1px solid rgba(255, 255, 255, 0.55);
-      border-radius: 999px;
-      color: white;
-      padding: 0 10px;
-      font-size: 12px;
-      font-weight: 800;
-      text-decoration: none;
-      white-space: nowrap;
+    .practitioner .page-head {
+      background: var(--blue);
     }
 
     .step {
@@ -218,6 +210,10 @@
       background: var(--green);
       color: white;
       font-weight: 900;
+    }
+
+    .practitioner .step {
+      background: var(--blue);
     }
 
     .page-body {
@@ -233,8 +229,8 @@
     .route {
       color: var(--muted);
       font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
     .screen {
@@ -242,7 +238,6 @@
       border-radius: 8px;
       background: #f8fbf9;
       padding: 14px;
-      min-height: 250px;
     }
 
     .field,
@@ -252,126 +247,106 @@
       border: 1px solid #dbe3df;
       border-radius: 8px;
       background: white;
-      padding: 12px;
-      margin-bottom: 10px;
+      padding: 11px 12px;
+      margin-bottom: 9px;
       font-size: 15px;
+      line-height: 1.35;
     }
 
     .field {
       color: #7b8581;
     }
 
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      border-radius: 999px;
-      background: var(--green);
-      color: white;
-      padding: 0 16px;
-      font-weight: 800;
-      margin: 4px 0 10px;
-      text-decoration: none;
-    }
-
-    .ghost {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--green);
-    }
-
     .message {
       background: #eef5f2;
       border-left: 4px solid var(--green);
-      line-height: 1.42;
-      font-size: 15px;
     }
 
     .answer {
       background: #fff8ef;
-      border-left: 4px solid var(--amber);
-      line-height: 1.42;
-      font-size: 15px;
+      border-left: 4px solid #8a5a22;
+    }
+
+    .flow-action {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 42px;
+      border: 1px solid var(--green);
+      border-radius: 999px;
+      background: var(--green);
+      color: white;
+      padding: 8px 13px;
+      margin: 4px 0 9px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .flow-action.secondary {
+      background: white;
+      color: var(--green);
+    }
+
+    .practitioner .flow-action {
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .practitioner .flow-action.secondary {
+      background: white;
+      color: var(--blue);
+    }
+
+    .target {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .secondary .target {
+      background: #e3eee9;
     }
 
     .caption {
-      margin: 14px 0 0;
+      margin: 12px 0 0;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.45;
     }
 
-    .outcomes {
-      display: grid;
+    .actual-row {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      margin-top: 14px;
-      border-top: 1px solid var(--line);
-      padding-top: 12px;
+      margin-top: 12px;
     }
 
-    .outcomes-title {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .outcome {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 3px;
-      border: 1px solid #dbe3df;
-      border-left: 4px solid var(--green);
+    .selected {
+      position: sticky;
+      bottom: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: #f8fbf9;
-      padding: 9px 10px;
-      color: var(--ink);
-      font-size: 13px;
-      line-height: 1.3;
-      text-decoration: none;
+      background: rgba(255, 253, 249, 0.96);
+      padding: 12px 14px;
+      box-shadow: 0 -10px 24px rgba(34, 40, 38, 0.08);
     }
 
-    .outcome strong {
+    .selected strong {
       color: var(--green);
-    }
-
-    .outcome span {
-      color: var(--muted);
-    }
-
-    .route-link {
-      color: var(--green);
-      font-weight: 800;
-      text-decoration: none;
-    }
-
-    .route-link:hover,
-    .button:hover,
-    .open-screen:hover,
-    .links a:hover {
-      text-decoration: underline;
-    }
-
-    .decision {
-      border-top: 1px solid var(--line);
-      margin-top: 14px;
-      padding-top: 14px;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .decision strong {
-      color: var(--green);
-    }
-
-    .practitioner .page-head {
-      background: var(--blue);
-    }
-
-    .practitioner .step,
-    .practitioner .button {
-      background: var(--blue);
     }
 
     .deferred {
@@ -403,19 +378,24 @@
       header {
         align-items: flex-start;
         flex-direction: column;
+        padding: 16px;
       }
 
-      .links {
-        justify-content: flex-start;
+      h1 {
+        font-size: 28px;
+      }
+
+      main {
+        padding: 18px 14px 42px;
       }
 
       .rail {
-        grid-auto-columns: min(82vw, 320px);
-        gap: 42px;
+        grid-auto-columns: min(84vw, 320px);
       }
 
-      .page {
-        min-height: 500px;
+      .selected {
+        align-items: flex-start;
+        flex-direction: column;
       }
     }
   </style>
@@ -423,8 +403,8 @@
 <body>
   <header>
     <div>
-      <h1>Patient Flow Storyboard</h1>
-      <p class="sub">Read left to right. This shows exactly where a patient goes from first visit to answered questions.</p>
+      <h1>Patient Flow Map</h1>
+      <p class="sub">Click a mock button to highlight the page it goes to. Use Open actual to enter the live route.</p>
     </div>
     <nav class="links" aria-label="Quick links">
       <a href="index.html">Live app</a>
@@ -434,11 +414,11 @@
   </header>
 
   <main>
-    <div class="notice">
-      <strong>Critical path only:</strong> no approval inbox, no booking, no schedule, no analytics. The MVP should make one thing obvious: patient receives basic questions, answers them, and the practitioner reads the reply.
+    <div class="note">
+      <strong>Critical path only:</strong> patient gets questions, answers them, and the practitioner reads the reply. Booking, approvals, schedule, and analytics stay out of the MVP flow.
     </div>
-    <p class="hint">
-      <strong>How to use:</strong> click any Open pill or action button to enter the real app screen in this tab. Use the browser Back button to return to this storyboard.
+    <p class="how">
+      <strong>How to use:</strong> the big buttons do not leave the board. They highlight the destination card so you can see where each action lands. Use <strong>Open actual</strong> when you want to test the real page.
     </p>
 
     <div class="section-title">
@@ -446,122 +426,114 @@
       <span class="pill">start here, move right</span>
     </div>
 
-    <div class="rail-wrap" aria-label="Patient page sequence">
-      <section class="rail">
-        <article class="page">
-          <div class="page-head"><span>Patient Portal</span><a class="open-screen" href="index.html#/patient">Open</a><span class="step">1</span></div>
+    <div class="rail-wrap">
+      <section class="rail" aria-label="Patient page sequence">
+        <article class="page" id="p1">
+          <div class="page-head"><span>Patient Portal</span><span class="step">1</span></div>
           <div class="page-body">
             <h2>Sign up or login</h2>
-            <div class="route"><a class="route-link" href="index.html#/patient">/patient</a> or <a class="route-link" href="index.html#/patient-beta-auth">/patient-beta-auth</a></div>
+            <div class="route">/patient</div>
             <div class="screen">
               <div class="field">Name</div>
               <div class="field">Phone or email</div>
               <div class="field">Password</div>
-              <a class="button" href="index.html#/patient">Create and get questions</a>
-              <a class="button ghost" href="index.html#/patient-beta-auth">Use existing account</a>
-              <a class="button ghost" href="index.html#/patient-beta-auth">Find ID</a>
+              <button class="flow-action" type="button" data-target="p3" data-label="Create and get questions"><span>Create and get questions</span><span class="target">-> 3 Home</span></button>
+              <button class="flow-action secondary" type="button" data-target="p1" data-label="Use existing account"><span>Use existing account</span><span class="target">stays here</span></button>
+              <button class="flow-action secondary" type="button" data-target="p1" data-label="Find ID"><span>Find ID</span><span class="target">modal here</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/patient-home"><strong>Create and get questions -> Patient Home</strong><span>After account creation, patient should land on next action.</span></a>
-              <a class="outcome" href="index.html#/patient-beta-auth"><strong>Use existing account -> Login mode</strong><span>Same portal, existing account flow.</span></a>
-              <a class="outcome" href="index.html#/patient-beta-auth"><strong>Find ID -> Find patient ID modal</strong><span>Stays on portal and opens recovery help.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/patient">Open actual</a>
             </div>
-            <p class="caption">First screen should explain the promise by action, not text: create account and get questions.</p>
+            <p class="caption">Patient should know the first action immediately.</p>
           </div>
         </article>
 
-        <article class="page">
-          <div class="page-head"><span>Clinic Picker</span><a class="open-screen" href="index.html#/patient-home">Open</a><span class="step">2</span></div>
+        <article class="page" id="p2">
+          <div class="page-head"><span>Clinic Picker</span><span class="step">2</span></div>
           <div class="page-body">
             <h2>Choose clinic</h2>
-            <div class="route"><a class="route-link" href="index.html#/patient-home">/patient-home</a> before questions</div>
+            <div class="route">before /patient-home if no clinic</div>
             <div class="screen">
               <div class="field">Search clinic name</div>
               <div class="row"><strong>iSaw Acu</strong><br>Hugo Seong &middot; Fort Lee, NJ</div>
               <div class="row"><strong>Seong Acupuncture Center</strong><br>Suggested result</div>
-              <a class="button" href="index.html#/patient-home">Use clinic</a>
+              <button class="flow-action" type="button" data-target="p3" data-label="Use clinic"><span>Use clinic</span><span class="target">-> 3 Home</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/patient-home"><strong>Use clinic -> Patient Home</strong><span>Picker closes, selected clinic remains, questions become the next action.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/patient-home">Open actual</a>
             </div>
-            <p class="caption">If the patient has no clinic, show this as a full page or simple sheet, then close immediately after selection.</p>
+            <p class="caption">After choosing a clinic, the picker should close.</p>
           </div>
         </article>
 
-        <article class="page">
-          <div class="page-head"><span>Patient Home</span><a class="open-screen" href="index.html#/patient-home">Open</a><span class="step">3</span></div>
+        <article class="page" id="p3">
+          <div class="page-head"><span>Patient Home</span><span class="step">3</span></div>
           <div class="page-body">
             <h2>Next action</h2>
-            <div class="route"><a class="route-link" href="index.html#/patient-home">/patient-home</a></div>
+            <div class="route">/patient-home</div>
             <div class="screen">
               <div class="message"><strong>Basic questions are ready</strong><br>Answer 10 questions from your practitioner.</div>
-              <a class="button" href="index.html#/patient-requests">Answer now</a>
+              <button class="flow-action" type="button" data-target="p4" data-label="Answer now"><span>Answer now</span><span class="target">-> 4 Questions</span></button>
               <div class="row">Waiting: 10</div>
               <div class="row">Answered: 0</div>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/patient-requests"><strong>Answer now -> Patient Questions</strong><span>Shows waiting questions and answer entry point.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/patient-home">Open actual</a>
             </div>
-            <p class="caption">Patient should never land on an empty dashboard. It should always show the next action or waiting state.</p>
+            <p class="caption">No empty patient home. Always show next step or waiting state.</p>
           </div>
         </article>
 
-        <article class="page">
-          <div class="page-head"><span>Question</span><a class="open-screen" href="index.html#/patient-requests">Open</a><span class="step">4</span></div>
+        <article class="page" id="p4">
+          <div class="page-head"><span>Questions</span><span class="step">4</span></div>
           <div class="page-body">
             <h2>Answer questions</h2>
-            <div class="route"><a class="route-link" href="index.html#/patient-requests">/patient-requests</a> or <a class="route-link" href="index.html#/intake">/intake</a></div>
+            <div class="route">/patient-requests or /intake</div>
             <div class="screen">
               <div class="message"><strong>1 of 10</strong><br>How is your sleep recently?</div>
               <div class="field">Type answer...</div>
-              <a class="button" href="index.html#/intake">Next</a>
-              <a class="button ghost" href="index.html#/patient-home">Save for later</a>
+              <button class="flow-action" type="button" data-target="p4" data-label="Next"><span>Next</span><span class="target">next question</span></button>
+              <button class="flow-action secondary" type="button" data-action="save-later" data-target="p3" data-label="Save for later"><span>Save for later</span><span class="target">-> 3 Home</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/intake"><strong>Next -> Intake question page</strong><span>Continue to the next unanswered question.</span></a>
-              <a class="outcome" href="index.html#/patient-home"><strong>Save for later -> Patient Home</strong><span>Returns to home with questions still waiting.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/patient-requests">Open requests</a>
+              <a class="open-actual" href="index.html#/intake">Open intake</a>
             </div>
-            <p class="caption">One question at a time is better on mobile. Progress should be impossible to miss.</p>
+            <p class="caption">This is where your example matters: Save for later returns to Patient Home.</p>
           </div>
         </article>
 
-        <article class="page">
-          <div class="page-head"><span>Submitted</span><a class="open-screen" href="index.html#/patient-home">Open</a><span class="step">5</span></div>
+        <article class="page" id="p5">
+          <div class="page-head"><span>Submitted</span><span class="step">5</span></div>
           <div class="page-body">
             <h2>Waiting for review</h2>
-            <div class="route"><a class="route-link" href="index.html#/patient-home">/patient-home</a> after submit</div>
+            <div class="route">/patient-home after submit</div>
             <div class="screen">
               <div class="answer"><strong>Questions sent</strong><br>Your practitioner can now review your answers.</div>
               <div class="row">Answered: 10</div>
-              <div class="row">Next: wait for follow-up</div>
+              <button class="flow-action secondary" type="button" data-target="p3" data-label="Back to home"><span>Back to home</span><span class="target">-> 3 Home</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/patient-home"><strong>Done / back -> Patient Home</strong><span>Home changes to waiting-for-review state.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/patient-home">Open actual</a>
             </div>
-            <p class="caption">After contact info or answers are updated, patient needs a clear destination: done, waiting, or answer next.</p>
+            <p class="caption">After submit, patient lands in a clear waiting state.</p>
           </div>
         </article>
 
-        <article class="page last">
-          <div class="page-head"><span>Conversation</span><a class="open-screen" href="index.html#/patient-requests">Open</a><span class="step">6</span></div>
+        <article class="page last" id="p6">
+          <div class="page-head"><span>Conversation</span><span class="step">6</span></div>
           <div class="page-body">
             <h2>Follow-up chat</h2>
-            <div class="route"><a class="route-link" href="index.html#/patient-requests">future focused conversation view</a></div>
+            <div class="route">future focused conversation view</div>
             <div class="screen">
               <div class="message"><strong>Practitioner</strong><br>Any bloating after meals?</div>
               <div class="answer"><strong>Patient</strong><br>Mostly after dinner, especially late meals.</div>
-              <a class="button" href="index.html#/patient-requests">Reply</a>
+              <button class="flow-action" type="button" data-target="p4" data-label="Reply"><span>Reply</span><span class="target">-> 4 Questions</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/patient-requests"><strong>Reply -> Patient Questions</strong><span>Opens the current follow-up question thread.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/patient-requests">Open actual</a>
             </div>
-            <p class="caption">This is the product core: every reply should enrich age, sex/gender, habits, symptoms, and TCM notes.</p>
+            <p class="caption">Every reply enriches the TCM view over time.</p>
           </div>
         </article>
       </section>
@@ -569,81 +541,75 @@
 
     <div class="section-title">
       Practitioner path
-      <span class="pill">mirrors patient path</span>
+      <span class="pill">supports patient path</span>
     </div>
 
-    <div class="rail-wrap" aria-label="Practitioner page sequence">
-      <section class="rail">
-        <article class="page practitioner">
-          <div class="page-head"><span>Clinic Login</span><a class="open-screen" href="index.html#/clinic">Open</a><span class="step">A</span></div>
+    <div class="rail-wrap">
+      <section class="rail" aria-label="Practitioner page sequence">
+        <article class="page practitioner" id="d1">
+          <div class="page-head"><span>Clinic Login</span><span class="step">A</span></div>
           <div class="page-body">
             <h2>Practitioner login</h2>
-            <div class="route"><a class="route-link" href="index.html#/clinic">/clinic</a> or <a class="route-link" href="index.html#/login">/login</a></div>
+            <div class="route">/clinic</div>
             <div class="screen">
               <div class="field">Email</div>
               <div class="field">Password</div>
-              <a class="button" href="index.html#/clinic">Login</a>
+              <button class="flow-action" type="button" data-target="d2" data-label="Login"><span>Login</span><span class="target">-> B Dashboard</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/dashboard"><strong>Login -> Questions Dashboard</strong><span>Practitioner starts where patient conversation work happens.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/clinic">Open actual</a>
             </div>
-            <p class="caption">No approval workflow in the MVP. Login should go straight to questions.</p>
+            <p class="caption">No approval dashboard first. Go straight to questions.</p>
           </div>
         </article>
 
-        <article class="page practitioner">
-          <div class="page-head"><span>Questions Dashboard</span><a class="open-screen" href="index.html#/dashboard">Open</a><span class="step">B</span></div>
+        <article class="page practitioner" id="d2">
+          <div class="page-head"><span>Questions Dashboard</span><span class="step">B</span></div>
           <div class="page-body">
             <h2>Send questions</h2>
-            <div class="route"><a class="route-link" href="index.html#/dashboard">/dashboard</a></div>
+            <div class="route">/dashboard</div>
             <div class="screen">
               <div class="row"><strong>Mingyu</strong><br>No questions sent yet</div>
-              <a class="button" href="index.html#/dashboard">Send basic 10</a>
-              <a class="button ghost" href="index.html#/dashboard">Custom question</a>
+              <button class="flow-action" type="button" data-target="p3" data-label="Send basic 10"><span>Send basic 10</span><span class="target">patient sees 3</span></button>
+              <button class="flow-action secondary" type="button" data-target="d2" data-label="Custom question"><span>Custom question</span><span class="target">composer here</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/dashboard"><strong>Send basic 10 -> Same dashboard</strong><span>Patient row changes to waiting / sent state.</span></a>
-              <a class="outcome" href="index.html#/dashboard"><strong>Custom question -> Composer</strong><span>Stays on dashboard and opens custom question entry.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/dashboard">Open actual</a>
             </div>
-            <p class="caption">This should be the main practitioner screen. Not schedule, not inbox, not analytics.</p>
+            <p class="caption">Main practitioner screen should be question work.</p>
           </div>
         </article>
 
-        <article class="page practitioner">
-          <div class="page-head"><span>Answer Review</span><a class="open-screen" href="index.html#/brief">Open</a><span class="step">C</span></div>
+        <article class="page practitioner" id="d3">
+          <div class="page-head"><span>Answer Review</span><span class="step">C</span></div>
           <div class="page-body">
             <h2>Read answers</h2>
-            <div class="route"><a class="route-link" href="index.html#/brief">patient detail</a></div>
+            <div class="route">/brief</div>
             <div class="screen">
-              <div class="answer"><strong>Sleep</strong><br>Wakes around 3 AM, hard to fall back asleep.</div>
+              <div class="answer"><strong>Sleep</strong><br>Wakes around 3 AM.</div>
               <div class="answer"><strong>Digestion</strong><br>Bloating after late meals.</div>
-              <a class="button" href="index.html#/brief">Add follow-up</a>
+              <button class="flow-action" type="button" data-target="p6" data-label="Add follow-up"><span>Add follow-up</span><span class="target">patient sees 6</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/brief"><strong>Add follow-up -> Patient brief</strong><span>Opens follow-up composer in the patient detail context.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/brief">Open actual</a>
             </div>
-            <p class="caption">Answers should be grouped so the practitioner can respond quickly.</p>
+            <p class="caption">Answers should lead directly to a follow-up question.</p>
           </div>
         </article>
 
-        <article class="page practitioner last">
-          <div class="page-head"><span>TCM View</span><a class="open-screen" href="index.html#/brief">Open</a><span class="step">D</span></div>
+        <article class="page practitioner last" id="d4">
+          <div class="page-head"><span>TCM View</span><span class="step">D</span></div>
           <div class="page-body">
             <h2>Evolving profile</h2>
-            <div class="route">patient detail / <a class="route-link" href="index.html#/brief">brief</a></div>
+            <div class="route">/brief</div>
             <div class="screen">
-              <div class="message"><strong>Signals</strong><br>Sleep disruption, late meals, digestion pattern.</div>
-              <div class="message"><strong>Context</strong><br>Age, sex/gender, habits, prior replies.</div>
-              <a class="button" href="index.html#/brief">Send follow-up</a>
+              <div class="message"><strong>Signals</strong><br>Sleep, digestion, habits, age, sex/gender.</div>
+              <button class="flow-action" type="button" data-target="p6" data-label="Send follow-up"><span>Send follow-up</span><span class="target">patient sees 6</span></button>
             </div>
-            <div class="outcomes">
-              <div class="outcomes-title">Button destinations</div>
-              <a class="outcome" href="index.html#/brief"><strong>Send follow-up -> Patient brief</strong><span>Adds the next question from the evolving TCM view.</span></a>
+            <div class="actual-row">
+              <a class="open-actual" href="index.html#/brief">Open actual</a>
             </div>
-            <p class="caption">This view gets smarter over time as questions and replies accumulate.</p>
+            <p class="caption">This is where the TCM view gets smarter over time.</p>
           </div>
         </article>
       </section>
@@ -653,17 +619,80 @@
     <section class="deferred">
       <div class="deferred-card">
         <strong>Booking / schedule</strong>
-        <p>Keep in README as later database-backed work. Do not show in primary nav.</p>
+        <p>Keep in README for later. Do not show in primary navigation now.</p>
       </div>
       <div class="deferred-card">
         <strong>Clinic approval inbox</strong>
-        <p>Conflicts with the current direction. Patient choosing a clinic is enough for now.</p>
+        <p>It conflicts with the current direct patient-to-clinic conversation path.</p>
       </div>
       <div class="deferred-card">
         <strong>Analytics / trends</strong>
-        <p>Useful later, but it distracts from the conversation-first MVP.</p>
+        <p>Useful later, but not before the question and answer loop works.</p>
       </div>
     </section>
+
+    <div class="selected" aria-live="polite">
+      <span id="selected-text"><strong>Click a mock button</strong> to highlight where it goes.</span>
+      <a class="open-actual" id="selected-open" href="index.html#/patient">Open highlighted actual</a>
+    </div>
   </main>
+
+  <script>
+    const routeByTarget = {
+      p1: 'index.html#/patient',
+      p2: 'index.html#/patient-home',
+      p3: 'index.html#/patient-home',
+      p4: 'index.html#/patient-requests',
+      p5: 'index.html#/patient-home',
+      p6: 'index.html#/patient-requests',
+      d1: 'index.html#/clinic',
+      d2: 'index.html#/dashboard',
+      d3: 'index.html#/brief',
+      d4: 'index.html#/brief'
+    };
+
+    const titleByTarget = {
+      p1: '1 Patient Portal',
+      p2: '2 Clinic Picker',
+      p3: '3 Patient Home',
+      p4: '4 Questions',
+      p5: '5 Submitted',
+      p6: '6 Conversation',
+      d1: 'A Clinic Login',
+      d2: 'B Questions Dashboard',
+      d3: 'C Answer Review',
+      d4: 'D TCM View'
+    };
+
+    const selectedText = document.getElementById('selected-text');
+    const selectedOpen = document.getElementById('selected-open');
+
+    function selectDestination(button) {
+      const target = button.dataset.target;
+      document.querySelectorAll('.page').forEach((page) => page.classList.remove('is-target'));
+      const card = document.getElementById(target);
+      if (!card) {
+        return;
+      }
+      card.classList.add('is-target');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      selectedText.innerHTML = `<strong>${button.dataset.label}</strong> goes to <strong>${titleByTarget[target]}</strong>.`;
+      selectedOpen.href = routeByTarget[target] || 'index.html';
+    }
+
+    document.querySelectorAll('.flow-action').forEach((button) => {
+      button.addEventListener('click', () => {
+        selectDestination(button);
+      });
+    });
+
+    const presetAction = new URLSearchParams(location.search).get('action');
+    if (presetAction) {
+      const presetButton = document.querySelector(`.flow-action[data-action="${presetAction}"]`);
+      if (presetButton) {
+        window.setTimeout(() => selectDestination(presetButton), 150);
+      }
+    }
+  </script>
 </body>
 </html>
