@@ -3,20 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MVP UI Flow Whiteboard</title>
+  <title>Patient Flow Storyboard</title>
   <style>
     :root {
-      --ink: #202624;
+      --ink: #222826;
       --muted: #66736f;
-      --paper: #fffdf8;
-      --board: #f7f4ec;
-      --line: #cfc8b8;
-      --pin: #145245;
-      --patient: #9a6a3f;
-      --practitioner: #22577a;
-      --defer: #a15c07;
-      --broken: #b42318;
-      --shadow: 0 14px 32px rgba(44, 42, 35, 0.12);
+      --green: #145245;
+      --soft: #f6f4ef;
+      --paper: #fffdf9;
+      --line: #ded8cb;
+      --blue: #22577a;
+      --amber: #8a5a22;
+      --red: #b42318;
+      --shadow: 0 12px 30px rgba(34, 40, 38, 0.12);
     }
 
     * {
@@ -26,11 +25,12 @@
     body {
       margin: 0;
       color: var(--ink);
-      font-family: Calibri, Arial, sans-serif;
+      font-family: Arial, sans-serif;
       background:
-        radial-gradient(circle at 20px 20px, rgba(20, 82, 69, 0.06) 1.5px, transparent 1.5px),
-        linear-gradient(180deg, #fbfaf6 0%, var(--board) 100%);
-      background-size: 24px 24px, auto;
+        linear-gradient(rgba(20, 82, 69, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 82, 69, 0.04) 1px, transparent 1px),
+        #fbfaf6;
+      background-size: 28px 28px;
     }
 
     header {
@@ -41,373 +41,303 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      border-bottom: 1px solid rgba(207, 200, 184, 0.9);
-      background: rgba(255, 253, 248, 0.94);
+      padding: 18px clamp(16px, 3vw, 34px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 249, 0.96);
       backdrop-filter: blur(10px);
-      padding: 16px clamp(14px, 3vw, 30px);
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(24px, 4vw, 40px);
+      font-size: clamp(24px, 4vw, 38px);
       letter-spacing: 0;
     }
 
     .sub {
-      margin: 5px 0 0;
+      margin: 6px 0 0;
       color: var(--muted);
       font-size: 15px;
+      line-height: 1.4;
     }
 
     .links {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
       justify-content: flex-end;
+      gap: 8px;
     }
 
     .links a {
+      min-height: 36px;
       display: inline-flex;
       align-items: center;
-      min-height: 36px;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: white;
-      color: var(--pin);
+      color: var(--green);
       padding: 0 12px;
       font-weight: 700;
       text-decoration: none;
+      white-space: nowrap;
     }
 
     main {
-      padding: 22px clamp(12px, 2vw, 30px) 36px;
+      padding: 24px clamp(14px, 3vw, 34px) 48px;
     }
 
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
+    .notice {
+      max-width: 1180px;
       margin: 0 0 18px;
+      border: 1px solid rgba(180, 35, 24, 0.24);
+      border-left: 5px solid var(--red);
+      border-radius: 8px;
+      background: #fff8f7;
+      padding: 14px 16px;
+      line-height: 1.45;
     }
 
-    .tag {
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 24px 0 12px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .pill {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      border: 1px solid var(--line);
+      min-height: 28px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.82);
-      padding: 8px 11px;
-      color: var(--muted);
+      background: #e3eee9;
+      color: var(--green);
+      padding: 0 10px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--pin);
+    .rail-wrap {
+      overflow-x: auto;
+      padding: 10px 0 24px;
     }
 
-    .dot.patient {
-      background: var(--patient);
+    .rail {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 270px;
+      align-items: stretch;
+      gap: 30px;
+      min-width: max-content;
+      padding: 8px 6px 18px;
     }
 
-    .dot.practitioner {
-      background: var(--practitioner);
-    }
-
-    .dot.defer {
-      background: var(--defer);
-    }
-
-    .dot.broken {
-      background: var(--broken);
-    }
-
-    .whiteboard {
+    .page {
       position: relative;
-      min-height: 980px;
-      overflow: hidden;
+      min-height: 520px;
       border: 1px solid var(--line);
-      border-radius: 22px;
-      background:
-        linear-gradient(rgba(20, 82, 69, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(20, 82, 69, 0.045) 1px, transparent 1px),
-        rgba(255, 253, 248, 0.76);
-      background-size: 42px 42px;
+      border-radius: 8px;
+      background: var(--paper);
       box-shadow: var(--shadow);
-      padding: 22px;
+      overflow: hidden;
     }
 
-    .wires {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .wire {
-      fill: none;
-      stroke: rgba(32, 38, 36, 0.34);
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-dasharray: 8 8;
-    }
-
-    .wire.primary {
-      stroke: rgba(20, 82, 69, 0.7);
-      stroke-dasharray: none;
-    }
-
-    .node {
-      position: absolute;
-      width: min(290px, calc(100vw - 52px));
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: white;
-      box-shadow: 0 10px 24px rgba(32, 38, 36, 0.11);
-      padding: 13px;
-    }
-
-    .node::before {
+    .page::after {
       content: "";
       position: absolute;
-      top: -8px;
-      left: 50%;
-      width: 14px;
-      height: 14px;
+      top: 50%;
+      right: -27px;
+      width: 22px;
+      height: 2px;
+      background: var(--green);
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      top: calc(50% - 5px);
+      right: -30px;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid var(--green);
+      border-right: 2px solid var(--green);
+      transform: rotate(45deg);
+    }
+
+    .page.last::after,
+    .page.last::before {
+      display: none;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      background: #1f2a27;
+      color: white;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: var(--pin);
-      transform: translateX(-50%);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+      background: var(--green);
+      color: white;
+      font-weight: 900;
     }
 
-    .node.patient::before {
-      background: var(--patient);
+    .page-body {
+      padding: 16px;
     }
 
-    .node.practitioner::before {
-      background: var(--practitioner);
-    }
-
-    .node.defer::before {
-      background: var(--defer);
-    }
-
-    .node.broken::before {
-      background: var(--broken);
-    }
-
-    .node h2,
-    .node h3 {
-      margin: 0;
-      font-size: 18px;
+    h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
       letter-spacing: 0;
     }
 
-    .node .route {
-      margin-top: 2px;
+    .route {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
+      margin-bottom: 14px;
     }
 
-    .node p {
-      margin: 9px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.35;
+    .screen {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbf9;
+      padding: 14px;
+      min-height: 250px;
     }
 
-    .center {
-      left: calc(50% - 155px);
-      top: 370px;
-      width: 310px;
-      border: 2px solid rgba(20, 82, 69, 0.6);
-      background: #f9fffc;
-      text-align: center;
-      z-index: 2;
+    .field,
+    .row,
+    .message,
+    .answer {
+      border: 1px solid #dbe3df;
+      border-radius: 8px;
+      background: white;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 15px;
     }
 
-    .center h2 {
-      font-size: 24px;
-    }
-
-    .mini-screen {
-      margin-top: 12px;
-      overflow: hidden;
-      border: 1px solid #dfe5e2;
-      border-radius: 16px;
-      background: #f7faf8;
-      text-align: left;
-    }
-
-    .mini-top {
-      height: 25px;
-      background: #202624;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .mini-body {
-      display: grid;
-      gap: 7px;
-      padding: 10px;
-    }
-
-    .line {
-      height: 9px;
-      border-radius: 999px;
-      background: #dce6e2;
-    }
-
-    .line.short {
-      width: 54%;
-    }
-
-    .line.mid {
-      width: 76%;
+    .field {
+      color: #7b8581;
     }
 
     .button {
       display: inline-flex;
       align-items: center;
-      width: fit-content;
-      min-height: 27px;
+      justify-content: center;
+      min-height: 42px;
       border-radius: 999px;
-      background: var(--pin);
+      background: var(--green);
       color: white;
-      padding: 0 10px;
-      font-size: 12px;
-      font-weight: 700;
+      padding: 0 16px;
+      font-weight: 800;
+      margin: 4px 0 10px;
     }
 
-    .button.secondary {
-      border: 1px solid #dfe5e2;
-      background: white;
-      color: var(--ink);
-    }
-
-    .note {
-      margin-top: 8px;
-      border-left: 3px solid var(--pin);
-      padding: 7px 9px;
-      background: rgba(20, 82, 69, 0.06);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .broken .note {
-      border-left-color: var(--broken);
-      background: rgba(180, 35, 24, 0.08);
-      color: var(--broken);
-      font-weight: 700;
-    }
-
-    .auth-patient { left: 4%; top: 64px; }
-    .clinic-choice { left: 4%; top: 286px; }
-    .questions-home { left: 4%; top: 540px; }
-    .answer-screen { left: 4%; top: 762px; }
-
-    .auth-practitioner { right: 4%; top: 64px; }
-    .dashboard { right: 4%; top: 286px; }
-    .conversation { right: 4%; top: 540px; }
-    .deferred { right: 4%; top: 762px; }
-
-    .blocker {
-      left: calc(50% - 145px);
-      top: 116px;
-      border-color: rgba(180, 35, 24, 0.32);
-    }
-
-    .capture {
-      left: calc(50% - 145px);
-      top: 686px;
-      border-color: rgba(161, 92, 7, 0.38);
-    }
-
-    .next {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .task {
+    .ghost {
       border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.86);
-      padding: 14px;
-      box-shadow: 0 8px 18px rgba(44, 42, 35, 0.07);
+      background: white;
+      color: var(--green);
     }
 
-    .task strong {
-      display: block;
-      margin-bottom: 5px;
+    .message {
+      background: #eef5f2;
+      border-left: 4px solid var(--green);
+      line-height: 1.42;
+      font-size: 15px;
     }
 
-    .task p {
-      margin: 0;
+    .answer {
+      background: #fff8ef;
+      border-left: 4px solid var(--amber);
+      line-height: 1.42;
+      font-size: 15px;
+    }
+
+    .caption {
+      margin: 14px 0 0;
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.35;
+      line-height: 1.45;
     }
 
-    @media (max-width: 980px) {
+    .decision {
+      border-top: 1px solid var(--line);
+      margin-top: 14px;
+      padding-top: 14px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .decision strong {
+      color: var(--green);
+    }
+
+    .practitioner .page-head {
+      background: var(--blue);
+    }
+
+    .practitioner .step,
+    .practitioner .button {
+      background: var(--blue);
+    }
+
+    .deferred {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      max-width: 1180px;
+    }
+
+    .deferred-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 14px;
+    }
+
+    .deferred-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .deferred-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 720px) {
       header {
         align-items: flex-start;
         flex-direction: column;
       }
 
-      .whiteboard {
-        display: grid;
-        gap: 14px;
-        min-height: 0;
-        overflow: visible;
+      .links {
+        justify-content: flex-start;
       }
 
-      .wires {
-        display: none;
+      .rail {
+        grid-auto-columns: min(82vw, 320px);
+        gap: 42px;
       }
 
-      .node,
-      .center,
-      .auth-patient,
-      .clinic-choice,
-      .questions-home,
-      .answer-screen,
-      .auth-practitioner,
-      .dashboard,
-      .conversation,
-      .deferred,
-      .blocker,
-      .capture {
-        position: relative;
-        inset: auto;
-        left: auto;
-        right: auto;
-        top: auto;
-        width: 100%;
-      }
-
-      .center {
-        order: -2;
-      }
-
-      .blocker {
-        order: -1;
-      }
-
-      .next {
-        grid-template-columns: 1fr;
+      .page {
+        min-height: 500px;
       }
     }
   </style>
@@ -415,167 +345,198 @@
 <body>
   <header>
     <div>
-      <h1>MVP UI Flow Whiteboard</h1>
-      <p class="sub">Center the app around one loop: practitioner sends questions, patient answers, practitioner refines the TCM view.</p>
+      <h1>Patient Flow Storyboard</h1>
+      <p class="sub">Read left to right. This shows exactly where a patient goes from first visit to answered questions.</p>
     </div>
     <nav class="links" aria-label="Quick links">
       <a href="index.html">Live app</a>
+      <a href="mvp-ui-flow-storyboard-preview.png">Preview image</a>
       <a href="https://github.com/HugoSeong0721/test-mvp/blob/main/MVP_UI_AUDIT.md">Audit doc</a>
-      <a href="mvp-ui-flow-whiteboard-preview.png">Preview image</a>
     </nav>
   </header>
 
   <main>
-    <div class="legend">
-      <span class="tag"><span class="dot patient"></span>Patient branch</span>
-      <span class="tag"><span class="dot practitioner"></span>Practitioner branch</span>
-      <span class="tag"><span class="dot"></span>Core app loop</span>
-      <span class="tag"><span class="dot defer"></span>Deferred</span>
-      <span class="tag"><span class="dot broken"></span>Blocking / needs fix</span>
+    <div class="notice">
+      <strong>Critical path only:</strong> no approval inbox, no booking, no schedule, no analytics. The MVP should make one thing obvious: patient receives basic questions, answers them, and the practitioner reads the reply.
     </div>
 
-    <section class="whiteboard" aria-label="Whiteboard flow map">
-      <svg class="wires" viewBox="0 0 1200 980" preserveAspectRatio="none" aria-hidden="true">
-        <path class="wire primary" d="M 170 190 C 260 250, 365 320, 500 410" />
-        <path class="wire primary" d="M 170 405 C 280 440, 380 455, 500 470" />
-        <path class="wire primary" d="M 170 650 C 285 610, 385 555, 500 500" />
-        <path class="wire primary" d="M 170 850 C 285 755, 390 640, 505 520" />
-        <path class="wire primary" d="M 1030 190 C 940 250, 835 320, 700 410" />
-        <path class="wire primary" d="M 1030 405 C 920 440, 820 455, 700 470" />
-        <path class="wire primary" d="M 1030 650 C 915 610, 815 555, 700 500" />
-        <path class="wire" d="M 1030 850 C 910 780, 800 685, 700 540" />
-        <path class="wire" d="M 600 295 C 590 330, 590 350, 600 370" />
-        <path class="wire" d="M 600 604 C 590 645, 590 660, 600 686" />
-      </svg>
+    <div class="section-title">
+      Patient path
+      <span class="pill">start here, move right</span>
+    </div>
 
-      <article class="node center">
-        <h2>Care Chat MVP</h2>
-        <div class="route">Product core</div>
-        <p>Patient and practitioner communicate through focused TCM questions and answers.</p>
-        <div class="mini-screen">
-          <div class="mini-top">Main loop</div>
-          <div class="mini-body">
-            <div class="line mid"></div>
-            <div class="line short"></div>
-            <span class="button">Questions -> Answers -> TCM view</span>
+    <div class="rail-wrap" aria-label="Patient page sequence">
+      <section class="rail">
+        <article class="page">
+          <div class="page-head"><span>Patient Portal</span><span class="step">1</span></div>
+          <div class="page-body">
+            <h2>Sign up or login</h2>
+            <div class="route">/patient or /patient-beta-auth</div>
+            <div class="screen">
+              <div class="field">Name</div>
+              <div class="field">Phone or email</div>
+              <div class="field">Password</div>
+              <div class="button">Create and get questions</div>
+              <div class="button ghost">Use existing account</div>
+              <div class="button ghost">Find ID</div>
+            </div>
+            <p class="caption">First screen should explain the promise by action, not text: create account and get questions.</p>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="node broken blocker">
-        <h3>Boot/capture blocker</h3>
-        <div class="route">index.html / Flutter startup</div>
-        <p>Loader can stay visible in capture, making pages look impossible to inspect.</p>
-        <div class="note">Fix: remove loader after Flutter starts; show this board link if startup stalls.</div>
-      </article>
-
-      <article class="node patient auth-patient">
-        <h3>Patient auth</h3>
-        <div class="route">/patient, /patient-beta-auth</div>
-        <p>Sign up, login, find ID, reset password.</p>
-        <div class="mini-screen">
-          <div class="mini-top">Patient Portal</div>
-          <div class="mini-body">
-            <div class="line mid"></div>
-            <div class="line"></div>
-            <span class="button">Create and get questions</span>
+        <article class="page">
+          <div class="page-head"><span>Clinic Picker</span><span class="step">2</span></div>
+          <div class="page-body">
+            <h2>Choose clinic</h2>
+            <div class="route">/patient-home before questions</div>
+            <div class="screen">
+              <div class="field">Search clinic name</div>
+              <div class="row"><strong>iSaw Acu</strong><br>Hugo Seong · Fort Lee, NJ</div>
+              <div class="row"><strong>Seong Acupuncture Center</strong><br>Suggested result</div>
+              <div class="button">Use clinic</div>
+            </div>
+            <p class="caption">If the patient has no clinic, show this as a full page or simple sheet, then close immediately after selection.</p>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="node patient clinic-choice">
-        <h3>Choose clinic</h3>
-        <div class="route">currently inside /patient-home</div>
-        <p>Patient connects to the clinic that will send questions.</p>
-        <div class="note">Make this a simple full page or bottom sheet. Hide clinic-open request for MVP.</div>
-      </article>
-
-      <article class="node patient questions-home">
-        <h3>Patient Questions</h3>
-        <div class="route">/patient-requests</div>
-        <p>One clear next action: answer new questions or wait.</p>
-        <div class="mini-screen">
-          <div class="mini-top">Questions</div>
-          <div class="mini-body">
-            <div class="line mid"></div>
-            <span class="button">Answer now</span>
-            <span class="button secondary">Answered history</span>
+        <article class="page">
+          <div class="page-head"><span>Patient Home</span><span class="step">3</span></div>
+          <div class="page-body">
+            <h2>Next action</h2>
+            <div class="route">/patient-home</div>
+            <div class="screen">
+              <div class="message"><strong>Basic questions are ready</strong><br>Answer 10 questions from your practitioner.</div>
+              <div class="button">Answer now</div>
+              <div class="row">Waiting: 10</div>
+              <div class="row">Answered: 0</div>
+            </div>
+            <p class="caption">Patient should never land on an empty dashboard. It should always show the next action or waiting state.</p>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="node patient answer-screen">
-        <h3>Answer questions</h3>
-        <div class="route">/intake</div>
-        <p>Internally still intake, but visible language should be Questions / Answer.</p>
-        <div class="note">One question at a time, clear progress, submit returns to Questions.</div>
-      </article>
-
-      <article class="node practitioner auth-practitioner">
-        <h3>Practitioner auth</h3>
-        <div class="route">/clinic, /login</div>
-        <p>Practitioner logs in or creates the clinic account.</p>
-        <div class="mini-screen">
-          <div class="mini-top">Clinic Portal</div>
-          <div class="mini-body">
-            <div class="line mid"></div>
-            <span class="button">Login</span>
-            <span class="button secondary">Create</span>
+        <article class="page">
+          <div class="page-head"><span>Question</span><span class="step">4</span></div>
+          <div class="page-body">
+            <h2>Answer questions</h2>
+            <div class="route">/patient-requests or /intake</div>
+            <div class="screen">
+              <div class="message"><strong>1 of 10</strong><br>How is your sleep recently?</div>
+              <div class="field">Type answer...</div>
+              <div class="button">Next</div>
+              <div class="button ghost">Save for later</div>
+            </div>
+            <p class="caption">One question at a time is better on mobile. Progress should be impossible to miss.</p>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="node practitioner dashboard">
-        <h3>Questions dashboard</h3>
-        <div class="route">/dashboard</div>
-        <p>First practitioner screen should be patient conversation status.</p>
-        <div class="mini-screen">
-          <div class="mini-top">Practitioner</div>
-          <div class="mini-body">
-            <div class="line short"></div>
-            <span class="button">Send basic 10</span>
-            <span class="button secondary">Custom question</span>
+        <article class="page">
+          <div class="page-head"><span>Submitted</span><span class="step">5</span></div>
+          <div class="page-body">
+            <h2>Waiting for review</h2>
+            <div class="route">/patient-home after submit</div>
+            <div class="screen">
+              <div class="answer"><strong>Questions sent</strong><br>Your practitioner can now review your answers.</div>
+              <div class="row">Answered: 10</div>
+              <div class="row">Next: wait for follow-up</div>
+            </div>
+            <p class="caption">After contact info or answers are updated, patient needs a clear destination: done, waiting, or answer next.</p>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="node practitioner conversation">
-        <h3>Patient conversation detail</h3>
-        <div class="route">dashboard detail / /brief</div>
-        <p>Show patient basics, sent questions, answers, and evolving TCM notes.</p>
-        <div class="note">This is the real product value after basic sending works.</div>
-      </article>
+        <article class="page last">
+          <div class="page-head"><span>Conversation</span><span class="step">6</span></div>
+          <div class="page-body">
+            <h2>Follow-up chat</h2>
+            <div class="route">future focused conversation view</div>
+            <div class="screen">
+              <div class="message"><strong>Practitioner</strong><br>Any bloating after meals?</div>
+              <div class="answer"><strong>Patient</strong><br>Mostly after dinner, especially late meals.</div>
+              <div class="button">Reply</div>
+            </div>
+            <p class="caption">This is the product core: every reply should enrich age, sex/gender, habits, symptoms, and TCM notes.</p>
+          </div>
+        </article>
+      </section>
+    </div>
 
-      <article class="node defer deferred">
-        <h3>Deferred surfaces</h3>
-        <div class="route">schedule, visits, analytics, approvals</div>
-        <p>Keep documented, but remove from the primary patient/practitioner loop.</p>
-        <div class="note">Booking, availability, visit calendar, approval labels, insights, symptom trends.</div>
-      </article>
+    <div class="section-title">
+      Practitioner path
+      <span class="pill">mirrors patient path</span>
+    </div>
 
-      <article class="node defer capture">
-        <h3>Screenshot pass</h3>
-        <div class="route">next audit step</div>
-        <p>After startup is stable, replace these sketches with real screenshots for each route.</p>
-      </article>
-    </section>
+    <div class="rail-wrap" aria-label="Practitioner page sequence">
+      <section class="rail">
+        <article class="page practitioner">
+          <div class="page-head"><span>Clinic Login</span><span class="step">A</span></div>
+          <div class="page-body">
+            <h2>Practitioner login</h2>
+            <div class="route">/clinic or /login</div>
+            <div class="screen">
+              <div class="field">Email</div>
+              <div class="field">Password</div>
+              <div class="button">Login</div>
+            </div>
+            <p class="caption">No approval workflow in the MVP. Login should go straight to questions.</p>
+          </div>
+        </article>
 
-    <section class="next" aria-label="Next build batch">
-      <div class="task">
-        <strong>1. Make board visible</strong>
-        <p>Loader now links to this board, and this file lives in `web/` so builds keep it.</p>
+        <article class="page practitioner">
+          <div class="page-head"><span>Questions Dashboard</span><span class="step">B</span></div>
+          <div class="page-body">
+            <h2>Send questions</h2>
+            <div class="route">/dashboard</div>
+            <div class="screen">
+              <div class="row"><strong>Mingyu</strong><br>No questions sent yet</div>
+              <div class="button">Send basic 10</div>
+              <div class="button ghost">Custom question</div>
+            </div>
+            <p class="caption">This should be the main practitioner screen. Not schedule, not inbox, not analytics.</p>
+          </div>
+        </article>
+
+        <article class="page practitioner">
+          <div class="page-head"><span>Answer Review</span><span class="step">C</span></div>
+          <div class="page-body">
+            <h2>Read answers</h2>
+            <div class="route">patient detail</div>
+            <div class="screen">
+              <div class="answer"><strong>Sleep</strong><br>Wakes around 3 AM, hard to fall back asleep.</div>
+              <div class="answer"><strong>Digestion</strong><br>Bloating after late meals.</div>
+              <div class="button">Add follow-up</div>
+            </div>
+            <p class="caption">Answers should be grouped so the practitioner can respond quickly.</p>
+          </div>
+        </article>
+
+        <article class="page practitioner last">
+          <div class="page-head"><span>TCM View</span><span class="step">D</span></div>
+          <div class="page-body">
+            <h2>Evolving profile</h2>
+            <div class="route">patient detail / brief</div>
+            <div class="screen">
+              <div class="message"><strong>Signals</strong><br>Sleep disruption, late meals, digestion pattern.</div>
+              <div class="message"><strong>Context</strong><br>Age, sex/gender, habits, prior replies.</div>
+              <div class="button">Send follow-up</div>
+            </div>
+            <p class="caption">This view gets smarter over time as questions and replies accumulate.</p>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <div class="section-title">Removed from MVP</div>
+    <section class="deferred">
+      <div class="deferred-card">
+        <strong>Booking / schedule</strong>
+        <p>Keep in README as later database-backed work. Do not show in primary nav.</p>
       </div>
-      <div class="task">
-        <strong>2. Practitioner first</strong>
-        <p>Turn `/dashboard` into a Questions-first screen.</p>
+      <div class="deferred-card">
+        <strong>Clinic approval inbox</strong>
+        <p>Conflicts with the current direction. Patient choosing a clinic is enough for now.</p>
       </div>
-      <div class="task">
-        <strong>3. Patient first</strong>
-        <p>Patient sees choose clinic, answer questions, or waiting. Nothing else first.</p>
-      </div>
-      <div class="task">
-        <strong>4. Real captures</strong>
-        <p>Use the whiteboard as the frame, then swap in route screenshots.</p>
+      <div class="deferred-card">
+        <strong>Analytics / trends</strong>
+        <p>Useful later, but it distracts from the conversation-first MVP.</p>
       </div>
     </section>
   </main>

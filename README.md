@@ -38,7 +38,7 @@ Scheduling and booking confirmation are intentionally removed from the primary U
 
 See [`MVP_UI_AUDIT.md`](MVP_UI_AUDIT.md) for the current full-screen map, connection map, deferred feature list, and rebuild checklist.
 
-For a visual whiteboard, open [`docs/mvp-ui-flow-board.html`](docs/mvp-ui-flow-board.html). On GitHub Pages, use [`/test-mvp/mvp-ui-flow-board.html`](https://hugoseong0721.github.io/test-mvp/mvp-ui-flow-board.html). A static preview is kept at [`docs/mvp-ui-flow-whiteboard-preview.png`](docs/mvp-ui-flow-whiteboard-preview.png).
+For a visual storyboard, open [`docs/mvp-ui-flow-board.html`](docs/mvp-ui-flow-board.html). On GitHub Pages, use [`/test-mvp/mvp-ui-flow-board.html`](https://hugoseong0721.github.io/test-mvp/mvp-ui-flow-board.html). A static preview is kept at [`docs/mvp-ui-flow-storyboard-preview.png`](docs/mvp-ui-flow-storyboard-preview.png).
 
 Keep these for a later database-backed phase:
 

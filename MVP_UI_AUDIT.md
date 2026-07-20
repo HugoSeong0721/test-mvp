@@ -171,6 +171,6 @@ Run this after each batch on mobile width:
 
 ## Visual Board
 
-Open `docs/mvp-ui-flow-board.html` locally or `https://hugoseong0721.github.io/test-mvp/mvp-ui-flow-board.html` on GitHub Pages to see the page-by-page flow as a connected whiteboard.
+Open `docs/mvp-ui-flow-board.html` locally or `https://hugoseong0721.github.io/test-mvp/mvp-ui-flow-board.html` on GitHub Pages to see the patient and practitioner pages as a left-to-right storyboard.
 
-The current board uses structured screen sketches because the GitHub Pages app can still hang at `Loading Test MVP...` in automated capture. The loader now links to the whiteboard if startup stalls, and the next audit pass should replace sketches with real route screenshots after boot is stable.
+The current board uses structured screen sketches because the GitHub Pages app can still hang at `Loading Test MVP...` in automated capture. The loader now links to the storyboard if startup stalls, and the next audit pass should replace sketches with real route screenshots after boot is stable.
