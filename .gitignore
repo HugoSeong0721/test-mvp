@@ -40,6 +40,9 @@ migrate_working_dir/
 /coverage/
 .env
 .env.*
+docs/route-captures/
+web/route-captures/
+docs/patient-swiftshader-test.png
 
 # Symbolication related
 app.*.symbols
