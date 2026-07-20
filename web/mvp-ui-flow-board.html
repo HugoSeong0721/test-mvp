@@ -96,6 +96,17 @@
       line-height: 1.45;
     }
 
+    .hint {
+      max-width: 1180px;
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .hint strong {
+      color: var(--green);
+    }
+
     .section-title {
       display: flex;
       align-items: center;
@@ -182,6 +193,21 @@
       font-weight: 800;
     }
 
+    .open-screen {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 999px;
+      color: white;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
     .step {
       display: inline-flex;
       align-items: center;
@@ -246,6 +272,7 @@
       padding: 0 16px;
       font-weight: 800;
       margin: 4px 0 10px;
+      text-decoration: none;
     }
 
     .ghost {
@@ -273,6 +300,19 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.45;
+    }
+
+    .route-link {
+      color: var(--green);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .route-link:hover,
+    .button:hover,
+    .open-screen:hover,
+    .links a:hover {
+      text-decoration: underline;
     }
 
     .decision {
@@ -359,6 +399,9 @@
     <div class="notice">
       <strong>Critical path only:</strong> no approval inbox, no booking, no schedule, no analytics. The MVP should make one thing obvious: patient receives basic questions, answers them, and the practitioner reads the reply.
     </div>
+    <p class="hint">
+      <strong>How to use:</strong> click any Open pill or action button to enter the real app screen in this tab. Use the browser Back button to return to this storyboard.
+    </p>
 
     <div class="section-title">
       Patient path
@@ -368,45 +411,45 @@
     <div class="rail-wrap" aria-label="Patient page sequence">
       <section class="rail">
         <article class="page">
-          <div class="page-head"><span>Patient Portal</span><span class="step">1</span></div>
+          <div class="page-head"><span>Patient Portal</span><a class="open-screen" href="index.html#/patient">Open</a><span class="step">1</span></div>
           <div class="page-body">
             <h2>Sign up or login</h2>
-            <div class="route">/patient or /patient-beta-auth</div>
+            <div class="route"><a class="route-link" href="index.html#/patient">/patient</a> or <a class="route-link" href="index.html#/patient-beta-auth">/patient-beta-auth</a></div>
             <div class="screen">
               <div class="field">Name</div>
               <div class="field">Phone or email</div>
               <div class="field">Password</div>
-              <div class="button">Create and get questions</div>
-              <div class="button ghost">Use existing account</div>
-              <div class="button ghost">Find ID</div>
+              <a class="button" href="index.html#/patient">Create and get questions</a>
+              <a class="button ghost" href="index.html#/patient-beta-auth">Use existing account</a>
+              <a class="button ghost" href="index.html#/patient-beta-auth">Find ID</a>
             </div>
             <p class="caption">First screen should explain the promise by action, not text: create account and get questions.</p>
           </div>
         </article>
 
         <article class="page">
-          <div class="page-head"><span>Clinic Picker</span><span class="step">2</span></div>
+          <div class="page-head"><span>Clinic Picker</span><a class="open-screen" href="index.html#/patient-home">Open</a><span class="step">2</span></div>
           <div class="page-body">
             <h2>Choose clinic</h2>
-            <div class="route">/patient-home before questions</div>
+            <div class="route"><a class="route-link" href="index.html#/patient-home">/patient-home</a> before questions</div>
             <div class="screen">
               <div class="field">Search clinic name</div>
-              <div class="row"><strong>iSaw Acu</strong><br>Hugo Seong · Fort Lee, NJ</div>
+              <div class="row"><strong>iSaw Acu</strong><br>Hugo Seong &middot; Fort Lee, NJ</div>
               <div class="row"><strong>Seong Acupuncture Center</strong><br>Suggested result</div>
-              <div class="button">Use clinic</div>
+              <a class="button" href="index.html#/patient-home">Use clinic</a>
             </div>
             <p class="caption">If the patient has no clinic, show this as a full page or simple sheet, then close immediately after selection.</p>
           </div>
         </article>
 
         <article class="page">
-          <div class="page-head"><span>Patient Home</span><span class="step">3</span></div>
+          <div class="page-head"><span>Patient Home</span><a class="open-screen" href="index.html#/patient-home">Open</a><span class="step">3</span></div>
           <div class="page-body">
             <h2>Next action</h2>
-            <div class="route">/patient-home</div>
+            <div class="route"><a class="route-link" href="index.html#/patient-home">/patient-home</a></div>
             <div class="screen">
               <div class="message"><strong>Basic questions are ready</strong><br>Answer 10 questions from your practitioner.</div>
-              <div class="button">Answer now</div>
+              <a class="button" href="index.html#/patient-requests">Answer now</a>
               <div class="row">Waiting: 10</div>
               <div class="row">Answered: 0</div>
             </div>
@@ -415,25 +458,25 @@
         </article>
 
         <article class="page">
-          <div class="page-head"><span>Question</span><span class="step">4</span></div>
+          <div class="page-head"><span>Question</span><a class="open-screen" href="index.html#/patient-requests">Open</a><span class="step">4</span></div>
           <div class="page-body">
             <h2>Answer questions</h2>
-            <div class="route">/patient-requests or /intake</div>
+            <div class="route"><a class="route-link" href="index.html#/patient-requests">/patient-requests</a> or <a class="route-link" href="index.html#/intake">/intake</a></div>
             <div class="screen">
               <div class="message"><strong>1 of 10</strong><br>How is your sleep recently?</div>
               <div class="field">Type answer...</div>
-              <div class="button">Next</div>
-              <div class="button ghost">Save for later</div>
+              <a class="button" href="index.html#/intake">Next</a>
+              <a class="button ghost" href="index.html#/patient-home">Save for later</a>
             </div>
             <p class="caption">One question at a time is better on mobile. Progress should be impossible to miss.</p>
           </div>
         </article>
 
         <article class="page">
-          <div class="page-head"><span>Submitted</span><span class="step">5</span></div>
+          <div class="page-head"><span>Submitted</span><a class="open-screen" href="index.html#/patient-home">Open</a><span class="step">5</span></div>
           <div class="page-body">
             <h2>Waiting for review</h2>
-            <div class="route">/patient-home after submit</div>
+            <div class="route"><a class="route-link" href="index.html#/patient-home">/patient-home</a> after submit</div>
             <div class="screen">
               <div class="answer"><strong>Questions sent</strong><br>Your practitioner can now review your answers.</div>
               <div class="row">Answered: 10</div>
@@ -444,14 +487,14 @@
         </article>
 
         <article class="page last">
-          <div class="page-head"><span>Conversation</span><span class="step">6</span></div>
+          <div class="page-head"><span>Conversation</span><a class="open-screen" href="index.html#/patient-requests">Open</a><span class="step">6</span></div>
           <div class="page-body">
             <h2>Follow-up chat</h2>
-            <div class="route">future focused conversation view</div>
+            <div class="route"><a class="route-link" href="index.html#/patient-requests">future focused conversation view</a></div>
             <div class="screen">
               <div class="message"><strong>Practitioner</strong><br>Any bloating after meals?</div>
               <div class="answer"><strong>Patient</strong><br>Mostly after dinner, especially late meals.</div>
-              <div class="button">Reply</div>
+              <a class="button" href="index.html#/patient-requests">Reply</a>
             </div>
             <p class="caption">This is the product core: every reply should enrich age, sex/gender, habits, symptoms, and TCM notes.</p>
           </div>
@@ -467,56 +510,56 @@
     <div class="rail-wrap" aria-label="Practitioner page sequence">
       <section class="rail">
         <article class="page practitioner">
-          <div class="page-head"><span>Clinic Login</span><span class="step">A</span></div>
+          <div class="page-head"><span>Clinic Login</span><a class="open-screen" href="index.html#/clinic">Open</a><span class="step">A</span></div>
           <div class="page-body">
             <h2>Practitioner login</h2>
-            <div class="route">/clinic or /login</div>
+            <div class="route"><a class="route-link" href="index.html#/clinic">/clinic</a> or <a class="route-link" href="index.html#/login">/login</a></div>
             <div class="screen">
               <div class="field">Email</div>
               <div class="field">Password</div>
-              <div class="button">Login</div>
+              <a class="button" href="index.html#/clinic">Login</a>
             </div>
             <p class="caption">No approval workflow in the MVP. Login should go straight to questions.</p>
           </div>
         </article>
 
         <article class="page practitioner">
-          <div class="page-head"><span>Questions Dashboard</span><span class="step">B</span></div>
+          <div class="page-head"><span>Questions Dashboard</span><a class="open-screen" href="index.html#/dashboard">Open</a><span class="step">B</span></div>
           <div class="page-body">
             <h2>Send questions</h2>
-            <div class="route">/dashboard</div>
+            <div class="route"><a class="route-link" href="index.html#/dashboard">/dashboard</a></div>
             <div class="screen">
               <div class="row"><strong>Mingyu</strong><br>No questions sent yet</div>
-              <div class="button">Send basic 10</div>
-              <div class="button ghost">Custom question</div>
+              <a class="button" href="index.html#/dashboard">Send basic 10</a>
+              <a class="button ghost" href="index.html#/dashboard">Custom question</a>
             </div>
             <p class="caption">This should be the main practitioner screen. Not schedule, not inbox, not analytics.</p>
           </div>
         </article>
 
         <article class="page practitioner">
-          <div class="page-head"><span>Answer Review</span><span class="step">C</span></div>
+          <div class="page-head"><span>Answer Review</span><a class="open-screen" href="index.html#/brief">Open</a><span class="step">C</span></div>
           <div class="page-body">
             <h2>Read answers</h2>
-            <div class="route">patient detail</div>
+            <div class="route"><a class="route-link" href="index.html#/brief">patient detail</a></div>
             <div class="screen">
               <div class="answer"><strong>Sleep</strong><br>Wakes around 3 AM, hard to fall back asleep.</div>
               <div class="answer"><strong>Digestion</strong><br>Bloating after late meals.</div>
-              <div class="button">Add follow-up</div>
+              <a class="button" href="index.html#/brief">Add follow-up</a>
             </div>
             <p class="caption">Answers should be grouped so the practitioner can respond quickly.</p>
           </div>
         </article>
 
         <article class="page practitioner last">
-          <div class="page-head"><span>TCM View</span><span class="step">D</span></div>
+          <div class="page-head"><span>TCM View</span><a class="open-screen" href="index.html#/brief">Open</a><span class="step">D</span></div>
           <div class="page-body">
             <h2>Evolving profile</h2>
-            <div class="route">patient detail / brief</div>
+            <div class="route">patient detail / <a class="route-link" href="index.html#/brief">brief</a></div>
             <div class="screen">
               <div class="message"><strong>Signals</strong><br>Sleep disruption, late meals, digestion pattern.</div>
               <div class="message"><strong>Context</strong><br>Age, sex/gender, habits, prior replies.</div>
-              <div class="button">Send follow-up</div>
+              <a class="button" href="index.html#/brief">Send follow-up</a>
             </div>
             <p class="caption">This view gets smarter over time as questions and replies accumulate.</p>
           </div>
