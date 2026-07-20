@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Patient Flow Map</title>
+  <title>Care Chat Flow</title>
   <style>
     :root {
-      --ink: #202624;
-      --muted: #66736f;
-      --green: #145245;
-      --blue: #22577a;
-      --line: #ddd7ca;
-      --paper: #fffdf9;
-      --soft: #f6f4ef;
-      --focus: #fff0bd;
-      --shadow: 0 10px 24px rgba(34, 40, 38, 0.11);
+      --ink: #17211f;
+      --muted: #61716c;
+      --paper: #fffdf8;
+      --green: #0f5d4f;
+      --mint: #dff2ea;
+      --coral: #f16b4f;
+      --sun: #ffd166;
+      --blue: #256d85;
+      --line: #dfd8c8;
+      --shadow: 0 18px 38px rgba(23, 33, 31, 0.14);
     }
 
     * {
@@ -26,55 +27,55 @@
       color: var(--ink);
       font-family: Arial, sans-serif;
       background:
-        linear-gradient(rgba(20, 82, 69, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(20, 82, 69, 0.045) 1px, transparent 1px),
-        #fbfaf6;
-      background-size: 28px 28px;
+        radial-gradient(circle at 18px 18px, rgba(15, 93, 79, 0.08) 2px, transparent 2px),
+        linear-gradient(135deg, #fffaf0 0%, #f7fbf8 45%, #f5f0ff 100%);
+      background-size: 36px 36px, auto;
     }
 
     header {
       position: sticky;
       top: 0;
-      z-index: 5;
-      display: flex;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
       align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 253, 249, 0.97);
-      padding: 18px 28px;
+      border-bottom: 1px solid rgba(223, 216, 200, 0.9);
+      background: rgba(255, 253, 248, 0.94);
+      backdrop-filter: blur(10px);
+      padding: 18px clamp(16px, 3vw, 34px);
     }
 
     h1 {
       margin: 0;
-      font-size: 36px;
+      font-size: clamp(30px, 5vw, 56px);
       letter-spacing: 0;
     }
 
     .sub {
-      margin: 6px 0 0;
+      margin: 5px 0 0;
       color: var(--muted);
       font-size: 15px;
     }
 
     .links {
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
+      flex-wrap: wrap;
       justify-content: flex-end;
     }
 
-    .links a,
-    .open-actual {
+    .pill-link,
+    .open-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 34px;
+      min-height: 36px;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: white;
       color: var(--green);
-      padding: 0 12px;
+      padding: 0 13px;
       font-size: 13px;
       font-weight: 800;
       text-decoration: none;
@@ -82,45 +83,75 @@
     }
 
     main {
-      padding: 22px 28px 54px;
+      padding: 22px clamp(14px, 3vw, 34px) 72px;
     }
 
-    .note {
-      max-width: 1200px;
-      border: 1px solid #e7b8b4;
-      border-left: 5px solid #b42318;
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(240px, 360px) 1fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .mission {
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff8f7;
-      padding: 14px 16px;
-      line-height: 1.45;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      padding: 20px;
     }
 
-    .how {
-      max-width: 1200px;
-      margin: 14px 0 22px;
+    .mission strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .mission span {
       color: var(--muted);
       line-height: 1.45;
     }
 
-    .how strong {
-      color: var(--green);
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .legend-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      padding: 16px;
+    }
+
+    .legend-item b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .legend-item span {
+      color: var(--muted);
+      font-size: 14px;
     }
 
     .section-title {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 26px 0 12px;
-      font-size: 22px;
+      margin: 24px 0 12px;
+      font-size: 24px;
       font-weight: 900;
     }
 
-    .pill {
+    .tag {
       display: inline-flex;
       align-items: center;
       min-height: 28px;
       border-radius: 999px;
-      background: #e3eee9;
+      background: var(--mint);
       color: var(--green);
       padding: 0 10px;
       font-size: 13px;
@@ -129,271 +160,254 @@
 
     .rail-wrap {
       overflow-x: auto;
-      padding: 8px 0 30px;
+      padding: 6px 0 28px;
     }
 
     .rail {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: 278px;
-      gap: 32px;
-      min-width: max-content;
+      grid-auto-columns: 248px;
+      gap: 42px;
       align-items: stretch;
-      padding: 8px 8px 18px;
+      min-width: max-content;
+      padding: 8px 8px 24px;
     }
 
-    .page {
+    .card {
       position: relative;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--paper);
       box-shadow: var(--shadow);
       overflow: hidden;
-      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
     }
 
-    .page::after {
+    .card::after {
       content: "";
       position: absolute;
-      top: 58px;
-      right: -28px;
-      width: 24px;
-      height: 2px;
+      top: 78px;
+      right: -35px;
+      width: 28px;
+      height: 4px;
+      border-radius: 99px;
       background: var(--green);
     }
 
-    .page::before {
+    .card::before {
       content: "";
       position: absolute;
-      top: 53px;
-      right: -31px;
-      width: 10px;
-      height: 10px;
-      border-top: 2px solid var(--green);
-      border-right: 2px solid var(--green);
+      top: 72px;
+      right: -39px;
+      width: 16px;
+      height: 16px;
+      border-top: 4px solid var(--green);
+      border-right: 4px solid var(--green);
       transform: rotate(45deg);
     }
 
-    .page.last::after,
-    .page.last::before {
+    .card.last::before,
+    .card.last::after {
       display: none;
     }
 
-    .page.is-target {
-      border-color: #b88b00;
-      background: var(--focus);
-      transform: translateY(-4px);
+    .card.is-target {
+      border-color: #b88600;
+      background: #fff3bf;
+      transform: translateY(-6px);
     }
 
-    .page-head {
+    .top {
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
       align-items: center;
-      background: #1f2a27;
+      background: #17211f;
       color: white;
-      padding: 12px 14px;
-      font-weight: 900;
+      padding: 12px;
     }
 
-    .practitioner .page-head {
+    .pro .top {
       background: var(--blue);
     }
 
-    .step {
+    .num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      background: var(--green);
-      color: white;
+      background: var(--sun);
+      color: #241b00;
       font-weight: 900;
     }
 
-    .practitioner .step {
-      background: var(--blue);
+    .title {
+      font-weight: 900;
     }
 
-    .page-body {
-      padding: 16px;
+    .body {
+      padding: 14px;
     }
 
-    h2 {
-      margin: 0 0 4px;
-      font-size: 20px;
+    .big {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.12;
       letter-spacing: 0;
     }
 
     .route {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
       margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    .screen {
+    .phone {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #f8fbf9;
-      padding: 14px;
+      background: #f9fcfa;
+      padding: 12px;
     }
 
     .field,
-    .row,
-    .message,
-    .answer {
-      border: 1px solid #dbe3df;
+    .bubble,
+    .mini-row {
+      border: 1px solid #dae4df;
       border-radius: 8px;
       background: white;
-      padding: 11px 12px;
+      padding: 10px;
       margin-bottom: 9px;
-      font-size: 15px;
-      line-height: 1.35;
+      font-size: 14px;
     }
 
-    .field {
-      color: #7b8581;
+    .bubble {
+      border-left: 5px solid var(--green);
+      background: #edf8f3;
+      font-weight: 800;
     }
 
-    .message {
-      background: #eef5f2;
-      border-left: 4px solid var(--green);
+    .reply {
+      border-left-color: var(--coral);
+      background: #fff2ef;
     }
 
-    .answer {
-      background: #fff8ef;
-      border-left: 4px solid #8a5a22;
-    }
-
-    .flow-action {
+    .action {
       display: flex;
       width: 100%;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      min-height: 42px;
-      border: 1px solid var(--green);
+      min-height: 44px;
+      border: 0;
       border-radius: 999px;
       background: var(--green);
       color: white;
-      padding: 8px 13px;
-      margin: 4px 0 9px;
+      padding: 8px 12px;
+      margin: 8px 0;
       font: inherit;
       font-size: 14px;
       font-weight: 900;
-      cursor: pointer;
       text-align: left;
+      cursor: pointer;
     }
 
-    .flow-action.secondary {
+    .action.light {
+      border: 1px solid var(--green);
       background: white;
       color: var(--green);
     }
 
-    .practitioner .flow-action {
-      border-color: var(--blue);
+    .pro .action {
       background: var(--blue);
     }
 
-    .practitioner .flow-action.secondary {
+    .pro .action.light {
+      border-color: var(--blue);
       background: white;
       color: var(--blue);
     }
 
-    .target {
+    .dest {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.22);
-      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.24);
+      padding: 3px 8px;
       white-space: nowrap;
     }
 
-    .secondary .target {
-      background: #e3eee9;
+    .light .dest {
+      background: var(--mint);
     }
 
-    .caption {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .actual-row {
+    .open-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 12px;
     }
 
-    .selected {
+    .status {
       position: sticky;
       bottom: 0;
-      z-index: 4;
+      z-index: 8;
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 12px;
+      align-items: center;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 253, 249, 0.96);
-      padding: 12px 14px;
-      box-shadow: 0 -10px 24px rgba(34, 40, 38, 0.08);
+      background: rgba(255, 253, 248, 0.97);
+      box-shadow: 0 -14px 30px rgba(23, 33, 31, 0.1);
+      padding: 14px 16px;
     }
 
-    .selected strong {
+    .status strong {
       color: var(--green);
     }
 
-    .deferred {
+    .later {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
       gap: 12px;
-      max-width: 1180px;
+      max-width: 980px;
     }
 
-    .deferred-card {
+    .later div {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: white;
-      padding: 14px;
+      padding: 16px;
+      font-weight: 900;
     }
 
-    .deferred-card strong {
+    .later span {
       display: block;
-      margin-bottom: 6px;
-    }
-
-    .deferred-card p {
-      margin: 0;
+      margin-top: 5px;
       color: var(--muted);
-      line-height: 1.45;
+      font-size: 13px;
+      font-weight: 400;
     }
 
-    @media (max-width: 720px) {
-      header {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 16px;
+    @media (max-width: 780px) {
+      header,
+      .hero {
+        grid-template-columns: 1fr;
       }
 
-      h1 {
-        font-size: 28px;
-      }
-
-      main {
-        padding: 18px 14px 42px;
+      .legend,
+      .later {
+        grid-template-columns: 1fr;
       }
 
       .rail {
-        grid-auto-columns: min(84vw, 320px);
+        grid-auto-columns: min(82vw, 300px);
       }
 
-      .selected {
+      .status {
         align-items: flex-start;
         flex-direction: column;
       }
@@ -403,237 +417,187 @@
 <body>
   <header>
     <div>
-      <h1>Patient Flow Map</h1>
-      <p class="sub">Click a mock button to highlight the page it goes to. Use Open actual to enter the live route.</p>
+      <h1>Care Chat Flow</h1>
+      <p class="sub">Tap a button. The destination lights up.</p>
     </div>
     <nav class="links" aria-label="Quick links">
-      <a href="index.html">Live app</a>
-      <a href="mvp-ui-flow-storyboard-preview.png">Preview image</a>
-      <a href="https://github.com/HugoSeong0721/test-mvp/blob/main/MVP_UI_AUDIT.md">Audit doc</a>
+      <a class="pill-link" href="index.html">Live app</a>
+      <a class="pill-link" href="mvp-ui-flow-storyboard-preview.png">Preview</a>
+      <a class="pill-link" href="https://github.com/HugoSeong0721/test-mvp/blob/main/MVP_UI_AUDIT.md">Audit</a>
     </nav>
   </header>
 
   <main>
-    <div class="note">
-      <strong>Critical path only:</strong> patient gets questions, answers them, and the practitioner reads the reply. Booking, approvals, schedule, and analytics stay out of the MVP flow.
-    </div>
-    <p class="how">
-      <strong>How to use:</strong> the big buttons do not leave the board. They highlight the destination card so you can see where each action lands. Use <strong>Open actual</strong> when you want to test the real page.
-    </p>
-
-    <div class="section-title">
-      Patient path
-      <span class="pill">start here, move right</span>
-    </div>
-
-    <div class="rail-wrap">
-      <section class="rail" aria-label="Patient page sequence">
-        <article class="page" id="p1">
-          <div class="page-head"><span>Patient Portal</span><span class="step">1</span></div>
-          <div class="page-body">
-            <h2>Sign up or login</h2>
-            <div class="route">/patient</div>
-            <div class="screen">
-              <div class="field">Name</div>
-              <div class="field">Phone or email</div>
-              <div class="field">Password</div>
-              <button class="flow-action" type="button" data-target="p3" data-label="Create and get questions"><span>Create and get questions</span><span class="target">-> 3 Home</span></button>
-              <button class="flow-action secondary" type="button" data-target="p1" data-label="Use existing account"><span>Use existing account</span><span class="target">stays here</span></button>
-              <button class="flow-action secondary" type="button" data-target="p1" data-label="Find ID"><span>Find ID</span><span class="target">modal here</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/patient">Open actual</a>
-            </div>
-            <p class="caption">Patient should know the first action immediately.</p>
-          </div>
-        </article>
-
-        <article class="page" id="p2">
-          <div class="page-head"><span>Clinic Picker</span><span class="step">2</span></div>
-          <div class="page-body">
-            <h2>Choose clinic</h2>
-            <div class="route">before /patient-home if no clinic</div>
-            <div class="screen">
-              <div class="field">Search clinic name</div>
-              <div class="row"><strong>iSaw Acu</strong><br>Hugo Seong &middot; Fort Lee, NJ</div>
-              <div class="row"><strong>Seong Acupuncture Center</strong><br>Suggested result</div>
-              <button class="flow-action" type="button" data-target="p3" data-label="Use clinic"><span>Use clinic</span><span class="target">-> 3 Home</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/patient-home">Open actual</a>
-            </div>
-            <p class="caption">After choosing a clinic, the picker should close.</p>
-          </div>
-        </article>
-
-        <article class="page" id="p3">
-          <div class="page-head"><span>Patient Home</span><span class="step">3</span></div>
-          <div class="page-body">
-            <h2>Next action</h2>
-            <div class="route">/patient-home</div>
-            <div class="screen">
-              <div class="message"><strong>Basic questions are ready</strong><br>Answer 10 questions from your practitioner.</div>
-              <button class="flow-action" type="button" data-target="p4" data-label="Answer now"><span>Answer now</span><span class="target">-> 4 Questions</span></button>
-              <div class="row">Waiting: 10</div>
-              <div class="row">Answered: 0</div>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/patient-home">Open actual</a>
-            </div>
-            <p class="caption">No empty patient home. Always show next step or waiting state.</p>
-          </div>
-        </article>
-
-        <article class="page" id="p4">
-          <div class="page-head"><span>Questions</span><span class="step">4</span></div>
-          <div class="page-body">
-            <h2>Answer questions</h2>
-            <div class="route">/patient-requests or /intake</div>
-            <div class="screen">
-              <div class="message"><strong>1 of 10</strong><br>How is your sleep recently?</div>
-              <div class="field">Type answer...</div>
-              <button class="flow-action" type="button" data-target="p4" data-label="Next"><span>Next</span><span class="target">next question</span></button>
-              <button class="flow-action secondary" type="button" data-action="save-later" data-target="p3" data-label="Save for later"><span>Save for later</span><span class="target">-> 3 Home</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/patient-requests">Open requests</a>
-              <a class="open-actual" href="index.html#/intake">Open intake</a>
-            </div>
-            <p class="caption">This is where your example matters: Save for later returns to Patient Home.</p>
-          </div>
-        </article>
-
-        <article class="page" id="p5">
-          <div class="page-head"><span>Submitted</span><span class="step">5</span></div>
-          <div class="page-body">
-            <h2>Waiting for review</h2>
-            <div class="route">/patient-home after submit</div>
-            <div class="screen">
-              <div class="answer"><strong>Questions sent</strong><br>Your practitioner can now review your answers.</div>
-              <div class="row">Answered: 10</div>
-              <button class="flow-action secondary" type="button" data-target="p3" data-label="Back to home"><span>Back to home</span><span class="target">-> 3 Home</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/patient-home">Open actual</a>
-            </div>
-            <p class="caption">After submit, patient lands in a clear waiting state.</p>
-          </div>
-        </article>
-
-        <article class="page last" id="p6">
-          <div class="page-head"><span>Conversation</span><span class="step">6</span></div>
-          <div class="page-body">
-            <h2>Follow-up chat</h2>
-            <div class="route">future focused conversation view</div>
-            <div class="screen">
-              <div class="message"><strong>Practitioner</strong><br>Any bloating after meals?</div>
-              <div class="answer"><strong>Patient</strong><br>Mostly after dinner, especially late meals.</div>
-              <button class="flow-action" type="button" data-target="p4" data-label="Reply"><span>Reply</span><span class="target">-> 4 Questions</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/patient-requests">Open actual</a>
-            </div>
-            <p class="caption">Every reply enriches the TCM view over time.</p>
-          </div>
-        </article>
-      </section>
-    </div>
-
-    <div class="section-title">
-      Practitioner path
-      <span class="pill">supports patient path</span>
-    </div>
-
-    <div class="rail-wrap">
-      <section class="rail" aria-label="Practitioner page sequence">
-        <article class="page practitioner" id="d1">
-          <div class="page-head"><span>Clinic Login</span><span class="step">A</span></div>
-          <div class="page-body">
-            <h2>Practitioner login</h2>
-            <div class="route">/clinic</div>
-            <div class="screen">
-              <div class="field">Email</div>
-              <div class="field">Password</div>
-              <button class="flow-action" type="button" data-target="d2" data-label="Login"><span>Login</span><span class="target">-> B Dashboard</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/clinic">Open actual</a>
-            </div>
-            <p class="caption">No approval dashboard first. Go straight to questions.</p>
-          </div>
-        </article>
-
-        <article class="page practitioner" id="d2">
-          <div class="page-head"><span>Questions Dashboard</span><span class="step">B</span></div>
-          <div class="page-body">
-            <h2>Send questions</h2>
-            <div class="route">/dashboard</div>
-            <div class="screen">
-              <div class="row"><strong>Mingyu</strong><br>No questions sent yet</div>
-              <button class="flow-action" type="button" data-target="p3" data-label="Send basic 10"><span>Send basic 10</span><span class="target">patient sees 3</span></button>
-              <button class="flow-action secondary" type="button" data-target="d2" data-label="Custom question"><span>Custom question</span><span class="target">composer here</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/dashboard">Open actual</a>
-            </div>
-            <p class="caption">Main practitioner screen should be question work.</p>
-          </div>
-        </article>
-
-        <article class="page practitioner" id="d3">
-          <div class="page-head"><span>Answer Review</span><span class="step">C</span></div>
-          <div class="page-body">
-            <h2>Read answers</h2>
-            <div class="route">/brief</div>
-            <div class="screen">
-              <div class="answer"><strong>Sleep</strong><br>Wakes around 3 AM.</div>
-              <div class="answer"><strong>Digestion</strong><br>Bloating after late meals.</div>
-              <button class="flow-action" type="button" data-target="p6" data-label="Add follow-up"><span>Add follow-up</span><span class="target">patient sees 6</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/brief">Open actual</a>
-            </div>
-            <p class="caption">Answers should lead directly to a follow-up question.</p>
-          </div>
-        </article>
-
-        <article class="page practitioner last" id="d4">
-          <div class="page-head"><span>TCM View</span><span class="step">D</span></div>
-          <div class="page-body">
-            <h2>Evolving profile</h2>
-            <div class="route">/brief</div>
-            <div class="screen">
-              <div class="message"><strong>Signals</strong><br>Sleep, digestion, habits, age, sex/gender.</div>
-              <button class="flow-action" type="button" data-target="p6" data-label="Send follow-up"><span>Send follow-up</span><span class="target">patient sees 6</span></button>
-            </div>
-            <div class="actual-row">
-              <a class="open-actual" href="index.html#/brief">Open actual</a>
-            </div>
-            <p class="caption">This is where the TCM view gets smarter over time.</p>
-          </div>
-        </article>
-      </section>
-    </div>
-
-    <div class="section-title">Removed from MVP</div>
-    <section class="deferred">
-      <div class="deferred-card">
-        <strong>Booking / schedule</strong>
-        <p>Keep in README for later. Do not show in primary navigation now.</p>
+    <section class="hero">
+      <div class="mission">
+        <strong>One loop.</strong>
+        <span>Practitioner asks. Patient answers. TCM view gets sharper.</span>
       </div>
-      <div class="deferred-card">
-        <strong>Clinic approval inbox</strong>
-        <p>It conflicts with the current direct patient-to-clinic conversation path.</p>
-      </div>
-      <div class="deferred-card">
-        <strong>Analytics / trends</strong>
-        <p>Useful later, but not before the question and answer loop works.</p>
+      <div class="legend">
+        <div class="legend-item"><b>Green</b><span>Patient action</span></div>
+        <div class="legend-item"><b>Yellow</b><span>Where the action lands</span></div>
+        <div class="legend-item"><b>Blue</b><span>Practitioner action</span></div>
       </div>
     </section>
 
-    <div class="selected" aria-live="polite">
-      <span id="selected-text"><strong>Click a mock button</strong> to highlight where it goes.</span>
-      <a class="open-actual" id="selected-open" href="index.html#/patient">Open highlighted actual</a>
+    <div class="section-title">Patient <span class="tag">left to right</span></div>
+    <div class="rail-wrap">
+      <section class="rail" aria-label="Patient flow">
+        <article class="card" id="p1">
+          <div class="top"><span class="num">1</span><span class="title">Portal</span></div>
+          <div class="body">
+            <h2 class="big">Join</h2>
+            <div class="route">/patient</div>
+            <div class="phone">
+              <div class="field">Name</div>
+              <div class="field">Phone or email</div>
+              <button class="action" type="button" data-target="p3" data-label="Create account"><span>Create account</span><span class="dest">3</span></button>
+              <button class="action light" type="button" data-target="p1" data-label="Find ID"><span>Find ID</span><span class="dest">modal</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/patient">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card" id="p2">
+          <div class="top"><span class="num">2</span><span class="title">Clinic</span></div>
+          <div class="body">
+            <h2 class="big">Choose</h2>
+            <div class="route">before home</div>
+            <div class="phone">
+              <div class="field">Search clinic</div>
+              <div class="mini-row"><b>iSaw Acu</b><br>Fort Lee</div>
+              <button class="action" type="button" data-target="p3" data-label="Use clinic"><span>Use clinic</span><span class="dest">3</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/patient-home">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card" id="p3">
+          <div class="top"><span class="num">3</span><span class="title">Home</span></div>
+          <div class="body">
+            <h2 class="big">Next step</h2>
+            <div class="route">/patient-home</div>
+            <div class="phone">
+              <div class="bubble">10 questions ready</div>
+              <button class="action" type="button" data-target="p4" data-label="Answer now"><span>Answer now</span><span class="dest">4</span></button>
+              <div class="mini-row">Waiting 10</div>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/patient-home">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card" id="p4">
+          <div class="top"><span class="num">4</span><span class="title">Questions</span></div>
+          <div class="body">
+            <h2 class="big">Answer</h2>
+            <div class="route">/patient-requests</div>
+            <div class="phone">
+              <div class="bubble">1/10 Sleep?</div>
+              <div class="field">Type answer...</div>
+              <button class="action" type="button" data-target="p4" data-label="Next"><span>Next</span><span class="dest">next</span></button>
+              <button class="action light" type="button" data-action="save-later" data-target="p3" data-label="Save for later"><span>Save later</span><span class="dest">3</span></button>
+            </div>
+            <div class="open-row">
+              <a class="open-link" href="index.html#/patient-requests">Requests</a>
+              <a class="open-link" href="index.html#/intake">Intake</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" id="p5">
+          <div class="top"><span class="num">5</span><span class="title">Sent</span></div>
+          <div class="body">
+            <h2 class="big">Wait</h2>
+            <div class="route">after submit</div>
+            <div class="phone">
+              <div class="bubble reply">Sent to practitioner</div>
+              <div class="mini-row">Answered 10</div>
+              <button class="action light" type="button" data-target="p3" data-label="Back home"><span>Back home</span><span class="dest">3</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/patient-home">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card last" id="p6">
+          <div class="top"><span class="num">6</span><span class="title">Chat</span></div>
+          <div class="body">
+            <h2 class="big">Follow up</h2>
+            <div class="route">conversation</div>
+            <div class="phone">
+              <div class="bubble">Any bloating?</div>
+              <div class="bubble reply">After dinner</div>
+              <button class="action" type="button" data-target="p4" data-label="Reply"><span>Reply</span><span class="dest">4</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/patient-requests">Open actual</a></div>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <div class="section-title">Practitioner <span class="tag">supports patient</span></div>
+    <div class="rail-wrap">
+      <section class="rail" aria-label="Practitioner flow">
+        <article class="card pro" id="d1">
+          <div class="top"><span class="num">A</span><span class="title">Login</span></div>
+          <div class="body">
+            <h2 class="big">Enter</h2>
+            <div class="phone">
+              <div class="field">Email</div>
+              <button class="action" type="button" data-target="d2" data-label="Practitioner login"><span>Login</span><span class="dest">B</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/clinic">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card pro" id="d2">
+          <div class="top"><span class="num">B</span><span class="title">Send</span></div>
+          <div class="body">
+            <h2 class="big">Ask</h2>
+            <div class="phone">
+              <div class="mini-row"><b>Mingyu</b><br>No questions yet</div>
+              <button class="action" type="button" data-target="p3" data-label="Send basic 10"><span>Basic 10</span><span class="dest">patient 3</span></button>
+              <button class="action light" type="button" data-target="d2" data-label="Custom question"><span>Custom</span><span class="dest">here</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/dashboard">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card pro" id="d3">
+          <div class="top"><span class="num">C</span><span class="title">Review</span></div>
+          <div class="body">
+            <h2 class="big">Read</h2>
+            <div class="phone">
+              <div class="bubble reply">Sleep: wakes 3 AM</div>
+              <button class="action" type="button" data-target="p6" data-label="Add follow-up"><span>Follow up</span><span class="dest">patient 6</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/brief">Open actual</a></div>
+          </div>
+        </article>
+
+        <article class="card pro last" id="d4">
+          <div class="top"><span class="num">D</span><span class="title">TCM</span></div>
+          <div class="body">
+            <h2 class="big">Refine</h2>
+            <div class="phone">
+              <div class="bubble">Sleep + digestion + habits</div>
+              <button class="action" type="button" data-target="p6" data-label="Send follow-up"><span>Ask more</span><span class="dest">patient 6</span></button>
+            </div>
+            <div class="open-row"><a class="open-link" href="index.html#/brief">Open actual</a></div>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <div class="section-title">Later <span class="tag">not now</span></div>
+    <section class="later">
+      <div>Booking<span>Later database phase</span></div>
+      <div>Approvals<span>Removed from core loop</span></div>
+      <div>Analytics<span>After Q/A works</span></div>
+    </section>
+
+    <div class="status" aria-live="polite">
+      <span id="selected-text"><strong>Tap a button</strong> to see where it goes.</span>
+      <a class="open-link" id="selected-open" href="index.html#/patient">Open selected</a>
     </div>
   </main>
 
@@ -651,17 +615,17 @@
       d4: 'index.html#/brief'
     };
 
-    const titleByTarget = {
-      p1: '1 Patient Portal',
-      p2: '2 Clinic Picker',
-      p3: '3 Patient Home',
+    const nameByTarget = {
+      p1: '1 Portal',
+      p2: '2 Clinic',
+      p3: '3 Home',
       p4: '4 Questions',
-      p5: '5 Submitted',
-      p6: '6 Conversation',
-      d1: 'A Clinic Login',
-      d2: 'B Questions Dashboard',
-      d3: 'C Answer Review',
-      d4: 'D TCM View'
+      p5: '5 Sent',
+      p6: '6 Chat',
+      d1: 'A Login',
+      d2: 'B Send',
+      d3: 'C Review',
+      d4: 'D TCM'
     };
 
     const selectedText = document.getElementById('selected-text');
@@ -669,28 +633,26 @@
 
     function selectDestination(button) {
       const target = button.dataset.target;
-      document.querySelectorAll('.page').forEach((page) => page.classList.remove('is-target'));
+      document.querySelectorAll('.card').forEach((card) => card.classList.remove('is-target'));
       const card = document.getElementById(target);
       if (!card) {
         return;
       }
       card.classList.add('is-target');
       card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      selectedText.innerHTML = `<strong>${button.dataset.label}</strong> goes to <strong>${titleByTarget[target]}</strong>.`;
+      selectedText.innerHTML = `<strong>${button.dataset.label}</strong> -> <strong>${nameByTarget[target]}</strong>`;
       selectedOpen.href = routeByTarget[target] || 'index.html';
     }
 
-    document.querySelectorAll('.flow-action').forEach((button) => {
-      button.addEventListener('click', () => {
-        selectDestination(button);
-      });
+    document.querySelectorAll('.action').forEach((button) => {
+      button.addEventListener('click', () => selectDestination(button));
     });
 
-    const presetAction = new URLSearchParams(location.search).get('action');
-    if (presetAction) {
-      const presetButton = document.querySelector(`.flow-action[data-action="${presetAction}"]`);
-      if (presetButton) {
-        window.setTimeout(() => selectDestination(presetButton), 150);
+    const action = new URLSearchParams(location.search).get('action');
+    if (action) {
+      const button = document.querySelector(`.action[data-action="${action}"]`);
+      if (button) {
+        window.setTimeout(() => selectDestination(button), 150);
       }
     }
   </script>
