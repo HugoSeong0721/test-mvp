@@ -6,16 +6,17 @@
   <title>Care Chat Flow</title>
   <style>
     :root {
-      --ink: #17211f;
-      --muted: #61716c;
-      --paper: #fffdf8;
-      --green: #0f5d4f;
-      --mint: #dff2ea;
-      --coral: #f16b4f;
-      --sun: #ffd166;
-      --blue: #256d85;
-      --line: #dfd8c8;
-      --shadow: 0 18px 38px rgba(23, 33, 31, 0.14);
+      --ink: #20302a;
+      --muted: #5b6b64;
+      --paper: #fffcf4;
+      --cream: #f4eee3;
+      --green: #1e3d33;
+      --mint: #dce6e0;
+      --coral: #e28c74;
+      --sun: #d9b44a;
+      --blue: #2f5a4b;
+      --line: #e6ddce;
+      --shadow: 0 22px 42px rgba(32, 48, 42, 0.13);
     }
 
     * {
@@ -27,8 +28,8 @@
       color: var(--ink);
       font-family: Arial, sans-serif;
       background:
-        radial-gradient(circle at 18px 18px, rgba(15, 93, 79, 0.08) 2px, transparent 2px),
-        linear-gradient(135deg, #fffaf0 0%, #f7fbf8 45%, #f5f0ff 100%);
+        radial-gradient(circle at 18px 18px, rgba(30, 61, 51, 0.05) 2px, transparent 2px),
+        linear-gradient(135deg, #f4eee3 0%, #fbf6ec 48%, #e7e1d6 100%);
       background-size: 36px 36px, auto;
     }
 
@@ -41,7 +42,7 @@
       gap: 16px;
       align-items: center;
       border-bottom: 1px solid rgba(223, 216, 200, 0.9);
-      background: rgba(255, 253, 248, 0.94);
+      background: rgba(255, 252, 244, 0.94);
       backdrop-filter: blur(10px);
       padding: 18px clamp(16px, 3vw, 34px);
     }
@@ -268,14 +269,14 @@
     .phone {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #f9fcfa;
+      background: var(--cream);
       padding: 12px;
     }
 
     .field,
     .bubble,
     .mini-row {
-      border: 1px solid #dae4df;
+      border: 1px solid var(--line);
       border-radius: 8px;
       background: white;
       padding: 10px;
@@ -285,13 +286,70 @@
 
     .bubble {
       border-left: 5px solid var(--green);
-      background: #edf8f3;
+      background: #f8fbf7;
       font-weight: 800;
     }
 
     .reply {
       border-left-color: var(--coral);
       background: #fff2ef;
+    }
+
+    .progress {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 3px;
+      margin-bottom: 11px;
+    }
+
+    .progress span {
+      height: 5px;
+      border-radius: 999px;
+      background: #e2d9ca;
+    }
+
+    .progress .done {
+      background: var(--blue);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      color: var(--ink);
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .chip.on {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: rgba(226, 140, 116, 0.18);
+      color: #7a3b28;
+      padding: 6px 9px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .status-pill.review {
+      background: rgba(47, 90, 75, 0.16);
+      color: var(--green);
     }
 
     .action {
@@ -418,7 +476,7 @@
   <header>
     <div>
       <h1>Care Chat Flow</h1>
-      <p class="sub">Tap a button. The destination lights up.</p>
+      <p class="sub">Updated map: patient quick answers, practitioner review cards, and the core Q/A loop.</p>
     </div>
     <nav class="links" aria-label="Quick links">
       <a class="pill-link" href="index.html">Live app</a>
@@ -431,12 +489,12 @@
     <section class="hero">
       <div class="mission">
         <strong>One loop.</strong>
-        <span>Practitioner asks. Patient answers. TCM view gets sharper.</span>
+        <span>Send basic 10. Patient answers with chips/free text. Practitioner reviews and asks better follow-ups.</span>
       </div>
       <div class="legend">
-        <div class="legend-item"><b>Green</b><span>Patient action</span></div>
-        <div class="legend-item"><b>Yellow</b><span>Where the action lands</span></div>
-        <div class="legend-item"><b>Blue</b><span>Practitioner action</span></div>
+        <div class="legend-item"><b>Green</b><span>Selected action or review ready</span></div>
+        <div class="legend-item"><b>Coral</b><span>Next patient step</span></div>
+        <div class="legend-item"><b>Yellow</b><span>Waiting or follow-up state</span></div>
       </div>
     </section>
 
@@ -449,9 +507,10 @@
             <h2 class="big">Join</h2>
             <div class="route">/patient</div>
             <div class="phone">
+              <div class="bubble">Care Chat</div>
               <div class="field">Name</div>
-              <div class="field">Phone or email</div>
-              <button class="action" type="button" data-target="p3" data-label="Create account"><span>Create account</span><span class="dest">3</span></button>
+              <div class="field">Email + password</div>
+              <button class="action" type="button" data-target="p2" data-label="Create account"><span>Create account</span><span class="dest">2</span></button>
               <button class="action light" type="button" data-target="p1" data-label="Find ID"><span>Find ID</span><span class="dest">modal</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/patient">Open actual</a></div>
@@ -465,7 +524,8 @@
             <div class="route">before home</div>
             <div class="phone">
               <div class="field">Search clinic</div>
-              <div class="mini-row"><b>iSaw Acu</b><br>Fort Lee</div>
+              <div class="mini-row"><b>iSaw Acu</b><br>Hugo Seong · Fort Lee</div>
+              <div class="mini-row"><b>Seong Acupuncture</b><br>Suggested result</div>
               <button class="action" type="button" data-target="p3" data-label="Use clinic"><span>Use clinic</span><span class="dest">3</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/patient-home">Open actual</a></div>
@@ -478,9 +538,10 @@
             <h2 class="big">Next step</h2>
             <div class="route">/patient-home</div>
             <div class="phone">
-              <div class="bubble">10 questions ready</div>
+              <div class="status-pill">Your next step</div>
+              <div class="bubble reply">Answer your intake questions</div>
               <button class="action" type="button" data-target="p4" data-label="Answer now"><span>Answer now</span><span class="dest">4</span></button>
-              <div class="mini-row">Waiting 10</div>
+              <div class="mini-row">Clinic chosen · intake next · review after</div>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/patient-home">Open actual</a></div>
           </div>
@@ -492,10 +553,12 @@
             <h2 class="big">Answer</h2>
             <div class="route">/patient-requests</div>
             <div class="phone">
-              <div class="bubble">1/10 Sleep?</div>
-              <div class="field">Type answer...</div>
-              <button class="action" type="button" data-target="p4" data-label="Next"><span>Next</span><span class="dest">next</span></button>
-              <button class="action light" type="button" data-action="save-later" data-target="p3" data-label="Save for later"><span>Save later</span><span class="dest">3</span></button>
+              <div class="progress"><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="bubble">Question 4 of 10<br>How has digestion felt lately?</div>
+              <div class="chip-row"><span class="chip on">Bloated</span><span class="chip">Irregular</span><span class="chip">Slow & heavy</span></div>
+              <div class="field">Write what feels true today...</div>
+              <button class="action" type="button" data-target="p5" data-label="Send answers"><span>Send answers</span><span class="dest">5</span></button>
+              <button class="action light" type="button" data-action="save-later" data-target="p3" data-label="Save for later"><span>Save later</span><span class="dest">home</span></button>
             </div>
             <div class="open-row">
               <a class="open-link" href="index.html#/patient-requests">Requests</a>
@@ -510,8 +573,8 @@
             <h2 class="big">Wait</h2>
             <div class="route">after submit</div>
             <div class="phone">
-              <div class="bubble reply">Sent to practitioner</div>
-              <div class="mini-row">Answered 10</div>
+              <div class="bubble reply">Your answers are on the way.</div>
+              <div class="mini-row">Next: practitioner review. No action needed.</div>
               <button class="action light" type="button" data-target="p3" data-label="Back home"><span>Back home</span><span class="dest">3</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/patient-home">Open actual</a></div>
@@ -524,8 +587,9 @@
             <h2 class="big">Follow up</h2>
             <div class="route">conversation</div>
             <div class="phone">
-              <div class="bubble">Any bloating?</div>
-              <div class="bubble reply">After dinner</div>
+              <div class="bubble">Does discomfort feel sharp or dull?</div>
+              <div class="chip-row"><span class="chip on">Dull</span><span class="chip">Fixed</span></div>
+              <div class="bubble reply">Mostly after dinner</div>
               <button class="action" type="button" data-target="p4" data-label="Reply"><span>Reply</span><span class="dest">4</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/patient-requests">Open actual</a></div>
@@ -554,9 +618,10 @@
           <div class="body">
             <h2 class="big">Ask</h2>
             <div class="phone">
-              <div class="mini-row"><b>Mingyu</b><br>No questions yet</div>
-              <button class="action" type="button" data-target="p3" data-label="Send basic 10"><span>Basic 10</span><span class="dest">patient 3</span></button>
-              <button class="action light" type="button" data-target="d2" data-label="Custom question"><span>Custom</span><span class="dest">here</span></button>
+              <div class="status-pill">Needs the basic 10</div>
+              <div class="mini-row"><b>Mingyu</b><br>No questions sent yet</div>
+              <button class="action" type="button" data-target="p3" data-label="Send basic 10"><span>Send basic 10</span><span class="dest">patient 3</span></button>
+              <button class="action light" type="button" data-target="d2" data-label="Custom question"><span>Ask follow-up</span><span class="dest">here</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/dashboard">Open actual</a></div>
           </div>
@@ -567,8 +632,11 @@
           <div class="body">
             <h2 class="big">Read</h2>
             <div class="phone">
+              <div class="status-pill review">Ready for review</div>
               <div class="bubble reply">Sleep: wakes 3 AM</div>
-              <button class="action" type="button" data-target="p6" data-label="Add follow-up"><span>Follow up</span><span class="dest">patient 6</span></button>
+              <div class="bubble reply">Digestion: bloated after dinner</div>
+              <div class="chip-row"><span class="chip">Answers 10</span><span class="chip">Initial</span><span class="chip on">Review</span></div>
+              <button class="action" type="button" data-target="d4" data-label="Open care picture"><span>Open review</span><span class="dest">D</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/brief">Open actual</a></div>
           </div>
@@ -579,8 +647,9 @@
           <div class="body">
             <h2 class="big">Refine</h2>
             <div class="phone">
-              <div class="bubble">Sleep + digestion + habits</div>
-              <button class="action" type="button" data-target="p6" data-label="Send follow-up"><span>Ask more</span><span class="dest">patient 6</span></button>
+              <div class="mini-row"><b>Care picture</b><br>Sleep + digestion + habits</div>
+              <div class="field">Private TCM notes: cold + fatigue + bloating...</div>
+              <button class="action" type="button" data-target="p6" data-label="Send follow-up"><span>Ask follow-up</span><span class="dest">patient 6</span></button>
             </div>
             <div class="open-row"><a class="open-link" href="index.html#/brief">Open actual</a></div>
           </div>
