@@ -827,16 +827,37 @@ class _PractitionerDashboardScreenState
                   final latestRequestedLabel = latestRequestedAt == null
                       ? lang.tr('Just now', 'Just now')
                       : _formatDateTimeValue(latestRequestedAt);
+                  final latestIntake =
+                      _latestPatientIntakeByPatient[profile.id];
+                  final hasAnswered = latestIntake != null;
+                  final needsBasic = latest == null;
+                  final statusLabel = needsBasic
+                      ? 'Needs the basic 10'
+                      : hasAnswered
+                      ? 'Ready for review'
+                      : 'Waiting for reply';
+                  final statusColor = needsBasic
+                      ? AppTheme.copper
+                      : hasAnswered
+                      ? AppTheme.jade
+                      : AppTheme.sun;
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppTheme.border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.ink.withValues(alpha: 0.05),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
@@ -844,11 +865,40 @@ class _PractitionerDashboardScreenState
                           final info = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                profile.name,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      profile.name,
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 9,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withValues(
+                                        alpha: needsBasic ? 0.18 : 0.14,
+                                      ),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      statusLabel,
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: needsBasic
+                                                ? const Color(0xFF7A3B28)
+                                                : AppTheme.ink,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -865,6 +915,32 @@ class _PractitionerDashboardScreenState
                                   color: AppTheme.ink.withValues(alpha: 0.64),
                                 ),
                               ),
+                              if (hasAnswered) ...[
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: [
+                                    _CareSignalChip(
+                                      label: 'Answers',
+                                      value:
+                                          '${((latestIntake['answers'] as List?) ?? const []).length}',
+                                    ),
+                                    _CareSignalChip(
+                                      label: 'Type',
+                                      value:
+                                          (latestIntake['visitType'] ??
+                                                  'intake')
+                                              .toString()
+                                              .replaceAll('_', ' '),
+                                    ),
+                                    _CareSignalChip(
+                                      label: 'Review',
+                                      value: 'Open',
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ],
                           );
                           final actions = Wrap(
@@ -5048,6 +5124,46 @@ class _PractitionerDashboardScreenState
     } catch (_) {
       return null;
     }
+  }
+}
+
+class _CareSignalChip extends StatelessWidget {
+  const _CareSignalChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSoft,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.sky,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            value,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.ink,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

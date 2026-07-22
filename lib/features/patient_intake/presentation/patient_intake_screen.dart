@@ -264,6 +264,82 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
     });
   }
 
+  List<String> _quickAnswerOptions(String question) {
+    final q = question.toLowerCase();
+    if (q.contains('sleep') || q.contains('asleep') || q.contains('dream')) {
+      return const [
+        'Deeply, through the night',
+        'Restless or light',
+        'I wake often',
+        'Hard to fall asleep',
+      ];
+    }
+    if (q.contains('digestion') ||
+        q.contains('bloating') ||
+        q.contains('reflux') ||
+        q.contains('appetite')) {
+      return const [
+        'Comfortable',
+        'Bloated or full',
+        'Irregular',
+        'Slow and heavy',
+      ];
+    }
+    if (q.contains('hot') ||
+        q.contains('cold') ||
+        q.contains('temperature') ||
+        q.contains('sweat')) {
+      return const [
+        'Often cold',
+        'Often warm',
+        'Night sweats',
+        'No clear change',
+      ];
+    }
+    if (q.contains('stress') ||
+        q.contains('emotion') ||
+        q.contains('anxiety') ||
+        q.contains('mood')) {
+      return const ['Calm', 'Tense', 'Irritable', 'Worried'];
+    }
+    if (q.contains('energy') || q.contains('fatigue') || q.contains('tired')) {
+      return const [
+        'Steady',
+        'Low morning energy',
+        'Afternoon crash',
+        'Tired all day',
+      ];
+    }
+    if (q.contains('pain') ||
+        q.contains('tension') ||
+        q.contains('uncomfortable')) {
+      return const [
+        'Sharp and fixed',
+        'Dull and heavy',
+        'Comes and goes',
+        'Mostly tension',
+      ];
+    }
+    return const [
+      'Better than usual',
+      'About the same',
+      'Worse lately',
+      'Not sure',
+    ];
+  }
+
+  void _applyQuickAnswer(String option) {
+    final current = _answerController.text.trim();
+    final next = current.isEmpty ? option : '$current; $option';
+    setState(() {
+      _answerController.text = next;
+      _answerController.selection = TextSelection.collapsed(
+        offset: _answerController.text.length,
+      );
+      _activeAnswers[_currentQuestionIndex] = next;
+    });
+  }
+
   double _adherencePercent() {
     final totalChecked =
         _stretchingWeek.where((done) => done).length +
@@ -1977,6 +2053,35 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                   '답변을 적어주세요. 편한 만큼 자세히 적어도 됩니다.',
                                 ),
                               ),
+                            ),
+                            const SizedBox(height: 14),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                for (final option in _quickAnswerOptions(
+                                  _activeQuestions[_currentQuestionIndex].text(
+                                    lang,
+                                  ),
+                                ))
+                                  ActionChip(
+                                    onPressed: () => _applyQuickAnswer(option),
+                                    avatar: const Icon(
+                                      Icons.add_rounded,
+                                      size: 16,
+                                    ),
+                                    label: Text(option),
+                                    backgroundColor: AppTheme.surface,
+                                    side: const BorderSide(
+                                      color: AppTheme.border,
+                                    ),
+                                    labelStyle: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          color: AppTheme.ink,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                              ],
                             ),
                             if (!formCompact) ...[
                               const SizedBox(height: 12),
