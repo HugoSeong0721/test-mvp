@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color ink = Color(0xFF17211F);
-  static const Color pine = Color(0xFF0F5D4F);
-  static const Color jade = Color(0xFF247A69);
-  static const Color mint = Color(0xFFE6F6EF);
-  static const Color cream = Color(0xFFFFFCF4);
-  static const Color surface = Color(0xFFFFFDF8);
-  static const Color surfaceSoft = Color(0xFFF2F7F3);
-  static const Color copper = Color(0xFFF16B4F);
-  static const Color blush = Color(0xFFFFF0EA);
-  static const Color sun = Color(0xFFFFD166);
-  static const Color sky = Color(0xFF256D85);
-  static const Color lilac = Color(0xFFF2EDFF);
-  static const Color border = Color(0xFFE0D8C8);
+  static const Color ink = Color(0xFF20302A);
+  static const Color pine = Color(0xFF1E3D33);
+  static const Color jade = Color(0xFF2F5A4B);
+  static const Color mint = Color(0xFFDCE6E0);
+  static const Color cream = Color(0xFFF4EEE3);
+  static const Color surface = Color(0xFFFFFCF4);
+  static const Color surfaceSoft = Color(0xFFFBF6EC);
+  static const Color copper = Color(0xFFE28C74);
+  static const Color blush = Color(0xFFFFEEE8);
+  static const Color sun = Color(0xFFD9B44A);
+  static const Color sky = Color(0xFF5B6B64);
+  static const Color lilac = Color(0xFFE7E1D6);
+  static const Color border = Color(0xFFE6DDCE);
   static const String appFontFamily = 'Arial';
 
   static ThemeData light() {

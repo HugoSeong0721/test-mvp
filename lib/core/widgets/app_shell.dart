@@ -20,8 +20,8 @@ class AppBackdrop extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 AppTheme.cream,
-                AppTheme.mint.withValues(alpha: 0.55),
-                AppTheme.lilac.withValues(alpha: 0.55),
+                AppTheme.surfaceSoft.withValues(alpha: 0.75),
+                AppTheme.lilac.withValues(alpha: 0.72),
               ],
             ),
           ),
@@ -37,7 +37,7 @@ class _DotGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppTheme.pine.withValues(alpha: 0.08)
+      ..color = AppTheme.pine.withValues(alpha: 0.045)
       ..style = PaintingStyle.fill;
     const step = 32.0;
     for (double x = 14; x < size.width; x += step) {

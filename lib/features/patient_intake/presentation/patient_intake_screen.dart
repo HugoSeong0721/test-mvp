@@ -1845,14 +1845,22 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                 );
 
                 final formPanel = AppPanel(
-                  padding: EdgeInsets.all(formCompact ? 16 : 20),
+                  padding: EdgeInsets.all(formCompact ? 18 : 24),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppTheme.cream, AppTheme.surfaceSoft],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (!formCompact) ...[
                         Text(
-                          lang.tr('Question form', 'Question form'),
-                          style: theme.textTheme.headlineMedium,
+                          lang.tr('Care questions', 'Care questions'),
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            color: AppTheme.pine,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                         const SizedBox(height: 18),
                         Text(
@@ -1880,8 +1888,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.74),
-                          borderRadius: BorderRadius.circular(24),
+                          color: Colors.white.withValues(alpha: 0.72),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: AppTheme.border),
                         ),
                         child: Column(
@@ -1894,9 +1902,16 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               ),
                               const SizedBox(height: 10),
                             ],
-                            LinearProgressIndicator(
-                              value: progress,
-                              minHeight: 10,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(999),
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                minHeight: 6,
+                                backgroundColor: const Color(0xFFE2D9CA),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  AppTheme.jade,
+                                ),
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Text(
@@ -1923,8 +1938,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppTheme.surface.withValues(alpha: 0.88),
-                          borderRadius: BorderRadius.circular(28),
+                          color: Colors.white.withValues(alpha: 0.84),
+                          borderRadius: BorderRadius.circular(18),
                           border: Border.all(color: AppTheme.border),
                         ),
                         child: Column(
@@ -1936,7 +1951,8 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 '질문 ${_currentQuestionIndex + 1}',
                               ),
                               style: theme.textTheme.labelLarge?.copyWith(
-                                color: AppTheme.ink.withValues(alpha: 0.62),
+                                color: AppTheme.copper,
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -1944,7 +1960,11 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               _activeQuestions[_currentQuestionIndex].text(
                                 lang,
                               ),
-                              style: theme.textTheme.headlineMedium,
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                color: AppTheme.pine,
+                                fontWeight: FontWeight.w800,
+                                height: 1.14,
+                              ),
                             ),
                             const SizedBox(height: 14),
                             TextField(
@@ -1953,7 +1973,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                               maxLines: 8,
                               decoration: InputDecoration(
                                 hintText: lang.tr(
-                                  'Answer here.',
+                                  'Write what feels true today.',
                                   '답변을 적어주세요. 편한 만큼 자세히 적어도 됩니다.',
                                 ),
                               ),
@@ -1966,7 +1986,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
                                 maxLines: 4,
                                 decoration: InputDecoration(
                                   hintText: lang.tr(
-                                    'Extra note',
+                                    'Anything else your practitioner should know?',
                                     '침술사에게 추가로 남길 메모',
                                   ),
                                 ),
