@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/services/adaptive_tcm_inquiry_service.dart';
 import '../../../core/services/app_firestore_service.dart';
 import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
@@ -704,6 +705,15 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           },
         )
         .toList();
+    final adaptiveTcmSummary = AdaptiveTcmInquiryService.buildCarePicture(
+      answers: answers,
+      profile: {
+        'birthYear': _currentProfile.birthYear,
+        'ageRange': _currentProfile.ageRange,
+        'sex': _currentProfile.sex,
+        'ethnicity': _currentProfile.ethnicity,
+      },
+    );
 
     setState(() => _isSubmitting = true);
 
@@ -738,6 +748,7 @@ class _PatientIntakeScreenState extends State<PatientIntakeScreen> {
           'patientEmail': _currentProfile.email,
         },
         currentQuestionIndex: _currentQuestionIndex + 1,
+        adaptiveTcmSummary: adaptiveTcmSummary,
       );
 
       await AppFirestoreService.markPendingRequestsCompleted(

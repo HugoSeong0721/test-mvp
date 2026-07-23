@@ -32,6 +32,8 @@ The current product focus is patient-practitioner conversation for acupuncture c
 - The practitioner reviews answers, patient age, sex/gender, habits, and follow-up replies.
 - The patient's TCM-oriented view should become richer over time as more answers arrive.
 
+See [`ADAPTIVE_TCM_INQUIRY_NOTES.md`](ADAPTIVE_TCM_INQUIRY_NOTES.md) for the paper-inspired adaptive questioning roadmap.
+
 ### Deferred For Later
 
 Scheduling and booking confirmation are intentionally removed from the primary UI for now so the MVP can stay focused on conversation.

@@ -183,6 +183,7 @@ class AppFirestoreService {
     required String extraMemo,
     required Map<String, dynamic> adherence,
     required int currentQuestionIndex,
+    Map<String, dynamic>? adaptiveTcmSummary,
   }) async {
     final doc = await _db.collection('intake_submissions').add({
       'patientId': patientId,
@@ -193,6 +194,7 @@ class AppFirestoreService {
       'extraMemo': extraMemo,
       'adherence': adherence,
       'currentQuestionIndex': currentQuestionIndex,
+      'adaptiveTcmSummary': adaptiveTcmSummary ?? const <String, dynamic>{},
       'source': 'patient_intake_screen',
       'submittedAt': FieldValue.serverTimestamp(),
     });

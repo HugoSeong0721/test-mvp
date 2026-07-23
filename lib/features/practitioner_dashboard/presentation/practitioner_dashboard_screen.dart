@@ -830,6 +830,18 @@ class _PractitionerDashboardScreenState
                   final latestIntake =
                       _latestPatientIntakeByPatient[profile.id];
                   final hasAnswered = latestIntake != null;
+                  final adaptiveSummary =
+                      (latestIntake?['adaptiveTcmSummary'] as Map?)
+                          ?.cast<String, dynamic>() ??
+                      const <String, dynamic>{};
+                  final adaptiveSignals =
+                      (adaptiveSummary['signals'] as List?) ?? const [];
+                  final adaptiveDirections =
+                      (adaptiveSummary['patternDirections'] as List?) ??
+                      const [];
+                  final nextBestQuestions =
+                      (adaptiveSummary['nextBestQuestions'] as List?) ??
+                      const [];
                   final needsBasic = latest == null;
                   final statusLabel = needsBasic
                       ? 'Needs the basic 10'
@@ -938,8 +950,44 @@ class _PractitionerDashboardScreenState
                                       label: 'Review',
                                       value: 'Open',
                                     ),
+                                    for (final signal in adaptiveSignals.take(
+                                      2,
+                                    ))
+                                      if (signal is Map)
+                                        _CareSignalChip(
+                                          label: (signal['domain'] ?? 'Signal')
+                                              .toString(),
+                                          value: (signal['label'] ?? '')
+                                              .toString(),
+                                        ),
+                                    if (adaptiveDirections.isNotEmpty)
+                                      _CareSignalChip(
+                                        label: 'TCM path',
+                                        value: adaptiveDirections.first
+                                            .toString(),
+                                      ),
+                                    if (nextBestQuestions.isNotEmpty)
+                                      _CareSignalChip(
+                                        label: 'Next',
+                                        value:
+                                            '${nextBestQuestions.length} follow-ups',
+                                      ),
                                   ],
                                 ),
+                                if (nextBestQuestions.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Next best: ${nextBestQuestions.first}',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.ink.withValues(
+                                        alpha: 0.66,
+                                      ),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ],
                           );
