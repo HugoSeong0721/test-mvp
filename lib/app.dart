@@ -17,6 +17,7 @@ import 'features/patient_brief/presentation/patient_brief_screen.dart';
 import 'features/patient_home/presentation/patient_home_screen.dart';
 import 'features/patient_intake/presentation/patient_intake_screen.dart';
 import 'features/practitioner_dashboard/presentation/practitioner_dashboard_screen.dart';
+import 'features/research_library/presentation/research_library_screen.dart';
 import 'features/symptom_trend/presentation/symptom_trend_screen.dart';
 import 'features/tester_feedback/presentation/tester_feedback_inbox_screen.dart';
 
@@ -68,6 +69,8 @@ class TestMvpApp extends StatelessWidget {
                 ),
             SymptomTrendScreen.routeName: (_) =>
                 const _PractitionerRouteGuard(child: SymptomTrendScreen()),
+            ResearchLibraryScreen.routeName: (_) =>
+                const _PractitionerRouteGuard(child: ResearchLibraryScreen()),
             PatientBriefScreen.routeName: (_) => const PatientBriefScreen(),
             TesterFeedbackInboxScreen.routeName: (_) =>
                 const TesterFeedbackInboxScreen(),
