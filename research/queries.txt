@@ -1,0 +1,23 @@
+# Search queries for the daily TCM paper collector (tools/fetch_tcm_papers.py).
+# One query per line. Lines starting with '#' and blank lines are ignored.
+# Each query is sent to both arXiv and Europe PMC (PubMed/MEDLINE).
+# Edit freely — add narrower queries as your diagnosis model matures.
+
+# 1. Decision tree & adaptive symptom selection
+traditional chinese medicine syndrome differentiation decision tree
+TCM body constitution classification machine learning
+adaptive symptom questionnaire traditional chinese medicine
+
+# 2. Dynamic QA & adaptive dialogue
+traditional chinese medicine dynamic questioning diagnosis
+active medical inquiry reinforcement learning diagnosis
+large language model traditional chinese medicine diagnosis dialogue
+tongue image constitution reasoning language model
+
+# 3. Knowledge graph & chain-of-thought
+traditional chinese medicine knowledge graph syndrome differentiation
+chain of thought reasoning traditional chinese medicine
+TCM clinical decision support syndrome differentiation
+
+# Cross-cutting
+multi-label symptom syndrome classification traditional chinese medicine

@@ -55,3 +55,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Research collector transient artifacts
+research/.last_run.json

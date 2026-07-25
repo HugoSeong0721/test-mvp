@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/practitioner_shell.dart';
+import '../../research_library/presentation/research_library_screen.dart';
 
 class PractitionerInsightsScreen extends StatelessWidget {
   const PractitionerInsightsScreen({super.key});
@@ -36,6 +37,30 @@ class PractitionerInsightsScreen extends StatelessWidget {
               ),
               _KpiCard(title: lang.tr('No-Show Rate', '노쇼율'), value: '9%'),
             ],
+          ),
+          const SizedBox(height: 12),
+          _SectionTitle(lang.tr('Research Evidence', '연구 근거')),
+          Card(
+            child: ListTile(
+              leading: const Icon(
+                Icons.library_books_rounded,
+                color: Color(0xFF0F766E),
+              ),
+              title: Text(
+                lang.tr('TCM Research Library', 'TCM 연구 자료실'),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              subtitle: Text(
+                lang.tr(
+                  'Auto-collected papers on syndrome differentiation and '
+                  'adaptive inquiry, refreshed daily.',
+                  '매일 갱신되는 변증·적응형 문진 관련 자동 수집 논문.',
+                ),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context)
+                  .pushNamed(ResearchLibraryScreen.routeName),
+            ),
           ),
           const SizedBox(height: 12),
           _SectionTitle(lang.tr('Patient Mix', '환자 구성')),
