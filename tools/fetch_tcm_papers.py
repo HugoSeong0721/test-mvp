@@ -52,6 +52,45 @@ USER_AGENT = "test-mvp-tcm-paper-collector/1.0 (https://github.com/HugoSeong0721
 # Default search queries covering the three research directions described in
 # ADAPTIVE_TCM_INQUIRY_NOTES.md. You can override/extend these by editing
 # research/queries.txt (one query per line, '#' comments allowed).
+# Relevance gate. A fetched paper is kept only if its title or abstract
+# contains at least one of these anchor terms. This filters out the noise that
+# broad keyword search (especially arXiv) otherwise pulls in — unrelated recent
+# physics/ML papers, tangential biomedical results, and so on. Terms are matched
+# case-insensitively as substrings, so "acupunctur" also catches "acupuncture".
+RELEVANCE_ANCHORS = [
+    # Core TCM
+    "chinese medicine",
+    "tcm",
+    "syndrome differ",  # syndrome differentiation
+    "zheng differentiation",
+    "acupunctur",
+    "tongue diagnos",
+    "tongue image",
+    "pulse diagnos",
+    "body constitution",
+    "herbal medicine",
+    "materia medica",
+    "meridian",
+    "traditional medicine",
+    "traditional korean medicine",
+    "kampo",
+    "辨证",
+    "中医",
+    "中醫",
+    # Adaptive medical inquiry / decision support (kept intentionally — see notes)
+    "medical inquiry",
+    "symptom inquiry",
+    "adaptive questioning",
+    "clinical decision support",
+    "differential diagnosis",
+]
+
+
+def is_relevant(rec: dict) -> bool:
+    haystack = f"{rec.get('title', '')} {rec.get('abstract', '')}".lower()
+    return any(anchor in haystack for anchor in RELEVANCE_ANCHORS)
+
+
 DEFAULT_QUERIES = [
     # 1. Decision tree & adaptive symptom selection
     "traditional chinese medicine syndrome differentiation decision tree",
@@ -115,7 +154,9 @@ def fetch_arxiv(query: str) -> list[dict]:
             "search_query": f"all:{query}",
             "start": 0,
             "max_results": MAX_PER_QUERY,
-            "sortBy": "submittedDate",
+            # Relevance sort keeps on-topic hits near the top; date sort floods
+            # the results with the newest arXiv papers regardless of topic.
+            "sortBy": "relevance",
             "sortOrder": "descending",
         }
     )
@@ -312,6 +353,8 @@ def main() -> int:
         time.sleep(REQUEST_DELAY)
 
         for rec in results:
+            if not is_relevant(rec):
+                continue
             title_key = normalize_title(rec.get("title", ""))
             if rec["id"] in seen_ids:
                 continue
