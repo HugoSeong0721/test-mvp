@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/clinic_data_store.dart';
+import '../../../core/services/adaptive_tcm_inquiry_service.dart';
 import '../../../core/services/app_firestore_service.dart';
 import '../../../core/services/practitioner_session_service.dart';
 import '../../../core/settings/app_language_controller.dart';
@@ -12,6 +13,7 @@ import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/practitioner_shell.dart';
 import '../../patient_brief/presentation/patient_brief_screen.dart';
+import '../../research_library/presentation/research_library_screen.dart';
 import 'clinic_profile_workspace.dart';
 import 'patient_record_workspace.dart';
 
@@ -965,6 +967,16 @@ class _PractitionerDashboardScreenState
                                         label: 'TCM path',
                                         value: adaptiveDirections.first
                                             .toString(),
+                                        onTap: () => Navigator.of(context)
+                                            .pushNamed(
+                                              ResearchLibraryScreen.routeName,
+                                              arguments:
+                                                  AdaptiveTcmInquiryService
+                                                      .researchQueryForDirection(
+                                                        adaptiveDirections.first
+                                                            .toString(),
+                                                      ),
+                                            ),
                                       ),
                                     if (nextBestQuestions.isNotEmpty)
                                       _CareSignalChip(
@@ -5176,15 +5188,16 @@ class _PractitionerDashboardScreenState
 }
 
 class _CareSignalChip extends StatelessWidget {
-  const _CareSignalChip({required this.label, required this.value});
+  const _CareSignalChip({required this.label, required this.value, this.onTap});
 
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: AppTheme.surfaceSoft,
@@ -5209,8 +5222,22 @@ class _CareSignalChip extends StatelessWidget {
               fontWeight: FontWeight.w900,
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 4),
+            Icon(
+              Icons.menu_book_rounded,
+              size: 13,
+              color: AppTheme.ink.withValues(alpha: 0.55),
+            ),
+          ],
         ],
       ),
+    );
+    if (onTap == null) return chip;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: chip,
     );
   }
 }
