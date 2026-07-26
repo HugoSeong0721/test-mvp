@@ -178,6 +178,28 @@ class AdaptiveTcmInquiryService {
     return keywords.where((keyword) => text.contains(keyword)).toList();
   }
 
+  /// Maps a pattern direction produced by [_patternDirections] to a search
+  /// query for the bundled research corpus (see ResearchCorpusService), so the
+  /// practitioner can jump from a suggested direction to the literature that
+  /// motivates it. Falls back to a general syndrome-differentiation query for
+  /// unrecognized directions.
+  static String researchQueryForDirection(String direction) {
+    final d = direction.toLowerCase();
+    if (d.contains('spleen') || d.contains('damp')) {
+      return 'spleen deficiency damp digestion syndrome differentiation';
+    }
+    if (d.contains('cold-heat') || d.contains('deficiency/excess')) {
+      return 'cold heat deficiency excess syndrome differentiation classification';
+    }
+    if (d.contains('shen') || d.contains('liver')) {
+      return 'insomnia emotion liver depression syndrome differentiation';
+    }
+    if (d.contains('pain')) {
+      return 'pain syndrome differentiation acupuncture inquiry';
+    }
+    return 'syndrome differentiation adaptive inquiry question';
+  }
+
   static List<String> _patternDirections(Set<dynamic> domains) {
     final directions = <String>[];
     if (domains.contains('digestion') && domains.contains('energy')) {

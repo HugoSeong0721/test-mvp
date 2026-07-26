@@ -15,6 +15,7 @@ This app should support practitioner-led care conversations, not automated diagn
 - Patient answers are saved with an `adaptiveTcmSummary`.
 - The summary extracts lightweight signals across sleep, digestion, temperature, energy, emotion, and body pain/tension.
 - The practitioner dashboard shows the strongest signals and a small number of "next best" follow-up questions.
+- Each suggested pattern direction links to supporting papers in the bundled research corpus (`research/papers.json`, refreshed daily by a scheduled GitHub Action) via token-relevance retrieval — tap the "TCM path" chip to open the Research Library pre-filtered to the matching literature.
 - This is intentionally rule-based for now, so behavior is predictable and easy to review.
 
 ## Later

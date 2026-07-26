@@ -64,6 +64,27 @@ class ResearchPaper {
     if (source.toLowerCase().contains(q)) return true;
     return authors.any((a) => a.toLowerCase().contains(q));
   }
+
+  /// Token-based relevance score for [query]: each query word found in the
+  /// title counts 3, in the abstract counts 1. Zero means no overlap. This is
+  /// what lets a clinical phrase like "spleen qi damp digestion" surface the
+  /// right papers even when no single substring matches.
+  int relevanceScore(String query) {
+    final terms = query
+        .toLowerCase()
+        .split(RegExp(r'[^a-z0-9]+'))
+        .where((t) => t.length > 2)
+        .toSet();
+    if (terms.isEmpty) return 0;
+    final titleLower = title.toLowerCase();
+    final abstractLower = abstract.toLowerCase();
+    var score = 0;
+    for (final term in terms) {
+      if (titleLower.contains(term)) score += 3;
+      if (abstractLower.contains(term)) score += 1;
+    }
+    return score;
+  }
 }
 
 /// Loads the bundled TCM research corpus.
@@ -110,6 +131,21 @@ class ResearchCorpusService {
       _cache = const [];
       return _cache!;
     }
+  }
+
+  /// Returns the corpus papers most relevant to [query], ranked by
+  /// [ResearchPaper.relevanceScore], best first. Papers with no term overlap
+  /// are excluded, so an off-topic query returns an empty list rather than
+  /// arbitrary papers.
+  Future<List<ResearchPaper>> topMatches(String query, {int limit = 5}) async {
+    final papers = await load();
+    final scored = <(int, ResearchPaper)>[];
+    for (final paper in papers) {
+      final score = paper.relevanceScore(query);
+      if (score > 0) scored.add((score, paper));
+    }
+    scored.sort((a, b) => b.$1.compareTo(a.$1));
+    return scored.take(limit).map((e) => e.$2).toList();
   }
 
   /// Clears the in-memory cache (useful for tests / hot reload).

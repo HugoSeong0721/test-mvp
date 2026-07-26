@@ -24,11 +24,27 @@ class _ResearchLibraryScreenState extends State<ResearchLibraryScreen> {
   final _searchController = TextEditingController();
   late Future<List<ResearchPaper>> _future;
   String _query = '';
+  bool _seededFromRoute = false;
 
   @override
   void initState() {
     super.initState();
     _future = ResearchCorpusService.instance.load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // A pattern-direction chip on the dashboard can open this screen with a
+    // pre-filled evidence query passed as route arguments.
+    if (!_seededFromRoute) {
+      _seededFromRoute = true;
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is String && args.trim().isNotEmpty) {
+        _searchController.text = args;
+        _query = args;
+      }
+    }
   }
 
   @override
@@ -51,8 +67,22 @@ class _ResearchLibraryScreenState extends State<ResearchLibraryScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           final all = snapshot.data ?? const <ResearchPaper>[];
-          final filtered =
-              all.where((p) => p.matches(_query)).toList(growable: false);
+          // Rank by token relevance so multi-word clinical queries (e.g. from
+          // a pattern-direction chip) surface the best-matching papers first;
+          // substring matching keeps author/source search working.
+          final query = _query.trim();
+          late final List<ResearchPaper> filtered;
+          if (query.isEmpty) {
+            filtered = all;
+          } else {
+            final scored = <(int, ResearchPaper)>[];
+            for (final p in all) {
+              final score = p.relevanceScore(query);
+              if (score > 0 || p.matches(query)) scored.add((score, p));
+            }
+            scored.sort((a, b) => b.$1.compareTo(a.$1));
+            filtered = scored.map((e) => e.$2).toList(growable: false);
+          }
 
           return Column(
             children: [
