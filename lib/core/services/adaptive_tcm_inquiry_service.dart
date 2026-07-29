@@ -155,9 +155,32 @@ class AdaptiveTcmInquiryService {
       );
     }
 
+    final bloodEvidence = _hits(text, const [
+      'dizzy',
+      'dizziness',
+      'lightheaded',
+      'pale',
+      'blurry',
+      'palpitation',
+      'numb',
+    ]);
+    if (bloodEvidence.isNotEmpty) {
+      addSignal(
+        domain: 'blood',
+        label: 'Blood-nourishment signals',
+        weight: bloodEvidence.length,
+        evidence: bloodEvidence,
+      );
+    }
+
     signals.sort((a, b) => (b['weight'] as int).compareTo(a['weight'] as int));
     final domains = signals.map((signal) => signal['domain']).toSet();
-    final patternDirections = _patternDirections(domains);
+    final patternDirections = _patternDirections(
+      domains,
+      coldEvidence: coldEvidence,
+      heatEvidence: heatEvidence,
+      painEvidence: painEvidence,
+    );
     final nextQuestions = _nextQuestions(domains);
 
     return {
@@ -217,24 +240,90 @@ class AdaptiveTcmInquiryService {
     return 'syndrome differentiation adaptive inquiry question';
   }
 
-  static List<String> _patternDirections(Set<dynamic> domains) {
+  /// Refined direction rules aligned with the 7-pattern taxonomy used by
+  /// PatternFinderService (qi/yang/yin deficiency, damp-phlegm, liver qi
+  /// constraint, blood stasis, blood deficiency). Each direction string
+  /// contains the pattern phrase that [researchQueryForDirection] recognizes,
+  /// so the dashboard evidence chip always resolves to matching literature.
+  /// Cold vs heat and fixed vs moving pain are distinguished via the evidence
+  /// keywords, not just the domain, following the cold-heat classification
+  /// work in the research corpus. Still rule-based on purpose — these are
+  /// directions for a practitioner to confirm, not conclusions.
+  static List<String> _patternDirections(
+    Set<dynamic> domains, {
+    List<String> coldEvidence = const [],
+    List<String> heatEvidence = const [],
+    List<String> painEvidence = const [],
+  }) {
     final directions = <String>[];
-    if (domains.contains('digestion') && domains.contains('energy')) {
-      directions.add('Clarify Spleen qi / damp tendency');
+    final cold = coldEvidence.isNotEmpty;
+    final heat = heatEvidence.isNotEmpty;
+
+    // Temperature axis: split what used to be one cold-heat rule.
+    if (cold && domains.contains('energy')) {
+      directions.add(
+        'Clarify yang deficiency direction (cold signs with low energy)',
+      );
+    } else if (cold) {
+      directions.add(
+        'Clarify cold tendency: yang deficiency vs external cold',
+      );
     }
-    if (domains.contains('temperature') && domains.contains('energy')) {
-      directions.add('Clarify cold-heat and deficiency/excess direction');
+    if (heat && domains.contains('sleep')) {
+      directions.add(
+        'Clarify yin deficiency direction (heat or dryness with disturbed sleep)',
+      );
+    } else if (heat) {
+      directions.add(
+        'Clarify heat tendency: excess heat vs yin deficiency',
+      );
     }
+
+    // Digestion axis: damp burden vs stress-bound digestion.
+    if (domains.contains('digestion') && domains.contains('emotion')) {
+      directions.add(
+        'Clarify liver qi constraint direction (stress-linked digestion)',
+      );
+    } else if (domains.contains('digestion') && domains.contains('energy')) {
+      directions.add(
+        'Clarify qi deficiency with damp direction (digestive burden, low energy)',
+      );
+    } else if (domains.contains('digestion')) {
+      directions.add('Clarify damp tendency from digestive burden');
+    }
+
+    // Shen / emotion axis.
     if (domains.contains('sleep') && domains.contains('emotion')) {
-      directions.add('Clarify shen disturbance and Liver constraint signals');
+      directions.add(
+        'Clarify shen disturbance and liver constraint signals',
+      );
     }
-    if (domains.contains('body') && domains.contains('emotion')) {
-      directions.add('Clarify pain quality, movement, and stress relationship');
+
+    // Pain axis: fixed/sharp quality points toward stasis.
+    final fixedPain = painEvidence.any(
+      (e) => e == 'fixed' || e == 'sharp',
+    );
+    if (fixedPain) {
+      directions.add(
+        'Clarify blood stasis direction (fixed or sharp pain quality)',
+      );
+    } else if (domains.contains('body') && domains.contains('emotion')) {
+      directions.add(
+        'Clarify pain quality, movement, and stress relationship',
+      );
     }
+
+    // Blood nourishment axis.
+    if (domains.contains('blood')) {
+      directions.add(
+        'Clarify blood deficiency direction (dizziness, pallor, blurry vision)',
+      );
+    }
+
     if (directions.isEmpty) {
       directions.add('Collect more baseline evidence before pattern direction');
     }
-    return directions;
+    return directions.take(4).toList();
   }
 
   static List<String> _nextQuestions(Set<dynamic> domains) {
@@ -266,6 +355,11 @@ class AdaptiveTcmInquiryService {
     if (domains.contains('body')) {
       questions.add('Is the pain sharp/fixed, dull/heavy, or moving?');
     }
+    if (domains.contains('blood')) {
+      questions.add(
+        'Do you feel dizzy on standing, or notice blurry vision or pale lips?',
+      );
+    }
     if (questions.isEmpty) {
       questions.add('What changed most since your last visit?');
       questions.add('What symptom should your practitioner focus on first?');
@@ -281,6 +375,7 @@ class AdaptiveTcmInquiryService {
       'energy',
       'emotion',
       'body',
+      'blood',
     ];
     return allDomains.where((domain) => !domains.contains(domain)).toList();
   }
