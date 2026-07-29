@@ -18,6 +18,18 @@ This app should support practitioner-led care conversations, not automated diagn
 - Each suggested pattern direction links to supporting papers in the bundled research corpus (`research/papers.json`, refreshed daily by a scheduled GitHub Action) via token-relevance retrieval — tap the "TCM path" chip to open the Research Library pre-filtered to the matching literature.
 - This is intentionally rule-based for now, so behavior is predictable and easy to review.
 
+## Direction (2026-07): guided pattern finder, not chat
+
+Free-form chat proved hard to steer, so the product direction is a guided
+flow: the patient answers one multiple-choice question at a time, each answer
+adds weight to candidate pattern directions, and the next question is chosen
+to separate the current front-runners (`PatternFinderService`,
+`PatternFinderScreen`). After 8 questions the patient sees a ranked pattern
+*direction* (never a diagnosis) with the answers that pointed there and the
+supporting papers from the research corpus. Sharing the result reuses the
+intake submission path (`visitType: 'pattern_finder'`), so it lands on the
+existing practitioner dashboard unchanged.
+
 ## Later
 
 - Replace keyword-only signals with clinician-validated rules.
