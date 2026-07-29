@@ -76,14 +76,27 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
     if (question == null) return;
     setState(() {
       _engine.answer(question.id, optionIndex);
-      final next = _engine.nextQuestion();
-      if (next == null) {
-        _stage = _Stage.result;
-        _currentQuestion = null;
-      } else {
-        _currentQuestion = next;
-      }
+      _advance();
     });
+  }
+
+  void _chooseFreeText(String text) {
+    final question = _currentQuestion;
+    if (question == null || text.trim().isEmpty) return;
+    setState(() {
+      _engine.answerFreeText(question.id, text);
+      _advance();
+    });
+  }
+
+  void _advance() {
+    final next = _engine.nextQuestion();
+    if (next == null) {
+      _stage = _Stage.result;
+      _currentQuestion = null;
+    } else {
+      _currentQuestion = next;
+    }
   }
 
   void _back() {
@@ -116,14 +129,15 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
     }
     setState(() => _isSharing = true);
     try {
+      final pairs = _engine.answeredPairs();
       final answers = <Map<String, dynamic>>[];
-      for (var i = 0; i < _engine.answers.length; i++) {
-        final entry = _engine.answers[i];
-        final question = PatternFinderService.questionById[entry.key]!;
+      for (var i = 0; i < pairs.length; i++) {
+        final (question, option) = pairs[i];
+        final typed = _engine.isFreeText(question.id);
         answers.add({
           'questionIndex': i + 1,
           'questionText': question.textKo,
-          'answerText': question.options[entry.value].textKo,
+          'answerText': typed ? '(직접 입력) ${option.textKo}' : option.textKo,
           'markedMainPain': false,
           'markedRemember': false,
         });
@@ -191,10 +205,12 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
       body: switch (_stage) {
         _Stage.intro => _IntroView(onStart: _start),
         _Stage.questions => _QuestionView(
+          key: ValueKey(_currentQuestion!.id),
           question: _currentQuestion!,
           answered: _engine.answeredCount,
           total: PatternFinderService.questionsPerSession,
           onChoose: _choose,
+          onChooseFreeText: _chooseFreeText,
           onBack: _back,
         ),
         _Stage.result => _ResultView(
@@ -299,12 +315,14 @@ class _IntroView extends StatelessWidget {
   }
 }
 
-class _QuestionView extends StatelessWidget {
+class _QuestionView extends StatefulWidget {
   const _QuestionView({
+    super.key,
     required this.question,
     required this.answered,
     required this.total,
     required this.onChoose,
+    required this.onChooseFreeText,
     required this.onBack,
   });
 
@@ -312,18 +330,40 @@ class _QuestionView extends StatelessWidget {
   final int answered;
   final int total;
   final ValueChanged<int> onChoose;
+  final ValueChanged<String> onChooseFreeText;
   final VoidCallback onBack;
+
+  @override
+  State<_QuestionView> createState() => _QuestionViewState();
+}
+
+class _QuestionViewState extends State<_QuestionView> {
+  final _freeTextController = TextEditingController();
+  bool _showFreeText = false;
+
+  @override
+  void dispose() {
+    _freeTextController.dispose();
+    super.dispose();
+  }
+
+  void _submitFreeText() {
+    final text = _freeTextController.text.trim();
+    if (text.isEmpty) return;
+    widget.onChooseFreeText(text);
+  }
 
   @override
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
+    final question = widget.question;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Row(
           children: [
             IconButton(
-              onPressed: onBack,
+              onPressed: widget.onBack,
               icon: const Icon(Icons.arrow_back_rounded),
               tooltip: lang.tr('Back', '이전'),
             ),
@@ -331,7 +371,7 @@ class _QuestionView extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(99),
                 child: LinearProgressIndicator(
-                  value: answered / total,
+                  value: widget.answered / widget.total,
                   minHeight: 8,
                   backgroundColor: AppTheme.surfaceSoft,
                 ),
@@ -339,7 +379,7 @@ class _QuestionView extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              '${answered + 1}/$total',
+              '${widget.answered + 1}/${widget.total}',
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ],
@@ -355,9 +395,56 @@ class _QuestionView extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: _OptionButton(
               text: lang.tr(question.options[i].textEn, question.options[i].textKo),
-              onTap: () => onChoose(i),
+              onTap: () => widget.onChoose(i),
             ),
           ),
+        if (!_showFreeText)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => setState(() => _showFreeText = true),
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: Text(
+                lang.tr('Write my own answer', '직접 입력할게요'),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          )
+        else ...[
+          TextField(
+            controller: _freeTextController,
+            autofocus: true,
+            minLines: 2,
+            maxLines: 4,
+            maxLength: 200,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submitFreeText(),
+            decoration: InputDecoration(
+              hintText: lang.tr(
+                'Describe it in your own words',
+                '내 상태를 편하게 적어주세요',
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              FilledButton.icon(
+                onPressed: _submitFreeText,
+                icon: const Icon(Icons.check_rounded, size: 18),
+                label: Text(lang.tr('Use this answer', '이 답변으로 할게요')),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () => setState(() => _showFreeText = false),
+                child: Text(lang.tr('Cancel', '취소')),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
