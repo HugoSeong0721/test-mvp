@@ -30,6 +30,18 @@ supporting papers from the research corpus. Sharing the result reuses the
 intake submission path (`visitType: 'pattern_finder'`), so it lands on the
 existing practitioner dashboard unchanged.
 
+## LLM question bank (research-grounded RAG)
+
+When the `ANTHROPIC_API_KEY` GitHub Actions secret is configured, the daily
+workflow also runs `tools/generate_question_bank.py`: for each of the seven
+pattern directions it selects the most relevant collected abstracts and asks
+Claude to draft follow-up inquiry questions grounded only in those abstracts,
+each citing its source paper ids. The output (`research/question_bank.json`)
+ships as an app asset; the Pattern Finder result screen shows the questions for
+the leading pattern, and sharing a result prepends them to the summary's
+next-best questions. Generation is skipped when no new papers arrived, and the
+step is a no-op until the secret exists — the pipeline stays free until then.
+
 ## Later
 
 - Replace keyword-only signals with clinician-validated rules.
