@@ -536,12 +536,18 @@ class PatternFinderService {
 class PatternFinderEngine {
   PatternFinderEngine();
 
+  /// Sentinel option index meaning "the patient typed their own answer".
+  static const int freeTextOption = -1;
+
   final Map<String, int> _scores = {
     for (final p in PatternFinderService.patterns) p.id: 0,
   };
 
-  /// questionId -> chosen option index, in answer order.
+  /// questionId -> chosen option index (or [freeTextOption]), in answer order.
   final List<MapEntry<String, int>> _answers = [];
+
+  /// questionId -> the patient's typed answer, for free-text entries.
+  final Map<String, String> _freeTexts = {};
 
   List<MapEntry<String, int>> get answers => List.unmodifiable(_answers);
 
@@ -599,6 +605,18 @@ class PatternFinderEngine {
     });
   }
 
+  /// Records a typed answer instead of a multiple-choice option. Free-text
+  /// answers carry no pattern weights — scoring stays predictable and
+  /// reviewable — but they are kept verbatim for the recap and for sharing
+  /// with the practitioner.
+  void answerFreeText(String questionId, String text) {
+    final question = PatternFinderService.questionById[questionId];
+    final trimmed = text.trim();
+    if (question == null || trimmed.isEmpty) return;
+    _answers.add(MapEntry(questionId, freeTextOption));
+    _freeTexts[questionId] = trimmed;
+  }
+
   /// Every question asked so far with the chosen answer, in order — for the
   /// "review my answers" section on the result screen and for sharing.
   /// Each entry is (question, chosen option).
@@ -607,15 +625,30 @@ class PatternFinderEngine {
     for (final entry in _answers) {
       final question = PatternFinderService.questionById[entry.key];
       if (question == null) continue;
-      pairs.add((question, question.options[entry.value]));
+      if (entry.value == freeTextOption) {
+        final text = _freeTexts[entry.key] ?? '';
+        pairs.add((
+          question,
+          PatternOption(textEn: text, textKo: text),
+        ));
+      } else {
+        pairs.add((question, question.options[entry.value]));
+      }
     }
     return pairs;
   }
+
+  /// Whether the answer at [questionId] was typed by the patient.
+  bool isFreeText(String questionId) => _freeTexts.containsKey(questionId);
 
   /// Removes the most recent answer (back button support).
   void undo() {
     if (_answers.isEmpty) return;
     final last = _answers.removeLast();
+    if (last.value == freeTextOption) {
+      _freeTexts.remove(last.key);
+      return;
+    }
     final question = PatternFinderService.questionById[last.key];
     question?.options[last.value].weights.forEach((patternId, weight) {
       _scores[patternId] = (_scores[patternId] ?? 0) - weight;
@@ -648,7 +681,7 @@ class PatternFinderEngine {
     if (topId != null) {
       for (final a in _answers) {
         final question = PatternFinderService.questionById[a.key];
-        if (question == null) continue;
+        if (question == null || a.value == freeTextOption) continue;
         final option = question.options[a.value];
         if ((option.weights[topId] ?? 0) > 0) {
           contributions.add(option.textKo);
