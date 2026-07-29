@@ -1774,11 +1774,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     runSpacing: 10,
                                     children: [
                                       FilledButton.icon(
-                                        onPressed: nextStepAction,
-                                        icon: const Icon(Icons.arrow_forward),
-                                        label: Text(nextStepButton),
-                                      ),
-                                      FilledButton.tonalIcon(
                                         onPressed: () => Navigator.pushNamed(
                                           context,
                                           PatternFinderScreen.routeName,
@@ -1792,6 +1787,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                             '내 몸 패턴 찾기',
                                           ),
                                         ),
+                                      ),
+                                      FilledButton.tonalIcon(
+                                        onPressed: nextStepAction,
+                                        icon: const Icon(Icons.arrow_forward),
+                                        label: Text(nextStepButton),
                                       ),
                                       if (MediaQuery.sizeOf(context).width >=
                                           720)

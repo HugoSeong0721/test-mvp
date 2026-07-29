@@ -199,6 +199,7 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
         ),
         _Stage.result => _ResultView(
           result: _engine.result(),
+          answeredPairs: _engine.answeredPairs(),
           isSharing: _isSharing,
           shared: _shared,
           onShare: _share,
@@ -396,6 +397,7 @@ class _OptionButton extends StatelessWidget {
 class _ResultView extends StatelessWidget {
   const _ResultView({
     required this.result,
+    required this.answeredPairs,
     required this.isSharing,
     required this.shared,
     required this.onShare,
@@ -403,6 +405,7 @@ class _ResultView extends StatelessWidget {
   });
 
   final PatternFinderResult result;
+  final List<(PatternQuestion, PatternOption)> answeredPairs;
   final bool isSharing;
   final bool shared;
   final VoidCallback onShare;
@@ -474,6 +477,10 @@ class _ResultView extends StatelessWidget {
           const SizedBox(height: 16),
           _BankQuestionsSection(patternId: top.pattern.id),
           _ResearchEvidenceSection(query: top.pattern.researchQuery),
+        ],
+        if (answeredPairs.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _AnswerRecapSection(answeredPairs: answeredPairs),
         ],
         const SizedBox(height: 18),
         Wrap(
@@ -565,6 +572,63 @@ class _PatternCard extends StatelessWidget {
               lang.tr(score.pattern.summaryEn, score.pattern.summaryKo),
               style: const TextStyle(fontSize: 13.5, height: 1.45),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Collapsible recap of every question asked and the answer chosen, so the
+/// patient can review exactly what they said before sharing.
+class _AnswerRecapSection extends StatelessWidget {
+  const _AnswerRecapSection({required this.answeredPairs});
+
+  final List<(PatternQuestion, PatternOption)> answeredPairs;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+          title: Text(
+            lang.tr(
+              'Review my ${answeredPairs.length} answers',
+              '내가 답한 내용 모두 보기 (${answeredPairs.length}개)',
+            ),
+            style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
+          ),
+          children: [
+            for (var i = 0; i < answeredPairs.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Q${i + 1}. ${lang.tr(answeredPairs[i].$1.textEn, answeredPairs[i].$1.textKo)}',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.ink.withValues(alpha: 0.65),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      lang.tr(
+                        answeredPairs[i].$2.textEn,
+                        answeredPairs[i].$2.textKo,
+                      ),
+                      style: const TextStyle(fontSize: 13.5, height: 1.35),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
