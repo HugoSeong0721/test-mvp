@@ -654,7 +654,12 @@ class PatternFinderEngine {
   /// output, so a shared result appears on the existing practitioner dashboard
   /// (signals, pattern directions, next-best questions) without any dashboard
   /// changes.
-  Map<String, dynamic> toCarePicture() {
+  ///
+  /// [extraNextQuestions] lets callers prepend research-grounded follow-up
+  /// questions (from the LLM-generated question bank) ahead of the defaults.
+  Map<String, dynamic> toCarePicture({
+    List<String> extraNextQuestions = const [],
+  }) {
     final res = result();
     final directions = <String>[
       for (final s in res.ranked.take(2))
@@ -678,10 +683,11 @@ class PatternFinderEngine {
       'patternDirections': directions.isEmpty
           ? ['Collect more baseline evidence before pattern direction']
           : directions,
-      'nextBestQuestions': const [
+      'nextBestQuestions': [
+        ...extraNextQuestions,
         'Confirm tongue and pulse findings in person',
         'Ask how long the leading symptoms have lasted',
-      ],
+      ].take(5).toList(),
       'missingDomains': const <String>[],
       'updatedAtClient': DateTime.now().toUtc().toIso8601String(),
     };

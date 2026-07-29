@@ -69,6 +69,7 @@ flutter:
   # carries the latest accumulated literature.
   assets:
     - research/papers.json
+    - research/question_bank.json
 
   # To add more assets to your application, add them under the assets section
   # above, like this:
