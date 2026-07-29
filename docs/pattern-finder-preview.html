@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 몸 패턴 찾기 — 디자인 미리보기</title>
+<style>
+  :root {
+    --ground: #FFFCF4;
+    --card: #FFFFFF;
+    --soft: #FBF6EC;
+    --ink: #20302A;
+    --ink-dim: #5B6B64;
+    --jade: #2F5A4B;
+    --jade-deep: #1E3D33;
+    --mint: #DCE6E0;
+    --copper: #E28C74;
+    --blush: #FFEEE8;
+    --border: #E6DDCE;
+    --shadow: 0 10px 30px rgba(24, 33, 31, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #141E1A;
+      --card: #1D2A25;
+      --soft: #22302A;
+      --ink: #E8EDE9;
+      --ink-dim: #9FB0A8;
+      --jade: #7FB8A0;
+      --jade-deep: #A9D4C2;
+      --mint: #2B3B34;
+      --copper: #E89B85;
+      --blush: #3A2B25;
+      --border: #33443C;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #FFFCF4; --card: #FFFFFF; --soft: #FBF6EC; --ink: #20302A;
+    --ink-dim: #5B6B64; --jade: #2F5A4B; --jade-deep: #1E3D33; --mint: #DCE6E0;
+    --copper: #E28C74; --blush: #FFEEE8; --border: #E6DDCE;
+    --shadow: 0 10px 30px rgba(24,33,31,.10);
+  }
+  :root[data-theme="dark"] {
+    --ground: #141E1A; --card: #1D2A25; --soft: #22302A; --ink: #E8EDE9;
+    --ink-dim: #9FB0A8; --jade: #7FB8A0; --jade-deep: #A9D4C2; --mint: #2B3B34;
+    --copper: #E89B85; --blush: #3A2B25; --border: #33443C;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+  }
+  .kicker {
+    font-size: 12px;
+    letter-spacing: .12em;
+    font-weight: 700;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 4px;
+    text-wrap: balance;
+  }
+  .sub { font-size: 13px; color: var(--ink-dim); margin: 0 0 20px; }
+
+  .phone {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .phone-top {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--soft);
+  }
+  .phone-top .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--jade); }
+  .phone-top .name { font-size: 13px; font-weight: 800; }
+  .screen { padding: 20px 18px 24px; min-height: 480px; display: flex; flex-direction: column; }
+
+  .banner {
+    display: flex; gap: 8px; align-items: flex-start;
+    background: var(--soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+  .banner b { color: var(--ink); }
+
+  .q-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .back {
+    border: 1px solid var(--border); background: var(--card); color: var(--ink);
+    width: 34px; height: 34px; border-radius: 99px; cursor: pointer;
+    font-size: 15px; line-height: 1; flex: none;
+  }
+  .track { flex: 1; height: 8px; border-radius: 99px; background: var(--mint); overflow: hidden; }
+  .fill { height: 100%; background: var(--jade); border-radius: 99px; transition: width .35s ease; }
+  .count { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+  .q-text { font-size: 18px; font-weight: 800; margin: 4px 0 16px; text-wrap: balance; }
+
+  .opt {
+    display: block; width: 100%; text-align: left;
+    background: var(--card); color: var(--ink);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 13px 15px; margin-bottom: 10px;
+    font-size: 14.5px; font-family: inherit; line-height: 1.4;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .opt:hover { border-color: var(--jade); background: var(--soft); }
+  .opt:active { transform: scale(.985); }
+  .opt:focus-visible, .btn:focus-visible, .back:focus-visible {
+    outline: 2px solid var(--jade); outline-offset: 2px;
+  }
+
+  .btn {
+    border: none; border-radius: 999px; cursor: pointer;
+    font-family: inherit; font-size: 15px; font-weight: 800;
+    padding: 13px 22px;
+  }
+  .btn-primary { background: var(--jade); color: #FFFCF4; }
+  :root[data-theme="dark"] .btn-primary, .btn-primary.dark-fix { color: #10201A; }
+  .btn-ghost {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--border);
+  }
+
+  .result-card {
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; margin-bottom: 10px; background: var(--card);
+  }
+  .result-card.primary { border-color: var(--jade); }
+  .result-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .result-name { font-weight: 800; font-size: 17px; }
+  .result-card.secondary .result-name { font-size: 14px; }
+  .pct { font-weight: 900; color: var(--copper); font-variant-numeric: tabular-nums; }
+  .bar { height: 8px; border-radius: 99px; background: var(--mint); margin: 10px 0; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--copper); border-radius: 99px; transition: width .6s ease; }
+  .result-desc { font-size: 13px; color: var(--ink-dim); margin: 0; }
+
+  .section-label { font-size: 13.5px; font-weight: 800; margin: 16px 0 8px; }
+  .evidence { border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; background: var(--soft); }
+  .evidence p { margin: 0 0 6px; font-size: 13px; }
+  .evidence p:last-child { margin-bottom: 0; }
+
+  .paper {
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 12px; margin-bottom: 8px; background: var(--card);
+  }
+  .paper .t { font-size: 12.5px; font-weight: 700; margin: 0 0 2px; }
+  .paper .m { font-size: 11px; color: var(--ink-dim); margin: 0; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .spacer { flex: 1; }
+  .note { font-size: 12px; color: var(--ink-dim); margin-top: 22px; text-align: center; }
+
+  .fade { animation: fade .28s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .fade { animation: none; }
+    .fill, .bar > div, .opt { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Design Preview · test-mvp</p>
+  <h1>내 몸 패턴 찾기</h1>
+  <p class="sub">환자가 8개의 질문에 답하면 변증 방향으로 수렴하는 흐름 — Flutter 앱에 구현된 것과 동일한 질문·가중치·적응 로직입니다.</p>
+
+  <div class="phone">
+    <div class="phone-top">
+      <span class="dot"></span>
+      <span class="name">내 몸 패턴 찾기</span>
+    </div>
+    <div class="screen" id="screen"></div>
+  </div>
+
+  <p class="note">이 미리보기는 진단이 아닌 한의사 검토용 참고 흐름입니다.<br>디자인 확정 시 그대로 앱에 반영되어 있습니다.</p>
+</div>
+
+<script>
+// ── Same data as lib/core/services/pattern_finder_service.dart ──────────────
+const PATTERNS = {
+  qi_deficiency:   { name: "기허(기운 부족) 방향",   desc: "움직이면 심해지는 피로, 기운 없는 목소리나 식욕 저하, 조금만 움직여도 나는 땀이 특징적인 방향입니다." },
+  yang_deficiency: { name: "양허(몸이 찬) 방향",     desc: "추위를 많이 타고 손발이 차며, 따뜻한 것을 찾고 변이 무른 편인 방향입니다." },
+  yin_deficiency:  { name: "음허(허열·건조) 방향",   desc: "밤에 나는 식은땀과 입마름, 저녁의 달아오르는 열감, 얕은 잠이 특징적인 방향입니다." },
+  damp_phlegm:     { name: "습담(무겁고 더부룩) 방향", desc: "몸과 머리가 무겁고 식후 더부룩하며, 변이 끈적하고 습한 날 심해지는 방향입니다." },
+  liver_qi:        { name: "간기울결(스트레스·긴장) 방향", desc: "스트레스에 따라 증상이 오르내리고, 가슴답답함·한숨·짜증, 스트레스성 소화 문제가 특징적인 방향입니다." },
+  blood_stasis:    { name: "어혈(고정된 통증) 방향",  desc: "한 자리에 고정된 콕콕 찌르는 통증, 밤에 심해지는 통증, 어둡고 칙칙한 안색이 특징적인 방향입니다." },
+  blood_deficiency:{ name: "혈허(어지럼·창백) 방향",  desc: "일어날 때 어지럽고 안색이 창백하며, 눈이 침침하고 잠들기 어려운 것이 특징적인 방향입니다." },
+};
+
+const QUESTIONS = [
+  { id:"energy", text:"피로감이 가장 심한 때는 언제인가요?", options:[
+    { t:"아침부터 하루 종일 기운이 없어요", w:{qi_deficiency:3,yang_deficiency:2,blood_deficiency:1} },
+    { t:"오후가 되면 뚝 떨어져요", w:{qi_deficiency:2,damp_phlegm:1} },
+    { t:"저녁에 피곤한데 몸에 열감이 있어요", w:{yin_deficiency:3} },
+    { t:"스트레스 받은 날 특히 심해요", w:{liver_qi:3} },
+    { t:"피로는 별로 없어요", w:{} } ]},
+  { id:"temperature", text:"평소 추위나 더위는 어떤가요?", options:[
+    { t:"추위를 타고 손발이 차요", w:{yang_deficiency:3,qi_deficiency:1,blood_deficiency:1} },
+    { t:"밤이나 저녁에 얼굴이 달아오르고 더워요", w:{yin_deficiency:3} },
+    { t:"스트레스 받으면 가슴이 답답하고 열이 올라요", w:{liver_qi:2} },
+    { t:"특별히 없어요", w:{} } ]},
+  { id:"stress", text:"증상이 스트레스와 관련이 있나요?", options:[
+    { t:"스트레스 받으면 확실히 심해져요", w:{liver_qi:3} },
+    { t:"기분과 상관없이 무리하면 심해져요", w:{qi_deficiency:2} },
+    { t:"습하거나 비 오는 날 심해져요", w:{damp_phlegm:3} },
+    { t:"잘 모르겠어요", w:{} } ]},
+  { id:"digestion", text:"소화는 어떤가요?", options:[
+    { t:"먹고 나면 더부룩하고 몸이 무거워요", w:{damp_phlegm:3,qi_deficiency:1} },
+    { t:"입맛이 없고 먹는 게 부담스러워요", w:{qi_deficiency:2,yang_deficiency:1} },
+    { t:"스트레스 받으면 체하거나 답답해요", w:{liver_qi:3} },
+    { t:"괜찮은 편이에요", w:{} } ]},
+  { id:"sleep", text:"잠은 어떻게 주무시나요?", options:[
+    { t:"생각이 많아 잠들기 어려워요", w:{blood_deficiency:2,liver_qi:2} },
+    { t:"새벽에 깨고 식은땀이나 입마름이 있어요", w:{yin_deficiency:3} },
+    { t:"잠이 얕고 꿈을 많이 꿔요", w:{blood_deficiency:2,yin_deficiency:1} },
+    { t:"많이 자도 개운하지 않아요", w:{damp_phlegm:2,qi_deficiency:1} },
+    { t:"잘 자는 편이에요", w:{} } ]},
+  { id:"pain", text:"통증이 있다면 어떤 느낌인가요?", options:[
+    { t:"한 자리가 콕콕 찌르듯 아프고 밤에 심해요", w:{blood_stasis:3} },
+    { t:"결리는 곳이 옮겨 다니고 스트레스에 따라 달라져요", w:{liver_qi:2} },
+    { t:"묵직하고 뻐근하게 아파요", w:{damp_phlegm:2} },
+    { t:"통증은 없어요", w:{} } ]},
+  { id:"sweat", text:"땀은 어떤가요?", options:[
+    { t:"조금만 움직여도 땀이 나요", w:{qi_deficiency:3} },
+    { t:"자는 동안 식은땀이 나요", w:{yin_deficiency:3} },
+    { t:"땀이 거의 없고 몸이 차요", w:{yang_deficiency:2} },
+    { t:"보통이에요", w:{} } ]},
+  { id:"thirst", text:"입마름이나 갈증은 어떤가요?", options:[
+    { t:"입이 마르고 시원한 물이 당겨요", w:{yin_deficiency:2} },
+    { t:"입은 마른데 물은 잘 안 마셔요", w:{damp_phlegm:2,blood_stasis:1} },
+    { t:"따뜻한 물이나 차가 편해요", w:{yang_deficiency:2} },
+    { t:"별다른 갈증은 없어요", w:{} } ]},
+  { id:"stool", text:"대변은 평소 어떤 편인가요?", options:[
+    { t:"무른 편이고 찬 음식 먹으면 심해져요", w:{yang_deficiency:3,qi_deficiency:1} },
+    { t:"건조하고 변비 경향이 있어요", w:{yin_deficiency:2,blood_deficiency:1} },
+    { t:"끈적하고 시원하지 않아요", w:{damp_phlegm:3} },
+    { t:"스트레스에 따라 들쭉날쭉해요", w:{liver_qi:2} },
+    { t:"보통이에요", w:{} } ]},
+  { id:"head", text:"머리나 눈은 어떤가요?", options:[
+    { t:"일어날 때 어지럽고 눈이 쉽게 피로해요", w:{blood_deficiency:3} },
+    { t:"머리가 무겁고 멍해요", w:{damp_phlegm:3} },
+    { t:"한 부위가 콕콕 아픈 두통이 있어요", w:{blood_stasis:2} },
+    { t:"스트레스 받으면 옆머리가 아파요", w:{liver_qi:2} },
+    { t:"괜찮아요", w:{} } ]},
+  { id:"complexion", text:"요즘 안색은 어떤 편인가요?", options:[
+    { t:"창백하고 입술색이 옅어요", w:{blood_deficiency:3,yang_deficiency:1} },
+    { t:"저녁에 볼이 붉어져요", w:{yin_deficiency:2} },
+    { t:"칙칙하고 멍이 잘 들어요", w:{blood_stasis:3} },
+    { t:"보통이에요", w:{} } ]},
+  { id:"mood", text:"요즘 기분은 어떤가요?", options:[
+    { t:"짜증이 늘고 한숨이 잦고 가슴이 답답해요", w:{liver_qi:3} },
+    { t:"불안하고 밤에 생각이 많아요", w:{blood_deficiency:2,yin_deficiency:1} },
+    { t:"우울하다기보다 의욕이 없어요", w:{qi_deficiency:2,damp_phlegm:1} },
+    { t:"안정적이에요", w:{} } ]},
+];
+
+const SESSION = 8, BASELINE = 3;
+
+// ── Engine (mirrors PatternFinderEngine) ────────────────────────────────────
+let answers = [];   // {qid, idx}
+let scores = {};
+
+function reset() { answers = []; scores = {}; for (const k in PATTERNS) scores[k] = 0; }
+
+function rankedIds() {
+  return Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+}
+function nextQuestion() {
+  if (answers.length >= SESSION) return null;
+  const done = new Set(answers.map(a => a.qid));
+  const remaining = QUESTIONS.filter(q => !done.has(q.id));
+  if (!remaining.length) return null;
+  if (answers.length < BASELINE) return remaining[0];
+  const top3 = new Set(rankedIds().slice(0, 3));
+  let best = remaining[0], bestV = -1;
+  for (const q of remaining) {
+    let v = 0;
+    for (const o of q.options) for (const [p, w] of Object.entries(o.w)) if (top3.has(p)) v += w;
+    if (v > bestV) { bestV = v; best = q; }
+  }
+  return best;
+}
+function answeredPairs() {
+  return answers.map(a => {
+    const q = QUESTIONS.find(x => x.id === a.qid);
+    return { q: q.text, a: q.options[a.idx].t };
+  });
+}
+function answer(qid, idx) {
+  answers.push({ qid, idx });
+  const q = QUESTIONS.find(x => x.id === qid);
+  for (const [p, w] of Object.entries(q.options[idx].w)) scores[p] += w;
+}
+function undo() {
+  const last = answers.pop();
+  if (!last) return;
+  const q = QUESTIONS.find(x => x.id === last.qid);
+  for (const [p, w] of Object.entries(q.options[last.idx].w)) scores[p] -= w;
+}
+function result() {
+  const total = Object.values(scores).filter(v => v > 0).reduce((a, b) => a + b, 0);
+  const ranked = rankedIds().filter(id => scores[id] > 0)
+    .map(id => ({ id, score: scores[id], share: total ? scores[id] / total : 0 }));
+  const topId = ranked[0]?.id;
+  const contributions = [];
+  if (topId) for (const a of answers) {
+    const o = QUESTIONS.find(x => x.id === a.qid).options[a.idx];
+    if ((o.w[topId] || 0) > 0) contributions.push(o.t);
+  }
+  return { ranked, contributions };
+}
+
+// ── Views ───────────────────────────────────────────────────────────────────
+const screen = document.getElementById("screen");
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+function showIntro() {
+  reset();
+  screen.innerHTML = `
+    <div class="fade" style="display:flex;flex-direction:column;flex:1">
+      <h2 style="font-size:19px;font-weight:800;margin:6px 0 8px;text-wrap:balance">
+        8개의 질문으로<br>내 몸의 패턴 방향을 찾아봐요</h2>
+      <p style="font-size:13.5px;color:var(--ink-dim);margin:0 0 16px">
+        한 번에 하나씩만 답하면 돼요. 답할 때마다 다음 질문이 달라지고,
+        마지막에 내 답변이 가리키는 패턴 방향과 근거 연구를 보여드려요.</p>
+      <button class="btn btn-primary" id="start" style="align-self:flex-start">시작하기</button>
+      <div class="spacer"></div>
+      <div class="banner"><b>ⓘ</b><span>이 결과는 <b>진단이 아니에요</b>.
+        최종 판단은 한의사 선생님이 직접 진료로 확인합니다.</span></div>
+    </div>`;
+  document.getElementById("start").onclick = showQuestion;
+}
+
+function showQuestion() {
+  const q = nextQuestion();
+  if (!q) return showResult();
+  const n = answers.length;
+  screen.innerHTML = `
+    <div class="fade">
+      <div class="q-head">
+        <button class="back" id="back" aria-label="이전">←</button>
+        <div class="track"><div class="fill" style="width:${(n / SESSION) * 100}%"></div></div>
+        <span class="count">${n + 1}/${SESSION}</span>
+      </div>
+      <p class="q-text">${esc(q.text)}</p>
+      ${q.options.map((o, i) => `<button class="opt" data-i="${i}">${esc(o.t)}</button>`).join("")}
+    </div>`;
+  document.getElementById("back").onclick = () => {
+    if (!answers.length) return showIntro();
+    undo(); showQuestion();
+  };
+  screen.querySelectorAll(".opt").forEach(b =>
+    b.onclick = () => { answer(q.id, +b.dataset.i); showQuestion(); });
+}
+
+function showResult() {
+  const r = result();
+  const top = r.ranked[0];
+  const second = r.ranked[1] && top && r.ranked[1].score >= top.score * 0.6 ? r.ranked[1] : null;
+  let html = `<div class="fade">
+    <div class="banner" style="margin-bottom:12px"><b>ⓘ</b>
+      <span>이 결과는 <b>진단이 아니에요</b>. 한의사 선생님이 직접 확인합니다.</span></div>`;
+  if (!top) {
+    html += `<div class="result-card"><p style="margin:0;font-size:14px">
+      아직 뚜렷한 패턴 방향이 나오지 않았어요. 진료에서 함께 살펴보면 좋아요.</p></div>`;
+  } else {
+    const card = (s, primary) => `
+      <div class="result-card ${primary ? "primary" : "secondary"}">
+        <div class="result-row">
+          <span class="result-name">${PATTERNS[s.id].name}</span>
+          <span class="pct">${Math.round(s.share * 100)}%</span>
+        </div>
+        <div class="bar"><div style="width:${s.share * 100}%"></div></div>
+        <p class="result-desc">${PATTERNS[s.id].desc}</p>
+      </div>`;
+    html += card(top, true);
+    if (second) html += card(second, false);
+    if (r.contributions.length) {
+      html += `<p class="section-label">이 방향을 가리킨 내 답변</p>
+        <div class="evidence">${r.contributions.map(c => `<p>· ${esc(c)}</p>`).join("")}</div>`;
+    }
+    html += `<p class="section-label">관련 연구 <span style="font-weight:400;color:var(--ink-dim)">(앱에서는 실제 수집 논문이 연결됩니다)</span></p>
+      <div class="paper"><p class="t">TCM-SD: A Benchmark for Probing Syndrome Differentiation via NLU</p><p class="m">2022 · arXiv</p></div>
+      <div class="paper"><p class="t">Development of a cold-heat syndrome classification model</p><p class="m">2024 · Europe PMC</p></div>`;
+  }
+  const pairs = answeredPairs();
+  if (pairs.length) {
+    html += `<details style="margin-top:14px;border:1px solid var(--border);border-radius:14px;background:var(--card)">
+      <summary style="padding:12px 14px;font-size:14px;font-weight:800;cursor:pointer">
+        내가 답한 내용 모두 보기 (${pairs.length}개)</summary>
+      <div style="padding:0 14px 12px">
+        ${pairs.map((p, i) => `
+          <p style="margin:10px 0 2px;font-size:12px;font-weight:700;color:var(--ink-dim)">Q${i + 1}. ${esc(p.q)}</p>
+          <p style="margin:0;font-size:13.5px">${esc(p.a)}</p>`).join("")}
+      </div></details>`;
+  }
+  html += `<div class="actions">
+      <button class="btn btn-primary" id="share">한의사에게 공유하기</button>
+      <button class="btn btn-ghost" id="retry">다시 하기</button>
+    </div></div>`;
+  screen.innerHTML = html;
+  document.getElementById("retry").onclick = showIntro;
+  document.getElementById("share").onclick = e => {
+    e.target.textContent = "공유 완료 ✓"; e.target.disabled = true;
+  };
+}
+
+showIntro();
+</script>
+</body>
+</html>
