@@ -185,6 +185,23 @@ class AdaptiveTcmInquiryService {
   /// unrecognized directions.
   static String researchQueryForDirection(String direction) {
     final d = direction.toLowerCase();
+    // Pattern finder directions (see PatternFinderService.patterns).
+    if (d.contains('qi deficiency')) {
+      return 'qi deficiency fatigue syndrome differentiation';
+    }
+    if (d.contains('yang deficiency')) {
+      return 'yang deficiency cold syndrome differentiation';
+    }
+    if (d.contains('yin deficiency')) {
+      return 'yin deficiency heat night sweat syndrome differentiation';
+    }
+    if (d.contains('blood stasis')) {
+      return 'blood stasis pain syndrome differentiation';
+    }
+    if (d.contains('blood deficiency')) {
+      return 'blood deficiency dizziness insomnia syndrome differentiation';
+    }
+    // Free-text intake directions.
     if (d.contains('spleen') || d.contains('damp')) {
       return 'spleen deficiency damp digestion syndrome differentiation';
     }

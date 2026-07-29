@@ -16,6 +16,7 @@ import '../../../core/widgets/app_shell.dart';
 import '../../../core/widgets/language_menu_button.dart';
 import '../../../core/widgets/patient_shell.dart';
 import '../../patient_intake/presentation/patient_intake_screen.dart';
+import '../../pattern_finder/presentation/pattern_finder_screen.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({super.key});
@@ -1776,6 +1777,21 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                         onPressed: nextStepAction,
                                         icon: const Icon(Icons.arrow_forward),
                                         label: Text(nextStepButton),
+                                      ),
+                                      FilledButton.tonalIcon(
+                                        onPressed: () => Navigator.pushNamed(
+                                          context,
+                                          PatternFinderScreen.routeName,
+                                        ),
+                                        icon: const Icon(
+                                          Icons.explore_outlined,
+                                        ),
+                                        label: Text(
+                                          lang.tr(
+                                            'Pattern Finder',
+                                            '내 몸 패턴 찾기',
+                                          ),
+                                        ),
                                       ),
                                       if (MediaQuery.sizeOf(context).width >=
                                           720)
