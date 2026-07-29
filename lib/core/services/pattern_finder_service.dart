@@ -599,6 +599,19 @@ class PatternFinderEngine {
     });
   }
 
+  /// Every question asked so far with the chosen answer, in order — for the
+  /// "review my answers" section on the result screen and for sharing.
+  /// Each entry is (question, chosen option).
+  List<(PatternQuestion, PatternOption)> answeredPairs() {
+    final pairs = <(PatternQuestion, PatternOption)>[];
+    for (final entry in _answers) {
+      final question = PatternFinderService.questionById[entry.key];
+      if (question == null) continue;
+      pairs.add((question, question.options[entry.value]));
+    }
+    return pairs;
+  }
+
   /// Removes the most recent answer (back button support).
   void undo() {
     if (_answers.isEmpty) return;
