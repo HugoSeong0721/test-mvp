@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/adaptive_tcm_inquiry_service.dart';
@@ -111,6 +113,74 @@ class _PractitionerDashboardScreenState
     setState(() => _subView = _subView == view ? _DashboardSubView.main : view);
   }
 
+  /// Public "Pattern Finder" preview URL a patient can scan on arrival to run
+  /// the guided intake themselves before the consultation.
+  static const String _patientIntakeUrl =
+      'https://hugoseong0721.github.io/test-mvp/pattern-finder-preview.html';
+
+  void _showPatientQr() {
+    final lang = AppLanguageController.instance;
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(lang.tr('Patient intake QR', '환자 문진 QR')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              lang.tr(
+                'Ask the patient to scan this on arrival and answer the '
+                'questions. Their result comes back to you here.',
+                '환자분이 도착해서 이 QR을 찍고 질문에 답하면, 결과가 여기로 돌아옵니다.',
+              ),
+              style: const TextStyle(fontSize: 13, height: 1.5),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.border),
+              ),
+              child: QrImageView(
+                data: _patientIntakeUrl,
+                version: QrVersions.auto,
+                size: 220,
+                backgroundColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            SelectableText(
+              _patientIntakeUrl,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 11, color: AppTheme.sky),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton.icon(
+            onPressed: () async {
+              await Clipboard.setData(
+                const ClipboardData(text: _patientIntakeUrl),
+              );
+              if (!dialogContext.mounted) return;
+              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                SnackBar(content: Text(lang.tr('Link copied', '링크를 복사했습니다'))),
+              );
+            },
+            icon: const Icon(Icons.copy_rounded, size: 18),
+            label: Text(lang.tr('Copy link', '링크 복사')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(lang.tr('Close', '닫기')),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -210,6 +280,11 @@ class _PractitionerDashboardScreenState
           ),
           actions: [
             _buildCompactTopInboxAction(pendingAppointmentInboxCount),
+            IconButton(
+              tooltip: lang.tr('Patient QR', '환자용 QR'),
+              onPressed: _showPatientQr,
+              icon: const Icon(Icons.qr_code_2_rounded),
+            ),
             IconButton(
               tooltip: 'Clinic settings',
               onPressed: () => _selectSubView(_DashboardSubView.clinicProfile),

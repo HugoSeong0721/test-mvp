@@ -295,8 +295,9 @@ const SESSION = 8, BASELINE = 3;
 // ── Engine (mirrors PatternFinderEngine) ────────────────────────────────────
 let answers = [];   // {qid, idx}
 let scores = {};
+let basic = { h: null, w: null };
 
-function reset() { answers = []; scores = {}; for (const k in PATTERNS) scores[k] = 0; }
+function reset() { answers = []; scores = {}; basic = {h:null,w:null}; for (const k in PATTERNS) scores[k] = 0; }
 
 function rankedIds() {
   return Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
@@ -368,7 +369,35 @@ function showIntro() {
       <div class="banner"><b>ⓘ</b><span>이 결과는 <b>진단이 아니에요</b>.
         최종 판단은 한의사 선생님이 직접 진료로 확인합니다.</span></div>
     </div>`;
-  document.getElementById("start").onclick = showQuestion;
+  document.getElementById("start").onclick = showBasicInfo;
+}
+
+function showBasicInfo() {
+  screen.innerHTML = `
+    <div class="fade">
+      <h2 style="font-size:18px;font-weight:800;margin:2px 0 6px">기본 정보 (선택)</h2>
+      <p style="font-size:13px;color:var(--ink-dim);margin:0 0 16px">
+        키와 몸무게는 한의사 선생님이 결과를 볼 때 참고돼요.
+        적기 부담스러우면 건너뛰어도 되고, 패턴 점수에는 영향을 주지 않아요.</p>
+      <div style="display:flex;gap:10px">
+        <input id="bH" type="number" inputmode="decimal" placeholder="키 (cm)"
+          style="flex:1;box-sizing:border-box;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14.5px">
+        <input id="bW" type="number" inputmode="decimal" placeholder="몸무게 (kg)"
+          style="flex:1;box-sizing:border-box;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14.5px">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-primary" id="bGo">질문 시작하기</button>
+        <button class="btn btn-ghost" id="bSkip">건너뛰기</button>
+      </div>
+    </div>`;
+  const go = () => {
+    const h = parseFloat(document.getElementById("bH").value);
+    const w = parseFloat(document.getElementById("bW").value);
+    basic = { h: h > 0 ? h : null, w: w > 0 ? w : null };
+    showQuestion();
+  };
+  document.getElementById("bGo").onclick = go;
+  document.getElementById("bSkip").onclick = () => { basic = {h:null,w:null}; showQuestion(); };
 }
 
 function showQuestion() {
@@ -394,7 +423,7 @@ function showQuestion() {
       </div>
     </div>`;
   document.getElementById("back").onclick = () => {
-    if (!answers.length) return showIntro();
+    if (!answers.length) return showBasicInfo();
     undo(); showQuestion();
   };
   screen.querySelectorAll(".opt").forEach(b =>
@@ -447,6 +476,11 @@ function showResult() {
     html += `<p class="section-label">관련 연구 <span style="font-weight:400;color:var(--ink-dim)">(앱에서는 실제 수집 논문이 연결됩니다)</span></p>
       <div class="paper"><p class="t">TCM-SD: A Benchmark for Probing Syndrome Differentiation via NLU</p><p class="m">2022 · arXiv</p></div>
       <div class="paper"><p class="t">Development of a cold-heat syndrome classification model</p><p class="m">2024 · Europe PMC</p></div>`;
+  }
+  const bmi = (basic.h && basic.w) ? (basic.w / ((basic.h/100)**2)).toFixed(1) : null;
+  if (basic.h || basic.w) {
+    html += `<p class="section-label">기본 정보</p>
+      <div class="evidence"><p>${[basic.h?`키 ${basic.h}cm`:null, basic.w?`몸무게 ${basic.w}kg`:null, bmi?`BMI ${bmi}`:null].filter(Boolean).join(" · ")}</p></div>`;
   }
   const pairs = answeredPairs();
   if (pairs.length) {

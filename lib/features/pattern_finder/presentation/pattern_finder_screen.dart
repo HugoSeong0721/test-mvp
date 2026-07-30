@@ -27,7 +27,7 @@ class PatternFinderScreen extends StatefulWidget {
   State<PatternFinderScreen> createState() => _PatternFinderScreenState();
 }
 
-enum _Stage { intro, questions, result }
+enum _Stage { intro, basicInfo, questions, result }
 
 class _PatternFinderScreenState extends State<PatternFinderScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
@@ -37,6 +37,11 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
   PatientProfile? _sessionProfile;
   bool _isSharing = false;
   bool _shared = false;
+
+  /// Optional baseline info collected before the questions. Never scored —
+  /// passed to the practitioner as context (see toCarePicture docs).
+  double? _heightCm;
+  double? _weightKg;
 
   @override
   void initState() {
@@ -66,9 +71,35 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
     setState(() {
       _engine = PatternFinderEngine();
       _shared = false;
+      _heightCm = null;
+      _weightKg = null;
+      _stage = _Stage.basicInfo;
+    });
+  }
+
+  void _startQuestions({double? heightCm, double? weightKg}) {
+    setState(() {
+      _heightCm = heightCm;
+      _weightKg = weightKg;
       _currentQuestion = _engine.nextQuestion();
       _stage = _Stage.questions;
     });
+  }
+
+  Map<String, dynamic> _profileContext() {
+    final bmi = (_heightCm != null && _weightKg != null && _heightCm! > 0)
+        ? _weightKg! / ((_heightCm! / 100) * (_heightCm! / 100))
+        : null;
+    final profile = _profile;
+    return {
+      'birthYear': profile.birthYear,
+      'ageRange': profile.ageRange,
+      'sex': profile.sex,
+      'ethnicity': profile.ethnicity,
+      if (_heightCm != null) 'heightCm': _heightCm,
+      if (_weightKg != null) 'weightKg': _weightKg,
+      if (bmi != null) 'bmi': double.parse(bmi.toStringAsFixed(1)),
+    };
   }
 
   void _choose(int optionIndex) {
@@ -102,7 +133,7 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
   void _back() {
     setState(() {
       if (_engine.answeredCount == 0) {
-        _stage = _Stage.intro;
+        _stage = _Stage.basicInfo;
         _currentQuestion = null;
       } else {
         _engine.undo();
@@ -163,8 +194,10 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
         extraMemo: '',
         adherence: const {},
         currentQuestionIndex: 0,
-        adaptiveTcmSummary:
-            _engine.toCarePicture(extraNextQuestions: extraQuestions),
+        adaptiveTcmSummary: _engine.toCarePicture(
+          extraNextQuestions: extraQuestions,
+          profile: _profileContext(),
+        ),
       );
       if (!mounted) return;
       setState(() => _shared = true);
@@ -204,6 +237,10 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
       actions: const [LanguageMenuButton()],
       body: switch (_stage) {
         _Stage.intro => _IntroView(onStart: _start),
+        _Stage.basicInfo => _BasicInfoView(
+          onContinue: (h, w) => _startQuestions(heightCm: h, weightKg: w),
+          onBack: () => setState(() => _stage = _Stage.intro),
+        ),
         _Stage.questions => _QuestionView(
           key: ValueKey(_currentQuestion!.id),
           question: _currentQuestion!,
@@ -310,6 +347,135 @@ class _IntroView extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         const _NotDiagnosisBanner(),
+      ],
+    );
+  }
+}
+
+/// Optional baseline info (height/weight) collected before the questions.
+/// Both fields are skippable; values are context for the practitioner only
+/// and never affect scoring.
+class _BasicInfoView extends StatefulWidget {
+  const _BasicInfoView({required this.onContinue, required this.onBack});
+
+  final void Function(double? heightCm, double? weightKg) onContinue;
+  final VoidCallback onBack;
+
+  @override
+  State<_BasicInfoView> createState() => _BasicInfoViewState();
+}
+
+class _BasicInfoViewState extends State<_BasicInfoView> {
+  final _heightController = TextEditingController();
+  final _weightController = TextEditingController();
+
+  @override
+  void dispose() {
+    _heightController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
+
+  double? _parse(String raw, double min, double max) {
+    final value = double.tryParse(raw.trim().replaceAll(',', '.'));
+    if (value == null || value < min || value > max) return null;
+    return value;
+  }
+
+  void _continue() {
+    widget.onContinue(
+      _parse(_heightController.text, 80, 250),
+      _parse(_weightController.text, 20, 300),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(
+          children: [
+            IconButton(
+              onPressed: widget.onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+              tooltip: lang.tr('Back', '이전'),
+            ),
+            Expanded(
+              child: Text(
+                lang.tr('Basic info (optional)', '기본 정보 (선택)'),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          lang.tr(
+            'Height and weight help your practitioner read the result. '
+            'Feel free to skip — they never affect the pattern score.',
+            '키와 몸무게는 한의사 선생님이 결과를 볼 때 참고돼요. '
+            '적기 부담스러우면 건너뛰어도 되고, 패턴 점수에는 영향을 주지 않아요.',
+          ),
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.5,
+            color: AppTheme.ink.withValues(alpha: 0.65),
+          ),
+        ),
+        const SizedBox(height: 18),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _heightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  labelText: lang.tr('Height (cm)', '키 (cm)'),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: _weightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  labelText: lang.tr('Weight (kg)', '몸무게 (kg)'),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            FilledButton.icon(
+              onPressed: _continue,
+              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              label: Text(lang.tr('Start questions', '질문 시작하기')),
+            ),
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: () => widget.onContinue(null, null),
+              child: Text(lang.tr('Skip', '건너뛰기')),
+            ),
+          ],
+        ),
       ],
     );
   }
