@@ -703,8 +703,15 @@ class PatternFinderEngine {
   ///
   /// [extraNextQuestions] lets callers prepend research-grounded follow-up
   /// questions (from the LLM-generated question bank) ahead of the defaults.
+  ///
+  /// [profile] carries baseline patient context (age range, sex, ethnicity,
+  /// height/weight/BMI). It is surfaced to the practitioner verbatim and never
+  /// used for scoring — constitution-classification studies in the corpus use
+  /// demographics as practitioner-reviewed context, and BMI evidence there is
+  /// too thin to justify automatic weighting.
   Map<String, dynamic> toCarePicture({
     List<String> extraNextQuestions = const [],
+    Map<String, dynamic> profile = const {},
   }) {
     final res = result();
     final directions = <String>[
@@ -717,6 +724,7 @@ class PatternFinderEngine {
           'Guided pattern finder: fixed question pool, weighted multiple-choice '
           'answers, adaptive question selection. This is not a diagnosis.',
       'notDiagnosis': true,
+      'profileContext': profile,
       'signals': [
         for (final s in res.ranked.take(4))
           {
