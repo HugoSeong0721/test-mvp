@@ -101,7 +101,33 @@ class PatternFinderResult {
     if (ranked.first.score == 0) return null;
     return second.score >= ranked.first.score * 0.6 ? second : null;
   }
+
+  /// How separated the leading pattern is from the rest — drives whether the
+  /// result is presented as a clear direction, a tentative one, or "not yet
+  /// clear". Deliberately conservative: this is screening, not diagnosis.
+  PatternConfidence get confidence {
+    final leader = top;
+    if (leader == null) return PatternConfidence.unclear;
+    final second = ranked.length > 1 ? ranked[1] : null;
+    final gap = leader.share - (second?.share ?? 0);
+    // A leader that barely leads, or that itself holds little of the total
+    // weight (answers pointed in many directions), is not a clear signal.
+    if (leader.share < 0.30 || gap < 0.07) return PatternConfidence.unclear;
+    if (gap < 0.15) return PatternConfidence.moderate;
+    return PatternConfidence.clear;
+  }
+
+  /// True when the top two directions are close enough to read as a combined
+  /// pattern (兼證) rather than a single one — common in real presentations.
+  bool get isCombined {
+    final leader = top;
+    final second = runnerUp;
+    if (leader == null || second == null) return false;
+    return second.score >= leader.score * 0.75;
+  }
 }
+
+enum PatternConfidence { clear, moderate, unclear }
 
 class PatternFinderService {
   PatternFinderService._();
@@ -724,6 +750,8 @@ class PatternFinderEngine {
           'Guided pattern finder: fixed question pool, weighted multiple-choice '
           'answers, adaptive question selection. This is not a diagnosis.',
       'notDiagnosis': true,
+      'confidence': res.confidence.name,
+      'isCombined': res.isCombined,
       'profileContext': profile,
       'signals': [
         for (final s in res.ranked.take(4))

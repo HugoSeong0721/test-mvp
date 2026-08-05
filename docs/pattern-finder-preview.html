@@ -341,14 +341,24 @@ function result() {
   const total = Object.values(scores).filter(v => v > 0).reduce((a, b) => a + b, 0);
   const ranked = rankedIds().filter(id => scores[id] > 0)
     .map(id => ({ id, score: scores[id], share: total ? scores[id] / total : 0 }));
+  const lead = ranked[0], second = ranked[1];
+  let confidence = "unclear";
+  if (lead) {
+    const gap = lead.share - (second ? second.share : 0);
+    if (lead.share >= 0.30 && gap >= 0.15) confidence = "clear";
+    else if (lead.share >= 0.30 && gap >= 0.07) confidence = "moderate";
+  }
+  const isCombined = !!(lead && second && second.score >= lead.score * 0.75
+    && second.score >= lead.score * 0.6);
   const topId = ranked[0]?.id;
+  ranked.confidence = confidence; ranked.isCombined = isCombined; ranked.second = second;
   const contributions = [];
   if (topId) for (const a of answers) {
     if (a.idx === -1) continue;
     const o = QUESTIONS.find(x => x.id === a.qid).options[a.idx];
     if ((o.w[topId] || 0) > 0) contributions.push(o.t);
   }
-  return { ranked, contributions };
+  return { ranked, contributions, confidence, isCombined, second };
 }
 
 // ── Views ───────────────────────────────────────────────────────────────────
@@ -458,6 +468,16 @@ function showResult() {
     html += `<div class="result-card"><p style="margin:0;font-size:14px">
       아직 뚜렷한 패턴 방향이 나오지 않았어요. 진료에서 함께 살펴보면 좋아요.</p></div>`;
   } else {
+    const CONF = {
+      clear:    ["✓", "var(--jade)",   "한 방향이 뚜렷하게 나타났어요."],
+      moderate: ["↗", "#D9B44A",       "앞서는 방향이 보이지만, 진료에서 확인하면 좋아요."],
+      unclear:  ["?", "var(--sky, #5B6B64)", "아직 한 방향으로 뚜렷하진 않아요 — 진료에서 함께 살펴봐요."],
+    };
+    const c = CONF[r.confidence];
+    html += `<div style="border:1px solid ${c[1]}59;background:${c[1]}14;border-radius:12px;padding:12px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700"><span style="color:${c[1]}">${c[0]}</span> ${c[2]}</div>
+      ${r.isCombined && r.second ? `<div style="font-size:12px;color:var(--ink-dim);margin-top:6px">두 방향이 함께 나타나요 — 한의사 선생님이 ${PATTERNS[r.second.id].name}와(과) 겹친 복합 패턴(겸증)으로 볼 수 있어요.</div>` : ""}
+    </div>`;
     const card = (s, primary) => `
       <div class="result-card ${primary ? "primary" : "secondary"}">
         <div class="result-row">
