@@ -9,6 +9,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/adaptive_tcm_inquiry_service.dart';
 import '../../../core/services/app_firestore_service.dart';
+import '../../../core/services/pattern_finder_service.dart';
 import '../../../core/services/practitioner_session_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
@@ -118,6 +119,140 @@ class _PractitionerDashboardScreenState
   /// the guided intake themselves before the consultation.
   static const String _patientIntakeUrl =
       'https://hugoseong0721.github.io/test-mvp/pattern-finder-preview.html';
+
+  /// Records the practitioner's confirmed syndrome against the app's
+  /// prediction — the feedback loop that lets the rules improve over time.
+  Future<void> _recordSyndromeFeedback({
+    required String patientId,
+    required String patientName,
+    required Map<String, dynamic> adaptiveSummary,
+  }) async {
+    final lang = AppLanguageController.instance;
+    final clinicId = _currentClinicId;
+    if (clinicId == null || clinicId.isEmpty) return;
+
+    final predicted = [
+      for (final d
+          in (adaptiveSummary['patternDirections'] as List? ?? const []))
+        d.toString(),
+    ];
+    final confidence = (adaptiveSummary['confidence'] ?? '').toString();
+    final noteController = TextEditingController();
+    String? selected;
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setLocal) => AlertDialog(
+          title: Text(lang.tr('Confirm syndrome', '실제 변증 기록')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (predicted.isNotEmpty) ...[
+                  Text(
+                    lang.tr('App suggested', '앱 예측'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    predicted.join(' · '),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.ink.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                Text(
+                  lang.tr('Your diagnosis', '실제 변증'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final p in PatternFinderService.patterns)
+                      ChoiceChip(
+                        label: Text(p.nameKo),
+                        selected: selected == p.nameKo,
+                        onSelected: (_) =>
+                            setLocal(() => selected = p.nameKo),
+                      ),
+                    ChoiceChip(
+                      label: Text(lang.tr('Other', '기타')),
+                      selected: selected == '__other__',
+                      onSelected: (_) =>
+                          setLocal(() => selected = '__other__'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: noteController,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    labelText: selected == '__other__'
+                        ? lang.tr('Syndrome + notes', '변증명 + 메모')
+                        : lang.tr('Notes (optional)', '메모 (선택)'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(lang.tr('Cancel', '취소')),
+            ),
+            FilledButton(
+              onPressed: selected == null
+                  ? null
+                  : () => Navigator.of(dialogContext).pop(true),
+              child: Text(lang.tr('Save', '저장')),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (saved != true) return;
+    final actual = selected == '__other__'
+        ? noteController.text.trim()
+        : (selected ?? '');
+    if (actual.isEmpty) return;
+    try {
+      await AppFirestoreService.saveSyndromeFeedback(
+        patientId: patientId,
+        clinicId: clinicId,
+        patientName: patientName,
+        predictedDirections: predicted,
+        confidence: confidence,
+        actualSyndrome: actual,
+        note: noteController.text.trim(),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(lang.tr('Saved', '기록되었습니다'))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(lang.tr('Could not save', '기록하지 못했어요'))),
+      );
+    }
+  }
 
   /// Full-screen view of a patient-attached tongue photo for in-person review.
   void _showTongueImage(String base64Data) {
@@ -1118,6 +1253,16 @@ class _PractitionerDashboardScreenState
                                         value: lang.tr('photo', '사진'),
                                         onTap: () => _showTongueImage(
                                           tongueImageBase64,
+                                        ),
+                                      ),
+                                    if (hasAnswered)
+                                      _CareSignalChip(
+                                        label: lang.tr('Confirm', '확진'),
+                                        value: lang.tr('record', '기록'),
+                                        onTap: () => _recordSyndromeFeedback(
+                                          patientId: profile.id,
+                                          patientName: profile.name,
+                                          adaptiveSummary: adaptiveSummary,
                                         ),
                                       ),
                                   ],
