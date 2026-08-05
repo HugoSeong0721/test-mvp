@@ -42,6 +42,17 @@ the leading pattern, and sharing a result prepends them to the summary's
 next-best questions. Generation is skipped when no new papers arrived, and the
 step is a no-op until the secret exists — the pipeline stays free until then.
 
+## Practitioner feedback loop (data accumulation)
+
+The result screen now reports confidence (clear/moderate/unclear) and a
+combined-pattern (兼證) read instead of a bare ranking. Patients can attach a
+tongue photo (reviewed in person, never analysed by the app). On the
+practitioner dashboard, a "확진 기록" chip records the confirmed syndrome
+against the app's prediction into the `syndrome_feedback` collection
+(predicted directions, confidence, actual syndrome, note). Nothing consumes
+this yet — it is the dataset for later tuning the question weights and rules
+against real clinical outcomes.
+
 ## Later
 
 - Replace keyword-only signals with clinician-validated rules.

@@ -203,6 +203,31 @@ class AppFirestoreService {
     return doc.id;
   }
 
+  /// Records the practitioner's confirmed TCM syndrome against a pattern-finder
+  /// prediction. This is the feedback loop that lets the rules improve over
+  /// time: predicted directions are stored alongside the real diagnosis so
+  /// disagreements can be mined later. Storage-only — nothing consumes it yet.
+  static Future<void> saveSyndromeFeedback({
+    required String patientId,
+    required String clinicId,
+    required String patientName,
+    required List<String> predictedDirections,
+    required String confidence,
+    required String actualSyndrome,
+    required String note,
+  }) async {
+    await _db.collection('syndrome_feedback').add({
+      'patientId': patientId,
+      'clinicId': clinicId,
+      'patientName': patientName,
+      'predictedDirections': predictedDirections,
+      'confidence': confidence,
+      'actualSyndrome': actualSyndrome,
+      'note': note,
+      'recordedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   static Future<void> markPendingRequestsCompleted({
     required String patientId,
     required String clinicId,

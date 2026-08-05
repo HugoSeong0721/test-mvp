@@ -28,6 +28,13 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Practitioner-recorded confirmed syndrome vs the app's prediction.
+    // Transitional (same posture as the collections above) until practitioner
+    // auth lands.
+    match /syndrome_feedback/{documentId} {
+      allow read, write: if true;
+    }
+
     match /mail/{documentId} {
       allow create: if true;
       allow read, update, delete: if false;
