@@ -688,6 +688,14 @@ class _ResultView extends StatelessWidget {
             ),
           )
         else ...[
+          _ConfidenceBanner(
+            confidence: result.confidence,
+            isCombined: result.isCombined,
+            secondaryName: runnerUp == null
+                ? null
+                : lang.tr(runnerUp.pattern.nameEn, runnerUp.pattern.nameKo),
+          ),
+          const SizedBox(height: 12),
           _PatternCard(score: top, isPrimary: true),
           if (runnerUp != null) ...[
             const SizedBox(height: 10),
@@ -768,6 +776,88 @@ class _ResultView extends StatelessWidget {
         ),
         const SizedBox(height: 24),
       ],
+    );
+  }
+}
+
+/// Honest read of how strong the leading signal is, plus a combined-pattern
+/// (兼證) note when the top two directions are close.
+class _ConfidenceBanner extends StatelessWidget {
+  const _ConfidenceBanner({
+    required this.confidence,
+    required this.isCombined,
+    required this.secondaryName,
+  });
+
+  final PatternConfidence confidence;
+  final bool isCombined;
+  final String? secondaryName;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    final (IconData icon, Color color, String textEn, String textKo) =
+        switch (confidence) {
+      PatternConfidence.clear => (
+        Icons.check_circle_rounded,
+        const Color(0xFF0F766E),
+        'One direction stands out clearly.',
+        '한 방향이 뚜렷하게 나타났어요.',
+      ),
+      PatternConfidence.moderate => (
+        Icons.trending_up_rounded,
+        AppTheme.sun,
+        'A leading direction is emerging, worth confirming in person.',
+        '앞서는 방향이 보이지만, 진료에서 확인하면 좋아요.',
+      ),
+      PatternConfidence.unclear => (
+        Icons.help_outline_rounded,
+        AppTheme.sky,
+        'No single direction is clear yet — your practitioner will explore it.',
+        '아직 한 방향으로 뚜렷하진 않아요 — 진료에서 함께 살펴봐요.',
+      ),
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  lang.tr(textEn, textKo),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+          if (isCombined && secondaryName != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              lang.tr(
+                'Two directions appear together — your practitioner may treat '
+                'this as a combined pattern with $secondaryName.',
+                '두 방향이 함께 나타나요 — 한의사 선생님이 $secondaryName와(과) 겹친 '
+                '복합 패턴(겸증)으로 볼 수 있어요.',
+              ),
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.4,
+                color: AppTheme.ink.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
