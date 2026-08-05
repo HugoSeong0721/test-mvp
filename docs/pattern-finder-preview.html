@@ -513,12 +513,30 @@ function showResult() {
           <p style="margin:0;font-size:13.5px">${p.free ? "✏️ " : ""}${esc(p.a)}</p>`).join("")}
       </div></details>`;
   }
+  html += `<p class="section-label">혀 사진 (선택)</p>
+    <p style="font-size:12px;color:var(--ink-dim);margin:-4px 0 8px">혀를 밝은 곳에서 찍어 첨부하면 진료에 도움이 돼요. 앱이 분석하지 않고 선생님이 직접 확인만 합니다.</p>
+    <div id="tongueBox">
+      <label class="btn btn-ghost" style="display:inline-block">앨범에서 선택
+        <input id="tongueInput" type="file" accept="image/*" style="display:none">
+      </label>
+    </div>`;
   html += `<div class="actions">
       <button class="btn btn-primary" id="share">한의사에게 공유하기</button>
       <button class="btn btn-ghost" id="retry">다시 하기</button>
     </div></div>`;
   screen.innerHTML = html;
   document.getElementById("retry").onclick = showIntro;
+  const tongueInput = document.getElementById("tongueInput");
+  if (tongueInput) tongueInput.onchange = () => {
+    const f = tongueInput.files[0];
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    document.getElementById("tongueBox").innerHTML =
+      `<div style="display:flex;align-items:center;gap:12px">
+        <img src="${url}" style="width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--border)">
+        <span style="font-weight:700;color:var(--jade)">✓ 사진 첨부됨</span>
+      </div>`;
+  };
   document.getElementById("share").onclick = e => {
     e.target.textContent = "공유 완료 ✓"; e.target.disabled = true;
   };
