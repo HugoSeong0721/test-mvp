@@ -184,6 +184,7 @@ class AppFirestoreService {
     required Map<String, dynamic> adherence,
     required int currentQuestionIndex,
     Map<String, dynamic>? adaptiveTcmSummary,
+    String? tongueImageBase64,
   }) async {
     final doc = await _db.collection('intake_submissions').add({
       'patientId': patientId,
@@ -195,6 +196,7 @@ class AppFirestoreService {
       'adherence': adherence,
       'currentQuestionIndex': currentQuestionIndex,
       'adaptiveTcmSummary': adaptiveTcmSummary ?? const <String, dynamic>{},
+      if (tongueImageBase64 != null) 'tongueImageBase64': tongueImageBase64,
       'source': 'patient_intake_screen',
       'submittedAt': FieldValue.serverTimestamp(),
     });

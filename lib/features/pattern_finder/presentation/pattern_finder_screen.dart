@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';
@@ -43,6 +46,37 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
   double? _heightCm;
   double? _weightKg;
 
+  /// Optional tongue photo the patient attaches on the result screen. Not
+  /// analysed by the app — sent to the practitioner for in-person review
+  /// (see ADAPTIVE_TCM_INQUIRY_NOTES.md; ref: TongueVLM).
+  Uint8List? _tongueBytes;
+
+  Future<void> _pickTonguePhoto(ImageSource source) async {
+    final lang = AppLanguageController.instance;
+    try {
+      final picker = ImagePicker();
+      final file = await picker.pickImage(
+        source: source,
+        maxWidth: 900,
+        maxHeight: 900,
+        imageQuality: 55,
+      );
+      if (file == null) return;
+      final bytes = await file.readAsBytes();
+      if (!mounted) return;
+      setState(() => _tongueBytes = bytes);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            lang.tr('Could not add the photo.', '사진을 추가하지 못했어요.'),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,6 +107,7 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
       _shared = false;
       _heightCm = null;
       _weightKg = null;
+      _tongueBytes = null;
       _stage = _Stage.basicInfo;
     });
   }
@@ -198,6 +233,8 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
           extraNextQuestions: extraQuestions,
           profile: _profileContext(),
         ),
+        tongueImageBase64:
+            _tongueBytes == null ? null : base64Encode(_tongueBytes!),
       );
       if (!mounted) return;
       setState(() => _shared = true);
@@ -253,6 +290,9 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
         _Stage.result => _ResultView(
           result: _engine.result(),
           answeredPairs: _engine.answeredPairs(),
+          tongueBytes: _tongueBytes,
+          onPickTongue: _pickTonguePhoto,
+          onRemoveTongue: () => setState(() => _tongueBytes = null),
           isSharing: _isSharing,
           shared: _shared,
           onShare: _share,
@@ -651,6 +691,9 @@ class _ResultView extends StatelessWidget {
   const _ResultView({
     required this.result,
     required this.answeredPairs,
+    required this.tongueBytes,
+    required this.onPickTongue,
+    required this.onRemoveTongue,
     required this.isSharing,
     required this.shared,
     required this.onShare,
@@ -659,6 +702,9 @@ class _ResultView extends StatelessWidget {
 
   final PatternFinderResult result;
   final List<(PatternQuestion, PatternOption)> answeredPairs;
+  final Uint8List? tongueBytes;
+  final ValueChanged<ImageSource> onPickTongue;
+  final VoidCallback onRemoveTongue;
   final bool isSharing;
   final bool shared;
   final VoidCallback onShare;
@@ -743,6 +789,12 @@ class _ResultView extends StatelessWidget {
           const SizedBox(height: 16),
           _AnswerRecapSection(answeredPairs: answeredPairs),
         ],
+        const SizedBox(height: 16),
+        _TonguePhotoSection(
+          bytes: tongueBytes,
+          onPick: onPickTongue,
+          onRemove: onRemoveTongue,
+        ),
         const SizedBox(height: 18),
         Wrap(
           spacing: 10,
@@ -918,6 +970,114 @@ class _PatternCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Optional tongue photo the patient can attach for the practitioner to review
+/// in person. The app never analyses it — it is decision support, not
+/// automated tongue diagnosis (ref: TongueVLM in the corpus).
+class _TonguePhotoSection extends StatelessWidget {
+  const _TonguePhotoSection({
+    required this.bytes,
+    required this.onPick,
+    required this.onRemove,
+  });
+
+  final Uint8List? bytes;
+  final ValueChanged<ImageSource> onPick;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          lang.tr('Tongue photo (optional)', '혀 사진 (선택)'),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          lang.tr(
+            'A clear photo of your tongue helps your practitioner. It is '
+            'only reviewed in person — the app does not analyse it.',
+            '혀를 밝은 곳에서 찍어 첨부하면 한의사 선생님 진료에 도움이 돼요. '
+            '앱이 분석하지 않고, 선생님이 직접 확인만 합니다.',
+          ),
+          style: TextStyle(
+            fontSize: 12,
+            height: 1.4,
+            color: AppTheme.ink.withValues(alpha: 0.6),
+          ),
+        ),
+        const SizedBox(height: 10),
+        if (bytes != null)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.memory(
+                  bytes!,
+                  width: 96,
+                  height: 96,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        size: 16,
+                        color: Color(0xFF0F766E),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        lang.tr('Photo added', '사진 첨부됨'),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  TextButton.icon(
+                    onPressed: onRemove,
+                    icon: const Icon(Icons.close_rounded, size: 16),
+                    label: Text(lang.tr('Remove', '삭제')),
+                  ),
+                ],
+              ),
+            ],
+          )
+        else
+          Wrap(
+            spacing: 8,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => onPick(ImageSource.camera),
+                icon: const Icon(Icons.photo_camera_outlined, size: 18),
+                label: Text(lang.tr('Take photo', '사진 찍기')),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppTheme.border),
+                  foregroundColor: AppTheme.ink,
+                ),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => onPick(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library_outlined, size: 18),
+                label: Text(lang.tr('Choose photo', '앨범에서 선택')),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppTheme.border),
+                  foregroundColor: AppTheme.ink,
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }

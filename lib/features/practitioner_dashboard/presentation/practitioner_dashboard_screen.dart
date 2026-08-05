@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -117,6 +118,54 @@ class _PractitionerDashboardScreenState
   /// the guided intake themselves before the consultation.
   static const String _patientIntakeUrl =
       'https://hugoseong0721.github.io/test-mvp/pattern-finder-preview.html';
+
+  /// Full-screen view of a patient-attached tongue photo for in-person review.
+  void _showTongueImage(String base64Data) {
+    final lang = AppLanguageController.instance;
+    Uint8List bytes;
+    try {
+      bytes = base64Decode(base64Data);
+    } catch (_) {
+      return;
+    }
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        insetPadding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      lang.tr('Patient tongue photo', '환자 혀 사진'),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: InteractiveViewer(
+                child: Image.memory(bytes, fit: BoxFit.contain),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _showPatientQr() {
     final lang = AppLanguageController.instance;
@@ -919,6 +968,9 @@ class _PractitionerDashboardScreenState
                   final nextBestQuestions =
                       (adaptiveSummary['nextBestQuestions'] as List?) ??
                       const [];
+                  final tongueImageBase64 =
+                      (latestIntake?['tongueImageBase64'] as String?)
+                          ?.trim();
                   final needsBasic = latest == null;
                   final statusLabel = needsBasic
                       ? 'Needs the basic 10'
@@ -1058,6 +1110,15 @@ class _PractitionerDashboardScreenState
                                         label: 'Next',
                                         value:
                                             '${nextBestQuestions.length} follow-ups',
+                                      ),
+                                    if (tongueImageBase64 != null &&
+                                        tongueImageBase64.isNotEmpty)
+                                      _CareSignalChip(
+                                        label: lang.tr('Tongue', '혀'),
+                                        value: lang.tr('photo', '사진'),
+                                        onTap: () => _showTongueImage(
+                                          tongueImageBase64,
+                                        ),
                                       ),
                                   ],
                                 ),
