@@ -135,9 +135,35 @@ class PatternFinderService {
   /// How many questions a session asks before showing the result.
   static const int questionsPerSession = 8;
 
-  /// The first questions every session asks, before adaptive selection
-  /// starts steering toward the front-running patterns.
-  static const int baselineQuestions = 3;
+  /// Chapter 1 — common questions everyone answers (energy, temperature,
+  /// stress, digestion). These establish the broad picture.
+  static const List<String> commonQuestionIds = [
+    'energy',
+    'temperature',
+    'stress',
+    'digestion',
+  ];
+  static const int commonQuestionCount = 4;
+
+  /// Chapter 2 — how many personalized deep-dive questions follow, chosen to
+  /// drill into whichever direction Chapter 1 pointed to.
+  static const int deepDiveCount = 4;
+
+  /// Chapter 2 pool: per-pattern deep-dive question ids. When a pattern leads
+  /// after Chapter 1, its questions are asked to confirm/refine that direction
+  /// — so two patients with different answers get different Chapter 2s.
+  static const Map<String, List<String>> deepDiveIdsByPattern = {
+    'qi_deficiency': ['sweat', 'qi_deep_appetite', 'qi_deep_recovery'],
+    'yang_deficiency': ['stool', 'yang_deep_cold_area', 'yang_deep_urine'],
+    'yin_deficiency': ['thirst', 'sleep', 'yin_deep_five_heart'],
+    'damp_phlegm': ['head', 'damp_deep_heaviness', 'damp_deep_weather'],
+    'liver_qi': ['mood', 'liver_deep_chest', 'liver_deep_variability'],
+    'blood_stasis': ['pain', 'stasis_deep_night', 'stasis_deep_bruise'],
+    'blood_deficiency': ['complexion', 'blood_deep_palpitation', 'blood_deep_vision'],
+  };
+
+  /// Kept for the transitional call sites; Chapter 1 length.
+  static const int baselineQuestions = commonQuestionCount;
 
   static const List<TcmPattern> patterns = [
     TcmPattern(
@@ -551,6 +577,261 @@ class PatternFinderService {
         ),
       ],
     ),
+
+    // ── Chapter 2 · deep-dive questions (asked only when their pattern leads) ──
+    PatternQuestion(
+      id: 'qi_deep_appetite',
+      textEn: 'How is your appetite and energy after eating?',
+      textKo: '식사 후 기운과 입맛은 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'Sleepy and drained right after meals',
+          textKo: '먹고 나면 졸리고 축 처져요',
+          weights: {'qi_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Little appetite, get full quickly',
+          textKo: '입맛이 없고 조금만 먹어도 배불러요',
+          weights: {'qi_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'Fine after eating',
+          textKo: '식후에 괜찮아요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'qi_deep_recovery',
+      textEn: 'After exertion, how do you recover?',
+      textKo: '무리한 뒤 회복은 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'Wiped out for a long time; catch colds easily',
+          textKo: '오래 지치고 감기에 잘 걸려요',
+          weights: {'qi_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Short of breath or sweaty from light effort',
+          textKo: '조금만 움직여도 숨차거나 땀이 나요',
+          weights: {'qi_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'Recover normally',
+          textKo: '보통은 금방 회복해요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'yang_deep_cold_area',
+      textEn: 'Where do you feel cold the most?',
+      textKo: '주로 어디가 차게 느껴지나요?',
+      options: [
+        PatternOption(
+          textEn: 'Lower belly, lower back, or knees',
+          textKo: '아랫배·허리·무릎이 시려요',
+          weights: {'yang_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Hands and feet, all over',
+          textKo: '손발과 온몸이 전반적으로 차요',
+          weights: {'yang_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'Not especially cold anywhere',
+          textKo: '특별히 찬 곳은 없어요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'yang_deep_urine',
+      textEn: 'How is your urination?',
+      textKo: '소변은 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'Frequent, clear, worse at night or when cold',
+          textKo: '자주 마렵고 맑으며 밤이나 추울 때 심해요',
+          weights: {'yang_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Normal',
+          textKo: '보통이에요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'yin_deep_five_heart',
+      textEn: 'Do your palms, soles, or chest feel warm — especially evenings?',
+      textKo: '손바닥·발바닥·가슴에 열감이 있나요? (특히 저녁)',
+      options: [
+        PatternOption(
+          textEn: 'Yes, they feel hot and I want to cool them',
+          textKo: '네, 화끈거려서 시원하게 하고 싶어요',
+          weights: {'yin_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Cheeks flush in the late afternoon',
+          textKo: '늦은 오후에 볼이 붉어져요',
+          weights: {'yin_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'damp_deep_heaviness',
+      textEn: 'Where does the heaviness sit?',
+      textKo: '몸의 무거움은 어디에 느껴지나요?',
+      options: [
+        PatternOption(
+          textEn: 'Head feels foggy, limbs heavy',
+          textKo: '머리가 멍하고 팔다리가 무거워요',
+          weights: {'damp_phlegm': 3},
+        ),
+        PatternOption(
+          textEn: 'Chest or stomach feels stuffed, phlegmy throat',
+          textKo: '가슴·명치가 답답하고 가래가 껴요',
+          weights: {'damp_phlegm': 2},
+        ),
+        PatternOption(
+          textEn: 'No particular heaviness',
+          textKo: '특별한 무거움은 없어요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'damp_deep_weather',
+      textEn: 'Do damp or rainy days make it worse?',
+      textKo: '습하거나 비 오는 날 더 심해지나요?',
+      options: [
+        PatternOption(
+          textEn: 'Clearly worse — heavier and more sluggish',
+          textKo: '확실히 더 무겁고 처져요',
+          weights: {'damp_phlegm': 3},
+        ),
+        PatternOption(
+          textEn: 'Not really',
+          textKo: '별로 관계없어요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'liver_deep_chest',
+      textEn: 'Do you get chest or flank tightness, or sighing?',
+      textKo: '가슴·옆구리가 답답하거나 한숨이 나오나요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, chest feels stuck and I sigh a lot',
+          textKo: '네, 가슴이 막힌 듯하고 한숨이 잦아요',
+          weights: {'liver_qi': 3},
+        ),
+        PatternOption(
+          textEn: 'Tightness in the ribs/flank',
+          textKo: '옆구리·갈비뼈 쪽이 결려요',
+          weights: {'liver_qi': 2},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'liver_deep_variability',
+      textEn: 'Do your symptoms rise and fall with mood or the day?',
+      textKo: '증상이 기분이나 그날그날에 따라 오르내리나요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, they clearly change with stress and mood',
+          textKo: '네, 스트레스·기분 따라 확 달라져요',
+          weights: {'liver_qi': 3},
+        ),
+        PatternOption(
+          textEn: 'Fairly steady day to day',
+          textKo: '대체로 일정한 편이에요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'stasis_deep_night',
+      textEn: 'Is the pain fixed in one spot and worse at night?',
+      textKo: '통증이 한 자리에 고정되고 밤에 심한가요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, stabbing and always the same spot',
+          textKo: '네, 콕콕 찌르고 늘 같은 자리예요',
+          weights: {'blood_stasis': 3},
+        ),
+        PatternOption(
+          textEn: 'Worse at night but moves around',
+          textKo: '밤에 심하지만 자리가 옮겨 다녀요',
+          weights: {'blood_stasis': 1, 'liver_qi': 1},
+        ),
+        PatternOption(
+          textEn: 'No fixed pain',
+          textKo: '고정된 통증은 없어요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'stasis_deep_bruise',
+      textEn: 'Do you bruise easily or have dark/purplish spots?',
+      textKo: '멍이 잘 들거나 어둡고 자줏빛 반점이 있나요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, bruise easily; dark lips or complexion',
+          textKo: '네, 멍이 잘 들고 입술·안색이 어두워요',
+          weights: {'blood_stasis': 3},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'blood_deep_palpitation',
+      textEn: 'Do you notice palpitations or a racing mind at rest?',
+      textKo: '쉬는데도 가슴이 두근거리거나 생각이 많나요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, heart flutters and mind won\'t settle',
+          textKo: '네, 두근거리고 생각이 가라앉질 않아요',
+          weights: {'blood_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Sometimes, mostly when tired',
+          textKo: '가끔, 주로 피곤할 때요',
+          weights: {'blood_deficiency': 1},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'blood_deep_vision',
+      textEn: 'Any dizziness on standing, blurry vision, or numb limbs?',
+      textKo: '일어설 때 어지럽거나 눈이 침침하고 손발이 저리나요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, dizzy standing up and eyes tire/blur',
+          textKo: '네, 일어설 때 어지럽고 눈이 침침해요',
+          weights: {'blood_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Hands or feet go numb/tingly',
+          textKo: '손발이 저리거나 무감각할 때가 있어요',
+          weights: {'blood_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
   ];
 
   static final Map<String, PatternQuestion> questionById = {
@@ -585,40 +866,47 @@ class PatternFinderEngine {
 
   Set<String> get _answeredIds => {for (final a in _answers) a.key};
 
+  /// Which chapter the *next* question belongs to: 1 (common) or 2 (deep-dive).
+  int get currentChapter =>
+      _answers.length < PatternFinderService.commonQuestionCount ? 1 : 2;
+
   /// The next question to ask, or null when the session is done.
   ///
-  /// The first [PatternFinderService.baselineQuestions] follow the fixed
-  /// question order to establish a broad baseline; after that, the question
-  /// whose options carry the most weight toward the current top-3 patterns is
-  /// chosen, so follow-ups chase whichever directions are leading.
+  /// **Chapter 1 (common):** the fixed [PatternFinderService.commonQuestionIds]
+  /// in order, so everyone answers the same broad questions first.
+  ///
+  /// **Chapter 2 (deep-dive):** the leading pattern's own questions
+  /// ([PatternFinderService.deepDiveIdsByPattern]) are asked to confirm and
+  /// refine that direction; once its questions run out, the runner-up's are
+  /// used. Two patients with different Chapter 1 answers get different
+  /// Chapter 2 questions — that's where the picture sharpens.
   PatternQuestion? nextQuestion() {
     if (isDone) return null;
     final answered = _answeredIds;
-    final remaining = PatternFinderService.questions
-        .where((q) => !answered.contains(q.id))
-        .toList();
-    if (remaining.isEmpty) return null;
 
-    if (_answers.length < PatternFinderService.baselineQuestions) {
-      return remaining.first;
-    }
-
-    final topPatterns = _rankedPatternIds().take(3).toSet();
-    PatternQuestion best = remaining.first;
-    var bestValue = -1;
-    for (final q in remaining) {
-      var value = 0;
-      for (final option in q.options) {
-        option.weights.forEach((patternId, weight) {
-          if (topPatterns.contains(patternId)) value += weight;
-        });
-      }
-      if (value > bestValue) {
-        bestValue = value;
-        best = q;
+    if (currentChapter == 1) {
+      for (final id in PatternFinderService.commonQuestionIds) {
+        if (!answered.contains(id)) return PatternFinderService.questionById[id];
       }
     }
-    return best;
+
+    // Chapter 2: walk the ranked patterns, serving each one's deep-dive
+    // questions before moving to the next.
+    for (final patternId in _rankedPatternIds()) {
+      if ((_scores[patternId] ?? 0) <= 0) break; // no signal below here
+      for (final id
+          in PatternFinderService.deepDiveIdsByPattern[patternId] ?? const []) {
+        if (!answered.contains(id)) return PatternFinderService.questionById[id];
+      }
+    }
+
+    // Fallback (e.g. all-neutral Chapter 1): any unasked deep-dive question.
+    for (final ids in PatternFinderService.deepDiveIdsByPattern.values) {
+      for (final id in ids) {
+        if (!answered.contains(id)) return PatternFinderService.questionById[id];
+      }
+    }
+    return null;
   }
 
   void answer(String questionId, int optionIndex) {

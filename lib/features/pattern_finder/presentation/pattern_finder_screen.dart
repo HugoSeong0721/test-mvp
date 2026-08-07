@@ -283,6 +283,9 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
           question: _currentQuestion!,
           answered: _engine.answeredCount,
           total: PatternFinderService.questionsPerSession,
+          chapter: _engine.currentChapter,
+          isChapterStart: _engine.answeredCount ==
+              PatternFinderService.commonQuestionCount,
           onChoose: _choose,
           onChooseFreeText: _chooseFreeText,
           onBack: _back,
@@ -527,6 +530,8 @@ class _QuestionView extends StatefulWidget {
     required this.question,
     required this.answered,
     required this.total,
+    required this.chapter,
+    required this.isChapterStart,
     required this.onChoose,
     required this.onChooseFreeText,
     required this.onBack,
@@ -535,6 +540,8 @@ class _QuestionView extends StatefulWidget {
   final PatternQuestion question;
   final int answered;
   final int total;
+  final int chapter;
+  final bool isChapterStart;
   final ValueChanged<int> onChoose;
   final ValueChanged<String> onChooseFreeText;
   final VoidCallback onBack;
@@ -563,6 +570,9 @@ class _QuestionViewState extends State<_QuestionView> {
   Widget build(BuildContext context) {
     final lang = AppLanguageController.instance;
     final question = widget.question;
+    final chapterLabel = widget.chapter == 1
+        ? lang.tr('Chapter 1 · Common questions', '1장 · 공통 문진')
+        : lang.tr('Chapter 2 · Personalized questions', '2장 · 맞춤 심화 문진');
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -590,7 +600,52 @@ class _QuestionViewState extends State<_QuestionView> {
             ),
           ],
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
+        Text(
+          chapterLabel,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.2,
+            color: widget.chapter == 1
+                ? AppTheme.sky
+                : const Color(0xFF0F766E),
+          ),
+        ),
+        if (widget.isChapterStart) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F766E).withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFF0F766E).withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 18,
+                  color: Color(0xFF0F766E),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    lang.tr(
+                      "Based on your answers, we'll now ask a few questions "
+                      'tailored to you.',
+                      '지금까지 답변에 맞춰, 이제 나에게 맞는 질문을 몇 가지 더 여쭤볼게요.',
+                    ),
+                    style: const TextStyle(fontSize: 12.5, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 14),
         Text(
           lang.tr(question.textEn, question.textKo),
           style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800),

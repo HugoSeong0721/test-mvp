@@ -288,9 +288,67 @@ const QUESTIONS = [
     { t:"불안하고 밤에 생각이 많아요", w:{blood_deficiency:2,yin_deficiency:1} },
     { t:"우울하다기보다 의욕이 없어요", w:{qi_deficiency:2,damp_phlegm:1} },
     { t:"안정적이에요", w:{} } ]},
+  { id:"qi_deep_appetite", text:"식사 후 기운과 입맛은 어떤가요?", options:[
+    { t:"먹고 나면 졸리고 축 처져요", w:{qi_deficiency:3} },
+    { t:"입맛이 없고 조금만 먹어도 배불러요", w:{qi_deficiency:2} },
+    { t:"식후에 괜찮아요", w:{} } ]},
+  { id:"qi_deep_recovery", text:"무리한 뒤 회복은 어떤가요?", options:[
+    { t:"오래 지치고 감기에 잘 걸려요", w:{qi_deficiency:3} },
+    { t:"조금만 움직여도 숨차거나 땀이 나요", w:{qi_deficiency:2} },
+    { t:"보통은 금방 회복해요", w:{} } ]},
+  { id:"yang_deep_cold_area", text:"주로 어디가 차게 느껴지나요?", options:[
+    { t:"아랫배·허리·무릎이 시려요", w:{yang_deficiency:3} },
+    { t:"손발과 온몸이 전반적으로 차요", w:{yang_deficiency:2} },
+    { t:"특별히 찬 곳은 없어요", w:{} } ]},
+  { id:"yang_deep_urine", text:"소변은 어떤가요?", options:[
+    { t:"자주 마렵고 맑으며 밤이나 추울 때 심해요", w:{yang_deficiency:3} },
+    { t:"보통이에요", w:{} } ]},
+  { id:"yin_deep_five_heart", text:"손바닥·발바닥·가슴에 열감이 있나요? (특히 저녁)", options:[
+    { t:"네, 화끈거려서 시원하게 하고 싶어요", w:{yin_deficiency:3} },
+    { t:"늦은 오후에 볼이 붉어져요", w:{yin_deficiency:2} },
+    { t:"아니요", w:{} } ]},
+  { id:"damp_deep_heaviness", text:"몸의 무거움은 어디에 느껴지나요?", options:[
+    { t:"머리가 멍하고 팔다리가 무거워요", w:{damp_phlegm:3} },
+    { t:"가슴·명치가 답답하고 가래가 껴요", w:{damp_phlegm:2} },
+    { t:"특별한 무거움은 없어요", w:{} } ]},
+  { id:"damp_deep_weather", text:"습하거나 비 오는 날 더 심해지나요?", options:[
+    { t:"확실히 더 무겁고 처져요", w:{damp_phlegm:3} },
+    { t:"별로 관계없어요", w:{} } ]},
+  { id:"liver_deep_chest", text:"가슴·옆구리가 답답하거나 한숨이 나오나요?", options:[
+    { t:"네, 가슴이 막힌 듯하고 한숨이 잦아요", w:{liver_qi:3} },
+    { t:"옆구리·갈비뼈 쪽이 결려요", w:{liver_qi:2} },
+    { t:"아니요", w:{} } ]},
+  { id:"liver_deep_variability", text:"증상이 기분이나 그날그날에 따라 오르내리나요?", options:[
+    { t:"네, 스트레스·기분 따라 확 달라져요", w:{liver_qi:3} },
+    { t:"대체로 일정한 편이에요", w:{} } ]},
+  { id:"stasis_deep_night", text:"통증이 한 자리에 고정되고 밤에 심한가요?", options:[
+    { t:"네, 콕콕 찌르고 늘 같은 자리예요", w:{blood_stasis:3} },
+    { t:"밤에 심하지만 자리가 옮겨 다녀요", w:{blood_stasis:1,liver_qi:1} },
+    { t:"고정된 통증은 없어요", w:{} } ]},
+  { id:"stasis_deep_bruise", text:"멍이 잘 들거나 어둡고 자줏빛 반점이 있나요?", options:[
+    { t:"네, 멍이 잘 들고 입술·안색이 어두워요", w:{blood_stasis:3} },
+    { t:"아니요", w:{} } ]},
+  { id:"blood_deep_palpitation", text:"쉬는데도 가슴이 두근거리거나 생각이 많나요?", options:[
+    { t:"네, 두근거리고 생각이 가라앉질 않아요", w:{blood_deficiency:3} },
+    { t:"가끔, 주로 피곤할 때요", w:{blood_deficiency:1} },
+    { t:"아니요", w:{} } ]},
+  { id:"blood_deep_vision", text:"일어설 때 어지럽거나 눈이 침침하고 손발이 저리나요?", options:[
+    { t:"네, 일어설 때 어지럽고 눈이 침침해요", w:{blood_deficiency:3} },
+    { t:"손발이 저리거나 무감각할 때가 있어요", w:{blood_deficiency:2} },
+    { t:"아니요", w:{} } ]},
 ];
 
-const SESSION = 8, BASELINE = 3;
+const SESSION = 8, COMMON = 4;
+const COMMON_IDS = ["energy","temperature","stress","digestion"];
+const DEEP = {
+  qi_deficiency: ["sweat","qi_deep_appetite","qi_deep_recovery"],
+  yang_deficiency: ["stool","yang_deep_cold_area","yang_deep_urine"],
+  yin_deficiency: ["thirst","sleep","yin_deep_five_heart"],
+  damp_phlegm: ["head","damp_deep_heaviness","damp_deep_weather"],
+  liver_qi: ["mood","liver_deep_chest","liver_deep_variability"],
+  blood_stasis: ["pain","stasis_deep_night","stasis_deep_bruise"],
+  blood_deficiency: ["complexion","blood_deep_palpitation","blood_deep_vision"],
+};
 
 // ── Engine (mirrors PatternFinderEngine) ────────────────────────────────────
 let answers = [];   // {qid, idx}
@@ -305,17 +363,15 @@ function rankedIds() {
 function nextQuestion() {
   if (answers.length >= SESSION) return null;
   const done = new Set(answers.map(a => a.qid));
-  const remaining = QUESTIONS.filter(q => !done.has(q.id));
-  if (!remaining.length) return null;
-  if (answers.length < BASELINE) return remaining[0];
-  const top3 = new Set(rankedIds().slice(0, 3));
-  let best = remaining[0], bestV = -1;
-  for (const q of remaining) {
-    let v = 0;
-    for (const o of q.options) for (const [p, w] of Object.entries(o.w)) if (top3.has(p)) v += w;
-    if (v > bestV) { bestV = v; best = q; }
+  if (answers.length < COMMON) {
+    for (const id of COMMON_IDS) if (!done.has(id)) return QUESTIONS.find(q => q.id === id);
   }
-  return best;
+  for (const pid of rankedIds()) {
+    if ((scores[pid] || 0) <= 0) break;
+    for (const id of (DEEP[pid] || [])) if (!done.has(id)) return QUESTIONS.find(q => q.id === id);
+  }
+  for (const pid in DEEP) for (const id of DEEP[pid]) if (!done.has(id)) return QUESTIONS.find(q => q.id === id);
+  return null;
 }
 function answeredPairs() {
   return answers.map(a => {
@@ -421,6 +477,8 @@ function showQuestion() {
         <div class="track"><div class="fill" style="width:${(n / SESSION) * 100}%"></div></div>
         <span class="count">${n + 1}/${SESSION}</span>
       </div>
+      <p style="font-size:12px;font-weight:800;letter-spacing:.2px;margin:0 0 6px;color:${n < COMMON ? 'var(--sky,#5B6B64)' : 'var(--jade)'}">${n < COMMON ? '1장 · 공통 문진' : '2장 · 맞춤 심화 문진'}</p>
+      ${n === COMMON ? `<div style="border:1px solid #0F766E4d;background:#0F766E14;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12.5px">✨ 지금까지 답변에 맞춰, 이제 나에게 맞는 질문을 몇 가지 더 여쭤볼게요.</div>` : ''}
       <p class="q-text">${esc(q.text)}</p>
       ${q.options.map((o, i) => `<button class="opt" data-i="${i}">${esc(o.t)}</button>`).join("")}
       <button class="free-toggle" id="freeToggle">✏️ 직접 입력할게요</button>
