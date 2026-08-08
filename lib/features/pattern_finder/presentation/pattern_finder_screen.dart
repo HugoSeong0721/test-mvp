@@ -11,7 +11,6 @@ import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/services/pattern_finder_service.dart';
 import '../../../core/services/question_bank_service.dart';
-import '../../../core/services/research_corpus_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/language_menu_button.dart';
@@ -836,9 +835,6 @@ class _ResultView extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 16),
-          _BankQuestionsSection(patternId: top.pattern.id),
-          _ResearchEvidenceSection(query: top.pattern.researchQuery),
         ],
         if (answeredPairs.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -1190,143 +1186,6 @@ class _AnswerRecapSection extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Research-grounded follow-up questions for the leading pattern, drafted by
-/// the daily LLM step from collected paper abstracts. Hidden until the
-/// question bank has been generated at least once.
-class _BankQuestionsSection extends StatelessWidget {
-  const _BankQuestionsSection({required this.patternId});
-
-  final String patternId;
-
-  @override
-  Widget build(BuildContext context) {
-    final lang = AppLanguageController.instance;
-    return FutureBuilder<PatternQuestionBank?>(
-      future: QuestionBankService.instance.forPattern(patternId),
-      builder: (context, snapshot) {
-        final bank = snapshot.data;
-        if (bank == null || bank.questions.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              lang.tr(
-                'Questions your practitioner may ask next',
-                '진료에서 이어질 수 있는 질문',
-              ),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              lang.tr(
-                'Drafted from ${bank.sources.length} research papers — your '
-                'practitioner reviews these in person.',
-                '수집된 논문 ${bank.sources.length}편을 근거로 작성되었어요. '
-                '실제 질문 여부는 한의사 선생님이 판단합니다.',
-              ),
-              style: TextStyle(
-                fontSize: 11.5,
-                color: AppTheme.ink.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: 8),
-            for (final q in bank.questions)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        lang.tr(q.questionEn, q.questionKo),
-                        style: const TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          height: 1.4,
-                        ),
-                      ),
-                      if (q.rationaleKo.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          q.rationaleKo,
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 1.4,
-                            color: AppTheme.ink.withValues(alpha: 0.65),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _ResearchEvidenceSection extends StatelessWidget {
-  const _ResearchEvidenceSection({required this.query});
-
-  final String query;
-
-  @override
-  Widget build(BuildContext context) {
-    final lang = AppLanguageController.instance;
-    return FutureBuilder<List<ResearchPaper>>(
-      future: ResearchCorpusService.instance.topMatches(query, limit: 3),
-      builder: (context, snapshot) {
-        final papers = snapshot.data ?? const <ResearchPaper>[];
-        if (papers.isEmpty) return const SizedBox.shrink();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              lang.tr('Related research', '관련 연구'),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 8),
-            for (final p in papers)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        p.title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        [
-                          if (p.year.isNotEmpty) p.year,
-                          if (p.source.isNotEmpty) p.source,
-                        ].join(' · '),
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: AppTheme.ink.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
     );
   }
 }
