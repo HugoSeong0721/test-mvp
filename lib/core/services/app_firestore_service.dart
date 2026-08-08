@@ -198,9 +198,25 @@ class AppFirestoreService {
       'adaptiveTcmSummary': adaptiveTcmSummary ?? const <String, dynamic>{},
       if (tongueImageBase64 != null) 'tongueImageBase64': tongueImageBase64,
       'source': 'patient_intake_screen',
+      'status': 'new',
       'submittedAt': FieldValue.serverTimestamp(),
     });
     return doc.id;
+  }
+
+  /// Marks a shared intake/pattern-finder submission as reviewed by the
+  /// practitioner, so the dashboard inbox can tell new shares from ones the
+  /// practitioner has already looked at.
+  static Future<void> markIntakeSubmissionReviewed({
+    required String submissionId,
+  }) async {
+    if (submissionId.trim().isEmpty) {
+      return;
+    }
+    await _db.collection('intake_submissions').doc(submissionId).set({
+      'status': 'reviewed',
+      'reviewedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   /// Records the practitioner's confirmed TCM syndrome against a pattern-finder
