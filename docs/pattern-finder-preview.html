@@ -551,9 +551,6 @@ function showResult() {
       html += `<p class="section-label">이 방향을 가리킨 내 답변</p>
         <div class="evidence">${r.contributions.map(c => `<p>· ${esc(c)}</p>`).join("")}</div>`;
     }
-    html += `<p class="section-label">관련 연구 <span style="font-weight:400;color:var(--ink-dim)">(앱에서는 실제 수집 논문이 연결됩니다)</span></p>
-      <div class="paper"><p class="t">TCM-SD: A Benchmark for Probing Syndrome Differentiation via NLU</p><p class="m">2022 · arXiv</p></div>
-      <div class="paper"><p class="t">Development of a cold-heat syndrome classification model</p><p class="m">2024 · Europe PMC</p></div>`;
   }
   const bmi = (basic.h && basic.w) ? (basic.w / ((basic.h/100)**2)).toFixed(1) : null;
   if (basic.h || basic.w) {
