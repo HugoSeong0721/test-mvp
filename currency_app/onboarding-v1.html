@@ -1,0 +1,144 @@
+<!-- ============================================================
+     첫 실행 온보딩 — 기준 통화를 먼저 고르고, 그 통화가 맨 위로
+     (앱 본체 뒤에 붙고 JS가 .phone 안으로 옮겨 프레임에 딱 맞게 얹는다)
+     ============================================================ -->
+<style>
+.intro{
+  position:absolute;inset:0;z-index:30;
+  background:var(--app-bg);
+  display:flex;flex-direction:column;
+  animation:introIn .32s cubic-bezier(.2,.7,.3,1);
+}
+.intro[hidden]{display:none}
+.intro.leaving{animation:introOut .22s ease-in forwards}
+@keyframes introIn{from{opacity:0;transform:scale(.99)}}
+@keyframes introOut{to{opacity:0;transform:translateY(-8px)}}
+
+.intro-hd{padding:34px 24px 0}
+.intro-mark{
+  width:42px;height:42px;border-radius:13px;
+  background:var(--accent);color:var(--accent-ink);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;margin-bottom:18px;
+}
+.intro-hd h1{
+  font-size:25px;font-weight:700;line-height:1.32;
+  letter-spacing:-.02em;text-wrap:balance;
+}
+.intro-hd p{margin-top:9px;font-size:13.5px;line-height:1.55;color:var(--text-2)}
+
+.intro-body{flex:1;min-height:0;overflow-y:auto;padding:22px 20px 20px}
+.intro-label{
+  font-size:10.5px;font-weight:700;color:var(--muted);
+  letter-spacing:.13em;text-transform:uppercase;
+  padding:0 4px 10px;
+}
+.pop{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pop button{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;padding:12px 13px;text-align:left;
+  transition:border-color .14s, transform .14s;
+}
+.pop button:active{transform:scale(.98);border-color:var(--accent)}
+.pop .who{min-width:0}
+.pop .code{display:block;font-size:13.5px;font-weight:700;letter-spacing:.04em}
+.pop .name{
+  display:block;font-size:10.5px;color:var(--muted);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.intro-or{
+  display:flex;align-items:center;gap:12px;
+  padding:22px 4px 12px;font-size:11px;color:var(--muted);
+}
+.intro-or::before,.intro-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.intro-list{display:flex;flex-direction:column;gap:2px;padding-top:4px}
+.intro-foot{
+  padding:12px 24px calc(20px + env(safe-area-inset-bottom));
+  font-size:11.5px;color:var(--muted);text-align:center;line-height:1.5;
+  background:var(--app-bg);   /* 스크롤되는 목록이 뒤로 비쳐 겹치지 않게 */
+}
+</style>
+
+<div class="intro" id="intro" hidden>
+  <div class="intro-hd">
+    <div class="intro-mark">$</div>
+    <h1>어떤 통화를 기준으로<br>쓰시겠어요?</h1>
+    <p>고른 통화가 맨 위에 고정돼요.<br>내 돈을 넣으면 다른 나라 돈으로 바로 환산됩니다.</p>
+  </div>
+  <div class="intro-body">
+    <div class="intro-label">많이 쓰는 통화</div>
+    <div class="pop" id="intro-pop"></div>
+    <div class="intro-or">또는 검색해서 고르기</div>
+    <div class="searchbox" style="margin:0 0 4px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="intro-search" type="search" placeholder="통화명 또는 코드 검색" autocomplete="off">
+    </div>
+    <div class="intro-list" id="intro-list"></div>
+  </div>
+  <div class="intro-foot">나중에 앱에서 언제든 바꿀 수 있어요</div>
+</div>
+
+<script>
+'use strict';
+(function(){
+  const POPULAR = ['KGS','USD','KRW','RUB','KZT','EUR'];
+  const intro = document.getElementById('intro');
+  document.getElementById('app').appendChild(intro);   // 폰 프레임 안으로
+
+  /* 저장된 설정이 없으면 첫 실행. ?onboard=1 이면 다시 보기(데모용) */
+  function firstRun(){
+    if(new URLSearchParams(location.search).get('onboard') === '1') return true;
+    try{ return !localStorage.getItem('fx-app-v1'); }catch(e){ return true; }
+  }
+
+  function popTile(c){
+    return `<button data-c="${c.c}" aria-label="${c.n} 기준으로 시작">
+      ${flagHtml(c,'flag sm')}
+      <span class="who"><span class="code mono">${c.c}</span><span class="name">${c.n}</span></span>
+    </button>`;
+  }
+  function listRow(c){
+    return `<button class="prow" data-c="${c.c}">
+      ${flagHtml(c,'flag')}
+      <span class="who"><span class="code mono">${c.c}</span><br><span class="name">${c.n}</span></span>
+      <span class="rate num">1 USD = ${fmt(c.r)}</span>
+    </button>`;
+  }
+  function renderIntroList(q){
+    q = (q || '').trim().toLowerCase();
+    const hit = CURRENCIES.filter(c=>
+      !q || c.c.toLowerCase().includes(q) || c.n.toLowerCase().includes(q)
+         || (c.k || '').toLowerCase().includes(q));
+    document.getElementById('intro-list').innerHTML =
+      hit.length ? hit.map(listRow).join('') : '<div class="noresult">검색 결과가 없어요</div>';
+  }
+
+  /* 고른 통화를 기준으로 올리고, 비교 통화는 겹치지 않게 2개 채운다 */
+  function choose(code){
+    if(!BY[code]) return;
+    S.base = code;
+    S.targets = ['USD','KRW','EUR'].filter(x=>x !== code).slice(0,2);
+    S.chartTo = S.targets[0];
+    S.recents = [code, ...S.targets];
+    save();
+    renderConvert(); renderChart();
+    intro.classList.add('leaving');
+    setTimeout(()=>{ intro.hidden = true; intro.classList.remove('leaving'); }, 220);
+  }
+
+  intro.addEventListener('click', e=>{
+    const code = e.target.closest('[data-c]')?.dataset.c;
+    if(code) choose(code);
+  });
+  document.getElementById('intro-search')
+    .addEventListener('input', e=>renderIntroList(e.target.value));
+
+  if(firstRun()){
+    document.getElementById('intro-pop').innerHTML =
+      POPULAR.map(x=>BY[x]).filter(Boolean).map(popTile).join('');
+    renderIntroList('');
+    intro.hidden = false;
+  }
+})();
+</script>

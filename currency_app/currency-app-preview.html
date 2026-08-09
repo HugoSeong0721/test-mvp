@@ -141,9 +141,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 .cards{padding:0 16px}
 .crow{
   display:flex;align-items:center;gap:12px;
-  background:var(--surface);border:1.5px solid var(--accent);
+  background:var(--surface);border:1.5px solid var(--line);
   border-radius:20px;padding:15px 16px;
 }
+/* 금색 테두리는 "지금 입력 중"이라는 뜻 — 기준 행이든 아래 행이든 같다 */
+.crow.editing{border-color:var(--accent)}
 .crow .pick{display:flex;align-items:center;gap:10px;padding:2px 4px 2px 2px;border-radius:12px;flex-shrink:0}
 .flag{
   width:38px;height:38px;border-radius:50%;
@@ -186,8 +188,15 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 .trow .code{font-size:13.5px;font-weight:700;letter-spacing:.04em}
 .trow .code::after{content:"›";color:var(--muted);font-weight:400;margin-left:5px}
 .trow .name{font-size:11px;color:var(--muted)}
-.trow .val{flex:1;min-width:0;text-align:right}
+.trow .val{flex:1;min-width:0;text-align:right;border-radius:10px}
 .trow .val .a{font-size:21px;font-weight:400;letter-spacing:-.01em;overflow:hidden;white-space:nowrap}
+/* 입력 중인 행: 테두리를 살리고 캐럿을 붙인다 */
+.trow.editing{border-color:var(--accent)}
+.trow.editing .val .a::after{
+  content:"";display:inline-block;width:2px;height:.9em;margin-left:2px;
+  background:var(--accent);vertical-align:-.12em;
+  animation:blink 1.1s steps(1) infinite;
+}
 .trow .val .sub{font-size:10.5px;color:var(--muted);margin-top:2px}
 .trow .val .sub .chg{font-size:10.5px}
 .chg{font-weight:600}
@@ -398,7 +407,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
       </div>
       <div class="kbdwrap" id="kbdwrap" hidden>
       <div class="kbdbar">
-        <span class="hint">⌫ 길게 누르면 전체 지우기</span>
+        <span class="hint num" id="kbd-what">⌫ 길게 누르면 전체 지우기</span>
         <button class="done" id="btn-done">완료</button>
       </div>
       <div class="kbd" id="kbd">
@@ -508,6 +517,9 @@ const CURRENCIES = [
   {c:'INR', n:'인도 루피',        f:'🇮🇳', r:87.54,    d:+0.04, g:'fiat'},
   {c:'KGS', n:'키르기스스탄 솜',  f:'🇰🇬', r:87.45,    d:+0.07, g:'fiat',
    k:'키르기즈 키르기스탄 솜 kyrgyz kyrgyzstan som'},
+  {c:'RUB', n:'러시아 루블',      f:'🇷🇺', r:79.60,    d:-0.11, g:'fiat', k:'루블 ruble russia'},
+  {c:'KZT', n:'카자흐스탄 텡게',  f:'🇰🇿', r:527.40,   d:+0.18, g:'fiat', k:'텡게 tenge kazakh'},
+  {c:'UZS', n:'우즈베키스탄 숨',  f:'🇺🇿', r:12420,    d:+0.09, g:'fiat', k:'숨 sum soum uzbek'},
   {c:'MXN', n:'멕시코 페소',      f:'🇲🇽', r:18.62,    d:-0.14, g:'fiat'},
   {c:'BRL', n:'브라질 헤알',      f:'🇧🇷', r:5.423,    d:+0.19, g:'fiat'},
   {c:'BTC', n:'비트코인',         b:'₿',  cls:'cr', r:1/89420, d:-1.42, g:'crypto'},
@@ -522,9 +534,11 @@ const BY = Object.fromEntries(CURRENCIES.map(x=>[x.c,x]));
 const GROUPS = [['fiat','법정통화'],['crypto','암호화폐'],['metal','귀금속']];
 
 /* ================= 상태 =================
-   base = 기준 통화(내 돈), buf = 기준 금액 입력 버퍼,
-   targets = 아래에 깔리는 변환 대상 국가들 */
-const DEFAULTS = {base:'KGS', buf:'1000', targets:['USD','KRW'],
+   base    = 맨 위에 고정되는 기준 통화
+   targets = 아래에 깔리는 변환 대상 국가들
+   active  = 지금 숫자를 입력 중인 통화 (기준이든 아래 행이든 아무거나)
+   buf     = active 통화의 입력 버퍼 — 나머지 금액은 여기서 환산된다 */
+const DEFAULTS = {base:'KGS', buf:'1000', targets:['USD','KRW'], active:'KGS',
                   chartTo:'USD', recents:['USD','KRW']};
 let S = load();
 function load(){
@@ -532,8 +546,11 @@ function load(){
     const raw = localStorage.getItem('fx-proto-v3');
     if(raw){
       const p = JSON.parse(raw);
-      if(BY[p.base] && Array.isArray(p.targets) && p.targets.every(t=>BY[t]))
-        return {...DEFAULTS, ...p};
+      if(BY[p.base] && Array.isArray(p.targets) && p.targets.every(t=>BY[t])){
+        const s = {...DEFAULTS, ...p};
+        if(!BY[s.active]) s.active = s.base;
+        return s;
+      }
     }
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
@@ -561,6 +578,16 @@ function fmtBuf(buf){
   const grouped = (i === '' ? '0' : Number(i).toLocaleString('ko-KR'));
   return buf.includes('.') ? grouped + '.' + (dec ?? '') : grouped;
 }
+/* 화면에 보이던 금액을 그대로 이어서 입력할 수 있게 입력 버퍼 문자열로 되돌린다 */
+function rawStr(v){
+  if(!isFinite(v) || v === 0) return '';
+  const a = Math.abs(v);
+  let s = a >= 10000 ? v.toFixed(0)
+        : a >= 1     ? v.toFixed(2)
+        :              v.toFixed(Math.min(10, 3 - Math.floor(Math.log10(a))));
+  if(s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  return s;
+}
 function chgHtml(d){
   const cls = d > 0.005 ? 'up' : d < -0.005 ? 'down' : 'flat';
   const arrow = cls === 'up' ? '▲' : cls === 'down' ? '▼' : '·';
@@ -586,43 +613,66 @@ let kbdOpen = false;
 function setKbd(open){
   kbdOpen = open;
   $('kbdwrap').hidden = !open;
-  document.querySelector('#view-convert .crow').classList.toggle('editing', open);
+  renderConvert();
 }
 
-/* ================= 변환 화면 ================= */
+/* ================= 변환 화면 =================
+   어느 행이든 금액을 눌러 고칠 수 있고, 고치면 나머지 전부가 따라 바뀐다 */
+function amountIn(code){
+  const v = parseFloat(S.buf || '0') || 0;
+  return code === S.active ? v : convert(v, S.active, code);
+}
+/* 입력 중이던 통화가 목록에서 사라졌으면 그 금액을 기준 통화로 옮겨 담는다 */
+function keepActiveValid(){
+  if(S.active === S.base || S.targets.includes(S.active)) return;
+  if(!BY[S.active]){ S.active = S.base; return; }
+  S.buf = rawStr(amountIn(S.base));
+  S.active = S.base;
+}
+function startEdit(code){
+  if(S.active === code){ setKbd(!kbdOpen); return; }
+  S.buf = rawStr(amountIn(code));   // 보이던 숫자를 그대로 이어받아 입력
+  S.active = code;
+  save(); setKbd(true);
+}
+
 function renderConvert(){
+  keepActiveValid();
   const base = BY[S.base];
   setFlag($('fl-base'), base);
   $('cd-base').textContent = base.c;
   $('nm-base').textContent = base.n;
-  const amtEl = $('amt-base');
-  amtEl.textContent = fmtBuf(S.buf);
-  amtEl.classList.toggle('small', amtEl.textContent.length > 11);
 
-  const amt = parseFloat(S.buf || '0') || 0;
+  const baseEditing = S.active === S.base;
+  const amtEl = $('amt-base');
+  amtEl.textContent = baseEditing ? fmtBuf(S.buf) : fmt(amountIn(S.base));
+  amtEl.classList.toggle('small', amtEl.textContent.length > 11);
+  document.querySelector('#view-convert .crow')
+    .classList.toggle('editing', kbdOpen && baseEditing);
+
   $('tlist').innerHTML = S.targets.map((code, i)=>{
     const c = BY[code];
-    const v = convert(amt, S.base, code);
+    const editing = code === S.active;
+    const shown = editing ? fmtBuf(S.buf) : fmt(amountIn(code));
     const unit = convert(1, code, S.base);            // 1 USD = 1,385 KRW 방향
     const d = pairChg(code, S.base);                  // 위 표기 방향의 전일 대비
-    return `<div class="trow">
-      <button class="pick" data-idx="${i}" aria-label="${code} 변경">
+    return `<div class="trow${kbdOpen && editing ? ' editing' : ''}">
+      <button class="pick" data-idx="${i}" aria-label="${code} 통화 변경">
         ${flagHtml(c,'flag sm')}
         <span class="who"><span class="code mono">${c.c}</span><span class="name">${c.n}</span></span>
       </button>
-      <div class="val num">
-        <div class="a">${fmt(v)}</div>
+      <button class="val num" data-amt="${code}" aria-label="${c.n} 금액 입력">
+        <div class="a">${shown}</div>
         <div class="sub">1 ${c.c} = ${fmt(unit)} ${S.base} · ${chgHtml(d)}</div>
-      </div>
+      </button>
     </div>`;
   }).join('');
+
+  $('kbd-what').textContent = `${S.active} 입력 중 · ⌫ 길게 누르면 전체 지우기`;
 }
 
-$('amt-base').addEventListener('click', ()=>setKbd(!kbdOpen));
+$('amt-base').addEventListener('click', ()=>startEdit(S.base));
 $('btn-done').addEventListener('click', ()=>setKbd(false));
-/* 목록을 만지기 시작하면 자연스럽게 키패드는 내려간다 */
-$('tlist').addEventListener('pointerdown', ()=>setKbd(false));
-$('btn-add').addEventListener('pointerdown', ()=>setKbd(false));
 
 $('kbd').addEventListener('click', e=>{
   const k = e.target.closest('[data-k]')?.dataset.k;
@@ -669,8 +719,10 @@ $('sheet-close').addEventListener('click', closeSheet);
 $('pick-base').addEventListener('click', ()=>openSheet('base'));
 $('btn-add').addEventListener('click', ()=>openSheet('add'));
 $('tlist').addEventListener('click', e=>{
+  const code = e.target.closest('[data-amt]')?.dataset.amt;
+  if(code){ startEdit(code); return; }          // 금액 쪽을 누르면 그 통화로 입력
   const idx = e.target.closest('.pick[data-idx]')?.dataset.idx;
-  if(idx !== undefined) openSheet(Number(idx));
+  if(idx !== undefined) openSheet(Number(idx));  // 국기·코드 쪽을 누르면 통화 변경
 });
 
 function renderList(q){
