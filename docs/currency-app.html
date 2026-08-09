@@ -524,12 +524,12 @@ const GROUPS = [['fiat','법정통화'],['crypto','암호화폐'],['metal','귀�
 /* ================= 상태 =================
    base = 기준 통화(내 돈), buf = 기준 금액 입력 버퍼,
    targets = 아래에 깔리는 변환 대상 국가들 */
-const DEFAULTS = {base:'KRW', buf:'100000', targets:['USD','JPY','EUR'],
-                  chartTo:'USD', recents:['USD','JPY','EUR']};
+const DEFAULTS = {base:'KGS', buf:'1000', targets:['USD','KRW'],
+                  chartTo:'USD', recents:['USD','KRW']};
 let S = load();
 function load(){
   try{
-    const raw = localStorage.getItem('fx-proto-v2');
+    const raw = localStorage.getItem('fx-proto-v3');
     if(raw){
       const p = JSON.parse(raw);
       if(BY[p.base] && Array.isArray(p.targets) && p.targets.every(t=>BY[t]))
@@ -538,7 +538,7 @@ function load(){
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
 }
-function save(){ try{ localStorage.setItem('fx-proto-v2', JSON.stringify(S)); }catch(e){} }
+function save(){ try{ localStorage.setItem('fx-proto-v3', JSON.stringify(S)); }catch(e){} }
 
 /* ================= 유틸 ================= */
 const $ = id => document.getElementById(id);
