@@ -346,9 +346,9 @@ const DEEP = {
 // ── Engine (mirrors PatternFinderEngine) ────────────────────────────────────
 let answers = [];   // {qid, idx}
 let scores = {};
-let basic = { h: null, w: null };
+let basic = { h: null, w: null, unit: 'imperial' };
 
-function reset() { answers = []; scores = {}; basic = {h:null,w:null}; for (const k in PATTERNS) scores[k] = 0; }
+function reset() { answers = []; scores = {}; basic = {h:null,w:null,unit:'imperial'}; for (const k in PATTERNS) scores[k] = 0; }
 
 function rankedIds() {
   return Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
@@ -434,12 +434,20 @@ function showBasicInfo() {
   screen.innerHTML = `
     <div class="fade">
       <h2 style="font-size:18px;font-weight:800;margin:2px 0 6px">Basic info (optional)</h2>
-      <p style="font-size:13px;color:var(--ink-dim);margin:0 0 16px">
+      <p style="font-size:13px;color:var(--ink-dim);margin:0 0 14px">
         Height and weight help your practitioner read the result. Feel free to skip — they never affect the pattern score.</p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:12.5px;color:var(--ink-dim)">Units</span>
+        <select id="bUnit"
+          style="flex:none;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:8px 12px;font-family:inherit;font-size:13.5px;font-weight:700">
+          <option value="imperial">Inches · Pounds (in / lb)</option>
+          <option value="metric">Centimeters · Kilograms (cm / kg)</option>
+        </select>
+      </div>
       <div style="display:flex;gap:10px">
-        <input id="bH" type="number" inputmode="decimal" placeholder="Height (cm)"
+        <input id="bH" type="number" inputmode="decimal" placeholder="Height (in)"
           style="flex:1;box-sizing:border-box;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14.5px">
-        <input id="bW" type="number" inputmode="decimal" placeholder="Weight (kg)"
+        <input id="bW" type="number" inputmode="decimal" placeholder="Weight (lb)"
           style="flex:1;box-sizing:border-box;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14.5px">
       </div>
       <div style="display:flex;gap:8px;margin-top:16px">
@@ -447,14 +455,39 @@ function showBasicInfo() {
         <button class="btn btn-ghost" id="bSkip">Skip</button>
       </div>
     </div>`;
+  const uSel = document.getElementById("bUnit");
+  const hIn = document.getElementById("bH");
+  const wIn = document.getElementById("bW");
+  uSel.value = basic.unit || 'imperial';
+  const applyPlaceholders = () => {
+    if (uSel.value === 'imperial') { hIn.placeholder = "Height (in)"; wIn.placeholder = "Weight (lb)"; }
+    else { hIn.placeholder = "Height (cm)"; wIn.placeholder = "Weight (kg)"; }
+  };
+  applyPlaceholders();
+  let cur = uSel.value;
+  uSel.onchange = () => {
+    const to = uSel.value;
+    if (to !== cur) {
+      const h = parseFloat(hIn.value), w = parseFloat(wIn.value);
+      if (to === 'metric') {
+        if (h > 0) hIn.value = (h * 2.54).toFixed(1);
+        if (w > 0) wIn.value = (w * 0.453592).toFixed(1);
+      } else {
+        if (h > 0) hIn.value = (h / 2.54).toFixed(1);
+        if (w > 0) wIn.value = (w / 0.453592).toFixed(1);
+      }
+      cur = to;
+    }
+    applyPlaceholders();
+  };
   const go = () => {
-    const h = parseFloat(document.getElementById("bH").value);
-    const w = parseFloat(document.getElementById("bW").value);
-    basic = { h: h > 0 ? h : null, w: w > 0 ? w : null };
+    const h = parseFloat(hIn.value);
+    const w = parseFloat(wIn.value);
+    basic = { h: h > 0 ? h : null, w: w > 0 ? w : null, unit: uSel.value };
     showQuestion();
   };
   document.getElementById("bGo").onclick = go;
-  document.getElementById("bSkip").onclick = () => { basic = {h:null,w:null}; showQuestion(); };
+  document.getElementById("bSkip").onclick = () => { basic = {h:null,w:null,unit:uSel.value}; showQuestion(); };
 }
 
 function showQuestion() {
@@ -543,10 +576,13 @@ function showResult() {
         <div class="evidence">${r.contributions.map(c => `<p>· ${esc(c)}</p>`).join("")}</div>`;
     }
   }
-  const bmi = (basic.h && basic.w) ? (basic.w / ((basic.h/100)**2)).toFixed(1) : null;
+  const isImp = basic.unit === 'imperial';
+  const hCm = basic.h ? (isImp ? basic.h * 2.54 : basic.h) : null;
+  const wKg = basic.w ? (isImp ? basic.w * 0.453592 : basic.w) : null;
+  const bmi = (hCm && wKg) ? (wKg / ((hCm/100)**2)).toFixed(1) : null;
   if (basic.h || basic.w) {
     html += `<p class="section-label">Basic info</p>
-      <div class="evidence"><p>${[basic.h?`Height ${basic.h}cm`:null, basic.w?`Weight ${basic.w}kg`:null, bmi?`BMI ${bmi}`:null].filter(Boolean).join(" · ")}</p></div>`;
+      <div class="evidence"><p>${[basic.h?`Height ${basic.h}${isImp?'in':'cm'}`:null, basic.w?`Weight ${basic.w}${isImp?'lb':'kg'}`:null, bmi?`BMI ${bmi}`:null].filter(Boolean).join(" · ")}</p></div>`;
   }
   const pairs = answeredPairs();
   if (pairs.length) {
