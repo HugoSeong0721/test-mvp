@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>변증별 경혈 가이드 — 한의사 화면 미리보기</title>
+<style>
+  :root {
+    --ground: #FFFCF4; --card: #FFFFFF; --soft: #FBF6EC; --ink: #20302A;
+    --ink-dim: #5B6B64; --jade: #2F5A4B; --jade-deep: #1E3D33; --mint: #DCE6E0;
+    --copper: #E28C74; --blush: #FFEEE8; --sun: #F3D9A4; --border: #E6DDCE;
+    --body-fill: #EEF3EF; --body-line: #C4D2C9; --meridian: #C9D8CF;
+    --shadow: 0 10px 30px rgba(24, 33, 31, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #141E1A; --card: #1D2A25; --soft: #22302A; --ink: #E8EDE9;
+      --ink-dim: #9FB0A8; --jade: #7FB8A0; --jade-deep: #A9D4C2; --mint: #2B3B34;
+      --copper: #E89B85; --blush: #3A2B25; --sun: #4A3E22; --border: #33443C;
+      --body-fill: #243530; --body-line: #3B5049; --meridian: #384E46;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #141E1A; --card: #1D2A25; --soft: #22302A; --ink: #E8EDE9;
+    --ink-dim: #9FB0A8; --jade: #7FB8A0; --jade-deep: #A9D4C2; --mint: #2B3B34;
+    --copper: #E89B85; --blush: #3A2B25; --sun: #4A3E22; --border: #33443C;
+    --body-fill: #243530; --body-line: #3B5049; --meridian: #384E46;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 26px 16px 60px; }
+  .kicker { font-size: 12px; letter-spacing: .12em; font-weight: 700; color: var(--ink-dim); text-transform: uppercase; margin: 0 0 6px; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0 0 6px; }
+  .sub { font-size: 13px; color: var(--ink-dim); margin: 0 0 18px; }
+
+  .app { background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; }
+  .app-top { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--soft); }
+  .app-top .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--jade); flex: none; }
+  .app-top .name { font-size: 13px; font-weight: 800; }
+  .app-top .who { margin-left: auto; font-size: 12px; color: var(--ink-dim); }
+
+  .sect { padding: 15px 18px; }
+  .sect + .sect { border-top: 1px solid var(--border); }
+  .label { font-size: 11.5px; font-weight: 800; letter-spacing: .04em; color: var(--ink-dim); margin-bottom: 8px; }
+
+  .pats { display: flex; flex-wrap: wrap; gap: 7px; }
+  .pat {
+    font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    padding: 7px 13px; border-radius: 99px; border: 1px solid var(--border);
+    background: var(--card); color: var(--ink-dim);
+  }
+  .pat.on { background: var(--jade); border-color: var(--jade); color: #fff; }
+  .pat .pct { opacity: .75; font-weight: 600; }
+
+  .rule { font-size: 12.5px; color: var(--ink-dim); margin-top: 10px; }
+  .rule b { color: var(--ink); }
+
+  .stagewrap { display: grid; grid-template-columns: minmax(0,1fr); gap: 14px; }
+  @media (min-width: 760px) { .stagewrap { grid-template-columns: 340px minmax(0,1fr); } }
+
+  .viewer { position: relative; background: var(--soft); border: 1px solid var(--border); border-radius: 18px; padding: 8px; }
+  .flip { transform-style: preserve-3d; will-change: transform; }
+  svg.body { display: block; width: 100%; height: auto; touch-action: pan-y; cursor: grab; }
+  svg.body:active { cursor: grabbing; }
+
+  .viewbar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .navbtn {
+    font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; line-height: 1;
+    width: 38px; height: 34px; border-radius: 11px; border: 1px solid var(--border);
+    background: var(--card); color: var(--ink);
+  }
+  .viewname { flex: 1; text-align: center; font-size: 13px; font-weight: 800; }
+  .viewhint { font-size: 11.5px; color: var(--ink-dim); text-align: center; margin-top: 4px; }
+
+  .pt { cursor: pointer; }
+  .pt .halo { fill: var(--copper); opacity: .22; }
+  .pt .core { fill: var(--copper); stroke: #fff; stroke-width: 1.6; }
+  .pt.sel .core { fill: var(--jade); }
+  .pt.sel .halo { fill: var(--jade); opacity: .3; }
+  .pt .num { font-size: 9.5px; font-weight: 800; fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  @keyframes pulse { 0%,100% { r: 13; opacity: .2 } 50% { r: 17; opacity: .34 } }
+  .pt .halo { animation: pulse 2.4s ease-in-out infinite; }
+
+  .plist { display: flex; flex-direction: column; gap: 7px; }
+  .prow {
+    display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+    font: inherit; cursor: pointer; padding: 9px 11px; border-radius: 13px;
+    border: 1px solid var(--border); background: var(--card); color: var(--ink);
+  }
+  .prow.sel { border-color: var(--jade); background: color-mix(in srgb, var(--mint) 55%, var(--card)); }
+  .prow .idx {
+    flex: none; width: 21px; height: 21px; border-radius: 99px; background: var(--copper);
+    color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  }
+  .prow.sel .idx { background: var(--jade); }
+  .prow .pn { font-size: 13.5px; font-weight: 700; }
+  .prow .pc { font-size: 11.5px; color: var(--ink-dim); }
+  .prow .side { margin-left: auto; font-size: 11px; color: var(--ink-dim); white-space: nowrap; }
+
+  .detail { border: 1px solid var(--border); border-radius: 16px; padding: 13px 14px; background: var(--soft); }
+  .detail .dn { font-size: 15.5px; font-weight: 800; }
+  .detail .dc { font-size: 12px; color: var(--ink-dim); margin-bottom: 8px; }
+  .detail .drow { font-size: 12.5px; margin-bottom: 5px; }
+  .detail .drow b { color: var(--ink-dim); font-weight: 800; }
+  .warn { margin-top: 8px; font-size: 12px; font-weight: 700; color: #B4553C; background: var(--blush); border-radius: 10px; padding: 7px 10px; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .warn { color: var(--copper); } }
+
+  .note { font-size: 12px; color: var(--ink-dim); margin-top: 18px; line-height: 1.6; }
+  .note a { color: var(--jade); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Design Preview · test-mvp</p>
+  <h1>변증별 경혈 가이드</h1>
+  <p class="sub">
+    환자가 공유한 변증 방향을 고르면, 그 변증에 쓰는 경혈이 인체 모델의 실제 위치에 표시됩니다.
+    모델을 좌우로 끌면 앞·뒤·좌·우로 돌려 볼 수 있어요.
+  </p>
+
+  <div class="app">
+    <div class="app-top">
+      <span class="dot"></span>
+      <span class="name">한의사 대시보드 · 경혈 가이드</span>
+      <span class="who">이서연 님 · 공유된 변증 결과</span>
+    </div>
+
+    <div class="sect">
+      <div class="label">의심 변증 (환자 공유 결과)</div>
+      <div class="pats" id="pats"></div>
+      <div class="rule" id="rule"></div>
+    </div>
+
+    <div class="sect">
+      <div class="stagewrap">
+        <div>
+          <div class="viewer">
+            <div class="flip" id="flip">
+              <svg class="body" id="svg" viewBox="0 0 420 780" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+          </div>
+          <div class="viewbar">
+            <button class="navbtn" id="prev" aria-label="왼쪽으로 돌리기">‹</button>
+            <div class="viewname" id="viewname"></div>
+            <button class="navbtn" id="next" aria-label="오른쪽으로 돌리기">›</button>
+          </div>
+          <div class="viewhint" id="viewhint"></div>
+        </div>
+
+        <div>
+          <div class="label" id="listlabel"></div>
+          <div class="plist" id="plist"></div>
+          <div style="height:12px"></div>
+          <div class="detail" id="detail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    이 화면은 한의사용 참고 자료이며 처방이 아닙니다. 실제 취혈·자침 여부와 깊이는 진료로 확인한 뒤 한의사가 판단합니다.<br>
+    좌표는 표준 취혈 기준을 인체 모델 비율에 맞춰 배치한 것으로, 환자 체형에 따라 촌(寸)으로 다시 재어야 합니다.<br>
+    환자 화면은 <a href="./pattern-finder-preview.html">여기</a>, 한의사 수신함은 <a href="./practitioner-inbox-preview.html">여기</a>에서 볼 수 있어요.
+  </p>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ── 인체 모델 ────────────────────────────────────────────────────────────
+  // 정면/후면은 같은 실루엣(좌우 대칭), 측면은 별도 윤곽.
+  // 네 방향 모두 머리 cy=120, 어깨 y=196, 골반 y=452, 발 y=714로 높이를 맞춰
+  // 같은 경혈이 어느 면에서나 같은 높이에 오도록 했다.
+  const SIL = {
+    front: `
+      <circle cx="210" cy="120" r="46"/>
+      <rect x="196" y="160" width="28" height="26" rx="8"/>
+      <path d="M138 196 Q210 172 282 196 L294 340 Q292 420 262 452 L158 452 Q128 420 126 340 Z"/>
+      <path d="M138 200 Q104 216 96 300 L84 396 Q82 416 100 418 Q116 420 120 402 L136 316 Z"/>
+      <path d="M282 200 Q316 216 324 300 L336 396 Q338 416 320 418 Q304 420 300 402 L284 316 Z"/>
+      <ellipse cx="92" cy="436" rx="17" ry="21"/>
+      <ellipse cx="328" cy="436" rx="17" ry="21"/>
+      <path d="M162 452 L150 600 Q148 660 158 700 L196 700 Q200 650 198 600 L204 480 L216 480 L222 600 Q220 650 224 700 L262 700 Q272 660 270 600 L258 452 Z"/>
+      <ellipse cx="177" cy="714" rx="30" ry="15"/>
+      <ellipse cx="243" cy="714" rx="30" ry="15"/>`,
+    side: `
+      <circle cx="206" cy="120" r="46"/>
+      <path d="M250 112 L262 128 L248 134 Z"/>
+      <rect x="196" y="160" width="30" height="26" rx="8"/>
+      <path d="M176 196 Q216 182 246 202 L252 300 Q254 380 246 452 L182 452 Q172 400 172 320 Z"/>
+      <path d="M186 202 Q170 240 172 320 L166 398 Q164 417 181 417 Q196 417 197 399 L202 318 Z"/>
+      <ellipse cx="181" cy="436" rx="16" ry="21"/>
+      <path d="M182 452 Q174 560 178 620 Q180 670 186 700 L226 700 Q232 660 228 610 L236 452 Z"/>
+      <ellipse cx="216" cy="714" rx="38" ry="15"/>`,
+  };
+  const MERIDIAN = {
+    front: `<path d="M210 186 L210 452"/><path d="M138 206 Q102 264 94 416"/><path d="M282 206 Q318 264 326 416"/><path d="M180 458 L176 700"/><path d="M240 458 L244 700"/>`,
+    back:  `<path d="M210 186 L210 452"/><path d="M194 200 L194 452"/><path d="M226 200 L226 452"/><path d="M178 458 L172 700"/><path d="M242 458 L248 700"/>`,
+    side:  `<path d="M240 190 Q248 300 240 452"/><path d="M178 196 Q172 320 178 452"/><path d="M206 458 Q200 580 206 700"/>`,
+  };
+
+  // ── 경혈 ────────────────────────────────────────────────────────────────
+  // pos: 면별 좌표. 좌우 한 쌍인 혈은 정면/후면에 좌표 2개, 측면에는 가까운 쪽 1개.
+  const P = {
+    CV17: { ko:'전중', han:'膻中', m:'임맥', loc:'양 젖꼭지 사이, 흉골 정중선', use:'기가 모이는 기회혈(氣會). 가슴 답답함과 한숨을 풀어준다.',
+            pos:{ front:[[210,258]], side:[[240,258]] } },
+    CV12: { ko:'중완', han:'中脘', m:'임맥', loc:'배꼽 위 4촌', use:'위의 모혈. 소화를 돕고 중초를 고른다.',
+            pos:{ front:[[210,330]], side:[[244,330]] } },
+    CV6:  { ko:'기해', han:'氣海', m:'임맥', loc:'배꼽 아래 1.5촌', use:'원기를 북돋운다. 뜸을 자주 쓰는 자리.',
+            pos:{ front:[[210,382]], side:[[246,382]] } },
+    CV4:  { ko:'관원', han:'關元', m:'임맥', loc:'배꼽 아래 3촌', use:'원기와 양기를 채운다. 허증에 뜸.',
+            pos:{ front:[[210,402]], side:[[246,402]] } },
+    GV14: { ko:'대추', han:'大椎', m:'독맥', loc:'제7경추 극돌기 아래', use:'모든 양경이 모이는 자리. 양기를 통하게 한다.',
+            pos:{ back:[[210,198]], side:[[176,198]] } },
+    GV4:  { ko:'명문', han:'命門', m:'독맥', loc:'제2요추 극돌기 아래', use:'신양(腎陽)을 덥힌다. 냉증에 뜸.',
+            pos:{ back:[[210,388]], side:[[174,388]] } },
+    BL17: { ko:'격수', han:'膈兪', m:'방광경', loc:'제7흉추 아래 옆 1.5촌', use:'혈이 모이는 혈회(血會). 혈허·어혈에 쓴다.',
+            pos:{ back:[[194,292],[226,292]] } },
+    BL18: { ko:'간수', han:'肝兪', m:'방광경', loc:'제9흉추 아래 옆 1.5촌', use:'간의 배수혈. 울결을 풀고 혈을 갈무리한다.',
+            pos:{ back:[[194,314],[226,314]] } },
+    BL20: { ko:'비수', han:'脾兪', m:'방광경', loc:'제11흉추 아래 옆 1.5촌', use:'비의 배수혈. 기혈을 만들고 습을 다스린다.',
+            pos:{ back:[[194,340],[226,340]] } },
+    BL21: { ko:'위수', han:'胃兪', m:'방광경', loc:'제12흉추 아래 옆 1.5촌', use:'위의 배수혈. 소화를 돕는다.',
+            pos:{ back:[[194,356],[226,356]] } },
+    BL23: { ko:'신수', han:'腎兪', m:'방광경', loc:'제2요추 아래 옆 1.5촌', use:'신의 배수혈. 음과 양을 함께 보한다.',
+            pos:{ back:[[194,388],[226,388]], side:[[182,388]] } },
+    LR14: { ko:'기문', han:'期門', m:'간경', loc:'유두 아래 제6늑간', use:'간의 모혈. 옆구리 결림과 가슴 답답함에.',
+            pos:{ front:[[172,288],[248,288]], side:[[240,288]] } },
+    LR3:  { ko:'태충', han:'太衝', m:'간경', loc:'발등 제1·2 중족골 사이 오목한 곳', use:'간의 원혈. 스트레스로 오르는 기를 내린다.',
+            pos:{ front:[[177,712],[243,712]], side:[[222,712]] } },
+    LI4:  { ko:'합곡', han:'合谷', m:'대장경', loc:'엄지와 검지 뼈 사이, 손등 쪽', use:'태충과 함께 사관(四關). 기혈을 크게 소통시킨다.',
+            caution:'임신 중에는 쓰지 않는다.',
+            pos:{ front:[[92,436],[328,436]], back:[[92,436],[328,436]], side:[[181,436]] } },
+    PC6:  { ko:'내관', han:'內關', m:'심포경', loc:'손목 주름 위 2촌, 두 힘줄 사이', use:'가슴 답답함·구역질·불안을 가라앉힌다.',
+            pos:{ front:[[104,352],[316,352]], side:[[196,352]] } },
+    HT6:  { ko:'음극', han:'陰郄', m:'심경', loc:'손목 주름 위 0.5촌, 새끼손가락 쪽 힘줄 안', use:'밤에 나는 식은땀(도한)을 멎게 한다.',
+            pos:{ front:[[99,376],[321,376]] } },
+    ST36: { ko:'족삼리', han:'足三里', m:'위경', loc:'무릎 아래 3촌, 정강뼈 바깥 한 손가락', use:'기혈을 보하는 대표 보익혈. 뜸에도 좋다.',
+            pos:{ front:[[160,572],[260,572]], side:[[212,572]] } },
+    ST40: { ko:'풍륭', han:'豐隆', m:'위경', loc:'무릎과 바깥 복사뼈 중간, 정강뼈 바깥 두 손가락', use:'담(痰)을 삭이는 요혈. 몸이 무겁고 더부룩할 때.',
+            pos:{ front:[[157,620],[263,620]], side:[[204,620]] } },
+    SP3:  { ko:'태백', han:'太白', m:'비경', loc:'엄지발가락 뿌리 안쪽 오목한 곳', use:'비의 원혈. 비기를 세운다.',
+            pos:{ front:[[193,718],[227,718]] } },
+    SP6:  { ko:'삼음교', han:'三陰交', m:'비경', loc:'안쪽 복사뼈 위 3촌, 정강뼈 뒤', use:'세 음경이 만나는 자리. 혈과 음을 함께 다스린다.',
+            caution:'임신 중에는 쓰지 않는다.',
+            pos:{ front:[[191,652],[229,652]], side:[[214,652]] } },
+    SP9:  { ko:'음릉천', han:'陰陵泉', m:'비경', loc:'무릎 아래 안쪽, 정강뼈 안쪽 아래 오목한 곳', use:'습을 빼내는 요혈. 붓고 무거울 때.',
+            pos:{ front:[[192,566],[228,566]], side:[[216,566]] } },
+    SP10: { ko:'혈해', han:'血海', m:'비경', loc:'무릎뼈 안쪽 위 2촌, 넓적다리 안쪽 융기', use:'혈을 다스리는 자리. 혈허와 어혈 모두에.',
+            pos:{ front:[[190,496],[230,496]], side:[[214,496]] } },
+    GB34: { ko:'양릉천', han:'陽陵泉', m:'담경', loc:'종아리 바깥, 비골두 앞아래 오목한 곳', use:'근이 모이는 근회(筋會). 결림과 옆구리 통증에.',
+            pos:{ front:[[158,552],[262,552]], side:[[202,552]] } },
+    KI3:  { ko:'태계', han:'太谿', m:'신경', loc:'안쪽 복사뼈와 아킬레스건 사이', use:'신의 원혈. 음허·양허 어느 쪽이든 뿌리를 채운다.',
+            pos:{ front:[[189,684],[231,684]], side:[[210,684]] } },
+    KI6:  { ko:'조해', han:'照海', m:'신경', loc:'안쪽 복사뼈 아래 오목한 곳', use:'음을 적셔 입마름과 목마름을 덜어준다.',
+            pos:{ front:[[191,698],[229,698]] } },
+    KI7:  { ko:'부류', han:'復溜', m:'신경', loc:'태계 위 2촌', use:'음극과 짝지어 도한을 멎게 한다.',
+            pos:{ front:[[188,668],[232,668]] } },
+  };
+
+  // ── 변증별 처방 ──────────────────────────────────────────────────────────
+  const PATTERNS = [
+    { id:'qi',    ko:'기허 (기운 부족)',       pct:62, rule:'치법 — 보기건비(補氣健脾). 비위를 세워 기를 만들어 준다. 보법과 뜸을 위주로.',
+      pts:['ST36','CV6','CV4','CV12','BL20','BL21','SP3'] },
+    { id:'yang',  ko:'양허 (몸이 참)',         pct:0,  rule:'치법 — 온보신양(溫補腎陽). 아랫배와 허리를 덥힌다. 뜸을 넉넉히.',
+      pts:['CV4','CV6','GV4','BL23','ST36','KI3'] },
+    { id:'yin',   ko:'음허 (허열·건조)',       pct:0,  rule:'치법 — 자음강화(滋陰降火). 음을 적시고 허열을 내린다. 뜸보다 침 보법.',
+      pts:['KI3','KI6','KI7','HT6','SP6','BL23','BL18'] },
+    { id:'damp',  ko:'습담 (무겁고 더부룩)',   pct:24, rule:'치법 — 건비화담(健脾化痰). 비를 세우고 습담을 삭인다.',
+      pts:['ST40','SP9','CV12','ST36','BL20','SP6'] },
+    { id:'liver', ko:'간기울결 (스트레스·긴장)', pct:0, rule:'치법 — 소간해울(疏肝解鬱). 막힌 기를 흐르게 한다. 사법 위주.',
+      pts:['LR3','LI4','LR14','CV17','PC6','BL18','GB34'] },
+    { id:'stasis',ko:'어혈 (고정된 통증)',     pct:0,  rule:'치법 — 활혈화어(活血化瘀). 뭉친 혈을 풀어 통증을 없앤다.',
+      pts:['BL17','SP10','SP6','LR3','LI4','GB34'] },
+    { id:'blood', ko:'혈허 (어지럼·창백)',     pct:0,  rule:'치법 — 보혈양혈(補血養血). 혈을 만들고 갈무리한다.',
+      pts:['SP10','BL17','BL18','BL20','ST36','SP6'] },
+  ];
+
+  const VIEWS = [
+    { id:'front', ko:'정면 (앞)' },
+    { id:'right', ko:'우측면 (오른쪽)' },
+    { id:'back',  ko:'후면 (뒤)' },
+    { id:'left',  ko:'좌측면 (왼쪽)' },
+  ];
+
+  let patIdx = 0, viewIdx = 0, selCode = null, busy = false;
+
+  const $ = id => document.getElementById(id);
+  const svg = $('svg'), flip = $('flip');
+
+  // 정면·후면은 좌우 대칭이라 같은 실루엣을 쓰고, 측면은 하나의 윤곽을
+  // 좌우 반전해 반대쪽을 만든다(좌표도 420에서 뺀다).
+  const isSide = v => v === 'left' || v === 'right';
+  const mirrored = v => v === 'left';
+
+  function coordsFor(code, view) {
+    const p = P[code];
+    if (!p) return [];
+    const key = isSide(view) ? 'side' : view;
+    const list = p.pos[key] || [];
+    return mirrored(view) ? list.map(([x, y]) => [420 - x, y]) : list;
+  }
+
+  function renderPatterns() {
+    $('pats').innerHTML = PATTERNS.map((p, i) => `
+      <button class="pat ${i === patIdx ? 'on' : ''}" data-i="${i}">
+        ${p.ko}${p.pct ? ` <span class="pct">${p.pct}%</span>` : ''}
+      </button>`).join('');
+    for (const b of $('pats').children) {
+      b.onclick = () => { patIdx = +b.dataset.i; selCode = null; renderPatterns(); renderAll(); };
+    }
+    $('rule').innerHTML = `<b>${PATTERNS[patIdx].rule.split(' — ')[0]}</b> — ${PATTERNS[patIdx].rule.split(' — ')[1]}`;
+  }
+
+  function renderBody() {
+    const view = VIEWS[viewIdx].id;
+    const pts = PATTERNS[patIdx].pts;
+
+    const sil = SIL[isSide(view) ? 'side' : 'front'];
+    const mer = MERIDIAN[isSide(view) ? 'side' : view];
+    const flipAttr = mirrored(view) ? ' transform="translate(420,0) scale(-1,1)"' : '';
+
+    let marks = '';
+    pts.forEach((code, i) => {
+      for (const [x, y] of coordsFor(code, view)) {
+        marks += `
+          <g class="pt ${selCode === code ? 'sel' : ''}" data-code="${code}" transform="translate(${x},${y})">
+            <circle class="halo" r="13"/>
+            <circle class="core" r="8.5"/>
+            <text class="num" y="0.5">${i + 1}</text>
+          </g>`;
+      }
+    });
+
+    svg.innerHTML = `
+      <g${flipAttr}>
+        <g fill="var(--body-fill)" stroke="var(--body-line)" stroke-width="2">${sil}</g>
+        <g stroke="var(--meridian)" stroke-width="1.5" fill="none" stroke-dasharray="4 6" opacity=".9">${mer}</g>
+      </g>
+      <g>${marks}</g>`;
+
+    for (const g of svg.querySelectorAll('.pt')) {
+      g.onclick = () => { selCode = g.dataset.code; renderAll(); };
+    }
+
+    $('viewname').textContent = VIEWS[viewIdx].ko;
+    const here = pts.filter(c => coordsFor(c, view).length).length;
+    $('viewhint').textContent = `이 면에 ${here}곳 / 전체 ${pts.length}곳 · 모델을 좌우로 끌어 돌려보세요`;
+  }
+
+  function viewsOf(code) {
+    return VIEWS.filter(v => coordsFor(code, v.id).length).map(v => v.ko.split(' ')[0]);
+  }
+
+  function renderList() {
+    const pts = PATTERNS[patIdx].pts;
+    $('listlabel').textContent = `추천 경혈 ${pts.length}곳 — 누르면 해당 면으로 돌아갑니다`;
+    $('plist').innerHTML = pts.map((code, i) => {
+      const p = P[code];
+      return `
+        <button class="prow ${selCode === code ? 'sel' : ''}" data-code="${code}">
+          <span class="idx">${i + 1}</span>
+          <span>
+            <span class="pn">${p.ko}</span>
+            <span class="pc"> ${p.han} · ${code} · ${p.m}</span>
+          </span>
+          <span class="side">${viewsOf(code).join('·')}</span>
+        </button>`;
+    }).join('');
+
+    for (const b of $('plist').children) {
+      b.onclick = () => {
+        const code = b.dataset.code;
+        selCode = code;
+        if (!coordsFor(code, VIEWS[viewIdx].id).length) {
+          const target = VIEWS.findIndex(v => coordsFor(code, v.id).length);
+          if (target >= 0) return rotateTo(target);
+        }
+        renderAll();
+      };
+    }
+  }
+
+  function renderDetail() {
+    const code = selCode;
+    if (!code) {
+      $('detail').innerHTML = `<div class="dc" style="margin:0">경혈을 누르면 취혈 위치와 쓰임이 여기에 나옵니다.</div>`;
+      return;
+    }
+    const p = P[code];
+    $('detail').innerHTML = `
+      <div class="dn">${p.ko} <span style="font-weight:600;color:var(--ink-dim)">${p.han}</span></div>
+      <div class="dc">${code} · ${p.m}</div>
+      <div class="drow"><b>취혈</b> · ${p.loc}</div>
+      <div class="drow"><b>쓰임</b> · ${p.use}</div>
+      <div class="drow"><b>보이는 면</b> · ${viewsOf(code).join(', ')}</div>
+      ${p.caution ? `<div class="warn">⚠ ${p.caution}</div>` : ''}`;
+  }
+
+  function renderAll() { renderBody(); renderList(); renderDetail(); }
+
+  // ── 회전 ────────────────────────────────────────────────────────────────
+  function rotateTo(target, dirHint) {
+    if (busy || target === viewIdx) { viewIdx = target; renderAll(); return; }
+    const forward = dirHint !== undefined ? dirHint
+      : ((target - viewIdx + 4) % 4 <= 2 ? 1 : -1);
+    busy = true;
+    flip.style.transition = 'transform .16s ease-in';
+    flip.style.transform = `perspective(900px) rotateY(${forward * 62}deg)`;
+    setTimeout(() => {
+      viewIdx = target;
+      renderAll();
+      flip.style.transition = 'none';
+      flip.style.transform = `perspective(900px) rotateY(${-forward * 62}deg)`;
+      requestAnimationFrame(() => {
+        flip.style.transition = 'transform .22s ease-out';
+        flip.style.transform = 'perspective(900px) rotateY(0deg)';
+        setTimeout(() => { busy = false; }, 230);
+      });
+    }, 165);
+  }
+  const step = d => rotateTo((viewIdx + d + 4) % 4, d);
+
+  $('prev').onclick = () => step(-1);
+  $('next').onclick = () => step(1);
+
+  let dragX = null;
+  svg.addEventListener('pointerdown', e => { dragX = e.clientX; });
+  svg.addEventListener('pointermove', e => {
+    if (dragX === null) return;
+    const dx = e.clientX - dragX;
+    if (Math.abs(dx) > 55) { step(dx < 0 ? 1 : -1); dragX = null; }
+  });
+  const endDrag = () => { dragX = null; };
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+  svg.addEventListener('pointerleave', endDrag);
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+
+  renderPatterns();
+  renderAll();
+})();
+</script>
+</body>
+</html>
