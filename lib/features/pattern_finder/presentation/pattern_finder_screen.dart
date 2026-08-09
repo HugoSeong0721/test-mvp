@@ -411,6 +411,11 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
 
+  // Patients enter height/weight in inches/pounds by default and can switch to
+  // centimeters/kilograms. Values are always converted to metric before they
+  // leave this screen, so the rest of the app keeps working in cm/kg.
+  bool _imperial = true;
+
   @override
   void dispose() {
     _heightController.dispose();
@@ -418,16 +423,39 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
     super.dispose();
   }
 
-  double? _parse(String raw, double min, double max) {
+  /// Parses a field and returns the value converted to metric (cm or kg),
+  /// or null when empty / out of a sensible range.
+  double? _parseMetric(String raw, {required bool isHeight}) {
     final value = double.tryParse(raw.trim().replaceAll(',', '.'));
-    if (value == null || value < min || value > max) return null;
-    return value;
+    if (value == null || value <= 0) return null;
+    final metric = _imperial
+        ? (isHeight ? value * 2.54 : value * 0.453592)
+        : value;
+    final min = isHeight ? 80.0 : 20.0;
+    final max = isHeight ? 250.0 : 300.0;
+    if (metric < min || metric > max) return null;
+    return metric;
+  }
+
+  void _switchUnit(bool imperial) {
+    if (imperial == _imperial) return;
+    // Convert whatever is already typed so the number stays meaningful.
+    void convert(TextEditingController c, double toImperial) {
+      final v = double.tryParse(c.text.trim().replaceAll(',', '.'));
+      if (v == null || v <= 0) return;
+      final next = imperial ? v / toImperial : v * toImperial;
+      c.text = next.toStringAsFixed(1);
+    }
+
+    convert(_heightController, 2.54);
+    convert(_weightController, 0.453592);
+    setState(() => _imperial = imperial);
   }
 
   void _continue() {
     widget.onContinue(
-      _parse(_heightController.text, 80, 250),
-      _parse(_weightController.text, 20, 300),
+      _parseMetric(_heightController.text, isHeight: true),
+      _parseMetric(_weightController.text, isHeight: false),
     );
   }
 
@@ -469,7 +497,37 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
             color: AppTheme.ink.withValues(alpha: 0.65),
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Text(
+              lang.tr('Units', '단위'),
+              style: TextStyle(
+                fontSize: 12.5,
+                color: AppTheme.ink.withValues(alpha: 0.65),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: SegmentedButton<bool>(
+                segments: [
+                  ButtonSegment(
+                    value: true,
+                    label: Text(lang.tr('in / lb', '인치 · 파운드')),
+                  ),
+                  ButtonSegment(
+                    value: false,
+                    label: Text(lang.tr('cm / kg', '센티 · 킬로')),
+                  ),
+                ],
+                selected: {_imperial},
+                showSelectedIcon: false,
+                onSelectionChanged: (s) => _switchUnit(s.first),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
         Row(
           children: [
             Expanded(
@@ -479,7 +537,9 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: lang.tr('Height (cm)', '키 (cm)'),
+                  labelText: _imperial
+                      ? lang.tr('Height (in)', '키 (in)')
+                      : lang.tr('Height (cm)', '키 (cm)'),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -494,7 +554,9 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: lang.tr('Weight (kg)', '몸무게 (kg)'),
+                  labelText: _imperial
+                      ? lang.tr('Weight (lb)', '몸무게 (lb)')
+                      : lang.tr('Weight (kg)', '몸무게 (kg)'),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
