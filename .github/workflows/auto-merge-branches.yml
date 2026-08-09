@@ -1,9 +1,11 @@
 name: Auto-merge branches
 
-# Every 4 hours, pull the latest main and the doctor-management branch and merge
-# them into the syndrome-paper feature branch, then push. If a merge conflicts,
-# the run aborts and fails loudly (no partial/garbage commit) so it can be
-# resolved by hand.
+# Every 4 hours, cross-sync the two Claude session branches: merge the latest
+# main and the sibling branch into each feature branch, then push. Once both
+# branches contain each other's work the merges are no-ops, so this stays
+# quiet until new commits appear. If a merge conflicts, that branch's sync
+# aborts and fails loudly (no partial/garbage commit) so it can be resolved
+# by hand.
 
 on:
   schedule:
@@ -18,45 +20,50 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  TARGET_BRANCH: claude/tcm-syndrome-paper-automation-0itj0j
-  SOURCE_BRANCHES: "main claude/tcm-doctor-management-automation-vflyi9"
+  BRANCH_A: claude/tcm-syndrome-paper-automation-0itj0j
+  BRANCH_B: claude/tcm-doctor-management-automation-vflyi9
 
 jobs:
   merge:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the target branch
+      - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.TARGET_BRANCH }}
           fetch-depth: 0
 
-      - name: Merge source branches
+      - name: Cross-merge branches
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin $SOURCE_BRANCHES
+          git fetch origin main "$BRANCH_A" "$BRANCH_B"
 
-          changed=0
-          for br in $SOURCE_BRANCHES; do
-            echo "::group::Merging origin/$br"
-            if git merge --no-edit "origin/$br"; then
-              echo "merged (or already up to date)"
+          failed=0
+          sync_target() {
+            target="$1"; shift
+            echo "::group::Syncing $target"
+            git checkout -B "$target" "origin/$target"
+            for br in "$@"; do
+              if git merge --no-edit "origin/$br"; then
+                echo "merged origin/$br (or already up to date)"
+              else
+                git merge --abort || true
+                echo "::error::Merge conflict while merging origin/$br into $target. Resolve manually."
+                failed=1
+                echo "::endgroup::"
+                return
+              fi
+            done
+            if [ -n "$(git rev-list "origin/$target"..HEAD)" ]; then
+              git push origin "HEAD:$target"
+              echo "Pushed merged changes to $target."
             else
-              git merge --abort || true
-              echo "::error::Merge conflict while merging origin/$br into $TARGET_BRANCH. Resolve manually."
-              exit 1
+              echo "Nothing new to merge into $target."
             fi
             echo "::endgroup::"
-          done
+          }
 
-          if [ -n "$(git rev-list origin/$TARGET_BRANCH..HEAD)" ]; then
-            changed=1
-          fi
+          sync_target "$BRANCH_A" main "$BRANCH_B"
+          sync_target "$BRANCH_B" main "$BRANCH_A"
 
-          if [ "$changed" = "1" ]; then
-            git push origin HEAD:$TARGET_BRANCH
-            echo "Pushed merged changes to $TARGET_BRANCH."
-          else
-            echo "Nothing new to merge."
-          fi
+          exit "$failed"
