@@ -485,6 +485,8 @@ const CURRENCIES = [
   {c:'CAD', n:'캐나다 달러',      f:'🇨🇦', r:1.3742,   d:+0.11, g:'fiat'},
   {c:'CHF', n:'스위스 프랑',      f:'🇨🇭', r:0.7962,   d:-0.22, g:'fiat'},
   {c:'INR', n:'인도 루피',        f:'🇮🇳', r:87.54,    d:+0.04, g:'fiat'},
+  {c:'KGS', n:'키르기스스탄 솜',  f:'🇰🇬', r:87.45,    d:+0.07, g:'fiat',
+   k:'키르기즈 키르기스탄 솜 kyrgyz kyrgyzstan som'},
   {c:'MXN', n:'멕시코 페소',      f:'🇲🇽', r:18.62,    d:-0.14, g:'fiat'},
   {c:'BRL', n:'브라질 헤알',      f:'🇧🇷', r:5.423,    d:+0.19, g:'fiat'},
   {c:'BTC', n:'비트코인',         b:'₿',  cls:'cr', r:1/89420, d:-1.42, g:'crypto'},
@@ -637,7 +639,9 @@ $('tlist').addEventListener('click', e=>{
 function renderList(q){
   q = q.trim().toLowerCase();
   const list = $('curlist');
-  const match = c => !q || c.c.toLowerCase().includes(q) || c.n.toLowerCase().includes(q);
+  /* 코드·한글명 외에 별칭(k)도 검색 — "키르기즈", "som" 같은 다른 표기 대응 */
+  const match = c => !q || c.c.toLowerCase().includes(q) || c.n.toLowerCase().includes(q)
+                        || (c.k || '').toLowerCase().includes(q);
   const taken = code =>
     pickMode === 'base' ? code === S.base
     : (code === S.base || S.targets.includes(code));
