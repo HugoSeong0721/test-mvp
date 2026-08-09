@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 인체 모델 — 경혈 · 장부</title>
+<style>
+  :root {
+    --ground:#FFFCF4; --card:#FFFFFF; --soft:#FBF6EC; --ink:#20302A;
+    --ink-dim:#5B6B64; --jade:#2F5A4B; --mint:#DCE6E0; --copper:#E28C74;
+    --blush:#FFEEE8; --border:#E6DDCE; --stage:#EFEDE4;
+    --skin:#D8C3A8; --shadow:0 10px 30px rgba(24,33,31,.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#141E1A; --card:#1D2A25; --soft:#22302A; --ink:#E8EDE9;
+      --ink-dim:#9FB0A8; --jade:#7FB8A0; --mint:#2B3B34; --copper:#E89B85;
+      --blush:#3A2B25; --border:#33443C; --stage:#16211D;
+      --skin:#7E8E80; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#141E1A; --card:#1D2A25; --soft:#22302A; --ink:#E8EDE9;
+    --ink-dim:#9FB0A8; --jade:#7FB8A0; --mint:#2B3B34; --copper:#E89B85;
+    --blush:#3A2B25; --border:#33443C; --stage:#16211D;
+    --skin:#7E8E80; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1040px; margin:0 auto; padding:26px 16px 60px; }
+  .kicker { font-size:12px; letter-spacing:.12em; font-weight:700; color:var(--ink-dim); text-transform:uppercase; margin:0 0 6px; }
+  h1 { font-size:24px; font-weight:800; margin:0 0 6px; }
+  .sub { font-size:13px; color:var(--ink-dim); margin:0 0 18px; }
+
+  .app { background:var(--card); border:1px solid var(--border); border-radius:22px; box-shadow:var(--shadow); overflow:hidden; }
+  .app-top { display:flex; align-items:center; gap:10px; padding:13px 18px; border-bottom:1px solid var(--border); background:var(--soft); }
+  .app-top .dot { width:8px; height:8px; border-radius:99px; background:var(--jade); flex:none; }
+  .app-top .name { font-size:13px; font-weight:800; }
+  .app-top .who { margin-left:auto; font-size:12px; color:var(--ink-dim); }
+
+  .sect { padding:14px 18px; }
+  .sect + .sect { border-top:1px solid var(--border); }
+  .label { font-size:11.5px; font-weight:800; letter-spacing:.04em; color:var(--ink-dim); margin-bottom:8px; }
+
+  .chips { display:flex; flex-wrap:wrap; gap:7px; }
+  .chip {
+    font:inherit; font-size:12.5px; font-weight:700; cursor:pointer;
+    padding:7px 13px; border-radius:99px; border:1px solid var(--border);
+    background:var(--card); color:var(--ink-dim);
+  }
+  .chip.on { background:var(--jade); border-color:var(--jade); color:#fff; }
+  .chip .sw { display:inline-block; width:9px; height:9px; border-radius:99px; margin-right:5px; vertical-align:1px; }
+
+  .grid { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+  @media (min-width:860px) { .grid { grid-template-columns:minmax(0,1fr) 350px; } }
+
+  .stage { position:relative; background:var(--stage); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+  canvas { display:block; width:100%; height:560px; touch-action:none; cursor:grab; }
+  canvas:active { cursor:grabbing; }
+  .hud {
+    position:absolute; font-size:11.5px; color:var(--ink);
+    background:color-mix(in srgb, var(--card) 84%, transparent);
+    border:1px solid var(--border); border-radius:9px; padding:5px 9px; pointer-events:none;
+  }
+  .hud.br { right:10px; top:10px; font-weight:800; }
+  .hud.bl { left:10px; bottom:10px; color:var(--ink-dim); }
+
+  .bar { display:flex; gap:7px; margin-top:9px; flex-wrap:wrap; }
+  .btn {
+    font:inherit; font-size:12px; font-weight:700; cursor:pointer;
+    padding:7px 11px; border-radius:11px; border:1px solid var(--border);
+    background:var(--card); color:var(--ink);
+  }
+  .btn.on { background:var(--jade); border-color:var(--jade); color:#fff; }
+
+  .rows { display:flex; flex-direction:column; gap:6px; max-height:262px; overflow-y:auto; padding-right:2px; }
+  .row {
+    display:flex; align-items:center; gap:8px; width:100%; text-align:left;
+    font:inherit; cursor:pointer; padding:8px 10px; border-radius:12px;
+    border:1px solid var(--border); background:var(--card); color:var(--ink);
+  }
+  .row.sel { border-color:var(--jade); background:color-mix(in srgb, var(--mint) 55%, var(--card)); }
+  .row .sw { width:11px; height:11px; border-radius:99px; flex:none; }
+  .row .rn { font-size:13px; font-weight:700; }
+  .row .rc { font-size:11.5px; color:var(--ink-dim); }
+  .row .rt { margin-left:auto; font-size:10.5px; font-weight:800; color:var(--ink-dim); white-space:nowrap; }
+
+  .card { border:1px solid var(--border); border-radius:16px; padding:13px 14px; background:var(--soft); margin-top:12px; }
+  .card .dn { font-size:16px; font-weight:800; }
+  .card .dc { font-size:12px; color:var(--ink-dim); }
+  .tagline { display:flex; flex-wrap:wrap; gap:5px; margin:8px 0 10px; }
+  .tag { font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:99px; background:var(--mint); border:1px solid var(--border); }
+  .drow { font-size:12.5px; margin-bottom:6px; }
+  .drow b { display:inline-block; min-width:52px; color:var(--ink-dim); font-weight:800; }
+  .warn { margin-top:8px; font-size:12px; font-weight:700; color:#B4553C; background:var(--blush); border-radius:10px; padding:8px 10px; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .warn { color:var(--copper); } }
+
+  .rxbox { border:1px solid var(--border); border-radius:14px; background:var(--card); padding:12px 13px; margin-top:10px; font-size:12.5px; }
+  .rxbox .h { font-size:11px; font-weight:800; color:var(--ink-dim); letter-spacing:.04em; margin-bottom:5px; }
+  .rxbox .l { margin-bottom:7px; }
+  .rxbox .l:last-child { margin-bottom:0; }
+  .rxbox b { color:var(--ink-dim); font-weight:800; }
+
+  .note { font-size:12px; color:var(--ink-dim); margin-top:18px; line-height:1.7; }
+  .note a { color:var(--jade); font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Design Preview · test-mvp</p>
+  <h1>3D 인체 모델 — 경혈 · 장부</h1>
+  <p class="sub">
+    변증을 고르면 주혈과 배혈이 몸 표면 제자리에 표시됩니다. 혈을 누르면 특정혈 분류·취혈·자침 방향과 깊이·주치·금기가 나옵니다.
+    장부 보기를 켜면 몸이 비쳐 보이며 오장육부가 제 위치에 나타납니다. 끌어서 자유롭게 돌려 보세요.
+  </p>
+
+  <div class="app">
+    <div class="app-top">
+      <span class="dot"></span>
+      <span class="name">한의사 대시보드 · 3D 인체 모델</span>
+      <span class="who">이서연 님 · 공유된 변증 결과</span>
+    </div>
+
+    <div class="sect">
+      <div class="label">보기</div>
+      <div class="chips" id="modes"></div>
+    </div>
+
+    <div class="sect" id="patsect">
+      <div class="label">변증</div>
+      <div class="chips" id="pats"></div>
+      <div class="rxbox" id="rx"></div>
+    </div>
+
+    <div class="sect">
+      <div class="grid">
+        <div>
+          <div class="stage">
+            <canvas id="cv"></canvas>
+            <div class="hud br" id="axis"></div>
+            <div class="hud bl">끌어서 회전 · 휠로 확대 · 점을 눌러 상세보기</div>
+          </div>
+          <div class="bar">
+            <button class="btn" data-view="front">정면</button>
+            <button class="btn" data-view="back">후면</button>
+            <button class="btn" data-view="left">좌측</button>
+            <button class="btn" data-view="right">우측</button>
+            <button class="btn" id="spin">자동 회전</button>
+            <button class="btn" id="zin">＋</button>
+            <button class="btn" id="zout">－</button>
+            <button class="btn" id="reset">초기화</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="label" id="listlabel"></div>
+          <div class="rows" id="rows"></div>
+          <div class="card" id="detail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    한의사용 참고 자료이며 처방이 아닙니다. 취혈·자침 여부와 깊이는 환자를 직접 보고 한의사가 판단합니다.<br>
+    자침 깊이는 성인 표준 기준이며 체형·부위 두께에 따라 달라집니다. 촌(寸)은 환자 자신의 손가락 너비를 기준으로 다시 재야 합니다.<br>
+    <a href="./acupoint-guide-preview.html">2D 경혈 가이드</a> ·
+    <a href="./practitioner-inbox-preview.html">한의사 수신함</a> ·
+    <a href="./pattern-finder-preview.html">환자 화면</a>
+  </p>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ═══ 경혈 ════════════════════════════════════════════════════════════════
+  // cls  특정혈 분류 (원혈·모혈·배수혈·팔회혈 등) — 배혈의 근거가 된다
+  // nd   자침 방향과 깊이 (성인 표준)
+  // moxa 뜸 적응
+  // ind  주치
+  // warn 금기·주의
+  const P = {
+    GV20:{ko:'백회',han:'百會',m:'독맥',cls:'삼양경·독맥 교회혈',
+      loc:'두정부 정중선, 양 귀끝을 이은 선과 만나는 곳',
+      nd:'평자(뒤로 눕혀) 0.5~0.8촌',moxa:'가능 — 승양거함에 뜸',
+      ind:'기운이 아래로 처지는 느낌, 어지럼, 두통, 건망, 탈항 등 중기하함',
+      pos:{t:'X',at:[[210,64,-4]]}},
+    CV17:{ko:'전중',han:'膻中',m:'임맥',cls:'심포의 모혈 · 팔회혈(氣會)',
+      loc:'전정중선, 양 젖꼭지를 이은 선의 가운데(제4늑간 높이)',
+      nd:'평자(횡자) 0.3~0.5촌',moxa:'가능',
+      ind:'가슴 답답함, 한숨, 늑간 통증, 기침, 젖 분비 부족',
+      warn:'흉골 위 자리라 직자하지 않는다.',
+      pos:{t:'T',y:268,x:0,f:'F'}},
+    CV12:{ko:'중완',han:'中脘',m:'임맥',cls:'위의 모혈 · 팔회혈(腑會)',
+      loc:'전정중선, 배꼽 위 4촌 (배꼽과 흉골검상돌기의 중간)',
+      nd:'직자 1~1.5촌',moxa:'가능 — 허한증에 좋다',
+      ind:'위통, 더부룩함, 구역, 식욕부진, 소화불량 전반',
+      pos:{t:'T',y:319,x:0,f:'F'}},
+    ST25:{ko:'천추',han:'天樞',m:'위경',cls:'대장의 모혈',
+      loc:'배꼽 옆 2촌',
+      nd:'직자 1~1.5촌',moxa:'가능',
+      ind:'설사와 변비 양쪽, 복통, 장명, 월경부조',
+      pos:{t:'T',y:356,x:18,f:'F'}},
+    CV6:{ko:'기해',han:'氣海',m:'임맥',cls:'황(肓)의 원혈로 보는 요혈',
+      loc:'전정중선, 배꼽 아래 1.5촌',
+      nd:'직자 1~1.5촌',moxa:'가능 — 보기의 대표 뜸자리',
+      ind:'기운 없음, 무력감, 복부 냉통, 유뇨, 월경부조',
+      warn:'임신부는 하복부 자침을 피한다.',
+      pos:{t:'T',y:370,x:0,f:'F'}},
+    CV4:{ko:'관원',han:'關元',m:'임맥',cls:'소장의 모혈 · 족삼음경과 임맥의 교회혈',
+      loc:'전정중선, 배꼽 아래 3촌',
+      nd:'직자 1~1.5촌 (배뇨 후 자침)',moxa:'가능 — 온보의 대표 뜸자리',
+      ind:'원기 부족, 하복 냉증, 소변 이상, 월경통, 양위',
+      warn:'임신부 금침. 방광이 찬 상태에서 깊이 찌르지 않는다.',
+      pos:{t:'T',y:384,x:0,f:'F'}},
+    CV3:{ko:'중극',han:'中極',m:'임맥',cls:'방광의 모혈',
+      loc:'전정중선, 배꼽 아래 4촌',
+      nd:'직자 1~1.5촌 (반드시 배뇨 후)',moxa:'가능',
+      ind:'소변 불리, 빈뇨, 유뇨, 월경 이상',
+      warn:'임신부 금침. 방광 충만 시 자침 금지.',
+      pos:{t:'T',y:393,x:0,f:'F'}},
+    LR14:{ko:'기문',han:'期門',m:'간경',cls:'간의 모혈',
+      loc:'유두 직하 제6늑간',
+      nd:'사자 또는 평자 0.5~0.8촌',moxa:'가능',
+      ind:'옆구리 결림과 통증, 가슴 답답함, 한숨, 스트레스성 소화장애',
+      warn:'아래에 간과 폐가 있어 직자·심자 금지 — 반드시 눕혀 찌른다.',
+      pos:{t:'T',y:290,x:38,f:'F'}},
+    GV14:{ko:'대추',han:'大椎',m:'독맥',cls:'수족 삼양경과 독맥의 교회혈',
+      loc:'제7경추 극돌기 아래 오목한 곳',
+      nd:'사자(위쪽으로) 0.5~1촌',moxa:'가능',
+      ind:'오한발열, 목·어깨 결림, 양기 부족, 만성 피로',
+      warn:'깊이 직자하면 척수강에 닿을 수 있어 방향을 지킨다.',
+      pos:{t:'T',y:205,x:0,f:'B'}},
+    GV4:{ko:'명문',han:'命門',m:'독맥',cls:'신양의 근본 자리',
+      loc:'제2요추 극돌기 아래',
+      nd:'직자 또는 약간 위로 사자 0.5~1촌',moxa:'가능 — 온양의 대표 뜸자리',
+      ind:'허리 시림과 무력, 하지 냉감, 유정, 만성 설사',
+      pos:{t:'T',y:356,x:0,f:'B'}},
+    BL13:{ko:'폐수',han:'肺兪',m:'방광경',cls:'폐의 배수혈',
+      loc:'제3흉추 극돌기 아래 옆 1.5촌',
+      nd:'사자(척추 쪽으로) 0.5~0.8촌',moxa:'가능',
+      ind:'기침, 숨참, 감기 잦음, 자한, 피부 문제',
+      warn:'직자·심자하면 기흉 위험 — 반드시 비스듬히.',
+      pos:{t:'T',y:240,x:14,f:'B'}},
+    BL17:{ko:'격수',han:'膈兪',m:'방광경',cls:'팔회혈(血會)',
+      loc:'제7흉추 극돌기 아래 옆 1.5촌',
+      nd:'사자 0.5~0.8촌',moxa:'가능',
+      ind:'혈허와 어혈 모두, 딸꾹질, 도한, 만성 출혈성 질환',
+      warn:'직자·심자 시 기흉 위험.',
+      pos:{t:'T',y:282,x:14,f:'B'}},
+    BL18:{ko:'간수',han:'肝兪',m:'방광경',cls:'간의 배수혈',
+      loc:'제9흉추 극돌기 아래 옆 1.5촌',
+      nd:'사자 0.5~0.8촌',moxa:'가능',
+      ind:'옆구리 통증, 눈 침침함, 짜증과 화, 어지럼',
+      warn:'직자·심자 시 기흉 위험.',
+      pos:{t:'T',y:302,x:14,f:'B'}},
+    BL20:{ko:'비수',han:'脾兪',m:'방광경',cls:'비의 배수혈',
+      loc:'제11흉추 극돌기 아래 옆 1.5촌',
+      nd:'사자 0.5~0.8촌',moxa:'가능 — 뜸을 즐겨 쓴다',
+      ind:'식욕부진, 무른 변, 몸이 무거움, 부종, 기혈 생성 부족',
+      pos:{t:'T',y:322,x:14,f:'B'}},
+    BL21:{ko:'위수',han:'胃兪',m:'방광경',cls:'위의 배수혈',
+      loc:'제12흉추 극돌기 아래 옆 1.5촌',
+      nd:'사자 0.5~0.8촌',moxa:'가능',
+      ind:'위통, 더부룩함, 구역, 소화불량',
+      pos:{t:'T',y:332,x:14,f:'B'}},
+    BL23:{ko:'신수',han:'腎兪',m:'방광경',cls:'신의 배수혈',
+      loc:'제2요추 극돌기 아래 옆 1.5촌 (명문과 같은 높이)',
+      nd:'직자 0.8~1.2촌',moxa:'가능',
+      ind:'허리 시큰함, 이명, 소변 이상, 하지 무력 — 신음·신양 모두',
+      pos:{t:'T',y:356,x:14,f:'B'}},
+    BL25:{ko:'대장수',han:'大腸兪',m:'방광경',cls:'대장의 배수혈',
+      loc:'제4요추 극돌기 아래 옆 1.5촌',
+      nd:'직자 0.8~1.2촌',moxa:'가능',
+      ind:'요통, 변비와 설사, 하지 방산통',
+      pos:{t:'T',y:376,x:14,f:'B'}},
+    PC6:{ko:'내관',han:'內關',m:'심포경',cls:'낙혈 · 팔맥교회혈(음유맥)',
+      loc:'손목 주름 위 2촌, 장장근건과 요측수근굴근건 사이',
+      nd:'직자 0.5~1촌',moxa:'가능',
+      ind:'가슴 답답함, 두근거림, 구역과 구토, 불안·불면, 위통',
+      pos:{t:'L',c:'arm',y:413,a:0.62}},
+    HT6:{ko:'음극',han:'陰郄',m:'심경',cls:'극혈(郄穴)',
+      loc:'손목 주름 위 0.5촌, 척측수근굴근건 요측',
+      nd:'직자 0.3~0.5촌',moxa:'가능',
+      ind:'도한(밤 식은땀), 두근거림, 갑작스러운 가슴 통증',
+      pos:{t:'L',c:'arm',y:426,a:0.85}},
+    HT7:{ko:'신문',han:'神門',m:'심경',cls:'수혈 · 원혈',
+      loc:'손목 주름 척측 끝, 두상골 위쪽 오목한 곳',
+      nd:'직자 0.3~0.5촌',moxa:'가능',
+      ind:'불면, 잘 놀람, 건망, 가슴 두근거림',
+      pos:{t:'L',c:'arm',y:430,a:0.90}},
+    LI4:{ko:'합곡',han:'合谷',m:'대장경',cls:'원혈 · 사관혈',
+      loc:'손등 제1·2중수골 사이, 제2중수골 중점 요측',
+      nd:'직자 0.5~1촌',moxa:'가능',
+      ind:'두통, 안면 통증, 치통, 감기, 기체 전반 — 기혈 소통의 요혈',
+      warn:'임신 중 금침 — 자궁 수축을 유발할 수 있다.',
+      pos:{t:'L',c:'hand',y:448,a:-0.45}},
+    SP10:{ko:'혈해',han:'血海',m:'비경',
+      loc:'무릎뼈 안쪽 위 모서리에서 위로 2촌, 대퇴사두근 내측두 융기',
+      nd:'직자 1~1.5촌',moxa:'가능',
+      ind:'월경 이상, 피부 가려움과 두드러기, 혈허·어혈 전반',
+      pos:{t:'L',c:'leg',y:516,a:0.78}},
+    GB34:{ko:'양릉천',han:'陽陵泉',m:'담경',cls:'합혈 · 팔회혈(筋會) · 담의 하합혈',
+      loc:'종아리 바깥, 비골두 앞아래 오목한 곳',
+      nd:'직자 1~1.5촌',moxa:'가능',
+      ind:'옆구리 통증, 입쓴맛, 근육 경직과 결림, 하지 마비',
+      pos:{t:'L',c:'leg',y:567,a:0.12}},
+    ST36:{ko:'족삼리',han:'足三里',m:'위경',cls:'합혈 · 위의 하합혈 · 사총혈',
+      loc:'독비 아래 3촌, 경골 앞능선에서 바깥으로 한 손가락',
+      nd:'직자 1~2촌',moxa:'가능 — 보익의 대표 뜸자리',
+      ind:'모든 소화기 증상, 기혈 부족, 피로, 하지 무력 — 최고의 보익혈',
+      pos:{t:'L',c:'leg',y:576,a:0.30}},
+    SP9:{ko:'음릉천',han:'陰陵泉',m:'비경',cls:'합혈',
+      loc:'경골 내측과 아래 오목한 곳',
+      nd:'직자 1~2촌',moxa:'가능',
+      ind:'부종, 소변 불리, 설사, 무릎 통증 — 습을 빼는 요혈',
+      pos:{t:'L',c:'leg',y:567,a:0.85}},
+    ST40:{ko:'풍륭',han:'豐隆',m:'위경',cls:'낙혈',
+      loc:'외과첨 위 8촌, 경골 앞능선에서 바깥으로 두 손가락',
+      nd:'직자 1~1.5촌',moxa:'가능',
+      ind:'가래, 기침, 어지럼, 머리 무거움, 가슴 답답함 — 화담의 요혈',
+      pos:{t:'L',c:'leg',y:624,a:0.15}},
+    SP6:{ko:'삼음교',han:'三陰交',m:'비경',cls:'족삼음경 교회혈',
+      loc:'내과첨 위 3촌, 경골 내측연 뒤',
+      nd:'직자 1~1.5촌',moxa:'가능',
+      ind:'월경 이상, 불면, 소화불량, 소변 이상 — 간·비·신을 함께 다스린다',
+      warn:'임신 중 금침.',
+      pos:{t:'L',c:'leg',y:671,a:0.95}},
+    KI7:{ko:'부류',han:'復溜',m:'신경',cls:'경혈(經穴)',
+      loc:'태계 위 2촌, 아킬레스건 앞',
+      nd:'직자 0.5~1촌',moxa:'가능',
+      ind:'도한과 자한, 부종, 설사 — 땀 조절의 요혈',
+      pos:{t:'L',c:'leg',y:681,a:1.12}},
+    KI3:{ko:'태계',han:'太谿',m:'신경',cls:'수혈 · 원혈',
+      loc:'내과첨과 아킬레스건 사이 오목한 곳',
+      nd:'직자 0.5~0.8촌',moxa:'가능',
+      ind:'이명, 어지럼, 허리 시큰함, 불면, 목마름 — 신음·신양의 뿌리',
+      pos:{t:'L',c:'leg',y:700,a:1.15}},
+    KI6:{ko:'조해',han:'照海',m:'신경',cls:'팔맥교회혈(음교맥)',
+      loc:'내과첨 아래 오목한 곳',
+      nd:'직자 0.3~0.5촌',moxa:'가능',
+      ind:'인후 건조, 목 이물감, 불면, 변비 — 음을 적신다',
+      pos:{t:'L',c:'foot',y:712,a:1.00}},
+    LR3:{ko:'태충',han:'太衝',m:'간경',cls:'수혈 · 원혈 · 사관혈',
+      loc:'발등 제1·2중족골 사이, 접합부 앞 오목한 곳',
+      nd:'직자 0.5~0.8촌',moxa:'가능',
+      ind:'두통, 어지럼, 눈 충혈, 짜증과 화, 옆구리 통증, 월경 이상',
+      pos:{t:'L',c:'foot',y:730,a:0.50}},
+    SP3:{ko:'태백',han:'太白',m:'비경',cls:'수혈 · 원혈',
+      loc:'제1중족골두 뒤아래 적백육제',
+      nd:'직자 0.3~0.5촌',moxa:'가능',
+      ind:'복부 더부룩함, 무른 변, 몸 무거움, 식욕부진',
+      pos:{t:'L',c:'foot',y:734,a:0.85}},
+  };
+
+  // ═══ 변증 ════════════════════════════════════════════════════════════════
+  const PATTERNS = [
+    { ko:'기허', han:'氣虛', pct:62,
+      sx:'움직이면 심해지는 피로, 기운 없는 목소리, 식욕 저하, 조금만 움직여도 나는 땀',
+      tongue:'담백설(淡白舌), 설변 치흔, 태 박백', pulse:'허(虛)·약(弱)',
+      rule:'보기건비(補氣健脾) — 비위를 세워 기를 만든다',
+      method:'보법 위주. 침보다 뜸을 넉넉히 쓴다.',
+      main:['ST36','CV6','BL20'],
+      sup:[['CV12','위기를 고른다'],['SP3','비의 원혈로 비기를 세운다'],['BL21','위수와 짝지어 중초를 돕는다'],['GV20','기운이 처질 때 승양']],
+      pair:'유모배혈 — 비수(배수혈) + 중완(위의 모혈)으로 앞뒤에서 중초를 잡는다.',
+      mod:[['숨차고 감기가 잦으면','폐수 BL13 추가'],['설사가 잦으면','천추 ST25 추가'],['탈항·장기 하수감이 있으면','백회 GV20에 뜸']] },
+
+    { ko:'양허', han:'陽虛', pct:0,
+      sx:'추위를 많이 탐, 손발 냉, 따뜻한 것을 찾음, 새벽 설사, 소변이 맑고 잦음',
+      tongue:'담반대설(淡胖大舌), 태 백활', pulse:'침(沈)·지(遲)·무력',
+      rule:'온보신양(溫補腎陽) — 아랫배와 허리를 덥힌다',
+      method:'뜸이 주가 된다. 관원·기해에 격강구나 온침을 고려.',
+      main:['CV4','GV4','BL23'],
+      sup:[['CV6','원기를 함께 북돋운다'],['ST36','후천의 기를 보태 선천을 돕는다'],['KI3','신의 원혈로 뿌리를 잡는다']],
+      pair:'신수(배수혈) + 명문(독맥)을 같은 높이에서 함께 잡아 신양을 덥힌다.',
+      mod:[['새벽 설사가 있으면','천추 ST25·비수 BL20 추가'],['소변이 잦고 참기 어려우면','중극 CV3 추가'],['임신 중이면','관원·중극 자침 금지 — 뜸도 피한다']] },
+
+    { ko:'음허', han:'陰虛', pct:0,
+      sx:'밤 식은땀, 입마름, 저녁에 달아오르는 열감, 손발바닥 번열, 얕은 잠',
+      tongue:'홍설(紅舌), 태가 적거나 없음', pulse:'세(細)·삭(數)',
+      rule:'자음강화(滋陰降火) — 음을 적시고 허열을 내린다',
+      method:'침 보법 위주. 뜸은 신중히 — 허열을 더 부추길 수 있다.',
+      main:['KI3','SP6','BL23'],
+      sup:[['KI6','음교맥을 열어 인후·수면을 돕는다'],['KI7','음극과 짝지어 도한을 멎게 한다'],['HT6','심경 극혈 — 도한의 특효'],['BL18','간음을 함께 채운다']],
+      pair:'부류 KI7 + 음극 HT6 — 도한을 멎게 하는 고전적 대증 배합.',
+      mod:[['불면과 두근거림이 심하면','신문 HT7 추가'],['눈이 침침하고 어지러우면','간수 BL18·태충 LR3 추가'],['목이 마르고 이물감이 있으면','조해 KI6 위주']] },
+
+    { ko:'습담', han:'濕痰', pct:24,
+      sx:'몸과 머리가 무거움, 식후 더부룩함, 끈적한 변, 가래, 습한 날 악화',
+      tongue:'반대설, 태 후니(厚膩)', pulse:'활(滑)·유(濡)',
+      rule:'건비화담(健脾化痰) — 비를 세우고 습담을 삭인다',
+      method:'평보평사. 담이 성하면 풍륭에 사법.',
+      main:['ST40','SP9','CV12'],
+      sup:[['ST36','비위를 세워 담이 생기는 근원을 막는다'],['BL20','비의 배수혈'],['SP6','습을 아래로 뺀다'],['SP3','비의 원혈']],
+      pair:'풍륭(화담) + 음릉천(이수) — 이미 생긴 담을 삭이고 습을 함께 뺀다.',
+      mod:[['가슴 답답하고 구역이 있으면','내관 PC6 추가'],['부종이 뚜렷하면','음릉천 SP9 위주로 사법'],['머리가 무겁고 어지러우면','백회 GV20 추가']] },
+
+    { ko:'간기울결', han:'肝氣鬱結', pct:0,
+      sx:'스트레스에 따른 증상 기복, 가슴·옆구리 답답함, 한숨, 짜증, 목 이물감',
+      tongue:'담홍설, 태 박백', pulse:'현(弦)',
+      rule:'소간해울(疏肝解鬱) — 막힌 기를 흐르게 한다',
+      method:'사법 위주. 태충은 아래로 향해 기를 내린다.',
+      main:['LR3','LI4','LR14'],
+      sup:[['CV17','기회혈 — 가슴의 기를 편다'],['PC6','가슴 답답함과 구역'],['BL18','간의 배수혈'],['GB34','옆구리 통증과 근 경직']],
+      pair:'사관(四關) — 합곡 LI4 + 태충 LR3. 상하·기혈을 함께 소통시키는 대표 배합.',
+      mod:[['소화가 막히면','중완 CV12·족삼리 ST36 추가'],['목 이물감이 뚜렷하면','조해 KI6 추가'],['임신 중이면','합곡·삼음교 금침 — 태충 위주로']] },
+
+    { ko:'어혈', han:'瘀血', pct:0,
+      sx:'한 자리에 고정된 자통, 밤에 심해짐, 어둡고 칙칙한 안색, 설하정맥 확장',
+      tongue:'자암설(紫暗舌) 또는 어반', pulse:'삽(澀)',
+      rule:'활혈화어(活血化瘀) — 뭉친 혈을 풀어 통증을 없앤다',
+      method:'사법. 완고하면 자락(刺絡)이나 부항을 병행.',
+      main:['BL17','SP10','LR3'],
+      sup:[['SP6','혈을 아래에서 돌린다'],['LI4','태충과 짝지어 기를 돌려 혈을 움직인다'],['GB34','근이 굳은 통증에']],
+      pair:'격수(혈회) + 혈해 — 혈을 다스리는 두 축. 기가 돌아야 혈이 돌므로 사관을 더한다.',
+      mod:[['통증이 극심하면','아시혈에 자락 부항 병행'],['한랭으로 악화되면','국소에 온침이나 뜸'],['임신 중이면','활혈 자체를 신중히 — 삼음교·합곡 금침']] },
+
+    { ko:'혈허', han:'血虛', pct:0,
+      sx:'일어설 때 어지럼, 창백한 안색과 입술, 눈 침침함, 잠들기 어려움, 손발 저림',
+      tongue:'담백설', pulse:'세(細)·무력',
+      rule:'보혈양혈(補血養血) — 혈을 만들고 갈무리한다',
+      method:'보법. 혈을 만드는 비위를 함께 돌본다.',
+      main:['SP10','BL17','ST36'],
+      sup:[['BL20','혈을 만드는 비를 세운다'],['BL18','간이 혈을 갈무리하게 한다'],['SP6','간·비·신을 함께'],['HT7','불면과 두근거림']],
+      pair:'격수(혈회) + 비수(생혈) + 간수(장혈) — 만들고 저장하는 축을 함께 잡는다.',
+      mod:[['불면이 심하면','신문 HT7·내관 PC6 추가'],['월경량이 적으면','관원 CV4 추가'],['어지럼이 심하면','백회 GV20에 뜸']] },
+  ];
+
+  // ═══ 장부 ════════════════════════════════════════════════════════════════
+  const ORGANS = [
+    { id:'lung', ko:'폐', han:'肺', color:'#D7A3AA',
+      e:[[173,250,0,31,44,25],[247,250,0,31,44,25]],
+      fn:'기를 주관하고 호흡을 다스린다. 피부와 땀 조절, 수액의 상원(上源).',
+      pat:'기허 · 음허', pts:'폐수 BL13 · 태연 LU9 · 열결 LU7',
+      note:'폐 위를 지나는 배수혈은 비스듬히 찔러 기흉을 피한다.' },
+    { id:'heart', ko:'심', han:'心', color:'#C5544F',
+      e:[[201,266,10,25,28,19]],
+      fn:'혈맥을 주관하고 정신(神)을 간직한다.',
+      pat:'혈허 · 음허', pts:'신문 HT7 · 내관 PC6 · 음극 HT6' },
+    { id:'liver', ko:'간', han:'肝', color:'#8B5747',
+      e:[[181,304,6,33,22,22]],
+      fn:'소설(疏泄)을 주관해 기를 소통시키고, 혈을 갈무리한다. 눈과 근에 통한다.',
+      pat:'간기울결 · 혈허 · 어혈', pts:'태충 LR3 · 기문 LR14 · 간수 BL18',
+      note:'기문은 간 위에 있어 직자·심자를 피한다.' },
+    { id:'gb', ko:'담', han:'膽', color:'#7E9E58',
+      e:[[186,320,15,11,9,9]],
+      fn:'담즙을 저장하고 결단을 주관한다.',
+      pat:'간기울결', pts:'양릉천 GB34 · 담수 BL19' },
+    { id:'stomach', ko:'위', han:'胃', color:'#C4964F',
+      e:[[229,318,6,25,23,16]],
+      fn:'음식을 받아들여 삭인다(수납·부숙).',
+      pat:'기허 · 습담', pts:'중완 CV12 · 족삼리 ST36 · 위수 BL21' },
+    { id:'spleen', ko:'비', han:'脾', color:'#9C6C88',
+      e:[[251,302,-5,14,19,12]],
+      fn:'운화를 주관해 기혈을 만들고, 혈을 통섭하며 사지와 기육을 채운다.',
+      pat:'기허 · 습담 · 혈허', pts:'족삼리 ST36 · 비수 BL20 · 태백 SP3' },
+    { id:'kidney', ko:'신', han:'腎', color:'#5A7E9E',
+      e:[[186,352,-15,13,19,9],[234,352,-15,13,19,9]],
+      fn:'정(精)을 간직하고 뼈·골수·생식을 주관한다. 음양의 뿌리.',
+      pat:'양허 · 음허', pts:'태계 KI3 · 신수 BL23 · 명문 GV4' },
+    { id:'li', ko:'대장', han:'大腸', color:'#AE886A',
+      e:[[180,372,11,11,32,10],[240,372,11,11,32,10],[210,340,13,31,10,9]],
+      fn:'전도(傳導)를 주관해 찌꺼기를 내보낸다.',
+      pat:'습담 · 양허', pts:'천추 ST25 · 합곡 LI4 · 대장수 BL25' },
+    { id:'si', ko:'소장', han:'小腸', color:'#C6A88A',
+      e:[[210,376,10,35,25,15]],
+      fn:'맑고 흐린 것을 갈라낸다(비별청탁).',
+      pat:'기허', pts:'관원 CV4 · 소장수 BL27' },
+    { id:'bladder', ko:'방광', han:'膀胱', color:'#6893A8',
+      e:[[210,396,10,17,13,11]],
+      fn:'진액을 저장했다가 기화시켜 내보낸다.',
+      pat:'양허', pts:'중극 CV3 · 방광수 BL28 · 위중 BL40' },
+  ];
+
+  // ═══ 인체 ════════════════════════════════════════════════════════════════
+  // 서 있는 성인 비율(약 7두신)에 맞춘 뼈대 높이 —
+  //   정수리 60 · 턱 156 · 어깨 212 · 유두 268 · 배꼽 356 · 치골 402
+  //   · 무릎 548 · 복사뼈 700 · 발바닥 744   (치골이 전신의 정중간에 온다)
+  // 각 부위를 높이별 단면표 [y, 중심 x오프셋, 중심 z, 반지름 x, 반지름 z]로 적고,
+  // 같은 표를 메시 생성과 경혈 배치에 함께 쓴다. 그래서 몸매를 고쳐도 경혈은
+  // 언제나 살갗 위에 남는다.
+  const COL = {
+    head:[[62,0,-4,5,6],[68,0,-4,18,20],[77,0,-3,29,34],[88,0,-2,37,43],
+          [100,0,-2,41,47],[114,0,-2,40,46],[127,0,-1,36,42],[139,0,1,30,36],
+          [149,0,2,23,28],[158,0,2,17,21]],
+    neck:[[152,0,-2,18,19],[176,0,-3,20,21],[202,0,-2,28,26]],
+    torso:[[198,0,0,46,25],[212,0,0,78,28],[230,0,0,76,30],[250,0,0,74,31],
+           [268,0,0,72,31],[290,0,0,68,30],[312,0,0,62,28],[332,0,0,57,26],
+           [356,0,0,58,27],[376,0,0,64,29],[396,0,0,70,31],[414,0,0,70,31],
+           [430,0,0,66,29],[442,0,0,56,24]],
+    arm:[[208,72,0,21,23],[232,79,0,20,22],[260,85,0,18,20],[300,91,0,16,17],
+         [330,95,0,13,14],[360,99,0,14,15],[400,105,0,11,12],[430,109,0,9,10]],
+    hand:[[430,109,0,9,10],[440,111,1,12,7],[458,112,1,12,7],[470,112,1,6,4]],
+    leg:[[394,32,0,35,35],[440,33,0,32,33],[480,34,0,29,30],[520,35,0,25,27],
+         [548,36,0,22,24],[570,36,0,23,25],[610,36,0,22,25],[650,36,0,16,18],
+         [690,36,0,12,13],[706,36,1,11,12]],
+    foot:[[702,36,0,11,12],[716,36,6,12,18],[732,36,13,12,27],[744,36,15,9,25],
+          [748,36,14,4,14]],
+  };
+  const BACKFLAT = 0.86;   // 등은 앞보다 납작하다
+
+  function sample(col, y) {
+    const T = COL[col], n = T.length;
+    if (y <= T[0][0]) return T[0];
+    if (y >= T[n - 1][0]) return T[n - 1];
+    for (let i = 0; i < n - 1; i++) {
+      const a = T[i], b = T[i + 1];
+      if (y <= b[0]) {
+        const k = (y - a[0]) / (b[0] - a[0]);
+        return [y, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k,
+                a[3] + (b[3] - a[3]) * k, a[4] + (b[4] - a[4]) * k];
+      }
+    }
+    return T[n - 1];
+  }
+  // 단면 위의 한 점. ang = 0 바깥쪽, π/2 앞, π 안쪽, -π/2 뒤 (오른쪽 기준)
+  function surf(col, y, ang, s) {
+    const r = sample(col, y);
+    const si = Math.sin(ang);
+    return [210 + s * r[1] + r[3] * Math.cos(ang) * s,
+            y,
+            r[2] + r[4] * si * (si < 0 ? BACKFLAT : 1)];
+  }
+
+  const VTX = [], FACE = [];
+  const V = (x, y, z) => (VTX.push({ x, y, z }), VTX.length - 1);
+  function ringAt(col, y, s, n) {
+    const idx = [];
+    for (let i = 0; i < n; i++) {
+      const [x, , z] = surf(col, y, i / n * Math.PI * 2, s);
+      idx.push(V(x, y, z));
+    }
+    return idx;
+  }
+  function loft(rings, col, kind, id) {
+    for (let r = 0; r < rings.length - 1; r++) {
+      const a = rings[r], b = rings[r + 1], n = a.length;
+      for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        FACE.push({ v: [a[i], a[j], b[j], b[i]], col, kind, id });
+      }
+    }
+  }
+  const SKIN = '#D8C3A8';
+  function build(col, s, n, steps) {
+    const T = COL[col], rings = [];
+    for (let i = 0; i < T.length - 1; i++) {
+      for (let k = 0; k < steps; k++) {
+        rings.push(ringAt(col, T[i][0] + (T[i + 1][0] - T[i][0]) * k / steps, s, n));
+      }
+    }
+    rings.push(ringAt(col, T[T.length - 1][0], s, n));
+    loft(rings, SKIN, 'body');
+  }
+  build('head', 1, 20, 2); build('neck', 1, 16, 2); build('torso', 1, 24, 2);
+  for (const s of [1, -1]) {
+    build('arm', s, 14, 2); build('hand', s, 12, 2);
+    build('leg', s, 16, 2); build('foot', s, 14, 2);
+  }
+
+  // 경혈을 단면표 위에 얹는다 — 좌우 한 쌍인 혈은 양쪽에 놓인다.
+  function onTorso(y, xoff, front) {
+    const r = sample('torso', y);
+    const c = Math.max(-1, Math.min(1, xoff / r[3]));
+    const si = (front ? 1 : -1) * Math.sqrt(1 - c * c);
+    return [210 + xoff, y, r[2] + r[4] * si * (si < 0 ? BACKFLAT : 1)];
+  }
+  for (const pt of Object.values(P)) {
+    const q = pt.pos;
+    if (q.t === 'X') pt.at = q.at;
+    else if (q.t === 'T') {
+      pt.at = q.x
+        ? [onTorso(q.y, -q.x, q.f === 'F'), onTorso(q.y, q.x, q.f === 'F')]
+        : [onTorso(q.y, 0, q.f === 'F')];
+    } else {
+      const r = surf(q.c, q.y, q.a * Math.PI, 1);
+      pt.at = [[420 - r[0], r[1], r[2]], r];
+    }
+  }
+
+  function ellipsoid(cx, cy, cz, rx, ry, rz, col, kind, id, nu = 12, nv = 8) {
+    const rings = [];
+    for (let j = 0; j <= nv; j++) {
+      const phi = j / nv * Math.PI, y = cy - ry * Math.cos(phi);
+      const a = rx * Math.sin(phi), b = rz * Math.sin(phi), idx = [];
+      for (let i = 0; i < nu; i++) {
+        const t = i / nu * Math.PI * 2;
+        idx.push(V(cx + a * Math.cos(t), y, cz + b * Math.sin(t)));
+      }
+      rings.push(idx);
+    }
+    loft(rings, col, kind, id);
+  }
+  for (const o of ORGANS) {
+    for (const [x, y, z, rx, ry, rz] of o.e) ellipsoid(x, y, z, rx, ry, rz, o.color, 'organ', o.id);
+  }
+
+  // ═══ 상태 · 렌더 ═════════════════════════════════════════════════════════
+  const CX = 210, CY = 400, FOCAL = 1250;
+  let yaw = 0, pitch = -0.05, zoom = 1, patIdx = 0;
+  let showPoints = true, showOrgans = false, spinning = false;
+  let selPoint = null, selOrgan = null, hits = [];
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  let W = 0, H = 0;
+  const TV = new Float32Array(VTX.length * 3);   // 변환된 정점
+  const PS = new Float32Array(VTX.length * 3);   // 화면 좌표 + 배율
+
+  function activePoints() {
+    const p = PATTERNS[patIdx];
+    return [...p.main.map(c => [c, true]), ...p.sup.map(([c]) => [c, false])];
+  }
+
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = cv.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function project(x, y, z) {
+    const dx = x - CX, dy = y - CY;
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    const x1 = dx * cy + z * sy, z1 = -dx * sy + z * cy;
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const y1 = dy * cp - z1 * sp, z2 = dy * sp + z1 * cp;
+    const base = Math.min(W / 470, H / 830) * zoom;
+    const s = FOCAL / (FOCAL - z2) * base;
+    return [W / 2 + x1 * s, H / 2 + y1 * s, z2, s];
+  }
+
+  let pending = false;
+  function scheduleDraw() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => { pending = false; draw(); });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < VTX.length; i++) {
+      const v = VTX[i], p = project(v.x, v.y, v.z);
+      PS[i * 3] = p[0]; PS[i * 3 + 1] = p[1]; PS[i * 3 + 2] = p[2];
+    }
+
+    const order = [];
+    for (let f = 0; f < FACE.length; f++) {
+      const fa = FACE[f];
+      if (fa.kind === 'organ' && !showOrgans) continue;
+      let z = 0;
+      for (const vi of fa.v) z += PS[vi * 3 + 2];
+      order.push({ f, z: z / fa.v.length, kind: fa.kind });
+    }
+    if (showPoints) {
+      activePoints().forEach(([code], i) => {
+        const pt = P[code]; if (!pt) return;
+        for (const [x, y, z] of pt.at) {
+          const p = project(x, y, z);
+          order.push({ kind: 'pt', z: p[2] + 7, sx: p[0], sy: p[1], s: p[3], code, n: i + 1 });
+        }
+      });
+    }
+    order.sort((a, b) => a.z - b.z);
+
+    const L = [0.42, -0.58, 0.70];
+    const bodyAlpha = showOrgans ? 0.20 : 1;
+    hits = [];
+
+    for (const it of order) {
+      if (it.kind === 'pt') {
+        const main = PATTERNS[patIdx].main.includes(it.code);
+        const sel = selPoint === it.code;
+        const r = Math.max(5.5, 9.5 * it.s);
+        ctx.globalAlpha = .85;
+        ctx.beginPath(); ctx.arc(it.sx, it.sy, r * 1.8, 0, 6.2832);
+        ctx.fillStyle = sel ? 'rgba(47,90,75,.28)' : main ? 'rgba(226,140,116,.30)' : 'rgba(120,140,130,.26)';
+        ctx.fill(); ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(it.sx, it.sy, r, 0, 6.2832);
+        ctx.fillStyle = sel ? '#2F5A4B' : main ? '#D9603F' : '#8AA093';
+        ctx.fill();
+        ctx.lineWidth = 1.7; ctx.strokeStyle = '#fff'; ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = `800 ${Math.max(8.5, r * 1.02)}px system-ui,sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(String(it.n), it.sx, it.sy + .5);
+        hits.push({ kind: 'point', id: it.code, x: it.sx, y: it.sy, r: r * 1.9, z: it.z });
+        continue;
+      }
+
+      const fa = FACE[it.f];
+      const a = fa.v[0] * 3, b = fa.v[1] * 3, c = fa.v[2] * 3;
+      const ux = PS[b] - PS[a], uy = PS[b + 1] - PS[a + 1], uz = PS[b + 2] - PS[a + 2];
+      const wx = PS[c] - PS[a], wy = PS[c + 1] - PS[a + 1], wz = PS[c + 2] - PS[a + 2];
+      let nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+      const len = Math.hypot(nx, ny, nz) || 1;
+      nx /= len; ny /= len; nz /= len;
+      const lam = Math.abs(nx * L[0] + ny * L[1] + nz * L[2]);
+      const k = 0.42 + 0.58 * lam;
+
+      const isOrgan = fa.kind === 'organ';
+      const dim = isOrgan && selOrgan && selOrgan !== fa.id;
+      ctx.globalAlpha = isOrgan ? (dim ? .28 : .96) : bodyAlpha;
+      ctx.fillStyle = tint(isOrgan ? fa.col : css('--skin'), k);
+      ctx.beginPath();
+      ctx.moveTo(PS[a], PS[a + 1]);
+      for (let i = 1; i < fa.v.length; i++) ctx.lineTo(PS[fa.v[i] * 3], PS[fa.v[i] * 3 + 1]);
+      ctx.closePath(); ctx.fill();
+      // 인접 면 사이의 미세한 틈을 메운다
+      ctx.lineWidth = .7; ctx.strokeStyle = ctx.fillStyle; ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      if (isOrgan && !dim) {
+        let sx = 0, sy = 0;
+        for (const vi of fa.v) { sx += PS[vi * 3]; sy += PS[vi * 3 + 1]; }
+        hits.push({ kind: 'organ', id: fa.id, x: sx / fa.v.length, y: sy / fa.v.length, r: 13, z: it.z });
+      }
+    }
+
+    const deg = ((yaw * 180 / Math.PI) % 360 + 360) % 360;
+    const face = deg < 45 || deg >= 315 ? '정면' : deg < 135 ? '좌측면' : deg < 225 ? '후면' : '우측면';
+    $('axis').textContent = `${face} · ${Math.round(deg)}°`;
+  }
+
+  const rgbCache = new Map();
+  function css(v) {
+    return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || '#D8C3A8';
+  }
+  function tint(hex, k) {
+    let c = rgbCache.get(hex);
+    if (!c) {
+      const n = parseInt(hex.replace('#', ''), 16);
+      c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      rgbCache.set(hex, c);
+    }
+    return `rgb(${Math.round(c[0] * k)},${Math.round(c[1] * k)},${Math.round(c[2] * k)})`;
+  }
+
+  // ═══ UI ══════════════════════════════════════════════════════════════════
+  function renderModes() {
+    $('modes').innerHTML =
+      `<button class="chip ${showPoints ? 'on' : ''}" id="m-pts"><span class="sw" style="background:#D9603F"></span>경혈</button>` +
+      `<button class="chip ${showOrgans ? 'on' : ''}" id="m-org"><span class="sw" style="background:#8B5747"></span>장부</button>`;
+    $('m-pts').onclick = () => { showPoints = !showPoints; if (!showPoints) selPoint = null; renderAll(); };
+    $('m-org').onclick = () => { showOrgans = !showOrgans; if (!showOrgans) selOrgan = null; renderAll(); };
+    $('patsect').style.display = showPoints ? '' : 'none';
+  }
+
+  function renderPats() {
+    $('pats').innerHTML = PATTERNS.map((p, i) =>
+      `<button class="chip ${i === patIdx ? 'on' : ''}" data-i="${i}">${p.ko} <span style="opacity:.7;font-weight:600">${p.han}</span>${p.pct ? ` <span style="opacity:.7;font-weight:600">${p.pct}%</span>` : ''}</button>`).join('');
+    for (const b of $('pats').children) b.onclick = () => { patIdx = +b.dataset.i; selPoint = null; renderAll(); };
+
+    const p = PATTERNS[patIdx];
+    $('rx').innerHTML = `
+      <div class="h">${p.ko} ${p.han}</div>
+      <div class="l"><b>주증</b> ${p.sx}</div>
+      <div class="l"><b>설·맥</b> ${p.tongue} / 맥 ${p.pulse}</div>
+      <div class="l"><b>치법</b> ${p.rule}</div>
+      <div class="l"><b>수기</b> ${p.method}</div>
+      <div class="l"><b>주혈</b> ${p.main.map(c => `${P[c].ko} ${c}`).join(' · ')}</div>
+      <div class="l"><b>배혈</b> ${p.sup.map(([c, why]) => `${P[c].ko} ${c}<span style="color:var(--ink-dim)">(${why})</span>`).join(' · ')}</div>
+      <div class="l"><b>배혈 원리</b> ${p.pair}</div>
+      <div class="l"><b>가감</b> ${p.mod.map(([w, a]) => `${w} → ${a}`).join(' / ')}</div>`;
+  }
+
+  function renderRows() {
+    if (showOrgans) {
+      $('listlabel').textContent = `장부 ${ORGANS.length} — 누르면 그 장부만 밝게 보입니다`;
+      $('rows').innerHTML = ORGANS.map(o =>
+        `<button class="row ${selOrgan === o.id ? 'sel' : ''}" data-organ="${o.id}">
+           <span class="sw" style="background:${o.color}"></span>
+           <span><span class="rn">${o.ko}</span> <span class="rc">${o.han}</span></span>
+         </button>`).join('');
+      for (const b of $('rows').children) b.onclick = () => {
+        selOrgan = selOrgan === b.dataset.organ ? null : b.dataset.organ; selPoint = null; renderAll();
+      };
+    } else {
+      const list = activePoints();
+      $('listlabel').textContent = `주혈 ${PATTERNS[patIdx].main.length} · 배혈 ${PATTERNS[patIdx].sup.length} — 누르면 그 자리가 앞으로 옵니다`;
+      $('rows').innerHTML = list.map(([code, isMain], i) => {
+        const p = P[code];
+        return `<button class="row ${selPoint === code ? 'sel' : ''}" data-code="${code}">
+          <span class="sw" style="background:${selPoint === code ? '#2F5A4B' : isMain ? '#D9603F' : '#8AA093'}"></span>
+          <span><span class="rn">${i + 1}. ${p.ko}</span> <span class="rc">${p.han} · ${code}</span></span>
+          <span class="rt">${isMain ? '주혈' : '배혈'}</span>
+        </button>`;
+      }).join('');
+      for (const b of $('rows').children) b.onclick = () => {
+        selPoint = b.dataset.code; faceTo(P[selPoint].at[0]); renderAll();
+      };
+    }
+  }
+
+  function renderDetail() {
+    if (selOrgan) {
+      const o = ORGANS.find(v => v.id === selOrgan);
+      $('detail').innerHTML = `
+        <div class="dn">${o.ko} <span style="font-weight:600;color:var(--ink-dim)">${o.han}</span></div>
+        <div class="dc">장부</div>
+        <div class="tagline"><span class="tag">관련 변증 ${o.pat}</span></div>
+        <div class="drow"><b>기능</b> ${o.fn}</div>
+        <div class="drow"><b>상용혈</b> ${o.pts}</div>
+        ${o.note ? `<div class="warn">⚠ ${o.note}</div>` : ''}`;
+      return;
+    }
+    if (selPoint && P[selPoint]) {
+      const p = P[selPoint];
+      const isMain = PATTERNS[patIdx].main.includes(selPoint);
+      const why = (PATTERNS[patIdx].sup.find(([c]) => c === selPoint) || [])[1];
+      $('detail').innerHTML = `
+        <div class="dn">${p.ko} <span style="font-weight:600;color:var(--ink-dim)">${p.han}</span></div>
+        <div class="dc">${selPoint} · ${p.m}</div>
+        <div class="tagline">
+          <span class="tag">${isMain ? '주혈' : '배혈'}</span>
+          ${p.cls ? `<span class="tag">${p.cls}</span>` : ''}
+        </div>
+        <div class="drow"><b>취혈</b> ${p.loc}</div>
+        <div class="drow"><b>자침</b> ${p.nd}</div>
+        <div class="drow"><b>뜸</b> ${p.moxa}</div>
+        <div class="drow"><b>주치</b> ${p.ind}</div>
+        ${why ? `<div class="drow"><b>이 변증에서</b> ${why}</div>` : ''}
+        ${p.warn ? `<div class="warn">⚠ ${p.warn}</div>` : ''}`;
+      return;
+    }
+    $('detail').innerHTML = `<div class="dc">${showOrgans
+      ? '장부를 누르면 기능과 상용혈이 나옵니다.'
+      : '경혈을 누르면 취혈·자침 방향과 깊이·주치·금기가 나옵니다.'}</div>`;
+  }
+
+  function renderAll() { renderModes(); renderPats(); renderRows(); renderDetail(); draw(); }
+
+  function faceTo([x, y, z]) { animateYaw(-Math.atan2(x - CX, z)); }
+  function animateYaw(target) {
+    let d = target - yaw;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    const from = yaw, t0 = performance.now(), dur = 430;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      yaw = from + d * (1 - Math.pow(1 - k, 3));
+      draw();
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ═══ 조작 ════════════════════════════════════════════════════════════════
+  let drag = null, moved = 0;
+  cv.addEventListener('pointerdown', e => {
+    drag = { x: e.clientX, y: e.clientY }; moved = 0;
+    cv.setPointerCapture(e.pointerId); spinning = false; $('spin').classList.remove('on');
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    yaw += dx * 0.011;
+    pitch = Math.max(-0.55, Math.min(0.55, pitch + dy * 0.005));
+    drag = { x: e.clientX, y: e.clientY };
+    scheduleDraw();
+  });
+  cv.addEventListener('pointerup', e => { if (drag && moved < 6) pick(e); drag = null; });
+  cv.addEventListener('pointercancel', () => { drag = null; });
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    zoom = Math.max(0.6, Math.min(3.2, zoom * (e.deltaY > 0 ? 0.92 : 1.08)));
+    scheduleDraw();
+  }, { passive: false });
+
+  function pick(e) {
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = null;
+    for (const h of hits) {
+      if (Math.hypot(h.x - mx, h.y - my) <= h.r && (!best || h.z > best.z)) best = h;
+    }
+    if (!best) return;
+    if (best.kind === 'point') { selPoint = best.id; selOrgan = null; }
+    else { selOrgan = selOrgan === best.id ? null : best.id; selPoint = null; }
+    renderAll();
+  }
+
+  for (const b of document.querySelectorAll('[data-view]')) {
+    b.onclick = () => {
+      spinning = false; $('spin').classList.remove('on');
+      pitch = -0.05;
+      animateYaw({ front: 0, left: Math.PI / 2, back: Math.PI, right: -Math.PI / 2 }[b.dataset.view]);
+    };
+  }
+  $('zin').onclick = () => { zoom = Math.min(3.2, zoom * 1.18); draw(); };
+  $('zout').onclick = () => { zoom = Math.max(0.6, zoom / 1.18); draw(); };
+  $('reset').onclick = () => { yaw = 0; pitch = -0.05; zoom = 1; draw(); };
+  $('spin').onclick = () => {
+    spinning = !spinning; $('spin').classList.toggle('on', spinning);
+    last = 0; if (spinning) requestAnimationFrame(tick);
+  };
+  let last = 0;
+  function tick(now) {
+    if (!spinning) return;
+    if (last) yaw += (now - last) * 0.0006;
+    last = now; draw(); requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('resize', resize);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+
+  renderAll();
+  resize();
+})();
+</script>
+</body>
+</html>
