@@ -1,5 +1,7 @@
-환율 앱 프로토타입 미리보기 (항상 최신 버전):
-https://claude.ai/code/artifact/1cb2a452-a67d-4578-b797-302a4d951d3c
+환율 앱 프로토타입 미리보기 — 눌러서 바로 열기:
+https://hugoseong0721.github.io/test-mvp/currency-app.html
 
 폰/PC 어디서든 열면 실제 앱처럼 동작합니다.
+(GitHub Pages, main 브랜치 docs/currency-app.html 에서 서빙)
+
 로컬에서 보려면: currency_app/currency-app-preview.html 파일을 브라우저로 열기
