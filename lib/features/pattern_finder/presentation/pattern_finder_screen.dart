@@ -11,7 +11,6 @@ import '../../../core/services/beta_session_service.dart';
 import '../../../core/services/patient_profile_service.dart';
 import '../../../core/services/pattern_finder_service.dart';
 import '../../../core/services/question_bank_service.dart';
-import '../../../core/services/research_corpus_service.dart';
 import '../../../core/settings/app_language_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/language_menu_button.dart';
@@ -412,6 +411,11 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
 
+  // Patients enter height/weight in inches/pounds by default and can switch to
+  // centimeters/kilograms. Values are always converted to metric before they
+  // leave this screen, so the rest of the app keeps working in cm/kg.
+  bool _imperial = true;
+
   @override
   void dispose() {
     _heightController.dispose();
@@ -419,16 +423,39 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
     super.dispose();
   }
 
-  double? _parse(String raw, double min, double max) {
+  /// Parses a field and returns the value converted to metric (cm or kg),
+  /// or null when empty / out of a sensible range.
+  double? _parseMetric(String raw, {required bool isHeight}) {
     final value = double.tryParse(raw.trim().replaceAll(',', '.'));
-    if (value == null || value < min || value > max) return null;
-    return value;
+    if (value == null || value <= 0) return null;
+    final metric = _imperial
+        ? (isHeight ? value * 2.54 : value * 0.453592)
+        : value;
+    final min = isHeight ? 80.0 : 20.0;
+    final max = isHeight ? 250.0 : 300.0;
+    if (metric < min || metric > max) return null;
+    return metric;
+  }
+
+  void _switchUnit(bool imperial) {
+    if (imperial == _imperial) return;
+    // Convert whatever is already typed so the number stays meaningful.
+    void convert(TextEditingController c, double toImperial) {
+      final v = double.tryParse(c.text.trim().replaceAll(',', '.'));
+      if (v == null || v <= 0) return;
+      final next = imperial ? v / toImperial : v * toImperial;
+      c.text = next.toStringAsFixed(1);
+    }
+
+    convert(_heightController, 2.54);
+    convert(_weightController, 0.453592);
+    setState(() => _imperial = imperial);
   }
 
   void _continue() {
     widget.onContinue(
-      _parse(_heightController.text, 80, 250),
-      _parse(_weightController.text, 20, 300),
+      _parseMetric(_heightController.text, isHeight: true),
+      _parseMetric(_weightController.text, isHeight: false),
     );
   }
 
@@ -470,7 +497,37 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
             color: AppTheme.ink.withValues(alpha: 0.65),
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Text(
+              lang.tr('Units', '단위'),
+              style: TextStyle(
+                fontSize: 12.5,
+                color: AppTheme.ink.withValues(alpha: 0.65),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: SegmentedButton<bool>(
+                segments: [
+                  ButtonSegment(
+                    value: true,
+                    label: Text(lang.tr('in / lb', '인치 · 파운드')),
+                  ),
+                  ButtonSegment(
+                    value: false,
+                    label: Text(lang.tr('cm / kg', '센티 · 킬로')),
+                  ),
+                ],
+                selected: {_imperial},
+                showSelectedIcon: false,
+                onSelectionChanged: (s) => _switchUnit(s.first),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
         Row(
           children: [
             Expanded(
@@ -480,7 +537,9 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: lang.tr('Height (cm)', '키 (cm)'),
+                  labelText: _imperial
+                      ? lang.tr('Height (in)', '키 (in)')
+                      : lang.tr('Height (cm)', '키 (cm)'),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -495,7 +554,9 @@ class _BasicInfoViewState extends State<_BasicInfoView> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: lang.tr('Weight (kg)', '몸무게 (kg)'),
+                  labelText: _imperial
+                      ? lang.tr('Weight (lb)', '몸무게 (lb)')
+                      : lang.tr('Weight (kg)', '몸무게 (kg)'),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -836,9 +897,6 @@ class _ResultView extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 16),
-          _BankQuestionsSection(patternId: top.pattern.id),
-          _ResearchEvidenceSection(query: top.pattern.researchQuery),
         ],
         if (answeredPairs.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -1190,143 +1248,6 @@ class _AnswerRecapSection extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Research-grounded follow-up questions for the leading pattern, drafted by
-/// the daily LLM step from collected paper abstracts. Hidden until the
-/// question bank has been generated at least once.
-class _BankQuestionsSection extends StatelessWidget {
-  const _BankQuestionsSection({required this.patternId});
-
-  final String patternId;
-
-  @override
-  Widget build(BuildContext context) {
-    final lang = AppLanguageController.instance;
-    return FutureBuilder<PatternQuestionBank?>(
-      future: QuestionBankService.instance.forPattern(patternId),
-      builder: (context, snapshot) {
-        final bank = snapshot.data;
-        if (bank == null || bank.questions.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              lang.tr(
-                'Questions your practitioner may ask next',
-                '진료에서 이어질 수 있는 질문',
-              ),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              lang.tr(
-                'Drafted from ${bank.sources.length} research papers — your '
-                'practitioner reviews these in person.',
-                '수집된 논문 ${bank.sources.length}편을 근거로 작성되었어요. '
-                '실제 질문 여부는 한의사 선생님이 판단합니다.',
-              ),
-              style: TextStyle(
-                fontSize: 11.5,
-                color: AppTheme.ink.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: 8),
-            for (final q in bank.questions)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        lang.tr(q.questionEn, q.questionKo),
-                        style: const TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          height: 1.4,
-                        ),
-                      ),
-                      if (q.rationaleKo.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          q.rationaleKo,
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 1.4,
-                            color: AppTheme.ink.withValues(alpha: 0.65),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _ResearchEvidenceSection extends StatelessWidget {
-  const _ResearchEvidenceSection({required this.query});
-
-  final String query;
-
-  @override
-  Widget build(BuildContext context) {
-    final lang = AppLanguageController.instance;
-    return FutureBuilder<List<ResearchPaper>>(
-      future: ResearchCorpusService.instance.topMatches(query, limit: 3),
-      builder: (context, snapshot) {
-        final papers = snapshot.data ?? const <ResearchPaper>[];
-        if (papers.isEmpty) return const SizedBox.shrink();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              lang.tr('Related research', '관련 연구'),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 8),
-            for (final p in papers)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        p.title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        [
-                          if (p.year.isNotEmpty) p.year,
-                          if (p.source.isNotEmpty) p.source,
-                        ].join(' · '),
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: AppTheme.ink.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
     );
   }
 }

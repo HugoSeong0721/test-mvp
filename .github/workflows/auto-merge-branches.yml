@@ -1,0 +1,69 @@
+name: Auto-merge branches
+
+# Every 4 hours, cross-sync the two Claude session branches: merge the latest
+# main and the sibling branch into each feature branch, then push. Once both
+# branches contain each other's work the merges are no-ops, so this stays
+# quiet until new commits appear. If a merge conflicts, that branch's sync
+# aborts and fails loudly (no partial/garbage commit) so it can be resolved
+# by hand.
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-merge-branches
+  cancel-in-progress: false
+
+env:
+  BRANCH_A: claude/tcm-syndrome-paper-automation-0itj0j
+  BRANCH_B: claude/tcm-doctor-management-automation-vflyi9
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cross-merge branches
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main "$BRANCH_A" "$BRANCH_B"
+
+          failed=0
+          sync_target() {
+            target="$1"; shift
+            echo "::group::Syncing $target"
+            git checkout -B "$target" "origin/$target"
+            for br in "$@"; do
+              if git merge --no-edit "origin/$br"; then
+                echo "merged origin/$br (or already up to date)"
+              else
+                git merge --abort || true
+                echo "::error::Merge conflict while merging origin/$br into $target. Resolve manually."
+                failed=1
+                echo "::endgroup::"
+                return
+              fi
+            done
+            if [ -n "$(git rev-list "origin/$target"..HEAD)" ]; then
+              git push origin "HEAD:$target"
+              echo "Pushed merged changes to $target."
+            else
+              echo "Nothing new to merge into $target."
+            fi
+            echo "::endgroup::"
+          }
+
+          sync_target "$BRANCH_A" main "$BRANCH_B"
+          sync_target "$BRANCH_B" main "$BRANCH_A"
+
+          exit "$failed"

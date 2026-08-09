@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>내 몸 패턴 찾기 — 디자인 미리보기</title>
+<title>Body Pattern Finder — Design Preview</title>
 <style>
   :root {
     --ground: #FFFCF4;
@@ -196,147 +196,139 @@
 </head>
 <body>
 <div class="wrap">
-  <div style="text-align:right;font-size:12px;margin-bottom:6px"><a href="./pattern-finder-preview.html" style="font-weight:800;color:#2F5A4B;text-decoration:none">한국어</a> · <a href="./pattern-finder-preview-en.html" style="color:#5B6B64;text-decoration:none">English</a></div>
+  <div style="text-align:right;font-size:12px;margin-bottom:6px"><a href="./pattern-finder-preview.html" style="color:#5B6B64;text-decoration:none">한국어</a> · <a href="./pattern-finder-preview-en.html" style="font-weight:800;color:#2F5A4B;text-decoration:none">English</a></div>
   <p class="kicker">Design Preview · test-mvp</p>
-  <h1>내 몸 패턴 찾기</h1>
-  <p class="sub">환자가 8개의 질문에 답하면 변증 방향으로 수렴하는 흐름 — Flutter 앱에 구현된 것과 동일한 질문·가중치·적응 로직입니다.</p>
+  <h1>Body Pattern Finder</h1>
+  <p class="sub">The patient answers 8 questions that converge on a TCM pattern direction — same questions, weights, and adaptive logic as the Flutter app.</p>
 
   <div class="phone">
     <div class="phone-top">
       <span class="dot"></span>
-      <span class="name">내 몸 패턴 찾기</span>
+      <span class="name">Body Pattern Finder</span>
     </div>
     <div class="screen" id="screen"></div>
   </div>
 
-  <p class="note">이 미리보기는 진단이 아닌 한의사 검토용 참고 흐름입니다.<br>디자인 확정 시 그대로 앱에 반영되어 있습니다.</p>
+  <p class="note">This preview is a practitioner-review reference flow, not a diagnosis.<br>Once the design is confirmed it is already reflected in the app.</p>
 </div>
 
 <script>
 // ── Same data as lib/core/services/pattern_finder_service.dart ──────────────
 const PATTERNS = {
-  qi_deficiency:   { name: "기허(기운 부족) 방향",   desc: "움직이면 심해지는 피로, 기운 없는 목소리나 식욕 저하, 조금만 움직여도 나는 땀이 특징적인 방향입니다." },
-  yang_deficiency: { name: "양허(몸이 찬) 방향",     desc: "추위를 많이 타고 손발이 차며, 따뜻한 것을 찾고 변이 무른 편인 방향입니다." },
-  yin_deficiency:  { name: "음허(허열·건조) 방향",   desc: "밤에 나는 식은땀과 입마름, 저녁의 달아오르는 열감, 얕은 잠이 특징적인 방향입니다." },
-  damp_phlegm:     { name: "습담(무겁고 더부룩) 방향", desc: "몸과 머리가 무겁고 식후 더부룩하며, 변이 끈적하고 습한 날 심해지는 방향입니다." },
-  liver_qi:        { name: "간기울결(스트레스·긴장) 방향", desc: "스트레스에 따라 증상이 오르내리고, 가슴답답함·한숨·짜증, 스트레스성 소화 문제가 특징적인 방향입니다." },
-  blood_stasis:    { name: "어혈(고정된 통증) 방향",  desc: "한 자리에 고정된 콕콕 찌르는 통증, 밤에 심해지는 통증, 어둡고 칙칙한 안색이 특징적인 방향입니다." },
-  blood_deficiency:{ name: "혈허(어지럼·창백) 방향",  desc: "일어날 때 어지럽고 안색이 창백하며, 눈이 침침하고 잠들기 어려운 것이 특징적인 방향입니다." },
+  qi_deficiency: { name: "Qi deficiency direction", desc: "Low energy that worsens with activity, weak voice or appetite, easy sweating on light exertion." },
+  yang_deficiency: { name: "Yang deficiency (cold) direction", desc: "Feeling cold, cold hands and feet, preferring warmth, loose stool, low morning energy." },
+  yin_deficiency: { name: "Yin deficiency (dry heat) direction", desc: "Night sweats, dry mouth at night, flushed warmth in the evening, light restless sleep." },
+  damp_phlegm: { name: "Damp / phlegm direction", desc: "Heaviness of body or head, bloating after meals, sticky stool, worse in humid weather." },
+  liver_qi: { name: "Liver qi constraint direction", desc: "Symptoms flare with stress: chest or flank tightness, sighing, irritability, stress-related digestion issues." },
+  blood_stasis: { name: "Blood stasis direction", desc: "Fixed stabbing pain in one spot, worse at night, dark or dull complexion." },
+  blood_deficiency: { name: "Blood deficiency direction", desc: "Dizziness on standing, pale complexion, blurry or tired eyes, hard to fall asleep with a busy mind." },
 };
 
 const QUESTIONS = [
-  { id:"energy", text:"피로감이 가장 심한 때는 언제인가요?", options:[
-    { t:"아침부터 하루 종일 기운이 없어요", w:{qi_deficiency:3,yang_deficiency:2,blood_deficiency:1} },
-    { t:"오후가 되면 뚝 떨어져요", w:{qi_deficiency:2,damp_phlegm:1} },
-    { t:"저녁에 피곤한데 몸에 열감이 있어요", w:{yin_deficiency:3} },
-    { t:"스트레스 받은 날 특히 심해요", w:{liver_qi:3} },
-    { t:"피로는 별로 없어요", w:{} } ]},
-  { id:"temperature", text:"평소 추위나 더위는 어떤가요?", options:[
-    { t:"추위를 타고 손발이 차요", w:{yang_deficiency:3,qi_deficiency:1,blood_deficiency:1} },
-    { t:"밤이나 저녁에 얼굴이 달아오르고 더워요", w:{yin_deficiency:3} },
-    { t:"스트레스 받으면 가슴이 답답하고 열이 올라요", w:{liver_qi:2} },
-    { t:"특별히 없어요", w:{} } ]},
-  { id:"stress", text:"증상이 스트레스와 관련이 있나요?", options:[
-    { t:"스트레스 받으면 확실히 심해져요", w:{liver_qi:3} },
-    { t:"기분과 상관없이 무리하면 심해져요", w:{qi_deficiency:2} },
-    { t:"습하거나 비 오는 날 심해져요", w:{damp_phlegm:3} },
-    { t:"잘 모르겠어요", w:{} } ]},
-  { id:"digestion", text:"소화는 어떤가요?", options:[
-    { t:"먹고 나면 더부룩하고 몸이 무거워요", w:{damp_phlegm:3,qi_deficiency:1} },
-    { t:"입맛이 없고 먹는 게 부담스러워요", w:{qi_deficiency:2,yang_deficiency:1} },
-    { t:"스트레스 받으면 체하거나 답답해요", w:{liver_qi:3} },
-    { t:"괜찮은 편이에요", w:{} } ]},
-  { id:"sleep", text:"잠은 어떻게 주무시나요?", options:[
-    { t:"생각이 많아 잠들기 어려워요", w:{blood_deficiency:2,liver_qi:2} },
-    { t:"새벽에 깨고 식은땀이나 입마름이 있어요", w:{yin_deficiency:3} },
-    { t:"잠이 얕고 꿈을 많이 꿔요", w:{blood_deficiency:2,yin_deficiency:1} },
-    { t:"많이 자도 개운하지 않아요", w:{damp_phlegm:2,qi_deficiency:1} },
-    { t:"잘 자는 편이에요", w:{} } ]},
-  { id:"pain", text:"통증이 있다면 어떤 느낌인가요?", options:[
-    { t:"한 자리가 콕콕 찌르듯 아프고 밤에 심해요", w:{blood_stasis:3} },
-    { t:"결리는 곳이 옮겨 다니고 스트레스에 따라 달라져요", w:{liver_qi:2} },
-    { t:"묵직하고 뻐근하게 아파요", w:{damp_phlegm:2} },
-    { t:"통증은 없어요", w:{} } ]},
-  { id:"sweat", text:"땀은 어떤가요?", options:[
-    { t:"조금만 움직여도 땀이 나요", w:{qi_deficiency:3} },
-    { t:"자는 동안 식은땀이 나요", w:{yin_deficiency:3} },
-    { t:"땀이 거의 없고 몸이 차요", w:{yang_deficiency:2} },
-    { t:"보통이에요", w:{} } ]},
-  { id:"thirst", text:"입마름이나 갈증은 어떤가요?", options:[
-    { t:"입이 마르고 시원한 물이 당겨요", w:{yin_deficiency:2} },
-    { t:"입은 마른데 물은 잘 안 마셔요", w:{damp_phlegm:2,blood_stasis:1} },
-    { t:"따뜻한 물이나 차가 편해요", w:{yang_deficiency:2} },
-    { t:"별다른 갈증은 없어요", w:{} } ]},
-  { id:"stool", text:"대변은 평소 어떤 편인가요?", options:[
-    { t:"무른 편이고 찬 음식 먹으면 심해져요", w:{yang_deficiency:3,qi_deficiency:1} },
-    { t:"건조하고 변비 경향이 있어요", w:{yin_deficiency:2,blood_deficiency:1} },
-    { t:"끈적하고 시원하지 않아요", w:{damp_phlegm:3} },
-    { t:"스트레스에 따라 들쭉날쭉해요", w:{liver_qi:2} },
-    { t:"보통이에요", w:{} } ]},
-  { id:"head", text:"머리나 눈은 어떤가요?", options:[
-    { t:"일어날 때 어지럽고 눈이 쉽게 피로해요", w:{blood_deficiency:3} },
-    { t:"머리가 무겁고 멍해요", w:{damp_phlegm:3} },
-    { t:"한 부위가 콕콕 아픈 두통이 있어요", w:{blood_stasis:2} },
-    { t:"스트레스 받으면 옆머리가 아파요", w:{liver_qi:2} },
-    { t:"괜찮아요", w:{} } ]},
-  { id:"complexion", text:"요즘 안색은 어떤 편인가요?", options:[
-    { t:"창백하고 입술색이 옅어요", w:{blood_deficiency:3,yang_deficiency:1} },
-    { t:"저녁에 볼이 붉어져요", w:{yin_deficiency:2} },
-    { t:"칙칙하고 멍이 잘 들어요", w:{blood_stasis:3} },
-    { t:"보통이에요", w:{} } ]},
-  { id:"mood", text:"요즘 기분은 어떤가요?", options:[
-    { t:"짜증이 늘고 한숨이 잦고 가슴이 답답해요", w:{liver_qi:3} },
-    { t:"불안하고 밤에 생각이 많아요", w:{blood_deficiency:2,yin_deficiency:1} },
-    { t:"우울하다기보다 의욕이 없어요", w:{qi_deficiency:2,damp_phlegm:1} },
-    { t:"안정적이에요", w:{} } ]},
-  { id:"qi_deep_appetite", text:"식사 후 기운과 입맛은 어떤가요?", options:[
-    { t:"먹고 나면 졸리고 축 처져요", w:{qi_deficiency:3} },
-    { t:"입맛이 없고 조금만 먹어도 배불러요", w:{qi_deficiency:2} },
-    { t:"식후에 괜찮아요", w:{} } ]},
-  { id:"qi_deep_recovery", text:"무리한 뒤 회복은 어떤가요?", options:[
-    { t:"오래 지치고 감기에 잘 걸려요", w:{qi_deficiency:3} },
-    { t:"조금만 움직여도 숨차거나 땀이 나요", w:{qi_deficiency:2} },
-    { t:"보통은 금방 회복해요", w:{} } ]},
-  { id:"yang_deep_cold_area", text:"주로 어디가 차게 느껴지나요?", options:[
-    { t:"아랫배·허리·무릎이 시려요", w:{yang_deficiency:3} },
-    { t:"손발과 온몸이 전반적으로 차요", w:{yang_deficiency:2} },
-    { t:"특별히 찬 곳은 없어요", w:{} } ]},
-  { id:"yang_deep_urine", text:"소변은 어떤가요?", options:[
-    { t:"자주 마렵고 맑으며 밤이나 추울 때 심해요", w:{yang_deficiency:3} },
-    { t:"보통이에요", w:{} } ]},
-  { id:"yin_deep_five_heart", text:"손바닥·발바닥·가슴에 열감이 있나요? (특히 저녁)", options:[
-    { t:"네, 화끈거려서 시원하게 하고 싶어요", w:{yin_deficiency:3} },
-    { t:"늦은 오후에 볼이 붉어져요", w:{yin_deficiency:2} },
-    { t:"아니요", w:{} } ]},
-  { id:"damp_deep_heaviness", text:"몸의 무거움은 어디에 느껴지나요?", options:[
-    { t:"머리가 멍하고 팔다리가 무거워요", w:{damp_phlegm:3} },
-    { t:"가슴·명치가 답답하고 가래가 껴요", w:{damp_phlegm:2} },
-    { t:"특별한 무거움은 없어요", w:{} } ]},
-  { id:"damp_deep_weather", text:"습하거나 비 오는 날 더 심해지나요?", options:[
-    { t:"확실히 더 무겁고 처져요", w:{damp_phlegm:3} },
-    { t:"별로 관계없어요", w:{} } ]},
-  { id:"liver_deep_chest", text:"가슴·옆구리가 답답하거나 한숨이 나오나요?", options:[
-    { t:"네, 가슴이 막힌 듯하고 한숨이 잦아요", w:{liver_qi:3} },
-    { t:"옆구리·갈비뼈 쪽이 결려요", w:{liver_qi:2} },
-    { t:"아니요", w:{} } ]},
-  { id:"liver_deep_variability", text:"증상이 기분이나 그날그날에 따라 오르내리나요?", options:[
-    { t:"네, 스트레스·기분 따라 확 달라져요", w:{liver_qi:3} },
-    { t:"대체로 일정한 편이에요", w:{} } ]},
-  { id:"stasis_deep_night", text:"통증이 한 자리에 고정되고 밤에 심한가요?", options:[
-    { t:"네, 콕콕 찌르고 늘 같은 자리예요", w:{blood_stasis:3} },
-    { t:"밤에 심하지만 자리가 옮겨 다녀요", w:{blood_stasis:1,liver_qi:1} },
-    { t:"고정된 통증은 없어요", w:{} } ]},
-  { id:"stasis_deep_bruise", text:"멍이 잘 들거나 어둡고 자줏빛 반점이 있나요?", options:[
-    { t:"네, 멍이 잘 들고 입술·안색이 어두워요", w:{blood_stasis:3} },
-    { t:"아니요", w:{} } ]},
-  { id:"blood_deep_palpitation", text:"쉬는데도 가슴이 두근거리거나 생각이 많나요?", options:[
-    { t:"네, 두근거리고 생각이 가라앉질 않아요", w:{blood_deficiency:3} },
-    { t:"가끔, 주로 피곤할 때요", w:{blood_deficiency:1} },
-    { t:"아니요", w:{} } ]},
-  { id:"blood_deep_vision", text:"일어설 때 어지럽거나 눈이 침침하고 손발이 저리나요?", options:[
-    { t:"네, 일어설 때 어지럽고 눈이 침침해요", w:{blood_deficiency:3} },
-    { t:"손발이 저리거나 무감각할 때가 있어요", w:{blood_deficiency:2} },
-    { t:"아니요", w:{} } ]},
+  { id:"energy", text:"When is your fatigue strongest?", options:[
+    { t:"From the morning, all day", w:{qi_deficiency:3,yang_deficiency:2,blood_deficiency:1} },
+    { t:"It builds in the afternoon", w:{qi_deficiency:2,damp_phlegm:1} },
+    { t:"Evenings, with warmth or restlessness", w:{yin_deficiency:3} },
+    { t:"Mostly after stressful days", w:{liver_qi:3} },
+    { t:"Not really tired", w:{} } ] },
+  { id:"temperature", text:"How do you feel about temperature?", options:[
+    { t:"I feel cold; hands and feet are cold", w:{yang_deficiency:3,qi_deficiency:1,blood_deficiency:1} },
+    { t:"Warm or flushed, especially at night", w:{yin_deficiency:3} },
+    { t:"Chest feels hot when stressed", w:{liver_qi:2} },
+    { t:"No strong tendency", w:{} } ] },
+  { id:"stress", text:"Do symptoms change with stress?", options:[
+    { t:"Clearly worse with stress or frustration", w:{liver_qi:3} },
+    { t:"Worse after overwork, regardless of mood", w:{qi_deficiency:2} },
+    { t:"Worse in damp or rainy weather", w:{damp_phlegm:3} },
+    { t:"No clear connection", w:{} } ] },
+  { id:"digestion", text:"How is your digestion?", options:[
+    { t:"Bloated and heavy after meals", w:{damp_phlegm:3,qi_deficiency:1} },
+    { t:"Poor appetite, food feels like a chore", w:{qi_deficiency:2,yang_deficiency:1} },
+    { t:"Digestion locks up when stressed", w:{liver_qi:3} },
+    { t:"Generally fine", w:{} } ] },
+  { id:"sleep", text:"How is your sleep?", options:[
+    { t:"Hard to fall asleep, mind keeps running", w:{blood_deficiency:2,liver_qi:2} },
+    { t:"Wake at dawn with sweat or dry mouth", w:{yin_deficiency:3} },
+    { t:"Light sleep with many dreams", w:{blood_deficiency:2,yin_deficiency:1} },
+    { t:"I sleep heavily but wake unrefreshed", w:{damp_phlegm:2,qi_deficiency:1} },
+    { t:"Sleep is fine", w:{} } ] },
+  { id:"pain", text:"If you have pain, what is it like?", options:[
+    { t:"Stabbing, fixed in one spot, worse at night", w:{blood_stasis:3} },
+    { t:"Tightness that moves around with stress", w:{liver_qi:2} },
+    { t:"Dull, heavy ache", w:{damp_phlegm:2} },
+    { t:"No notable pain", w:{} } ] },
+  { id:"sweat", text:"How about sweating?", options:[
+    { t:"I sweat easily with light activity", w:{qi_deficiency:3} },
+    { t:"Night sweats while sleeping", w:{yin_deficiency:3} },
+    { t:"I rarely sweat and feel cold", w:{yang_deficiency:2} },
+    { t:"Normal", w:{} } ] },
+  { id:"thirst", text:"Mouth and thirst?", options:[
+    { t:"Dry mouth, want cool water", w:{yin_deficiency:2} },
+    { t:"Dry mouth but little desire to drink", w:{damp_phlegm:2,blood_stasis:1} },
+    { t:"Prefer warm drinks", w:{yang_deficiency:2} },
+    { t:"No particular thirst", w:{} } ] },
+  { id:"stool", text:"How is your stool, usually?", options:[
+    { t:"Loose or watery, worse with cold food", w:{yang_deficiency:3,qi_deficiency:1} },
+    { t:"Dry or constipated", w:{yin_deficiency:2,blood_deficiency:1} },
+    { t:"Sticky, hard to finish", w:{damp_phlegm:3} },
+    { t:"Irregular, changes with stress", w:{liver_qi:2} },
+    { t:"Normal", w:{} } ] },
+  { id:"head", text:"Head and eyes?", options:[
+    { t:"Dizzy when standing, eyes tire easily", w:{blood_deficiency:3} },
+    { t:"Head feels heavy and foggy", w:{damp_phlegm:3} },
+    { t:"Sharp headache in a fixed spot", w:{blood_stasis:2} },
+    { t:"Temple/side headaches when stressed", w:{liver_qi:2} },
+    { t:"No issues", w:{} } ] },
+  { id:"complexion", text:"How would you describe your complexion lately?", options:[
+    { t:"Pale, lips light in color", w:{blood_deficiency:3,yang_deficiency:1} },
+    { t:"Flushed cheeks in the evening", w:{yin_deficiency:2} },
+    { t:"Dark, dull, or easily bruised", w:{blood_stasis:3} },
+    { t:"Normal", w:{} } ] },
+  { id:"mood", text:"How has your mood been?", options:[
+    { t:"Irritable, sighing a lot, chest feels stuck", w:{liver_qi:3} },
+    { t:"Anxious with a racing mind at night", w:{blood_deficiency:2,yin_deficiency:1} },
+    { t:"Flat and unmotivated more than sad", w:{qi_deficiency:2,damp_phlegm:1} },
+    { t:"Stable", w:{} } ] },
+  { id:"qi_deep_appetite", text:"How is your appetite and energy after eating?", options:[
+    { t:"Sleepy and drained right after meals", w:{qi_deficiency:3} },
+    { t:"Little appetite, get full quickly", w:{qi_deficiency:2} },
+    { t:"Fine after eating", w:{} } ] },
+  { id:"qi_deep_recovery", text:"After exertion, how do you recover?", options:[
+    { t:"Wiped out for a long time; catch colds easily", w:{qi_deficiency:3} },
+    { t:"Short of breath or sweaty from light effort", w:{qi_deficiency:2} },
+    { t:"Recover normally", w:{} } ] },
+  { id:"yang_deep_cold_area", text:"Where do you feel cold the most?", options:[
+    { t:"Lower belly, lower back, or knees", w:{yang_deficiency:3} },
+    { t:"Hands and feet, all over", w:{yang_deficiency:2} },
+    { t:"Not especially cold anywhere", w:{} } ] },
+  { id:"yang_deep_urine", text:"How is your urination?", options:[
+    { t:"Frequent, clear, worse at night or when cold", w:{yang_deficiency:3} },
+    { t:"Normal", w:{} } ] },
+  { id:"yin_deep_five_heart", text:"Do your palms, soles, or chest feel warm — especially evenings?", options:[
+    { t:"Cheeks flush in the late afternoon", w:{yin_deficiency:2} },
+    { t:"No", w:{} } ] },
+  { id:"damp_deep_heaviness", text:"Where does the heaviness sit?", options:[
+    { t:"Head feels foggy, limbs heavy", w:{damp_phlegm:3} },
+    { t:"Chest or stomach feels stuffed, phlegmy throat", w:{damp_phlegm:2} },
+    { t:"No particular heaviness", w:{} } ] },
+  { id:"damp_deep_weather", text:"Do damp or rainy days make it worse?", options:[
+    { t:"Clearly worse — heavier and more sluggish", w:{damp_phlegm:3} },
+    { t:"Not really", w:{} } ] },
+  { id:"liver_deep_chest", text:"Do you get chest or flank tightness, or sighing?", options:[
+    { t:"Tightness in the ribs/flank", w:{liver_qi:2} },
+    { t:"No", w:{} } ] },
+  { id:"liver_deep_variability", text:"Do your symptoms rise and fall with mood or the day?", options:[
+    { t:"Fairly steady day to day", w:{} } ] },
+  { id:"stasis_deep_night", text:"Is the pain fixed in one spot and worse at night?", options:[
+    { t:"Worse at night but moves around", w:{blood_stasis:1,liver_qi:1} },
+    { t:"No fixed pain", w:{} } ] },
+  { id:"stasis_deep_bruise", text:"Do you bruise easily or have dark/purplish spots?", options:[
+    { t:"No", w:{} } ] },
+  { id:"blood_deep_palpitation", text:"Do you notice palpitations or a racing mind at rest?", options:[
+    { t:"No", w:{} } ] },
+  { id:"blood_deep_vision", text:"Any dizziness on standing, blurry vision, or numb limbs?", options:[
+    { t:"Hands or feet go numb/tingly", w:{blood_deficiency:2} },
+    { t:"No", w:{} } ] },
 ];
 
 const SESSION = 8, COMMON = 4;
@@ -427,14 +419,13 @@ function showIntro() {
   screen.innerHTML = `
     <div class="fade" style="display:flex;flex-direction:column;flex:1">
       <h2 style="font-size:19px;font-weight:800;margin:6px 0 8px;text-wrap:balance">
-        8개의 질문으로<br>내 몸의 패턴 방향을 찾아봐요</h2>
+        Find your body pattern<br>in 8 questions</h2>
       <p style="font-size:13.5px;color:var(--ink-dim);margin:0 0 16px">
-        한 번에 하나씩만 답하면 돼요. 답할 때마다 다음 질문이 달라지고,
-        마지막에 내 답변이 가리키는 패턴 방향과 근거 연구를 보여드려요.</p>
-      <button class="btn btn-primary" id="start" style="align-self:flex-start">시작하기</button>
+        Answer one question at a time. Each answer shapes the next, and at the end you see the pattern direction your answers point to.</p>
+      <button class="btn btn-primary" id="start" style="align-self:flex-start">Start</button>
       <div class="spacer"></div>
-      <div class="banner"><b>ⓘ</b><span>이 결과는 <b>진단이 아니에요</b>.
-        최종 판단은 한의사 선생님이 직접 진료로 확인합니다.</span></div>
+      <div class="banner"><b>ⓘ</b><span>This is <b>not a diagnosis</b>.
+        Your practitioner confirms everything in person.</span></div>
     </div>`;
   document.getElementById("start").onclick = showBasicInfo;
 }
@@ -442,27 +433,26 @@ function showIntro() {
 function showBasicInfo() {
   screen.innerHTML = `
     <div class="fade">
-      <h2 style="font-size:18px;font-weight:800;margin:2px 0 6px">기본 정보 (선택)</h2>
+      <h2 style="font-size:18px;font-weight:800;margin:2px 0 6px">Basic info (optional)</h2>
       <p style="font-size:13px;color:var(--ink-dim);margin:0 0 14px">
-        키와 몸무게는 한의사 선생님이 결과를 볼 때 참고돼요.
-        적기 부담스러우면 건너뛰어도 되고, 패턴 점수에는 영향을 주지 않아요.</p>
+        Height and weight help your practitioner read the result. Feel free to skip — they never affect the pattern score.</p>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <span style="font-size:12.5px;color:var(--ink-dim)">단위</span>
+        <span style="font-size:12.5px;color:var(--ink-dim)">Units</span>
         <select id="bUnit"
           style="flex:none;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:8px 12px;font-family:inherit;font-size:13.5px;font-weight:700">
-          <option value="imperial">인치 · 파운드 (in / lb)</option>
-          <option value="metric">센티 · 킬로 (cm / kg)</option>
+          <option value="imperial">Inches · Pounds (in / lb)</option>
+          <option value="metric">Centimeters · Kilograms (cm / kg)</option>
         </select>
       </div>
       <div style="display:flex;gap:10px">
-        <input id="bH" type="number" inputmode="decimal" placeholder="키 (in)"
+        <input id="bH" type="number" inputmode="decimal" placeholder="Height (in)"
           style="flex:1;box-sizing:border-box;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14.5px">
-        <input id="bW" type="number" inputmode="decimal" placeholder="몸무게 (lb)"
+        <input id="bW" type="number" inputmode="decimal" placeholder="Weight (lb)"
           style="flex:1;box-sizing:border-box;background:var(--card);color:var(--ink);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14.5px">
       </div>
       <div style="display:flex;gap:8px;margin-top:16px">
-        <button class="btn btn-primary" id="bGo">질문 시작하기</button>
-        <button class="btn btn-ghost" id="bSkip">건너뛰기</button>
+        <button class="btn btn-primary" id="bGo">Start questions</button>
+        <button class="btn btn-ghost" id="bSkip">Skip</button>
       </div>
     </div>`;
   const uSel = document.getElementById("bUnit");
@@ -470,8 +460,8 @@ function showBasicInfo() {
   const wIn = document.getElementById("bW");
   uSel.value = basic.unit || 'imperial';
   const applyPlaceholders = () => {
-    if (uSel.value === 'imperial') { hIn.placeholder = "키 (in)"; wIn.placeholder = "몸무게 (lb)"; }
-    else { hIn.placeholder = "키 (cm)"; wIn.placeholder = "몸무게 (kg)"; }
+    if (uSel.value === 'imperial') { hIn.placeholder = "Height (in)"; wIn.placeholder = "Weight (lb)"; }
+    else { hIn.placeholder = "Height (cm)"; wIn.placeholder = "Weight (kg)"; }
   };
   applyPlaceholders();
   let cur = uSel.value;
@@ -507,20 +497,20 @@ function showQuestion() {
   screen.innerHTML = `
     <div class="fade">
       <div class="q-head">
-        <button class="back" id="back" aria-label="이전">←</button>
+        <button class="back" id="back" aria-label="Back">←</button>
         <div class="track"><div class="fill" style="width:${(n / SESSION) * 100}%"></div></div>
         <span class="count">${n + 1}/${SESSION}</span>
       </div>
-      <p style="font-size:12px;font-weight:800;letter-spacing:.2px;margin:0 0 6px;color:${n < COMMON ? 'var(--sky,#5B6B64)' : 'var(--jade)'}">${n < COMMON ? '1장 · 공통 문진' : '2장 · 맞춤 심화 문진'}</p>
-      ${n === COMMON ? `<div style="border:1px solid #0F766E4d;background:#0F766E14;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12.5px">✨ 지금까지 답변에 맞춰, 이제 나에게 맞는 질문을 몇 가지 더 여쭤볼게요.</div>` : ''}
+      <p style="font-size:12px;font-weight:800;letter-spacing:.2px;margin:0 0 6px;color:${n < COMMON ? 'var(--sky,#5B6B64)' : 'var(--jade)'}">${n < COMMON ? 'Chapter 1 · Common questions' : 'Chapter 2 · Personalized questions'}</p>
+      ${n === COMMON ? `<div style="border:1px solid #0F766E4d;background:#0F766E14;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12.5px">✨ Based on your answers, we'll now ask a few questions tailored to you.</div>` : ''}
       <p class="q-text">${esc(q.text)}</p>
       ${q.options.map((o, i) => `<button class="opt" data-i="${i}">${esc(o.t)}</button>`).join("")}
-      <button class="free-toggle" id="freeToggle">✏️ 직접 입력할게요</button>
+      <button class="free-toggle" id="freeToggle">✏️ Write my own answer</button>
       <div id="freeBox" style="display:none">
-        <textarea id="freeText" rows="3" maxlength="200" placeholder="내 상태를 편하게 적어주세요"></textarea>
+        <textarea id="freeText" rows="3" maxlength="200" placeholder="Describe it in your own words"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn btn-primary" id="freeOk">이 답변으로 할게요</button>
-          <button class="btn btn-ghost" id="freeCancel">취소</button>
+          <button class="btn btn-primary" id="freeOk">Use this answer</button>
+          <button class="btn btn-ghost" id="freeCancel">Cancel</button>
         </div>
       </div>
     </div>`;
@@ -555,20 +545,20 @@ function showResult() {
   const second = r.ranked[1] && top && r.ranked[1].score >= top.score * 0.6 ? r.ranked[1] : null;
   let html = `<div class="fade">
     <div class="banner" style="margin-bottom:12px"><b>ⓘ</b>
-      <span>이 결과는 <b>진단이 아니에요</b>. 한의사 선생님이 직접 확인합니다.</span></div>`;
+      <span>This is <b>not a diagnosis</b>. Your practitioner confirms it in person.</span></div>`;
   if (!top) {
     html += `<div class="result-card"><p style="margin:0;font-size:14px">
-      아직 뚜렷한 패턴 방향이 나오지 않았어요. 진료에서 함께 살펴보면 좋아요.</p></div>`;
+      No clear pattern direction yet. Your practitioner can explore this with you in person.</p></div>`;
   } else {
     const CONF = {
-      clear:    ["✓", "var(--jade)",   "한 방향이 뚜렷하게 나타났어요."],
-      moderate: ["↗", "#D9B44A",       "앞서는 방향이 보이지만, 진료에서 확인하면 좋아요."],
-      unclear:  ["?", "var(--sky, #5B6B64)", "아직 한 방향으로 뚜렷하진 않아요 — 진료에서 함께 살펴봐요."],
+      clear:    ["✓", "var(--jade)",   "One direction stands out clearly."],
+      moderate: ["↗", "#D9B44A",       "A leading direction is emerging, worth confirming in person."],
+      unclear:  ["?", "var(--sky, #5B6B64)", "No single direction is clear yet — your practitioner will explore it."],
     };
     const c = CONF[r.confidence];
     html += `<div style="border:1px solid ${c[1]}59;background:${c[1]}14;border-radius:12px;padding:12px;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700"><span style="color:${c[1]}">${c[0]}</span> ${c[2]}</div>
-      ${r.isCombined && r.second ? `<div style="font-size:12px;color:var(--ink-dim);margin-top:6px">두 방향이 함께 나타나요 — 한의사 선생님이 ${PATTERNS[r.second.id].name}와(과) 겹친 복합 패턴(겸증)으로 볼 수 있어요.</div>` : ""}
+      ${r.isCombined && r.second ? `<div style="font-size:12px;color:var(--ink-dim);margin-top:6px">Two directions appear together — your practitioner may treat this as a combined pattern with ${PATTERNS[r.second.id].name}.</div>` : ""}
     </div>`;
     const card = (s, primary) => `
       <div class="result-card ${primary ? "primary" : "secondary"}">
@@ -582,7 +572,7 @@ function showResult() {
     html += card(top, true);
     if (second) html += card(second, false);
     if (r.contributions.length) {
-      html += `<p class="section-label">이 방향을 가리킨 내 답변</p>
+      html += `<p class="section-label">Answers that pointed this way</p>
         <div class="evidence">${r.contributions.map(c => `<p>· ${esc(c)}</p>`).join("")}</div>`;
     }
   }
@@ -591,30 +581,30 @@ function showResult() {
   const wKg = basic.w ? (isImp ? basic.w * 0.453592 : basic.w) : null;
   const bmi = (hCm && wKg) ? (wKg / ((hCm/100)**2)).toFixed(1) : null;
   if (basic.h || basic.w) {
-    html += `<p class="section-label">기본 정보</p>
-      <div class="evidence"><p>${[basic.h?`키 ${basic.h}${isImp?'in':'cm'}`:null, basic.w?`몸무게 ${basic.w}${isImp?'lb':'kg'}`:null, bmi?`BMI ${bmi}`:null].filter(Boolean).join(" · ")}</p></div>`;
+    html += `<p class="section-label">Basic info</p>
+      <div class="evidence"><p>${[basic.h?`Height ${basic.h}${isImp?'in':'cm'}`:null, basic.w?`Weight ${basic.w}${isImp?'lb':'kg'}`:null, bmi?`BMI ${bmi}`:null].filter(Boolean).join(" · ")}</p></div>`;
   }
   const pairs = answeredPairs();
   if (pairs.length) {
     html += `<details style="margin-top:14px;border:1px solid var(--border);border-radius:14px;background:var(--card)">
       <summary style="padding:12px 14px;font-size:14px;font-weight:800;cursor:pointer">
-        내가 답한 내용 모두 보기 (${pairs.length}개)</summary>
+        Review my answers (${pairs.length})</summary>
       <div style="padding:0 14px 12px">
         ${pairs.map((p, i) => `
           <p style="margin:10px 0 2px;font-size:12px;font-weight:700;color:var(--ink-dim)">Q${i + 1}. ${esc(p.q)}</p>
           <p style="margin:0;font-size:13.5px">${p.free ? "✏️ " : ""}${esc(p.a)}</p>`).join("")}
       </div></details>`;
   }
-  html += `<p class="section-label">혀 사진 (선택)</p>
-    <p style="font-size:12px;color:var(--ink-dim);margin:-4px 0 8px">혀를 밝은 곳에서 찍어 첨부하면 진료에 도움이 돼요. 앱이 분석하지 않고 선생님이 직접 확인만 합니다.</p>
+  html += `<p class="section-label">Tongue photo (optional)</p>
+    <p style="font-size:12px;color:var(--ink-dim);margin:-4px 0 8px">A clear photo of your tongue helps your practitioner. It is only reviewed in person — the app does not analyse it.</p>
     <div id="tongueBox">
-      <label class="btn btn-ghost" style="display:inline-block">앨범에서 선택
+      <label class="btn btn-ghost" style="display:inline-block">Choose photo
         <input id="tongueInput" type="file" accept="image/*" style="display:none">
       </label>
     </div>`;
   html += `<div class="actions">
-      <button class="btn btn-primary" id="share">한의사에게 공유하기</button>
-      <button class="btn btn-ghost" id="retry">다시 하기</button>
+      <button class="btn btn-primary" id="share">Share with my practitioner</button>
+      <button class="btn btn-ghost" id="retry">Start over</button>
     </div></div>`;
   screen.innerHTML = html;
   document.getElementById("retry").onclick = showIntro;
@@ -626,11 +616,11 @@ function showResult() {
     document.getElementById("tongueBox").innerHTML =
       `<div style="display:flex;align-items:center;gap:12px">
         <img src="${url}" style="width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--border)">
-        <span style="font-weight:700;color:var(--jade)">✓ 사진 첨부됨</span>
+        <span style="font-weight:700;color:var(--jade)">✓ Photo added</span>
       </div>`;
   };
   document.getElementById("share").onclick = e => {
-    e.target.textContent = "공유 완료 ✓"; e.target.disabled = true;
+    e.target.textContent = "Shared ✓"; e.target.disabled = true;
   };
 }
 

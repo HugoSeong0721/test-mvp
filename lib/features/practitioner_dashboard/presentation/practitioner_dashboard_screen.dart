@@ -566,6 +566,8 @@ class _PractitionerDashboardScreenState
                 ),
               if (_subView == _DashboardSubView.inbox) ...[
                 const SizedBox(height: 4),
+                _buildPatternShareInboxPanel(),
+                const SizedBox(height: 12),
                 _buildQuestionCenterPanel(connectedProfiles),
                 const SizedBox(height: 12),
                 _buildClinicOpenRequestsPanel(),
@@ -5051,6 +5053,499 @@ class _PractitionerDashboardScreenState
                 );
               }),
           ],
+        ],
+      ),
+    );
+  }
+
+  String _confidenceLabel(String confidence) {
+    final lang = AppLanguageController.instance;
+    switch (confidence) {
+      case 'clear':
+        return lang.tr('Clear direction', '뚜렷한 방향');
+      case 'moderate':
+        return lang.tr('Moderate', '중간 확신');
+      case 'unclear':
+        return lang.tr('Needs in-person review', '진료로 확인 필요');
+      default:
+        return confidence;
+    }
+  }
+
+  /// Receiving side of the patient pattern finder: every result a patient
+  /// shares with "한의사에게 공유하기" lands here, newest first, with an
+  /// unread badge until the practitioner opens or confirms it.
+  Widget _buildPatternShareInboxPanel() {
+    final lang = AppLanguageController.instance;
+    final theme = Theme.of(context);
+    return AppPanel(
+      padding: const EdgeInsets.all(18),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppTheme.mint.withValues(alpha: 0.22), Colors.white],
+      ),
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
+            .collection('intake_submissions')
+            .snapshots(),
+        builder: (context, snapshot) {
+          final shares =
+              [...?snapshot.data?.docs].where((doc) {
+                final data = doc.data();
+                return (data['visitType'] ?? '').toString() ==
+                        'pattern_finder' &&
+                    _matchesCurrentClinicDoc(data);
+              }).toList()..sort((a, b) {
+                final aTime =
+                    (a.data()['submittedAt'] as Timestamp?)
+                        ?.millisecondsSinceEpoch ??
+                    0;
+                final bTime =
+                    (b.data()['submittedAt'] as Timestamp?)
+                        ?.millisecondsSinceEpoch ??
+                    0;
+                return bTime.compareTo(aTime);
+              });
+          final newCount = shares
+              .where(
+                (doc) => (doc.data()['status'] ?? '').toString() != 'reviewed',
+              )
+              .length;
+          final visibleShares = shares.take(10).toList();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      lang.tr('Shared finder results', '변증 공유 수신함'),
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
+                  if (newCount > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.copper,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        lang.tr('$newCount new', '새 공유 $newCount건'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                lang.tr(
+                  'When a patient finishes the pattern finder and taps '
+                  '"Share with my practitioner", the result arrives here.',
+                  '환자가 변증 파인더를 마치고 "한의사에게 공유하기"를 누르면 '
+                  '결과가 여기로 도착합니다.',
+                ),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.ink.withValues(alpha: 0.68),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (!snapshot.hasData && !snapshot.hasError)
+                const LinearProgressIndicator(minHeight: 4)
+              else if (snapshot.hasError)
+                Text(
+                  lang.tr(
+                    'Could not load shared results.',
+                    '공유된 결과를 불러오지 못했습니다.',
+                  ),
+                  style: const TextStyle(color: Colors.redAccent),
+                )
+              else if (visibleShares.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSoft.withValues(alpha: 0.62),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: Text(
+                    lang.tr(
+                      'No shared results yet.',
+                      '아직 공유된 변증 결과가 없어요.',
+                    ),
+                  ),
+                )
+              else ...[
+                ...visibleShares.map((doc) {
+                  final data = doc.data();
+                  final isNew =
+                      (data['status'] ?? '').toString() != 'reviewed';
+                  final patientId = (data['patientId'] ?? '').toString();
+                  final patientName = (data['patientName'] ?? '').toString();
+                  final submittedAt = (data['submittedAt'] as Timestamp?)
+                      ?.toDate();
+                  final adaptiveSummary =
+                      (data['adaptiveTcmSummary'] as Map?)
+                          ?.cast<String, dynamic>() ??
+                      const <String, dynamic>{};
+                  final directions = [
+                    for (final d
+                        in (adaptiveSummary['patternDirections'] as List? ??
+                            const []))
+                      d.toString(),
+                  ];
+                  final confidence = (adaptiveSummary['confidence'] ?? '')
+                      .toString();
+                  final hasTongue =
+                      ((data['tongueImageBase64'] as String?) ?? '')
+                          .trim()
+                          .isNotEmpty;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isNew
+                            ? AppTheme.sun.withValues(alpha: 0.14)
+                            : AppTheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isNew
+                              ? AppTheme.copper.withValues(alpha: 0.5)
+                              : AppTheme.border,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  patientName.isEmpty
+                                      ? lang.tr('Patient', '환자')
+                                      : patientName,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                              ),
+                              if (isNew)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.copper,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    lang.tr('NEW', '새 공유'),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            submittedAt == null
+                                ? lang.tr('Just now', '방금 전')
+                                : _formatDateTimeValue(submittedAt),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppTheme.ink.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          if (directions.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              directions.join(' · '),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              if (confidence.isNotEmpty)
+                                Chip(
+                                  label: Text(_confidenceLabel(confidence)),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                              if (hasTongue)
+                                Chip(
+                                  avatar: const Icon(
+                                    Icons.photo_camera_outlined,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    lang.tr('Tongue photo', '혀 사진'),
+                                  ),
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              FilledButton.icon(
+                                onPressed: () =>
+                                    _showPatternShareDetail(doc.id, data),
+                                icon: const Icon(
+                                  Icons.open_in_new_rounded,
+                                  size: 18,
+                                ),
+                                label: Text(lang.tr('Open', '자세히 보기')),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: () => _recordSyndromeFeedback(
+                                  patientId: patientId,
+                                  patientName: patientName,
+                                  adaptiveSummary: adaptiveSummary,
+                                ),
+                                icon: const Icon(
+                                  Icons.fact_check_outlined,
+                                  size: 18,
+                                ),
+                                label: Text(
+                                  lang.tr('Confirm syndrome', '실제 변증 기록'),
+                                ),
+                              ),
+                              if (isNew)
+                                OutlinedButton.icon(
+                                  onPressed: () =>
+                                      AppFirestoreService
+                                          .markIntakeSubmissionReviewed(
+                                        submissionId: doc.id,
+                                      ),
+                                  icon: const Icon(
+                                    Icons.done_outline,
+                                    size: 18,
+                                  ),
+                                  label: Text(lang.tr('Reviewed', '확인 완료')),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+                if (shares.length > visibleShares.length)
+                  Text(
+                    lang.tr(
+                      'Showing the latest ${visibleShares.length} of ${shares.length} shares.',
+                      '전체 ${shares.length}건 중 최근 ${visibleShares.length}건을 보여줍니다.',
+                    ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppTheme.ink.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Full detail of one shared pattern-finder result. Opening it counts as
+  /// reading: the share is marked reviewed so the NEW badge clears.
+  void _showPatternShareDetail(String submissionId, Map<String, dynamic> data) {
+    final lang = AppLanguageController.instance;
+    final isNew = (data['status'] ?? '').toString() != 'reviewed';
+    if (isNew) {
+      // Fire-and-forget: opening the share clears its unread badge.
+      AppFirestoreService.markIntakeSubmissionReviewed(
+        submissionId: submissionId,
+      );
+    }
+
+    final patientId = (data['patientId'] ?? '').toString();
+    final patientName = (data['patientName'] ?? '').toString();
+    final submittedAt = (data['submittedAt'] as Timestamp?)?.toDate();
+    final adaptiveSummary =
+        (data['adaptiveTcmSummary'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+    final directions = [
+      for (final d
+          in (adaptiveSummary['patternDirections'] as List? ?? const []))
+        d.toString(),
+    ];
+    final confidence = (adaptiveSummary['confidence'] ?? '').toString();
+    final isCombined = adaptiveSummary['isCombined'] == true;
+    final nextQuestions = [
+      for (final q
+          in (adaptiveSummary['nextBestQuestions'] as List? ?? const []))
+        q.toString(),
+    ];
+    final profileContext =
+        (adaptiveSummary['profileContext'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
+    final answers = [
+      for (final a in (data['answers'] as List? ?? const []))
+        if (a is Map) a.cast<String, dynamic>(),
+    ];
+    final tongueImageBase64 =
+        ((data['tongueImageBase64'] as String?) ?? '').trim();
+
+    Widget sectionTitle(String en, String ko) => Padding(
+      padding: const EdgeInsets.only(top: 14, bottom: 6),
+      child: Text(
+        lang.tr(en, ko),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+      ),
+    );
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          patientName.isEmpty
+              ? lang.tr('Shared finder result', '공유된 변증 결과')
+              : lang.tr(
+                  '$patientName · Shared result',
+                  '$patientName · 공유된 변증 결과',
+                ),
+        ),
+        content: SizedBox(
+          width: 480,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  submittedAt == null
+                      ? lang.tr('Just now', '방금 전')
+                      : _formatDateTimeValue(submittedAt),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.ink.withValues(alpha: 0.6),
+                  ),
+                ),
+                if (directions.isNotEmpty) ...[
+                  sectionTitle('Pattern direction', '패턴 방향'),
+                  Text(
+                    directions.join(' · '),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  if (isCombined)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        lang.tr(
+                          'Two directions appear together (combined pattern).',
+                          '두 방향이 함께 나타나요 (겸증 가능).',
+                        ),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                ],
+                if (confidence.isNotEmpty) ...[
+                  sectionTitle('Confidence', '확신도'),
+                  Text(_confidenceLabel(confidence)),
+                ],
+                if (profileContext.isNotEmpty) ...[
+                  sectionTitle('Patient context', '환자 기본 정보'),
+                  ...profileContext.entries.map(
+                    (e) => Text(
+                      '${e.key}: ${e.value}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+                if (answers.isNotEmpty) ...[
+                  sectionTitle(
+                    'Answers (${answers.length})',
+                    '답변 내용 (${answers.length}개)',
+                  ),
+                  ...answers.map((a) {
+                    final q = (a['questionText'] ?? '').toString();
+                    final ans = (a['answerText'] ?? '').toString();
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            q,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.ink.withValues(alpha: 0.62),
+                            ),
+                          ),
+                          Text(
+                            ans,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+                if (nextQuestions.isNotEmpty) ...[
+                  sectionTitle(
+                    'Suggested follow-up questions',
+                    '진료 때 물어보면 좋은 질문',
+                  ),
+                  ...nextQuestions.map(
+                    (q) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text('• $q', style: const TextStyle(fontSize: 13)),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          if (tongueImageBase64.isNotEmpty)
+            TextButton.icon(
+              onPressed: () => _showTongueImage(tongueImageBase64),
+              icon: const Icon(Icons.photo_camera_outlined, size: 18),
+              label: Text(lang.tr('Tongue photo', '혀 사진')),
+            ),
+          TextButton.icon(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _recordSyndromeFeedback(
+                patientId: patientId,
+                patientName: patientName,
+                adaptiveSummary: adaptiveSummary,
+              );
+            },
+            icon: const Icon(Icons.fact_check_outlined, size: 18),
+            label: Text(lang.tr('Confirm syndrome', '실제 변증 기록')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(lang.tr('Close', '닫기')),
+          ),
         ],
       ),
     );
