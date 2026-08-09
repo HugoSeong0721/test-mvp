@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>우주 합치기 — 먼지에서 항성까지</title>
+</head>
+<body>
+<style>
+  /* 우주라는 하나의 세계관에 확정 — 테마 분기 없이 모든 색을 명시 */
+  :root {
+    --void:      #070b14;
+    --nebula:    #0f1626;
+    --well:      #0a1020;
+    --rim:       #24304a;
+    --rim-soft:  #1a2338;
+    --star:      #ffd98a;
+    --star-deep: #e0a63c;
+    --ice:       #8fd6e8;
+    --danger:    #ff6f61;
+    --text:      #e6ecf5;
+    --text-dim:  #9aa9c0;
+    --label:     #6b7c96;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+    background:
+      radial-gradient(ellipse 70% 40% at 50% 0%, #16203a 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, var(--nebula) 0%, var(--void) 70%);
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    user-select: none; -webkit-user-select: none; touch-action: none;
+  }
+
+  #stage {
+    position: relative;
+    width: min(100vw, 440px);
+    height: min(100vh, 820px);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 10px 10px 12px;
+    gap: 8px;
+  }
+
+  /* ── 상단 정보 ─────────────────────── */
+  #hud { display: flex; align-items: flex-end; justify-content: space-between; padding: 0 4px; }
+  .stat-label {
+    font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--label); margin-bottom: 1px;
+  }
+  .stat-value { font-size: 30px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  #best-value { font-size: 17px; font-weight: 700; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  #best-box { text-align: right; }
+
+  #next-box {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 12px 5px 6px; border-radius: 999px;
+    background: rgba(255, 255, 255, .05); border: 1px solid var(--rim-soft);
+  }
+  #next-canvas { width: 34px; height: 34px; display: block; }
+  #next-name { font-size: 12px; color: var(--text-dim); letter-spacing: .5px; }
+
+  /* ── 우주통 ────────────────────────── */
+  /* 너무 길면 아무리 떨어뜨려도 차지 않는다 — 가로에 가까운 비율로 묶어 긴장감 유지 */
+  #well {
+    position: relative; flex: 1 1 auto; min-height: 0; max-height: 470px;
+    border: 1px solid var(--rim);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(20, 30, 55, .55), var(--well) 45%);
+    box-shadow: inset 0 0 50px rgba(60, 100, 180, .12), 0 10px 40px rgba(0, 0, 0, .5);
+    overflow: hidden;
+    cursor: crosshair;
+  }
+  #game-canvas { display: block; width: 100%; height: 100%; }
+
+  /* ── 오버레이 ──────────────────────── */
+  .overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(7, 11, 20, .9); backdrop-filter: blur(5px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 26px; gap: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .title-main {
+    font-size: 38px; font-weight: 800; letter-spacing: 4px; text-wrap: balance;
+    background: linear-gradient(180deg, #fff, var(--star));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .title-sub {
+    font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--label); margin-top: 6px;
+  }
+  .rules {
+    font-size: 13.5px; line-height: 2; color: var(--text-dim);
+    text-align: left; max-width: 30em;
+  }
+  .rules b { color: var(--star); font-weight: 700; }
+  .rules em { color: var(--ice); font-style: normal; font-weight: 700; }
+  .rules s { color: var(--danger); text-decoration: none; font-weight: 700; }
+  .chain-preview { display: flex; align-items: center; gap: 5px; margin: 2px 0 4px; }
+  .chain-preview i { display: block; border-radius: 50%; }
+  .chain-preview span { color: var(--label); font-size: 15px; margin: 0 1px; }
+
+  .btn {
+    font: inherit; font-size: 17px; font-weight: 700; letter-spacing: 3px;
+    color: #1a1305; background: linear-gradient(180deg, var(--star), var(--star-deep));
+    border: none; border-radius: 999px; padding: 14px 46px; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(255, 200, 90, .28);
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:focus-visible { outline: 3px solid var(--ice); outline-offset: 4px; }
+
+  #final-rank { font-size: 26px; font-weight: 800; color: var(--star); text-wrap: balance; }
+  #final-score { font-size: 40px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  #final-note { font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+  #final-best { font-size: 12px; color: var(--label); letter-spacing: 1px; }
+</style>
+
+<div id="stage">
+  <div id="hud">
+    <div>
+      <div class="stat-label">점수</div>
+      <div class="stat-value" id="score-value">0</div>
+    </div>
+    <div id="next-box">
+      <canvas id="next-canvas" width="68" height="68"></canvas>
+      <span id="next-name">성간먼지</span>
+    </div>
+    <div id="best-box">
+      <div class="stat-label">최고</div>
+      <div id="best-value">0</div>
+    </div>
+  </div>
+
+  <div id="well">
+    <canvas id="game-canvas"></canvas>
+
+    <div class="overlay" id="start-overlay">
+      <div>
+        <div class="title-main">우주 합치기</div>
+        <div class="title-sub">dust to star</div>
+      </div>
+      <div class="rules">
+        좌우로 움직여 <b>천체를 떨어뜨리세요.</b><br>
+        같은 천체끼리 닿으면 <em>한 단계 위로 합쳐집니다.</em>
+        <div class="chain-preview" id="chain-preview"></div>
+        연쇄로 터질수록 점수가 크게 붙습니다.<br>
+        <b>항성 둘</b>이 만나면 <em>초신성</em> — 주변을 날려버립니다.<br>
+        천체가 <s>윗선을 넘으면</s> 그대로 끝입니다.
+      </div>
+      <button class="btn" id="start-btn">시작</button>
+    </div>
+
+    <div class="overlay hidden" id="end-overlay">
+      <div>
+        <div class="title-sub" style="letter-spacing:4px">우주의 종말</div>
+        <div id="final-rank"></div>
+      </div>
+      <div id="final-score">0</div>
+      <div id="final-note"></div>
+      <div id="final-best"></div>
+      <button class="btn" id="retry-btn">다시</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ── 천체 등급: 먼지에서 항성까지 ─────────────────────────
+  const TIERS = [
+    { name: '성간먼지', r: 12, hi: '#dbe4f0', lo: '#7e8fa6', pts: 1 },
+    { name: '운석',     r: 16, hi: '#c6b39a', lo: '#7b6a55', pts: 3 },
+    { name: '소행성',   r: 21, hi: '#d39371', lo: '#8a5540', pts: 6 },
+    { name: '위성',     r: 26, hi: '#e8e4d6', lo: '#9b958a', pts: 10 },
+    { name: '왜행성',   r: 32, hi: '#93e6e2', lo: '#3d9b99', pts: 16 },
+    { name: '지구',     r: 39, hi: '#84c4f7', lo: '#2a68b2', pts: 24 },
+    { name: '해왕성',   r: 47, hi: '#7b95f2', lo: '#26379b', pts: 34 },
+    { name: '토성',     r: 56, hi: '#f2d28c', lo: '#a87a2e', pts: 48, ring: true },
+    { name: '목성',     r: 66, hi: '#f0ad74', lo: '#a05a2b', pts: 68 },
+    { name: '적색거성', r: 78, hi: '#ff947e', lo: '#ae2a1e', pts: 96 },
+    { name: '항성',     r: 92, hi: '#fff6cf', lo: '#ffb638', pts: 140, star: true },
+  ];
+
+  const DROP_TIERS = [0, 0, 0, 1, 1, 1, 2, 2, 3, 4]; // 낮은 등급이 자주 나오도록
+  const GRAVITY = 2100;      // px/s²
+  const DAMPING = 0.992;
+  const WALL_BOUNCE = 0.32;
+  const ITERATIONS = 8;
+  const SUBSTEPS = 2;
+  const DEATH_Y = 112;       // 이 선을 넘어 머무르면 종료
+  const DEATH_GRACE = 1.2;   // 초
+  const DROP_Y = 50;
+  const DROP_COOLDOWN = 0.34;
+
+  const wellEl = document.getElementById('well');
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  const nextCanvas = document.getElementById('next-canvas');
+  const nextCtx = nextCanvas.getContext('2d');
+  const scoreEl = document.getElementById('score-value');
+  const bestEl = document.getElementById('best-value');
+  const nextNameEl = document.getElementById('next-name');
+  const startOverlay = document.getElementById('start-overlay');
+  const endOverlay = document.getElementById('end-overlay');
+
+  let W = 420, H = 600, dpr = 1;
+  let bodies = [], particles = [], floaters = [];
+  let running = false, score = 0, best = 0;
+  let nextTier = 0, aimX = 210, dropCd = 0, overTimer = 0;
+  let shake = 0, flash = 0;
+  let uid = 0;
+
+  // ── 저장소 (차단된 환경에서도 게임은 계속) ───────────────
+  function loadBest() {
+    try { return parseInt(localStorage.getItem('cosmos-merge-best') || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function saveBest(v) {
+    try { localStorage.setItem('cosmos-merge-best', String(v)); } catch (e) { /* 무시 */ }
+  }
+
+  // ── 사운드 ───────────────────────────────────────────────
+  let actx = null;
+  function tone(freq, dur, type = 'sine', gain = .09, delay = 0) {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const t0 = actx.currentTime + delay;
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(gain, t0);
+      g.gain.exponentialRampToValueAtTime(.0008, t0 + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t0); o.stop(t0 + dur);
+    } catch (e) { /* 무시 */ }
+  }
+  function noiseBurst(dur = .5, gain = .25) {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const n = Math.floor(actx.sampleRate * dur);
+      const buf = actx.createBuffer(1, n, actx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n) ** 2;
+      const src = actx.createBufferSource(); src.buffer = buf;
+      const g = actx.createGain(); g.gain.value = gain;
+      const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900;
+      src.connect(f); f.connect(g); g.connect(actx.destination);
+      src.start();
+    } catch (e) { /* 무시 */ }
+  }
+
+  // ── 배경 별 ─────────────────────────────────────────────
+  const STARFIELD = Array.from({ length: 70 }, (_, i) => ({
+    x: ((i * 97) % 100) / 100, y: ((i * 61) % 100) / 100,
+    r: (i % 3) * .4 + .5, a: ((i * 37) % 60) / 100 + .15,
+  }));
+
+  function resize() {
+    const rect = wellEl.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    aimX = clampAim(aimX, nextTier);
+  }
+
+  function clampAim(x, tier) {
+    const r = TIERS[tier].r;
+    return Math.max(r + 3, Math.min(W - r - 3, x));
+  }
+
+  function pickTier() { return DROP_TIERS[Math.floor(Math.random() * DROP_TIERS.length)]; }
+
+  function addBody(x, y, tier, vx = 0, vy = 0) {
+    const b = {
+      id: ++uid, x, y, px: x - vx / 60, py: y - vy / 60,
+      r: TIERS[tier].r, tier, age: 0, pop: 0,
+    };
+    bodies.push(b);
+    return b;
+  }
+
+  // ── 물리: Verlet 적분 + 반복 제약 해결 ────────────────────
+  function physics(dt) {
+    const h = dt / SUBSTEPS;
+    for (let s = 0; s < SUBSTEPS; s++) {
+      for (const b of bodies) {
+        const vx = (b.x - b.px) * DAMPING;
+        const vy = (b.y - b.py) * DAMPING;
+        b.px = b.x; b.py = b.y;
+        b.x += vx;
+        b.y += vy + GRAVITY * h * h;
+      }
+      for (let it = 0; it < ITERATIONS; it++) {
+        // 천체끼리
+        for (let i = 0; i < bodies.length; i++) {
+          const a = bodies[i];
+          for (let j = i + 1; j < bodies.length; j++) {
+            const b = bodies[j];
+            let dx = b.x - a.x, dy = b.y - a.y;
+            const minD = a.r + b.r;
+            let d2 = dx * dx + dy * dy;
+            if (d2 >= minD * minD || d2 === 0) continue;
+            const d = Math.sqrt(d2);
+            const overlap = (minD - d);
+            const nx = dx / d, ny = dy / d;
+            // 질량은 반지름 제곱에 비례 — 큰 천체가 덜 밀림
+            const ma = a.r * a.r, mb = b.r * b.r, tot = ma + mb;
+            const sa = (mb / tot) * overlap * 0.5;
+            const sb = (ma / tot) * overlap * 0.5;
+            a.x -= nx * sa; a.y -= ny * sa;
+            b.x += nx * sb; b.y += ny * sb;
+          }
+        }
+        // 벽과 바닥
+        for (const b of bodies) {
+          if (b.x < b.r) { const vx = b.x - b.px; b.x = b.r; b.px = b.x + vx * WALL_BOUNCE; }
+          if (b.x > W - b.r) { const vx = b.x - b.px; b.x = W - b.r; b.px = b.x + vx * WALL_BOUNCE; }
+          if (b.y > H - b.r) { const vy = b.y - b.py; b.y = H - b.r; b.py = b.y + vy * WALL_BOUNCE; }
+        }
+      }
+    }
+  }
+
+  // ── 합치기 (연쇄 포함) ───────────────────────────────────
+  function resolveMerges() {
+    let chain = 0;
+    for (let pass = 0; pass < 6; pass++) {
+      let merged = false;
+      outer:
+      for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+          const a = bodies[i], b = bodies[j];
+          if (a.tier !== b.tier) continue;
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const touch = a.r + b.r + 1.5;
+          if (dx * dx + dy * dy > touch * touch) continue;
+
+          const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+          const tier = a.tier;
+          bodies.splice(j, 1);
+          bodies.splice(i, 1);
+          chain++;
+
+          if (tier === TIERS.length - 1) {
+            supernova(mx, my);
+          } else {
+            const nb = addBody(mx, my, tier + 1);
+            nb.pop = 1;
+            const gain = Math.round(TIERS[tier + 1].pts * (1 + chain * 0.35));
+            score += gain;
+            burst(mx, my, TIERS[tier + 1].hi, 14 + tier * 2);
+            floaters.push({ x: mx, y: my, text: '+' + gain, life: .9, color: TIERS[tier + 1].hi });
+            tone(300 + tier * 78, .16, 'triangle', .09);
+            tone(600 + tier * 156, .1, 'sine', .05, .02);
+          }
+          merged = true;
+          break outer;
+        }
+      }
+      if (!merged) break;
+    }
+  }
+
+  function supernova(x, y) {
+    score += 2000;
+    flash = 1;
+    shake = 26;
+    burst(x, y, '#fff6cf', 90, 620);
+    floaters.push({ x, y, text: '초신성! +2000', life: 1.6, color: '#fff6cf' });
+    noiseBurst(.7, .3);
+    tone(140, .9, 'sawtooth', .16);
+    for (const b of bodies) {
+      const dx = b.x - x, dy = b.y - y;
+      const d = Math.hypot(dx, dy) || 1;
+      if (d < 300) {
+        const f = (1 - d / 300) * 26;
+        b.px -= (dx / d) * f;
+        b.py -= (dy / d) * f;
+      }
+    }
+  }
+
+  function burst(x, y, color, n, speed = 260) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = (0.25 + Math.random() * 0.75) * speed;
+      particles.push({
+        x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        life: .4 + Math.random() * .5, max: .9, color,
+        r: 1 + Math.random() * 2.4,
+      });
+    }
+  }
+
+  // ── 종료 판정 ────────────────────────────────────────────
+  function checkGameOver(dt) {
+    let over = false;
+    for (const b of bodies) {
+      if (b.age < 0.7) continue;                       // 막 떨어뜨린 천체는 예외
+      const speed = Math.hypot(b.x - b.px, b.y - b.py);
+      if (b.y - b.r < DEATH_Y && speed < 1.6) { over = true; break; }
+    }
+    overTimer = over ? overTimer + dt : 0;
+    if (overTimer >= DEATH_GRACE) endGame();
+  }
+
+  // ── 그리기 ───────────────────────────────────────────────
+  function drawPlanet(c, x, y, r, tier, alpha = 1) {
+    const t = TIERS[tier];
+    c.save();
+    c.globalAlpha = alpha;
+
+    if (t.star) {
+      const glow = c.createRadialGradient(x, y, r * .5, x, y, r * 1.9);
+      glow.addColorStop(0, 'rgba(255,214,120,.5)');
+      glow.addColorStop(1, 'rgba(255,214,120,0)');
+      c.fillStyle = glow;
+      c.beginPath(); c.arc(x, y, r * 1.9, 0, Math.PI * 2); c.fill();
+    }
+
+    if (t.ring) {
+      c.save();
+      c.translate(x, y); c.rotate(-0.32); c.scale(1, 0.3);
+      c.strokeStyle = 'rgba(238,208,150,.55)';
+      c.lineWidth = r * .22;
+      c.beginPath(); c.arc(0, 0, r * 1.5, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+
+    const g = c.createRadialGradient(x - r * .35, y - r * .4, r * .1, x, y, r);
+    g.addColorStop(0, t.hi);
+    g.addColorStop(1, t.lo);
+    c.fillStyle = g;
+    c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+
+    // 반대편 림 라이트
+    c.strokeStyle = 'rgba(255,255,255,.22)';
+    c.lineWidth = Math.max(1, r * .06);
+    c.beginPath(); c.arc(x, y, r - c.lineWidth / 2, Math.PI * .15, Math.PI * .85); c.stroke();
+
+    if (r >= 26) {
+      c.fillStyle = 'rgba(10,14,24,.55)';
+      c.font = '700 ' + Math.round(r * .3) + 'px system-ui, sans-serif';
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(t.name, x, y + r * .05);
+    }
+    c.restore();
+  }
+
+  function render(dt) {
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.save();
+    if (shake > 0) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
+
+    // 배경 별
+    for (const s of STARFIELD) {
+      ctx.fillStyle = 'rgba(190,215,255,' + s.a + ')';
+      ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // 종료선
+    const warn = overTimer > 0;
+    ctx.setLineDash([7, 9]);
+    ctx.strokeStyle = warn ? 'rgba(255,111,97,' + (.4 + .5 * Math.sin(performance.now() / 90)) + ')'
+                           : 'rgba(120,145,190,.28)';
+    ctx.lineWidth = warn ? 2 : 1;
+    ctx.beginPath(); ctx.moveTo(0, DEATH_Y); ctx.lineTo(W, DEATH_Y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 조준 가이드와 대기 중인 천체
+    if (running && dropCd <= 0) {
+      const r = TIERS[nextTier].r;
+      const grad = ctx.createLinearGradient(0, DROP_Y, 0, H);
+      grad.addColorStop(0, 'rgba(255,217,138,.28)');
+      grad.addColorStop(1, 'rgba(255,217,138,0)');
+      ctx.strokeStyle = grad; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(aimX, DROP_Y + r); ctx.lineTo(aimX, H); ctx.stroke();
+      drawPlanet(ctx, aimX, DROP_Y, r, nextTier, .95);
+    }
+
+    // 천체
+    for (const b of bodies) {
+      const s = b.pop > 0 ? 1 + b.pop * .28 : 1;
+      drawPlanet(ctx, b.x, b.y, b.r * s, b.tier);
+    }
+
+    // 파티클
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // 점수 표시
+    for (const f of floaters) {
+      ctx.globalAlpha = Math.min(1, f.life * 1.6);
+      ctx.fillStyle = f.color;
+      ctx.font = '800 ' + (f.text.length > 5 ? 20 : 16) + 'px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(f.text, f.x, f.y - (1 - f.life) * 34);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    if (flash > 0) {
+      ctx.fillStyle = 'rgba(255,246,207,' + flash * .75 + ')';
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function drawNext() {
+    const c = nextCtx, s = 68;
+    c.clearRect(0, 0, s, s);
+    drawPlanet(c, s / 2, s / 2, s / 2 - 6, nextTier);
+    nextNameEl.textContent = TIERS[nextTier].name;
+  }
+
+  // ── 루프 ─────────────────────────────────────────────────
+  let lastT = 0, acc = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    if (!lastT) lastT = t;
+    let dt = (t - lastT) / 1000;
+    lastT = t;
+    if (dt > 0.1) dt = 0.1;
+
+    if (running) {
+      acc += dt;
+      const STEP = 1 / 60;
+      let guard = 0;
+      while (acc >= STEP && guard++ < 5) {
+        physics(STEP);
+        resolveMerges();
+        for (const b of bodies) { b.age += STEP; if (b.pop > 0) b.pop = Math.max(0, b.pop - STEP * 6); }
+        checkGameOver(STEP);
+        acc -= STEP;
+      }
+      if (dropCd > 0) dropCd -= dt;
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.life -= dt;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      p.vy += 900 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    }
+    for (let i = floaters.length - 1; i >= 0; i--) {
+      floaters[i].life -= dt;
+      if (floaters[i].life <= 0) floaters.splice(i, 1);
+    }
+    if (shake > 0) shake = Math.max(0, shake - dt * 70);
+    if (flash > 0) flash = Math.max(0, flash - dt * 2.4);
+
+    scoreEl.textContent = score;
+    render(dt);
+  }
+
+  // ── 입력 ─────────────────────────────────────────────────
+  function pointerX(e) {
+    const rect = wellEl.getBoundingClientRect();
+    return e.clientX - rect.left;
+  }
+  wellEl.addEventListener('pointermove', (e) => {
+    if (!running) return;
+    aimX = clampAim(pointerX(e), nextTier);
+  });
+  wellEl.addEventListener('pointerdown', (e) => {
+    if (!running) return;
+    e.preventDefault();
+    aimX = clampAim(pointerX(e), nextTier);
+    drop();
+  });
+
+  function drop() {
+    if (dropCd > 0) return;
+    addBody(aimX, DROP_Y, nextTier);
+    tone(180, .08, 'sine', .05);
+    dropCd = DROP_COOLDOWN;
+    nextTier = pickTier();
+    aimX = clampAim(aimX, nextTier);
+    drawNext();
+  }
+
+  // ── 시작 / 종료 ──────────────────────────────────────────
+  function rankFor(s) {
+    if (s < 400) return ['먼지 구름', '아직 별이 태어나기 전입니다.'];
+    if (s < 1200) return ['원시 행성계', '천체들이 자리를 잡기 시작했군요.'];
+    if (s < 3000) return ['행성계', '제법 그럴듯한 태양계가 만들어졌습니다.'];
+    if (s < 6000) return ['거대 가스 행성대', '목성급을 다루는 손입니다.'];
+    if (s < 12000) return ['항성계', '드디어 별을 만들어냈습니다.'];
+    return ['은하의 창조주', '초신성까지 다루는 경지에 도달했습니다.'];
+  }
+
+  function endGame() {
+    running = false;
+    const [rank, note] = rankFor(score);
+    if (score > best) { best = score; saveBest(best); }
+    bestEl.textContent = best;
+    document.getElementById('final-rank').textContent = rank;
+    document.getElementById('final-score').textContent = score;
+    document.getElementById('final-note').textContent = note;
+    document.getElementById('final-best').textContent = '최고 기록 ' + best;
+    endOverlay.classList.remove('hidden');
+    tone(300, .3, 'sine', .08);
+    tone(200, .5, 'sine', .08, .12);
+  }
+
+  function startGame() {
+    bodies = []; particles = []; floaters = [];
+    score = 0; overTimer = 0; dropCd = 0; shake = 0; flash = 0; acc = 0;
+    nextTier = pickTier();
+    resize();
+    aimX = W / 2;
+    drawNext();
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    running = true;
+  }
+
+  // 규칙 설명의 합치기 사슬 미리보기
+  (function buildChainPreview() {
+    const el = document.getElementById('chain-preview');
+    [0, 2, 4, 6, 8, 10].forEach((tier, i) => {
+      if (i) {
+        const sep = document.createElement('span');
+        sep.textContent = '›';
+        el.appendChild(sep);
+      }
+      const dot = document.createElement('i');
+      const size = 9 + i * 4;
+      dot.style.width = size + 'px';
+      dot.style.height = size + 'px';
+      dot.style.background = 'radial-gradient(circle at 34% 30%, ' + TIERS[tier].hi + ', ' + TIERS[tier].lo + ')';
+      el.appendChild(dot);
+    });
+  })();
+
+  best = loadBest();
+  bestEl.textContent = best;
+  document.getElementById('start-btn').addEventListener('click', startGame);
+  document.getElementById('retry-btn').addEventListener('click', startGame);
+  window.addEventListener('resize', resize);
+  resize();
+  drawNext();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
