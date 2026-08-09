@@ -109,6 +109,99 @@
   #final-alt .unit { font-size: 20px; color: var(--text-dim); margin-left: 3px; }
   #final-rank { font-size: 19px; font-weight: 700; color: var(--flame-hi); text-wrap: balance; }
   #final-best { font-size: 12px; color: var(--label); letter-spacing: 1px; }
+
+  .is-hidden { display: none !important; }
+
+  /* ── 도전 상대 ─────────────────────── */
+  #chal-chip {
+    align-self: center;
+    font-size: 11px; letter-spacing: 1px; color: var(--text-dim);
+    background: rgba(255, 90, 31, .14); border: 1px solid rgba(255, 90, 31, .45);
+    border-radius: 999px; padding: 4px 11px;
+  }
+  #chal-chip b { color: var(--flame-hi); font-variant-numeric: tabular-nums; }
+
+  #pass-banner {
+    position: absolute; top: 26%; left: 0; right: 0; z-index: 6;
+    text-align: center; pointer-events: none; opacity: 0;
+    font-size: 26px; font-weight: 800; letter-spacing: 2px; color: var(--flame-hi);
+    text-shadow: 0 0 18px rgba(255, 150, 40, .9);
+  }
+  #pass-banner.show { animation: passPop 1.5s ease-out forwards; }
+  @keyframes passPop {
+    0%   { opacity: 0; transform: scale(.7); }
+    18%  { opacity: 1; transform: scale(1.08); }
+    32%  { transform: scale(1); }
+    78%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-26px); }
+  }
+
+  /* ── 결과 화면의 랭킹 ──────────────── */
+  .overlay#end-overlay { gap: 11px; }
+  #challenge-result { font-size: 13px; font-weight: 700; }
+  #challenge-result.win  { color: var(--spring); }
+  #challenge-result.lose { color: var(--danger); }
+
+  .name-row { display: flex; align-items: center; gap: 8px; }
+  .name-row label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--label); }
+  #name-input {
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--text);
+    background: rgba(255, 255, 255, .07); border: 1px solid var(--rim);
+    border-radius: 8px; padding: 7px 11px; width: 132px; text-align: center;
+  }
+  #name-input:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
+
+  #rank-board {
+    width: 100%; max-width: 290px; max-height: 148px; overflow-y: auto;
+    border: 1px solid var(--rim); border-radius: 10px;
+    background: rgba(255, 255, 255, .035);
+  }
+  .rank-row {
+    display: grid; grid-template-columns: 26px 1fr auto;
+    align-items: center; gap: 8px;
+    padding: 7px 11px; font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row.me { background: rgba(255, 90, 31, .16); }
+  .rank-pos { font-size: 11px; font-weight: 700; color: var(--label); font-variant-numeric: tabular-nums; }
+  .rank-row.me .rank-pos { color: var(--flame-hi); }
+  .rank-name { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .rank-row.me .rank-name { color: var(--text); font-weight: 700; }
+  .rank-m { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+  .rank-empty { padding: 14px; font-size: 12px; color: var(--label); }
+
+  .btn-row { display: flex; gap: 10px; align-items: center; }
+  .btn.secondary {
+    background: rgba(255, 255, 255, .08); color: var(--text);
+    border: 1px solid var(--rim); box-shadow: none;
+    font-size: 15px; letter-spacing: 1px; padding: 13px 22px;
+  }
+  .btn.secondary:active { transform: scale(.97); }
+
+  #share-note { font-size: 11.5px; color: var(--spring); min-height: 14px; }
+  /* 시작 화면의 도전 코드 입력 — 눈에 띄지 않게, 필요한 사람만 쓰도록 */
+  .code-row { display: flex; align-items: center; gap: 6px; margin-top: -4px; }
+  .code-row label { font-size: 10px; letter-spacing: 1.5px; color: var(--label); }
+  #code-input {
+    font: inherit; font-size: 13px; color: var(--text); width: 82px; text-align: center;
+    background: rgba(255, 255, 255, .06); border: 1px solid var(--rim);
+    border-radius: 7px; padding: 6px 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  #code-btn {
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--text-dim);
+    background: rgba(255, 255, 255, .07); border: 1px solid var(--rim);
+    border-radius: 7px; padding: 7px 12px; cursor: pointer;
+  }
+  #code-btn:active { transform: scale(.96); }
+  #code-input:focus-visible, #code-btn:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
+
+  #share-fallback {
+    font: inherit; font-size: 11px; color: var(--text-dim); width: 100%; max-width: 290px;
+    background: rgba(255, 255, 255, .06); border: 1px solid var(--rim);
+    border-radius: 8px; padding: 7px 9px;
+  }
 </style>
 
 <div id="stage">
@@ -117,6 +210,7 @@
       <div class="stat-label">고도</div>
       <div id="alt-value">0<span class="unit">m</span></div>
     </div>
+    <div id="chal-chip" class="is-hidden">도전 <b></b></div>
     <div id="best-box">
       <div class="stat-label">최고</div>
       <div id="best-value">0m</div>
@@ -126,6 +220,7 @@
   <div id="shaft">
     <canvas id="game-canvas"></canvas>
     <div id="heat"></div>
+    <div id="pass-banner">기록 추월!</div>
 
     <div class="overlay" id="start-overlay">
       <div>
@@ -142,14 +237,32 @@
         점프는 자동 · 양옆 벽은 통과합니다
       </div>
       <button class="btn" id="start-btn">도망친다</button>
+      <div class="code-row">
+        <label for="code-input">도전 코드</label>
+        <input id="code-input" inputmode="numeric" maxlength="6" placeholder="예: 420" autocomplete="off">
+        <button id="code-btn" type="button">적용</button>
+      </div>
     </div>
 
     <div class="overlay hidden" id="end-overlay">
       <div id="death-cause"></div>
       <div id="final-alt">0<span class="unit">m</span></div>
       <div id="final-rank"></div>
+      <div id="challenge-result" class="is-hidden"></div>
+
+      <div class="name-row">
+        <label for="name-input">이름</label>
+        <input id="name-input" maxlength="8" placeholder="이름 입력" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="rank-board"></div>
+
+      <div class="btn-row">
+        <button class="btn secondary" id="share-btn">기록 공유</button>
+        <button class="btn" id="retry-btn">다시</button>
+      </div>
+      <div id="share-note"></div>
+      <input id="share-fallback" class="is-hidden" readonly>
       <div id="final-best"></div>
-      <button class="btn" id="retry-btn">다시</button>
     </div>
   </div>
 </div>
@@ -195,6 +308,133 @@
     catch (e) { return 0; }
   }
   function saveBest(v) { try { localStorage.setItem('firechase-best', String(v)); } catch (e) { /* 무시 */ } }
+
+  // ── 랭킹 (이 기기에 남는 기록) ──────────────────────────
+  const RANK_MAX = 10;
+  let ranks = [], myRankRow = null;
+
+  function loadRanks() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('firechase-ranks') || '[]');
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter(r => r && typeof r.m === 'number' && isFinite(r.m))
+        .map(r => ({ n: String(r.n || '나').slice(0, 8), m: Math.max(0, Math.round(r.m)), t: r.t || 0 }))
+        .sort((a, b) => b.m - a.m)
+        .slice(0, RANK_MAX);
+    } catch (e) { return []; }
+  }
+  function saveRanks() {
+    try { localStorage.setItem('firechase-ranks', JSON.stringify(ranks)); } catch (e) { /* 무시 */ }
+  }
+  function loadName() {
+    try { return (localStorage.getItem('firechase-name') || '').slice(0, 8); } catch (e) { return ''; }
+  }
+  function saveName(v) { try { localStorage.setItem('firechase-name', v); } catch (e) { /* 무시 */ } }
+
+  function renderRanks() {
+    const board = document.getElementById('rank-board');
+    board.textContent = '';
+    if (!ranks.length) {
+      const empty = document.createElement('div');
+      empty.className = 'rank-empty';
+      empty.textContent = '아직 기록이 없습니다.';
+      board.appendChild(empty);
+      return;
+    }
+    ranks.forEach((r, i) => {
+      const row = document.createElement('div');
+      row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
+      const pos = document.createElement('span');
+      pos.className = 'rank-pos';
+      pos.textContent = (i + 1) + '위';
+      const name = document.createElement('span');
+      name.className = 'rank-name';
+      name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
+      const m = document.createElement('span');
+      m.className = 'rank-m';
+      m.textContent = r.m + 'm';
+      row.append(pos, name, m);
+      board.appendChild(row);
+    });
+    const me = board.querySelector('.rank-row.me');
+    if (me) me.scrollIntoView({ block: 'nearest' });
+  }
+
+  function recordRank(m) {
+    const entry = { n: loadName() || '나', m, t: Date.now() };
+    ranks.push(entry);
+    ranks.sort((a, b) => b.m - a.m);
+    ranks = ranks.slice(0, RANK_MAX);
+    myRankRow = ranks.includes(entry) ? entry : null;
+    saveRanks();
+    renderRanks();
+  }
+
+  // ── 도전 상대 (공유 링크에 실려 오는 기록) ───────────────
+  let challengeM = 0, challengeBeaten = false;
+
+  function readHashChallenge() {
+    try {
+      const hit = /(?:^|[#&?])c=(\d{1,6})/.exec(location.hash || '');
+      return hit ? Math.min(999999, parseInt(hit[1], 10) || 0) : 0;
+    } catch (e) { return 0; }
+  }
+
+  function setChallenge(m) {
+    challengeM = Math.max(0, Math.min(999999, Math.round(m) || 0));
+    const chip = document.getElementById('chal-chip');
+    if (challengeM > 0) {
+      chip.querySelector('b').textContent = challengeM + 'm';
+      chip.classList.remove('is-hidden');
+    } else chip.classList.add('is-hidden');
+    const input = document.getElementById('code-input');
+    if (input && challengeM > 0 && input.value !== String(challengeM)) input.value = String(challengeM);
+  }
+
+  // 링크의 프래그먼트는 환경에 따라 전달되지 않을 수 있어 코드 입력도 함께 받는다
+  window.addEventListener('hashchange', () => {
+    const m = readHashChallenge();
+    if (m > 0) setChallenge(m);
+  });
+
+  // ── 공유 ────────────────────────────────────────────────
+  function challengeUrl(m) {
+    try {
+      const u = new URL(location.href);
+      u.hash = 'c=' + m;
+      return u.href;
+    } catch (e) { return ''; }
+  }
+  function note(msg) {
+    const el = document.getElementById('share-note');
+    el.textContent = msg;
+    clearTimeout(note._t);
+    note._t = setTimeout(() => { el.textContent = ''; }, 3200);
+  }
+  async function shareResult() {
+    const url = challengeUrl(altM);
+    // 링크가 막힌 곳에서도 겨룰 수 있도록 도전 코드를 함께 실어 보낸다
+    const text = '🔥 불길 탈출 — ' + altM + 'm까지 도망쳤습니다. 이길 수 있나요?\n도전 코드: ' + altM;
+    const full = url ? text + '\n' + url : text;
+    if (navigator.share) {
+      try {
+        await navigator.share(url ? { title: '불길 탈출', text, url } : { title: '불길 탈출', text });
+        return note('공유했습니다');
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(full);
+      return note('도전 링크를 복사했습니다');
+    } catch (e) { /* 아래 수동 복사로 넘어간다 */ }
+    const fb = document.getElementById('share-fallback');
+    fb.value = full;
+    fb.classList.remove('is-hidden');
+    fb.focus(); fb.select();
+    note('아래 링크를 복사해 보내세요');
+  }
 
   // ── 사운드 ──────────────────────────────────────────────
   let actx = null;
@@ -273,6 +513,7 @@
 
   // ── 입력 ────────────────────────────────────────────────
   window.addEventListener('keydown', (e) => {
+    if (e.target && e.target.tagName === 'INPUT') return;   // 이름 입력 중에는 조작키로 쓰지 않는다
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { inputLeft = true; targetX = null; }
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { inputRight = true; targetX = null; }
     if ((e.key === ' ' || e.key === 'Enter') && !running) { e.preventDefault(); startGame(); }
@@ -323,6 +564,8 @@
     fillPlatforms();
 
     lavaY = player.y + LAVA_LEASH;
+    challengeBeaten = false;
+    document.getElementById('pass-banner').classList.remove('show');
     running = true;
     startOverlay.classList.add('hidden');
     endOverlay.classList.add('hidden');
@@ -346,7 +589,20 @@
     document.getElementById('death-cause').textContent = cause;
     document.getElementById('final-alt').innerHTML = altM + '<span class="unit">m</span>';
     document.getElementById('final-rank').textContent = rankFor(altM);
-    document.getElementById('final-best').textContent = '최고 기록 ' + bestM + 'm';
+    document.getElementById('final-best').textContent = '이 기기 최고 ' + bestM + 'm';
+
+    const cr = document.getElementById('challenge-result');
+    if (challengeM > 0) {
+      const won = altM > challengeM;
+      cr.textContent = won
+        ? '도전 성공 — 상대 기록 ' + challengeM + 'm를 넘었습니다'
+        : '도전 실패 — 상대 기록까지 ' + (challengeM - altM) + 'm 남았습니다';
+      cr.className = won ? 'win' : 'lose';
+    } else cr.className = 'is-hidden';
+
+    recordRank(altM);
+    document.getElementById('share-fallback').classList.add('is-hidden');
+    document.getElementById('share-note').textContent = '';
     endOverlay.classList.remove('hidden');
     heatEl.style.opacity = 0;
     noise(.7, .3, 700);
@@ -423,6 +679,17 @@
     // 고도
     peakY = Math.min(peakY, player.y);
     altM = Math.max(0, Math.round(-peakY / PX_PER_M));
+
+    // 도전 기록 추월
+    if (challengeM > 0 && !challengeBeaten && altM > challengeM) {
+      challengeBeaten = true;
+      const banner = document.getElementById('pass-banner');
+      banner.classList.remove('show');
+      void banner.offsetWidth;          // 애니메이션 재시작
+      banner.classList.add('show');
+      tone(700, .12, 'triangle', .08);
+      tone(950, .16, 'triangle', .07, .07);
+    }
 
     // 불길 상승 — 높이 올라갈수록 빨라진다
     const lavaSpd = 55 + Math.min(230, altM * 0.30);
@@ -595,6 +862,24 @@
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
 
+    // 도전 상대의 기록선 — 넘어야 할 높이를 눈으로 보여준다
+    if (challengeM > 0) {
+      const cy = -challengeM * PX_PER_M - camY;
+      if (cy > -30 && cy < H + 30) {
+        ctx.save();
+        ctx.setLineDash([9, 7]);
+        ctx.strokeStyle = challengeBeaten ? 'rgba(79,191,106,.75)' : 'rgba(255,210,74,.75)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '700 11px system-ui, sans-serif';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+        ctx.fillStyle = challengeBeaten ? '#8ee8a4' : '#ffd24a';
+        ctx.fillText((challengeBeaten ? '추월함 ' : '도전 ') + challengeM + 'm', W - 8, cy - 4);
+        ctx.restore();
+      }
+    }
+
     for (const p of platforms) drawPlatform(p);
 
     ctx.fillStyle = '#c8bdb2';
@@ -641,6 +926,28 @@
 
   bestM = loadBest();
   bestEl.textContent = bestM + 'm';
+  ranks = loadRanks();
+  renderRanks();
+  setChallenge(readHashChallenge());
+
+  const codeInput = document.getElementById('code-input');
+  function applyCode() {
+    const v = parseInt((codeInput.value || '').replace(/[^\d]/g, ''), 10);
+    if (v > 0) { setChallenge(v); codeInput.blur(); }
+    else { setChallenge(0); codeInput.value = ''; }
+  }
+  document.getElementById('code-btn').addEventListener('click', applyCode);
+  codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCode(); } });
+
+  const nameInput = document.getElementById('name-input');
+  nameInput.value = loadName();
+  nameInput.addEventListener('input', () => {
+    const v = nameInput.value.trim().slice(0, 8);
+    saveName(v);
+    if (myRankRow) { myRankRow.n = v || '나'; saveRanks(); renderRanks(); }
+  });
+
+  document.getElementById('share-btn').addEventListener('click', shareResult);
   document.getElementById('start-btn').addEventListener('click', startGame);
   document.getElementById('retry-btn').addEventListener('click', startGame);
   window.addEventListener('resize', () => { resize(); });
