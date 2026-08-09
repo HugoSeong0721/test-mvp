@@ -211,8 +211,8 @@
   </div>
 
   <p class="note"
-     data-ko="이 페이지는 한의사 화면의 디자인 미리보기입니다. 실제 앱에서는 Firebase를 통해 공유가 실시간으로 도착합니다. 환자 화면은 <a href=&quot;./pattern-finder-preview.html&quot;>여기</a>에서 볼 수 있어요.<br>변증 방향은 진단이 아니며, 최종 판단은 한의사의 진료로 확인합니다."
-     data-en="This page is a design preview of the practitioner screen. In the real app, shares arrive live over Firebase. The patient screen is <a href=&quot;./pattern-finder-preview.html&quot;>here</a>.<br>Pattern directions are not a diagnosis; the practitioner confirms in person.">
+     data-ko="이 페이지는 한의사 화면의 디자인 미리보기입니다. 실제 앱에서는 Firebase를 통해 공유가 실시간으로 도착합니다. 환자 화면은 <a href=&quot;./pattern-finder-preview.html&quot;>여기</a>, 변증별 침 자리는 <a href=&quot;./acupoint-guide-preview.html&quot;>여기</a>에서 볼 수 있어요.<br>변증 방향은 진단이 아니며, 최종 판단은 한의사의 진료로 확인합니다."
+     data-en="This page is a design preview of the practitioner screen. In the real app, shares arrive live over Firebase. The patient screen is <a href=&quot;./pattern-finder-preview.html&quot;>here</a>, and the acupoint guide is <a href=&quot;./acupoint-guide-preview.html&quot;>here</a>.<br>Pattern directions are not a diagnosis; the practitioner confirms in person.">
   </p>
 </div>
 
@@ -231,6 +231,7 @@ const T = {
     newCount: n => `새 공유 ${n}건`, tagNew: "새 공유", open: "자세히 보기",
     confirm: "실제 변증 기록", reviewed: "확인 완료", close: "닫기",
     tongue: "혀 사진", empty: "아직 공유된 변증 결과가 없어요.",
+    acu: "침 자리 보기",
     secDir: "패턴 방향", secConf: "확신도", secCtx: "환자 기본 정보",
     secAns: n => `답변 내용 (${n}개)`, secNext: "진료 때 물어보면 좋은 질문",
     combined: "두 방향이 함께 나타나요 (겸증 가능).",
@@ -242,6 +243,7 @@ const T = {
     newCount: n => `${n} new`, tagNew: "NEW", open: "Open",
     confirm: "Confirm syndrome", reviewed: "Reviewed", close: "Close",
     tongue: "Tongue photo", empty: "No shared results yet.",
+    acu: "Acupoints",
     secDir: "Pattern direction", secConf: "Confidence", secCtx: "Patient context",
     secAns: n => `Answers (${n})`, secNext: "Suggested follow-up questions",
     combined: "Two directions appear together (combined pattern).",
@@ -430,6 +432,7 @@ function openDetail(id) {
   `;
 
   document.getElementById("d-foot").innerHTML = `
+    <a class="act" style="text-decoration:none" href="./acupoint-guide-preview.html">${t.acu}</a>
     <button class="act" onclick="document.getElementById('detail').close(); confirmSyndrome('${s.id}')">${t.confirm}</button>
     <button class="act primary" onclick="document.getElementById('detail').close()">${t.close}</button>
   `;
