@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>불길 탈출 — 멈추면 타 죽는다</title>
+</head>
+<body>
+<style>
+  /* 불타는 수직굴 하나에 확정 — 테마 분기 없이 모든 색을 명시 */
+  :root {
+    --soot:      #0b0908;
+    --soot-up:   #191311;
+    --shaft:     #120d0c;
+    --rim:       #33251f;
+    --stone:     #7d746c;
+    --stone-hi:  #a89c91;
+    --flame:     #ff5a1f;
+    --flame-hi:  #ffd24a;
+    --danger:    #ff3b30;
+    --spring:    #4fbf6a;
+    --text:      #f5ece2;
+    --text-dim:  #b5a89c;
+    --label:     #8a7b6f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+    background: radial-gradient(ellipse at 50% 100%, #2a1208 0%, var(--soot) 65%);
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    user-select: none; -webkit-user-select: none; touch-action: none;
+  }
+
+  #stage {
+    position: relative;
+    width: min(100vw, 440px);
+    height: min(100vh, 860px);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 10px; gap: 8px;
+  }
+
+  #hud { display: flex; align-items: flex-end; justify-content: space-between; padding: 0 6px; }
+  .stat-label { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--label); }
+  #alt-value {
+    font-size: 34px; font-weight: 800; line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  #alt-value .unit { font-size: 15px; font-weight: 600; color: var(--text-dim); margin-left: 2px; }
+  #best-value { font-size: 16px; font-weight: 700; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  #best-box { text-align: right; }
+
+  #shaft {
+    position: relative; flex: 1 1 auto; min-height: 0; max-height: 660px;
+    border: 1px solid var(--rim); border-radius: 14px;
+    background: linear-gradient(180deg, var(--shaft) 0%, #1a0f0a 100%);
+    overflow: hidden;
+    box-shadow: inset 0 -40px 70px rgba(255, 90, 31, .18), 0 10px 40px rgba(0, 0, 0, .55);
+  }
+  #game-canvas { display: block; width: 100%; height: 100%; }
+
+  /* 불길이 가까워지면 화면 가장자리가 달아오른다 */
+  #heat {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    box-shadow: inset 0 0 70px 18px rgba(255, 59, 48, .75);
+    transition: opacity .12s linear;
+  }
+
+  .overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(11, 9, 8, .92); backdrop-filter: blur(5px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 26px; gap: 18px;
+  }
+  .overlay.hidden { display: none; }
+
+  .title-main {
+    font-size: 42px; font-weight: 800; letter-spacing: 3px; text-wrap: balance;
+    background: linear-gradient(180deg, var(--flame-hi), var(--flame));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .title-sub { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--label); margin-top: 6px; }
+
+  .pitch { font-size: 16px; line-height: 1.85; color: var(--text); }
+  .pitch b { color: var(--flame-hi); }
+  .controls {
+    font-size: 12.5px; line-height: 1.9; color: var(--label);
+    border-top: 1px solid var(--rim); padding-top: 12px;
+  }
+  .controls kbd {
+    font: inherit; font-size: 11.5px; color: var(--text-dim);
+    background: rgba(255, 255, 255, .07); border: 1px solid var(--rim);
+    border-radius: 5px; padding: 1px 6px; margin: 0 1px;
+  }
+
+  .btn {
+    font: inherit; font-size: 18px; font-weight: 700; letter-spacing: 3px;
+    color: #2a1004; background: linear-gradient(180deg, var(--flame-hi), var(--flame));
+    border: none; border-radius: 999px; padding: 15px 50px; cursor: pointer;
+    box-shadow: 0 6px 26px rgba(255, 90, 31, .4);
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:focus-visible { outline: 3px solid var(--text); outline-offset: 4px; }
+
+  #death-cause { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--danger); }
+  #final-alt { font-size: 56px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+  #final-alt .unit { font-size: 20px; color: var(--text-dim); margin-left: 3px; }
+  #final-rank { font-size: 19px; font-weight: 700; color: var(--flame-hi); text-wrap: balance; }
+  #final-best { font-size: 12px; color: var(--label); letter-spacing: 1px; }
+</style>
+
+<div id="stage">
+  <div id="hud">
+    <div>
+      <div class="stat-label">고도</div>
+      <div id="alt-value">0<span class="unit">m</span></div>
+    </div>
+    <div id="best-box">
+      <div class="stat-label">최고</div>
+      <div id="best-value">0m</div>
+    </div>
+  </div>
+
+  <div id="shaft">
+    <canvas id="game-canvas"></canvas>
+    <div id="heat"></div>
+
+    <div class="overlay" id="start-overlay">
+      <div>
+        <div class="title-main">불길 탈출</div>
+        <div class="title-sub">climb or burn</div>
+      </div>
+      <div class="pitch">
+        불길이 <b>멈추지 않고</b> 올라옵니다.<br>
+        발판을 밟고 <b>계속 위로</b> 도망치세요.
+      </div>
+      <div class="controls">
+        마우스를 좌우로 움직이거나 <kbd>←</kbd> <kbd>→</kbd><br>
+        모바일은 화면 <b>왼쪽 / 오른쪽</b>을 누른 채로<br>
+        점프는 자동 · 양옆 벽은 통과합니다
+      </div>
+      <button class="btn" id="start-btn">도망친다</button>
+    </div>
+
+    <div class="overlay hidden" id="end-overlay">
+      <div id="death-cause"></div>
+      <div id="final-alt">0<span class="unit">m</span></div>
+      <div id="final-rank"></div>
+      <div id="final-best"></div>
+      <button class="btn" id="retry-btn">다시</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const shaftEl = document.getElementById('shaft');
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  const heatEl = document.getElementById('heat');
+  const altEl = document.getElementById('alt-value');
+  const bestEl = document.getElementById('best-value');
+  const startOverlay = document.getElementById('start-overlay');
+  const endOverlay = document.getElementById('end-overlay');
+
+  // ── 상수 ────────────────────────────────────────────────
+  const GRAVITY   = 2100;
+  const BOUNCE    = -790;    // 기본 점프 (약 148px 상승)
+  const SPRING    = -1360;   // 스프링 발판
+  const MOVE_SPD  = 430;
+  const MOVE_EASE = 12;
+  const PLAYER_R  = 13;
+  // 플레이어를 화면 위쪽에 두어 발밑 시야를 넓게 — 불길이 늘 보이게 하는 장치
+  const CAM_ANCHOR = 0.44;
+  // 불길이 이보다 더 뒤처지지 않는다. 화면 아래쪽 여백(약 0.42H)보다 짧게 잡아
+  // 아무리 잘 도망쳐도 불길이 늘 발밑에 보이도록 — 긴장감의 핵심
+  const LAVA_LEASH = 330;
+  const PX_PER_M  = 12;
+
+  let W = 420, H = 620, dpr = 1;
+  let running = false;
+  let player, platforms, embers, shards;
+  let camY, topSpawnY, lavaY, lavaShake;
+  let bestM = 0, altM = 0, peakY = 0;
+  let inputLeft = false, inputRight = false, targetX = null;
+  let heat = 0, beatT = 0;
+
+  // ── 저장 ────────────────────────────────────────────────
+  function loadBest() {
+    try { return parseInt(localStorage.getItem('firechase-best') || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function saveBest(v) { try { localStorage.setItem('firechase-best', String(v)); } catch (e) { /* 무시 */ } }
+
+  // ── 사운드 ──────────────────────────────────────────────
+  let actx = null;
+  function ac() {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    return actx;
+  }
+  function tone(freq, dur, type = 'sine', gain = .07, delay = 0, slideTo = null) {
+    try {
+      const c = ac(), t0 = c.currentTime + delay;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t0);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+      g.gain.setValueAtTime(gain, t0);
+      g.gain.exponentialRampToValueAtTime(.0008, t0 + dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(t0); o.stop(t0 + dur);
+    } catch (e) { /* 무시 */ }
+  }
+  function noise(dur, gain, cutoff) {
+    try {
+      const c = ac(), n = Math.floor(c.sampleRate * dur);
+      const buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      const s = c.createBufferSource(); s.buffer = buf;
+      const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutoff;
+      const g = c.createGain(); g.gain.value = gain;
+      s.connect(f); f.connect(g); g.connect(c.destination);
+      s.start();
+    } catch (e) { /* 무시 */ }
+  }
+
+  // ── 화면 크기 ───────────────────────────────────────────
+  function resize() {
+    const r = shaftEl.getBoundingClientRect();
+    W = r.width; H = r.height;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ── 발판 ────────────────────────────────────────────────
+  // y는 위로 갈수록 작아진다 (캔버스와 같은 방향)
+  function platWidth(height) { return Math.max(52, 74 - height / 260); }
+
+  function spawnPlatform(y) {
+    const h = Math.max(0, -y / PX_PER_M);
+    const w = platWidth(h);
+    const roll = Math.random();
+    let kind = 'solid';
+    if (h > 120) {
+      if (roll < 0.07) kind = 'spring';
+      else if (roll < 0.28) kind = 'fragile';
+      else if (roll < 0.48) kind = 'moving';
+    }
+    const p = {
+      x: 20 + Math.random() * (W - 40 - w), y, w, kind,
+      dir: Math.random() < .5 ? -1 : 1,
+      spd: 60 + Math.random() * 70 + Math.min(90, h / 12),
+      broken: 0,
+    };
+    platforms.push(p);
+    return p;
+  }
+
+  function fillPlatforms() {
+    while (topSpawnY > camY - 260) {
+      const h = Math.max(0, -topSpawnY / PX_PER_M);
+      const gap = 66 + Math.random() * 34 + Math.min(30, h / 90);
+      topSpawnY -= gap;
+      spawnPlatform(topSpawnY);
+    }
+  }
+
+  // ── 입력 ────────────────────────────────────────────────
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { inputLeft = true; targetX = null; }
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { inputRight = true; targetX = null; }
+    if ((e.key === ' ' || e.key === 'Enter') && !running) { e.preventDefault(); startGame(); }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') inputLeft = false;
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') inputRight = false;
+  });
+
+  function localX(e) { return e.clientX - shaftEl.getBoundingClientRect().left; }
+
+  shaftEl.addEventListener('pointermove', (e) => {
+    if (!running) return;
+    if (e.pointerType === 'mouse') { targetX = localX(e); inputLeft = inputRight = false; }
+    else if (e.buttons) { setTouchSide(localX(e)); }
+  });
+  shaftEl.addEventListener('pointerdown', (e) => {
+    if (!running) return;
+    e.preventDefault();
+    if (e.pointerType === 'mouse') targetX = localX(e);
+    else setTouchSide(localX(e));
+  });
+  shaftEl.addEventListener('pointerup', () => { inputLeft = inputRight = false; });
+  shaftEl.addEventListener('pointercancel', () => { inputLeft = inputRight = false; });
+  shaftEl.addEventListener('pointerleave', () => { inputLeft = inputRight = false; });
+
+  function setTouchSide(x) {
+    targetX = null;
+    inputLeft = x < W / 2;
+    inputRight = !inputLeft;
+  }
+
+  // ── 시작 / 종료 ─────────────────────────────────────────
+  function startGame() {
+    resize();
+    platforms = []; embers = []; shards = [];
+    camY = -H * (1 - CAM_ANCHOR);
+    player = { x: W / 2, y: 0, py: 0, vx: 0, vy: -300, face: 1 };
+    peakY = 0; altM = 0;
+    heat = 0; beatT = 0; lavaShake = 0;
+    inputLeft = inputRight = false; targetX = null;
+
+    // 시작 바닥은 화면 전체 폭 — 첫 착지를 보장해 시작하자마자 추락하는 일이 없도록
+    const base = { x: 0, y: 70, w: W, kind: 'solid', dir: 1, spd: 0, broken: 0 };
+    platforms.push(base);
+    topSpawnY = 70;
+    camY = player.y - H * CAM_ANCHOR;
+    fillPlatforms();
+
+    lavaY = player.y + LAVA_LEASH;
+    running = true;
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    heatEl.style.opacity = 0;
+  }
+
+  function rankFor(m) {
+    if (m < 60)   return '연기도 못 벗어났습니다.';
+    if (m < 200)  return '아직 발끝이 뜨겁습니다.';
+    if (m < 450)  return '제법 올라왔습니다.';
+    if (m < 800)  return '불길이 겨우 따라옵니다.';
+    if (m < 1400) return '연기 위로 솟았습니다.';
+    return '불길이 당신을 포기했습니다.';
+  }
+
+  function endGame(cause) {
+    if (!running) return;
+    running = false;
+    if (altM > bestM) { bestM = altM; saveBest(bestM); }
+    bestEl.textContent = bestM + 'm';
+    document.getElementById('death-cause').textContent = cause;
+    document.getElementById('final-alt').innerHTML = altM + '<span class="unit">m</span>';
+    document.getElementById('final-rank').textContent = rankFor(altM);
+    document.getElementById('final-best').textContent = '최고 기록 ' + bestM + 'm';
+    endOverlay.classList.remove('hidden');
+    heatEl.style.opacity = 0;
+    noise(.7, .3, 700);
+    tone(320, .7, 'sawtooth', .1, 0, 60);
+  }
+
+  // ── 갱신 ────────────────────────────────────────────────
+  function update(dt) {
+    // 좌우 이동
+    let want = 0;
+    if (targetX !== null) {
+      const d = targetX - player.x;
+      want = Math.max(-1, Math.min(1, d / 26));
+    } else {
+      want = (inputRight ? 1 : 0) - (inputLeft ? 1 : 0);
+    }
+    const goal = want * MOVE_SPD;
+    player.vx += (goal - player.vx) * Math.min(1, MOVE_EASE * dt);
+    if (Math.abs(player.vx) > 8) player.face = player.vx > 0 ? 1 : -1;
+
+    player.py = player.y;
+    player.x += player.vx * dt;
+    player.vy += GRAVITY * dt;
+    player.y += player.vy * dt;
+
+    // 양옆 벽 통과
+    if (player.x < -PLAYER_R) player.x = W + PLAYER_R;
+    if (player.x > W + PLAYER_R) player.x = -PLAYER_R;
+
+    // 발판 이동 + 충돌
+    for (const p of platforms) {
+      if (p.kind === 'moving' && !p.broken) {
+        p.x += p.dir * p.spd * dt;
+        if (p.x < 8) { p.x = 8; p.dir = 1; }
+        if (p.x + p.w > W - 8) { p.x = W - 8 - p.w; p.dir = -1; }
+      }
+      if (p.broken) { p.broken += dt; continue; }
+      if (player.vy <= 0) continue;
+      const prevBottom = player.py + PLAYER_R;
+      const bottom = player.y + PLAYER_R;
+      if (prevBottom <= p.y && bottom >= p.y && player.x + PLAYER_R * .7 > p.x && player.x - PLAYER_R * .7 < p.x + p.w) {
+        if (p.kind === 'spring') {
+          player.vy = SPRING;
+          tone(420, .18, 'square', .07, 0, 1500);
+        } else {
+          player.vy = BOUNCE;
+          tone(210 + Math.random() * 30, .07, 'triangle', .055);
+        }
+        player.y = p.y - PLAYER_R;
+        if (p.kind === 'fragile') {
+          p.broken = 0.001;
+          for (let i = 0; i < 8; i++) {
+            shards.push({
+              x: p.x + Math.random() * p.w, y: p.y,
+              vx: (Math.random() - .5) * 160, vy: -40 + Math.random() * 90,
+              life: .8, r: 2 + Math.random() * 3,
+            });
+          }
+          noise(.16, .1, 2600);
+        }
+        break;
+      }
+    }
+    // 부서진 발판 제거
+    for (let i = platforms.length - 1; i >= 0; i--) {
+      const p = platforms[i];
+      if ((p.broken && p.broken > .25) || p.y > camY + H + 260) platforms.splice(i, 1);
+    }
+
+    // 카메라는 위로만
+    camY = Math.min(camY, player.y - H * CAM_ANCHOR);
+    fillPlatforms();
+
+    // 고도
+    peakY = Math.min(peakY, player.y);
+    altM = Math.max(0, Math.round(-peakY / PX_PER_M));
+
+    // 불길 상승 — 높이 올라갈수록 빨라진다
+    const lavaSpd = 55 + Math.min(230, altM * 0.30);
+    lavaY -= lavaSpd * dt;
+    // 너무 뒤처지면 따라붙는다
+    const leash = player.y + LAVA_LEASH;
+    if (lavaY > leash) lavaY += (leash - lavaY) * Math.min(1, dt * 1.9);
+
+    // 위험도
+    const lavaScreen = lavaY - camY;
+    const near = Math.max(0, Math.min(1, (H * 1.02 - lavaScreen) / (H * 0.55)));
+    heat = near;
+    heatEl.style.opacity = (near * 0.85).toFixed(3);
+    if (near > 0.45) {
+      beatT -= dt;
+      if (beatT <= 0) {
+        beatT = 0.62 - near * 0.32;
+        tone(58, .16, 'sine', .07 + near * .06);
+      }
+    } else beatT = 0;
+
+    // 불티
+    if (Math.random() < 0.12) {
+      embers.push({
+        x: Math.random() * W, y: lavaY - 4,
+        vx: (Math.random() - .5) * 40, vy: -50 - Math.random() * 120,
+        life: .7 + Math.random() * .9, r: 1 + Math.random() * 2.2,
+      });
+    }
+    for (let i = embers.length - 1; i >= 0; i--) {
+      const e = embers[i];
+      e.life -= dt;
+      if (e.life <= 0) { embers.splice(i, 1); continue; }
+      e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 30 * dt;
+    }
+    for (let i = shards.length - 1; i >= 0; i--) {
+      const s = shards[i];
+      s.life -= dt;
+      if (s.life <= 0) { shards.splice(i, 1); continue; }
+      s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 900 * dt;
+    }
+
+    if (lavaShake > 0) lavaShake = Math.max(0, lavaShake - dt * 40);
+
+    // 죽음
+    if (player.y + PLAYER_R >= lavaY) { endGame('불길에 삼켜짐'); return; }
+    if (player.y - camY > H + 80) { endGame('추락'); return; }
+  }
+
+  // ── 그리기 ──────────────────────────────────────────────
+  function drawPlatform(p) {
+    const y = p.y - camY;
+    if (y < -30 || y > H + 30) return;
+    const alpha = p.broken ? Math.max(0, 1 - p.broken / .25) : 1;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    let base = '#6f665e', hi = '#9c9088';
+    if (p.kind === 'fragile') { base = '#8a4636'; hi = '#c07158'; }
+    if (p.kind === 'moving')  { base = '#5b6b78'; hi = '#8ea3b2'; }
+    if (p.kind === 'spring')  { base = '#2f7f47'; hi = '#5fd47c'; }
+
+    ctx.fillStyle = base;
+    roundRect(ctx, p.x, y, p.w, 11, 5); ctx.fill();
+    ctx.fillStyle = hi;
+    roundRect(ctx, p.x, y, p.w, 4, 2); ctx.fill();
+
+    if (p.kind === 'fragile') {
+      ctx.strokeStyle = 'rgba(20,10,8,.55)'; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(p.x + p.w * .34, y + 1); ctx.lineTo(p.x + p.w * .44, y + 10);
+      ctx.moveTo(p.x + p.w * .66, y + 1); ctx.lineTo(p.x + p.w * .58, y + 10);
+      ctx.stroke();
+    }
+    if (p.kind === 'spring') {
+      ctx.strokeStyle = '#bdf5c9'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      const cx = p.x + p.w / 2;
+      ctx.moveTo(cx - 7, y - 3); ctx.lineTo(cx, y - 9); ctx.lineTo(cx + 7, y - 3);
+      ctx.stroke();
+    }
+    if (p.kind === 'moving') {
+      ctx.fillStyle = 'rgba(220,235,245,.7)';
+      const cx = p.x + p.w / 2;
+      tri(cx - 12, y + 5.5, -4); tri(cx + 12, y + 5.5, 4);
+      function tri(x, yy, d) {
+        ctx.beginPath();
+        ctx.moveTo(x + d, yy); ctx.lineTo(x - d * .3, yy - 3); ctx.lineTo(x - d * .3, yy + 3);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+
+  function drawPlayer() {
+    const x = player.x, y = player.y - camY;
+    ctx.save();
+    // 불빛을 받는 실루엣
+    const g = ctx.createRadialGradient(x, y - 3, 2, x, y, PLAYER_R + 3);
+    g.addColorStop(0, '#fff6ea');
+    g.addColorStop(1, '#d9c3ae');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, PLAYER_R, 0, Math.PI * 2); ctx.fill();
+    // 아래에서 올라오는 불빛 반사
+    ctx.globalAlpha = .35 + heat * .5;
+    ctx.fillStyle = '#ff7a2a';
+    ctx.beginPath(); ctx.arc(x, y + 3, PLAYER_R * .82, 0, Math.PI); ctx.fill();
+    ctx.globalAlpha = 1;
+    // 눈 — 진행 방향
+    ctx.fillStyle = '#2a1a12';
+    ctx.beginPath(); ctx.arc(x + player.face * 4, y - 3, 2.1, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawLava() {
+    const y = lavaY - camY;
+    if (y > H + 40) return;
+    ctx.save();
+    const top = y + Math.sin(performance.now() / 220) * 1.5;
+
+    const g = ctx.createLinearGradient(0, top - 26, 0, H);
+    g.addColorStop(0, 'rgba(255,210,74,.95)');
+    g.addColorStop(.18, '#ff7a1f');
+    g.addColorStop(1, '#8c1405');
+    ctx.fillStyle = g;
+
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, top);
+    const t = performance.now() / 260;
+    for (let x = 0; x <= W; x += 10) {
+      const wave = Math.sin(x * 0.05 + t) * 5 + Math.sin(x * 0.017 - t * 1.6) * 3.5;
+      ctx.lineTo(x, top + wave);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+
+    // 표면 발광
+    ctx.globalCompositeOperation = 'lighter';
+    const glow = ctx.createLinearGradient(0, top - 60, 0, top + 12);
+    glow.addColorStop(0, 'rgba(255,90,31,0)');
+    glow.addColorStop(1, 'rgba(255,150,50,.5)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, top - 60, W, 72);
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    if (lavaShake > 0) ctx.translate((Math.random() - .5) * lavaShake, 0);
+
+    // 배경 벽돌 결 — 속도감의 기준선
+    ctx.strokeStyle = 'rgba(255,255,255,.035)';
+    ctx.lineWidth = 1;
+    const step = 48;
+    const off = ((-camY % step) + step) % step;
+    for (let y = off - step; y < H; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    for (const p of platforms) drawPlatform(p);
+
+    ctx.fillStyle = '#c8bdb2';
+    for (const s of shards) {
+      ctx.globalAlpha = Math.max(0, s.life / .8);
+      ctx.fillRect(s.x, s.y - camY, s.r, s.r);
+    }
+    ctx.globalAlpha = 1;
+
+    if (running) drawPlayer();
+
+    drawLava();
+
+    // 불티는 불길 위로
+    ctx.globalCompositeOperation = 'lighter';
+    for (const e of embers) {
+      ctx.globalAlpha = Math.max(0, Math.min(1, e.life));
+      ctx.fillStyle = e.life > .6 ? '#ffd24a' : '#ff5a1f';
+      ctx.beginPath(); ctx.arc(e.x, e.y - camY, e.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // ── 루프 ────────────────────────────────────────────────
+  let last = 0, acc = 0;
+  const STEP = 1 / 120;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    if (!last) last = t;
+    let dt = (t - last) / 1000;
+    last = t;
+    if (dt > 0.1) dt = 0.1;
+
+    if (running) {
+      acc += dt;
+      let guard = 0;
+      while (acc >= STEP && guard++ < 20 && running) { update(STEP); acc -= STEP; }
+      altEl.innerHTML = altM + '<span class="unit">m</span>';
+    }
+    render();
+  }
+
+  bestM = loadBest();
+  bestEl.textContent = bestM + 'm';
+  document.getElementById('start-btn').addEventListener('click', startGame);
+  document.getElementById('retry-btn').addEventListener('click', startGame);
+  window.addEventListener('resize', () => { resize(); });
+
+  resize();
+  // 시작 화면 뒤에서도 불길이 일렁이도록 최소 상태를 만들어 둔다
+  platforms = []; embers = []; shards = [];
+  camY = -H * (1 - CAM_ANCHOR); lavaY = camY + H - 60;
+  player = { x: W / 2, y: 0, py: 0, vx: 0, vy: 0, face: 1 };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
