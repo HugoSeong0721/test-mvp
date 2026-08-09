@@ -199,7 +199,7 @@
   <div style="text-align:right;font-size:12px;margin-bottom:6px"><a href="./pattern-finder-preview.html" style="color:#5B6B64;text-decoration:none">한국어</a> · <a href="./pattern-finder-preview-en.html" style="font-weight:800;color:#2F5A4B;text-decoration:none">English</a></div>
   <p class="kicker">Design Preview · test-mvp</p>
   <h1>Body Pattern Finder</h1>
-  <p class="sub">The patient answers 8 questions that converge on a TCM pattern direction — same questions, weights, and adaptive logic as the Flutter app.</p>
+  <p class="sub">The patient answers a few questions that converge on a TCM pattern direction — with an optional deep-dive chapter — same questions, weights, and adaptive logic as the Flutter app.</p>
 
   <div class="phone">
     <div class="phone-top">
@@ -329,36 +329,69 @@ const QUESTIONS = [
   { id:"blood_deep_vision", text:"Any dizziness on standing, blurry vision, or numb limbs?", options:[
     { t:"Hands or feet go numb/tingly", w:{blood_deficiency:2} },
     { t:"No", w:{} } ] },
+  // ── Second-tier refinement questions — connected when you choose "Answer more" ──
+  { id:"qi_deep_voice", text:"How are your voice and energy when talking or active?", options:[
+    { t:"My voice trails off and gets quiet", w:{qi_deficiency:3} },
+    { t:"Energy drops sharply as the day goes on", w:{qi_deficiency:2} },
+    { t:"About the same as usual", w:{} } ] },
+  { id:"yang_deep_digest_cold", text:"What happens when you eat or drink cold things?", options:[
+    { t:"I get belly pain or loose stools", w:{yang_deficiency:3} },
+    { t:"I need something warm to feel settled", w:{yang_deficiency:2} },
+    { t:"No real difference", w:{} } ] },
+  { id:"yin_deep_night_sweat", text:"Night sweats or a dry mouth/throat before dawn?", options:[
+    { t:"I sweat in my sleep and wake with a dry mouth", w:{yin_deficiency:3} },
+    { t:"I reach for water often at night", w:{yin_deficiency:2} },
+    { t:"No", w:{} } ] },
+  { id:"damp_deep_mouth", text:"How are your mouth and appetite?", options:[
+    { t:"Mouth feels sticky/coated, food goes down poorly", w:{damp_phlegm:3} },
+    { t:"I crave sweets and swell up easily", w:{damp_phlegm:2} },
+    { t:"Nothing unusual", w:{} } ] },
+  { id:"liver_deep_neck", text:"Do your neck, shoulders, or jaw tense up often?", options:[
+    { t:"Yes, my neck/shoulders tighten when stressed", w:{liver_qi:3} },
+    { t:"I clench my jaw or get headaches", w:{liver_qi:2} },
+    { t:"No", w:{} } ] },
+  { id:"stasis_deep_dark", text:"Is the pain/blood dark, clotted, or purplish? (incl. periods)", options:[
+    { t:"Yes, dark, clotted, and stabbing", w:{blood_stasis:3} },
+    { t:"Sometimes", w:{blood_stasis:1} },
+    { t:"No", w:{} } ] },
+  { id:"blood_deep_dryness", text:"How dry are your hair, nails, and skin?", options:[
+    { t:"Hair sheds, nails split, skin is dry", w:{blood_deficiency:3} },
+    { t:"Skin looks dull and pale", w:{blood_deficiency:2} },
+    { t:"Fine", w:{} } ] },
 ];
 
-const SESSION = 8, COMMON = 4;
+const COMMON = 4;      // Chapter 1 · common questions
+const DEEP_CAP = 6;    // Chapter 2 · max deep questions asked when you choose "Answer more"
 const COMMON_IDS = ["energy","temperature","stress","digestion"];
 const DEEP = {
-  qi_deficiency: ["sweat","qi_deep_appetite","qi_deep_recovery"],
-  yang_deficiency: ["stool","yang_deep_cold_area","yang_deep_urine"],
-  yin_deficiency: ["thirst","sleep","yin_deep_five_heart"],
-  damp_phlegm: ["head","damp_deep_heaviness","damp_deep_weather"],
-  liver_qi: ["mood","liver_deep_chest","liver_deep_variability"],
-  blood_stasis: ["pain","stasis_deep_night","stasis_deep_bruise"],
-  blood_deficiency: ["complexion","blood_deep_palpitation","blood_deep_vision"],
+  qi_deficiency: ["sweat","qi_deep_appetite","qi_deep_recovery","qi_deep_voice"],
+  yang_deficiency: ["stool","yang_deep_cold_area","yang_deep_urine","yang_deep_digest_cold"],
+  yin_deficiency: ["thirst","sleep","yin_deep_five_heart","yin_deep_night_sweat"],
+  damp_phlegm: ["head","damp_deep_heaviness","damp_deep_weather","damp_deep_mouth"],
+  liver_qi: ["mood","liver_deep_chest","liver_deep_variability","liver_deep_neck"],
+  blood_stasis: ["pain","stasis_deep_night","stasis_deep_bruise","stasis_deep_dark"],
+  blood_deficiency: ["complexion","blood_deep_palpitation","blood_deep_vision","blood_deep_dryness"],
 };
 
 // ── Engine (mirrors PatternFinderEngine) ────────────────────────────────────
 let answers = [];   // {qid, idx}
 let scores = {};
 let basic = { h: null, w: null, unit: 'imperial' };
+let deepOptIn = null;   // null = not asked yet, true = answer more, false = stop here
 
-function reset() { answers = []; scores = {}; basic = {h:null,w:null,unit:'imperial'}; for (const k in PATTERNS) scores[k] = 0; }
+function reset() { answers = []; scores = {}; deepOptIn = null; basic = {h:null,w:null,unit:'imperial'}; for (const k in PATTERNS) scores[k] = 0; }
 
 function rankedIds() {
   return Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
 }
 function nextQuestion() {
-  if (answers.length >= SESSION) return null;
   const done = new Set(answers.map(a => a.qid));
   if (answers.length < COMMON) {
     for (const id of COMMON_IDS) if (!done.has(id)) return QUESTIONS.find(q => q.id === id);
   }
+  // Chapter 2 runs only when the patient chose "Answer more", up to DEEP_CAP items.
+  if (deepOptIn !== true) return null;
+  if (answers.length - COMMON >= DEEP_CAP) return null;
   for (const pid of rankedIds()) {
     if ((scores[pid] || 0) <= 0) break;
     for (const id of (DEEP[pid] || [])) if (!done.has(id)) return QUESTIONS.find(q => q.id === id);
@@ -419,9 +452,10 @@ function showIntro() {
   screen.innerHTML = `
     <div class="fade" style="display:flex;flex-direction:column;flex:1">
       <h2 style="font-size:19px;font-weight:800;margin:6px 0 8px;text-wrap:balance">
-        Find your body pattern<br>in 8 questions</h2>
+        Find your body pattern<br>in a few questions</h2>
       <p style="font-size:13.5px;color:var(--ink-dim);margin:0 0 16px">
-        Answer one question at a time. Each answer shapes the next, and at the end you see the pattern direction your answers point to.</p>
+        Answer a few common questions first, then, if you like, go deeper with
+        questions tailored to you for a more precise result. Each answer shapes the next.</p>
       <button class="btn btn-primary" id="start" style="align-self:flex-start">Start</button>
       <div class="spacer"></div>
       <div class="banner"><b>ⓘ</b><span>This is <b>not a diagnosis</b>.
@@ -490,16 +524,40 @@ function showBasicInfo() {
   document.getElementById("bSkip").onclick = () => { basic = {h:null,w:null,unit:uSel.value}; showQuestion(); };
 }
 
+function showDeepCheckpoint() {
+  const lead = rankedIds().filter(id => scores[id] > 0)[0];
+  const leadName = lead ? PATTERNS[lead].name : null;
+  screen.innerHTML = `
+    <div class="fade">
+      <div style="font-size:34px;margin:2px 0 4px">🧭</div>
+      <h2 style="font-size:19px;font-weight:800;margin:0 0 8px;text-wrap:balance">
+        A direction is starting to show</h2>
+      <p style="font-size:14px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px">
+        ${leadName ? `Right now it leans toward <b style="color:var(--jade)">${leadName}</b>. ` : ''}If you
+        <b>answer a few more</b>, we'll ask deeper questions tailored to you and the result is
+        <b>more likely to be precise</b>.</p>
+      <div style="border:1px solid var(--border);background:var(--soft);border-radius:12px;padding:10px 12px;margin:12px 0 16px;font-size:12.5px;color:var(--ink-dim)">
+        ✨ Chapter 2 · Personalized questions — they adapt to your answers (up to ${DEEP_CAP}, stop anytime)</div>
+      <button class="btn btn-primary" id="ckGo" style="width:100%;margin-bottom:8px">Yes, I'll answer more</button>
+      <button class="btn btn-ghost" id="ckStop" style="width:100%">No, I'll stop here</button>
+    </div>`;
+  document.getElementById("ckGo").onclick = () => { deepOptIn = true; showQuestion(); };
+  document.getElementById("ckStop").onclick = () => { deepOptIn = false; showResult(); };
+}
+
 function showQuestion() {
+  // After the common questions, the patient chooses to go deeper or stop here.
+  if (answers.length === COMMON && deepOptIn === null) return showDeepCheckpoint();
   const q = nextQuestion();
   if (!q) return showResult();
   const n = answers.length;
+  const plannedTotal = deepOptIn === true ? COMMON + DEEP_CAP : COMMON;
   screen.innerHTML = `
     <div class="fade">
       <div class="q-head">
         <button class="back" id="back" aria-label="Back">←</button>
-        <div class="track"><div class="fill" style="width:${(n / SESSION) * 100}%"></div></div>
-        <span class="count">${n + 1}/${SESSION}</span>
+        <div class="track"><div class="fill" style="width:${(n / plannedTotal) * 100}%"></div></div>
+        <span class="count">${n + 1}/${plannedTotal}</span>
       </div>
       <p style="font-size:12px;font-weight:800;letter-spacing:.2px;margin:0 0 6px;color:${n < COMMON ? 'var(--sky,#5B6B64)' : 'var(--jade)'}">${n < COMMON ? 'Chapter 1 · Common questions' : 'Chapter 2 · Personalized questions'}</p>
       ${n === COMMON ? `<div style="border:1px solid #0F766E4d;background:#0F766E14;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12.5px">✨ Based on your answers, we'll now ask a few questions tailored to you.</div>` : ''}
@@ -513,11 +571,16 @@ function showQuestion() {
           <button class="btn btn-ghost" id="freeCancel">Cancel</button>
         </div>
       </div>
+      ${n >= COMMON ? `<button class="free-toggle" id="stopHere" style="color:var(--ink-dim)">Stop here and see my result</button>` : ''}
     </div>`;
   document.getElementById("back").onclick = () => {
+    // Going back from the first deep question returns to the choice screen.
+    if (answers.length === COMMON && deepOptIn === true) { deepOptIn = null; return showQuestion(); }
     if (!answers.length) return showBasicInfo();
     undo(); showQuestion();
   };
+  const stopBtn = document.getElementById("stopHere");
+  if (stopBtn) stopBtn.onclick = () => showResult();
   screen.querySelectorAll(".opt").forEach(b =>
     b.onclick = () => { answer(q.id, +b.dataset.i); showQuestion(); });
   const freeToggle = document.getElementById("freeToggle");

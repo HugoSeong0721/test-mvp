@@ -1,7 +1,15 @@
-환율 앱 프로토타입 미리보기 — 눌러서 바로 열기:
+환율 앱 미리보기 — 눌러서 바로 열기
+
+[1] 출시용 앱 (첫 실행 때 기준 통화를 물어봄)
+https://hugoseong0721.github.io/test-mvp/currency-app-v1.html
+  · 온보딩 다시 보기: 위 주소 뒤에 ?onboard=1 붙이기
+
+[2] 프로토타입 (온보딩 없이 KGS 고정으로 바로 시작)
 https://hugoseong0721.github.io/test-mvp/currency-app.html
 
 폰/PC 어디서든 열면 실제 앱처럼 동작합니다.
-(GitHub Pages, main 브랜치 docs/currency-app.html 에서 서빙)
+(GitHub Pages, main 브랜치 docs/ 에서 서빙)
 
-로컬에서 보려면: currency_app/currency-app-preview.html 파일을 브라우저로 열기
+로컬에서 보려면 브라우저로 열기:
+  currency_app/currency-app-v1.html      (출시용)
+  currency_app/currency-app-preview.html (프로토타입)
