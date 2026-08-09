@@ -149,17 +149,23 @@ class PatternFinderService {
   /// drill into whichever direction Chapter 1 pointed to.
   static const int deepDiveCount = 4;
 
+  /// Maximum Chapter 2 questions asked when the patient opts to keep answering
+  /// at the checkpoint. The deeper they go, the more the picture sharpens.
+  static const int deepDiveCap = 6;
+
   /// Chapter 2 pool: per-pattern deep-dive question ids. When a pattern leads
   /// after Chapter 1, its questions are asked to confirm/refine that direction
-  /// — so two patients with different answers get different Chapter 2s.
+  /// — so two patients with different answers get different Chapter 2s. The
+  /// last id in each list is a second-tier refinement question, reached only
+  /// when the patient chooses to keep answering.
   static const Map<String, List<String>> deepDiveIdsByPattern = {
-    'qi_deficiency': ['sweat', 'qi_deep_appetite', 'qi_deep_recovery'],
-    'yang_deficiency': ['stool', 'yang_deep_cold_area', 'yang_deep_urine'],
-    'yin_deficiency': ['thirst', 'sleep', 'yin_deep_five_heart'],
-    'damp_phlegm': ['head', 'damp_deep_heaviness', 'damp_deep_weather'],
-    'liver_qi': ['mood', 'liver_deep_chest', 'liver_deep_variability'],
-    'blood_stasis': ['pain', 'stasis_deep_night', 'stasis_deep_bruise'],
-    'blood_deficiency': ['complexion', 'blood_deep_palpitation', 'blood_deep_vision'],
+    'qi_deficiency': ['sweat', 'qi_deep_appetite', 'qi_deep_recovery', 'qi_deep_voice'],
+    'yang_deficiency': ['stool', 'yang_deep_cold_area', 'yang_deep_urine', 'yang_deep_digest_cold'],
+    'yin_deficiency': ['thirst', 'sleep', 'yin_deep_five_heart', 'yin_deep_night_sweat'],
+    'damp_phlegm': ['head', 'damp_deep_heaviness', 'damp_deep_weather', 'damp_deep_mouth'],
+    'liver_qi': ['mood', 'liver_deep_chest', 'liver_deep_variability', 'liver_deep_neck'],
+    'blood_stasis': ['pain', 'stasis_deep_night', 'stasis_deep_bruise', 'stasis_deep_dark'],
+    'blood_deficiency': ['complexion', 'blood_deep_palpitation', 'blood_deep_vision', 'blood_deep_dryness'],
   };
 
   /// Kept for the transitional call sites; Chapter 1 length.
@@ -832,6 +838,155 @@ class PatternFinderService {
         ),
       ],
     ),
+    // ── Chapter 2, second tier — connected only when the patient chooses to
+    // keep answering at the checkpoint, to refine the leading direction. ──
+    PatternQuestion(
+      id: 'qi_deep_voice',
+      textEn: 'How are your voice and energy when talking or active?',
+      textKo: '말하거나 활동할 때 목소리·기력은 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'My voice trails off and gets quiet',
+          textKo: '말끝이 힘없고 목소리가 작아져요',
+          weights: {'qi_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Energy drops sharply as the day goes on',
+          textKo: '오후로 갈수록 기운이 뚝 떨어져요',
+          weights: {'qi_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'About the same as usual',
+          textKo: '평소와 비슷해요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'yang_deep_digest_cold',
+      textEn: 'What happens when you eat or drink cold things?',
+      textKo: '찬 음식·찬 물을 먹으면 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'I get belly pain or loose stools',
+          textKo: '배가 아프거나 설사를 해요',
+          weights: {'yang_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'I need something warm to feel settled',
+          textKo: '따뜻한 걸 먹어야 속이 편해요',
+          weights: {'yang_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'No real difference',
+          textKo: '별로 상관없어요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'yin_deep_night_sweat',
+      textEn: 'Night sweats or a dry mouth/throat before dawn?',
+      textKo: '잘 때 땀이 나거나 새벽에 입·목이 마르나요?',
+      options: [
+        PatternOption(
+          textEn: 'I sweat in my sleep and wake with a dry mouth',
+          textKo: '자다가 땀이 나고 새벽에 입이 말라요',
+          weights: {'yin_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'I reach for water often at night',
+          textKo: '밤에 물을 자주 찾아요',
+          weights: {'yin_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'damp_deep_mouth',
+      textEn: 'How are your mouth and appetite?',
+      textKo: '입안과 식욕은 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'Mouth feels sticky/coated, food goes down poorly',
+          textKo: '입이 끈적하고 텁텁하며 잘 안 넘어가요',
+          weights: {'damp_phlegm': 3},
+        ),
+        PatternOption(
+          textEn: 'I crave sweets and swell up easily',
+          textKo: '단 게 당기고 잘 붓는 편이에요',
+          weights: {'damp_phlegm': 2},
+        ),
+        PatternOption(
+          textEn: 'Nothing unusual',
+          textKo: '특별하지 않아요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'liver_deep_neck',
+      textEn: 'Do your neck, shoulders, or jaw tense up often?',
+      textKo: '목·어깨·턱이 자주 뭉치거나 뻐근한가요?',
+      options: [
+        PatternOption(
+          textEn: 'Yes, my neck/shoulders tighten when stressed',
+          textKo: '네, 긴장하면 목·어깨가 뻐근해요',
+          weights: {'liver_qi': 3},
+        ),
+        PatternOption(
+          textEn: 'I clench my jaw or get headaches',
+          textKo: '이를 악물거나 두통이 와요',
+          weights: {'liver_qi': 2},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'stasis_deep_dark',
+      textEn: 'Is the pain/blood dark, clotted, or purplish? (incl. periods)',
+      textKo: '통증·혈색이 검붉거나 덩어리가 있나요? (생리 포함)',
+      options: [
+        PatternOption(
+          textEn: 'Yes, dark, clotted, and stabbing',
+          textKo: '네, 어둡고 덩어리지며 콕콕 찔러요',
+          weights: {'blood_stasis': 3},
+        ),
+        PatternOption(
+          textEn: 'Sometimes',
+          textKo: '가끔 그런 편이에요',
+          weights: {'blood_stasis': 1},
+        ),
+        PatternOption(
+          textEn: 'No',
+          textKo: '아니요',
+        ),
+      ],
+    ),
+    PatternQuestion(
+      id: 'blood_deep_dryness',
+      textEn: 'How dry are your hair, nails, and skin?',
+      textKo: '머릿결·손톱·피부 건조함은 어떤가요?',
+      options: [
+        PatternOption(
+          textEn: 'Hair sheds, nails split, skin is dry',
+          textKo: '머리 잘 빠지고 손톱이 잘 갈라지며 건조해요',
+          weights: {'blood_deficiency': 3},
+        ),
+        PatternOption(
+          textEn: 'Skin looks dull and pale',
+          textKo: '피부가 푸석하고 창백한 편이에요',
+          weights: {'blood_deficiency': 2},
+        ),
+        PatternOption(
+          textEn: 'Fine',
+          textKo: '괜찮아요',
+        ),
+      ],
+    ),
   ];
 
   static final Map<String, PatternQuestion> questionById = {
@@ -856,13 +1011,44 @@ class PatternFinderEngine {
   /// questionId -> the patient's typed answer, for free-text entries.
   final Map<String, String> _freeTexts = {};
 
+  /// Whether the patient chose to continue into Chapter 2 at the checkpoint.
+  /// null = not asked yet, true = keep answering, false = stop after Chapter 1.
+  bool? _deepOptIn;
+
   List<MapEntry<String, int>> get answers => List.unmodifiable(_answers);
 
   int get answeredCount => _answers.length;
 
-  bool get isDone =>
-      _answers.length >= PatternFinderService.questionsPerSession ||
-      _answers.length >= PatternFinderService.questions.length;
+  /// The patient's checkpoint choice (null until they decide).
+  bool? get deepDiveChoice => _deepOptIn;
+
+  /// True when Chapter 1 is complete and the patient hasn't yet chosen whether
+  /// to keep going — the moment to show the "answer more?" checkpoint.
+  bool get atDeepCheckpoint =>
+      _answers.length == PatternFinderService.commonQuestionCount &&
+      _deepOptIn == null;
+
+  /// Records the checkpoint decision.
+  void chooseDeepDive(bool keepGoing) => _deepOptIn = keepGoing;
+
+  /// Re-opens the checkpoint (used when the patient steps back to it).
+  void clearDeepDiveChoice() => _deepOptIn = null;
+
+  /// Total questions the current path plans to ask — Chapter 1 only until the
+  /// patient opts in, then Chapter 1 + the deep-dive cap.
+  int get plannedTotal => _deepOptIn == true
+      ? PatternFinderService.commonQuestionCount +
+          PatternFinderService.deepDiveCap
+      : PatternFinderService.commonQuestionCount;
+
+  bool get isDone {
+    if (_answers.length >= PatternFinderService.questions.length) return true;
+    if (currentChapter == 1) return false;
+    // Chapter 2 runs only when the patient opted in, capped at deepDiveCap.
+    if (_deepOptIn != true) return true;
+    return _answers.length - PatternFinderService.commonQuestionCount >=
+        PatternFinderService.deepDiveCap;
+  }
 
   Set<String> get _answeredIds => {for (final a in _answers) a.key};
 
