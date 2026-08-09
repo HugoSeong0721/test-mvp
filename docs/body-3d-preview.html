@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 인체 모델 — 경혈 · 장기 보기</title>
+<style>
+  :root {
+    --ground: #FFFCF4; --card: #FFFFFF; --soft: #FBF6EC; --ink: #20302A;
+    --ink-dim: #5B6B64; --jade: #2F5A4B; --mint: #DCE6E0; --copper: #E28C74;
+    --blush: #FFEEE8; --border: #E6DDCE; --stage: #F4F1E8;
+    --skin-a: #E9DCCB; --skin-b: #C9B49B;
+    --shadow: 0 10px 30px rgba(24, 33, 31, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #141E1A; --card: #1D2A25; --soft: #22302A; --ink: #E8EDE9;
+      --ink-dim: #9FB0A8; --jade: #7FB8A0; --mint: #2B3B34; --copper: #E89B85;
+      --blush: #3A2B25; --border: #33443C; --stage: #18241F;
+      --skin-a: #6E7F74; --skin-b: #3C4E46;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #141E1A; --card: #1D2A25; --soft: #22302A; --ink: #E8EDE9;
+    --ink-dim: #9FB0A8; --jade: #7FB8A0; --mint: #2B3B34; --copper: #E89B85;
+    --blush: #3A2B25; --border: #33443C; --stage: #18241F;
+    --skin-a: #6E7F74; --skin-b: #3C4E46;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 26px 16px 60px; }
+  .kicker { font-size: 12px; letter-spacing: .12em; font-weight: 700; color: var(--ink-dim); text-transform: uppercase; margin: 0 0 6px; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0 0 6px; }
+  .sub { font-size: 13px; color: var(--ink-dim); margin: 0 0 18px; }
+
+  .app { background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; }
+  .app-top { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--soft); }
+  .app-top .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--jade); flex: none; }
+  .app-top .name { font-size: 13px; font-weight: 800; }
+  .app-top .who { margin-left: auto; font-size: 12px; color: var(--ink-dim); }
+
+  .sect { padding: 14px 18px; }
+  .sect + .sect { border-top: 1px solid var(--border); }
+  .label { font-size: 11.5px; font-weight: 800; letter-spacing: .04em; color: var(--ink-dim); margin-bottom: 8px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    padding: 7px 13px; border-radius: 99px; border: 1px solid var(--border);
+    background: var(--card); color: var(--ink-dim);
+  }
+  .chip.on { background: var(--jade); border-color: var(--jade); color: #fff; }
+  .chip .sw { display: inline-block; width: 9px; height: 9px; border-radius: 99px; margin-right: 5px; vertical-align: 1px; }
+
+  .grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 14px; }
+  @media (min-width: 800px) { .grid { grid-template-columns: minmax(0,1fr) 300px; } }
+
+  .stage { position: relative; background: var(--stage); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 520px; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  .tip {
+    position: absolute; left: 10px; bottom: 10px; font-size: 11.5px; color: var(--ink-dim);
+    background: color-mix(in srgb, var(--card) 82%, transparent); border: 1px solid var(--border);
+    border-radius: 9px; padding: 5px 9px; pointer-events: none;
+  }
+  .axis {
+    position: absolute; right: 10px; top: 10px; font-size: 11.5px; font-weight: 800; color: var(--ink);
+    background: color-mix(in srgb, var(--card) 82%, transparent); border: 1px solid var(--border);
+    border-radius: 9px; padding: 5px 9px; pointer-events: none;
+  }
+
+  .bar { display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap; }
+  .btn {
+    font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+    padding: 7px 11px; border-radius: 11px; border: 1px solid var(--border);
+    background: var(--card); color: var(--ink);
+  }
+  .btn.on { background: var(--jade); border-color: var(--jade); color: #fff; }
+
+  .rows { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+  .row {
+    display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+    font: inherit; cursor: pointer; padding: 8px 10px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--card); color: var(--ink);
+  }
+  .row.sel { border-color: var(--jade); background: color-mix(in srgb, var(--mint) 55%, var(--card)); }
+  .row .sw { width: 11px; height: 11px; border-radius: 99px; flex: none; }
+  .row .rn { font-size: 13px; font-weight: 700; }
+  .row .rc { font-size: 11.5px; color: var(--ink-dim); }
+
+  .detail { border: 1px solid var(--border); border-radius: 16px; padding: 13px 14px; background: var(--soft); margin-top: 12px; }
+  .detail .dn { font-size: 15.5px; font-weight: 800; }
+  .detail .dc { font-size: 12px; color: var(--ink-dim); margin-bottom: 8px; }
+  .detail .drow { font-size: 12.5px; margin-bottom: 5px; }
+  .detail .drow b { color: var(--ink-dim); font-weight: 800; }
+  .warn { margin-top: 8px; font-size: 12px; font-weight: 700; color: #B4553C; background: var(--blush); border-radius: 10px; padding: 7px 10px; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .warn { color: var(--copper); } }
+
+  .note { font-size: 12px; color: var(--ink-dim); margin-top: 18px; line-height: 1.6; }
+  .note a { color: var(--jade); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Design Preview · test-mvp</p>
+  <h1>3D 인체 모델 — 경혈 · 장기 보기</h1>
+  <p class="sub">
+    모델을 아무 방향으로나 끌어 돌려 보세요. 변증을 고르면 그 변증에 쓰는 경혈이 몸 표면의 제자리에 찍히고,
+    장기 보기를 켜면 몸이 비쳐 보이면서 오장육부가 제 위치에 나타납니다. 뒤쪽에 있는 것은 몸에 가려집니다.
+  </p>
+
+  <div class="app">
+    <div class="app-top">
+      <span class="dot"></span>
+      <span class="name">한의사 대시보드 · 3D 인체 모델</span>
+      <span class="who">이서연 님 · 공유된 변증 결과</span>
+    </div>
+
+    <div class="sect">
+      <div class="label">보기 모드</div>
+      <div class="chips" id="modes"></div>
+    </div>
+
+    <div class="sect" id="patsect">
+      <div class="label">의심 변증 — 경혈이 바뀝니다</div>
+      <div class="chips" id="pats"></div>
+      <div style="font-size:12.5px;color:var(--ink-dim);margin-top:9px" id="rule"></div>
+    </div>
+
+    <div class="sect">
+      <div class="grid">
+        <div>
+          <div class="stage">
+            <canvas id="cv"></canvas>
+            <div class="axis" id="axis"></div>
+            <div class="tip">끌어서 회전 · 휠/버튼으로 확대 · 표시된 점을 눌러보세요</div>
+          </div>
+          <div class="bar">
+            <button class="btn" data-view="front">정면</button>
+            <button class="btn" data-view="back">후면</button>
+            <button class="btn" data-view="left">좌측</button>
+            <button class="btn" data-view="right">우측</button>
+            <button class="btn" id="spin">자동 회전</button>
+            <button class="btn" id="zin">＋</button>
+            <button class="btn" id="zout">－</button>
+            <button class="btn" id="reset">초기화</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="label" id="listlabel"></div>
+          <div class="rows" id="rows"></div>
+          <div class="detail" id="detail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    한의사용 참고 자료이며 처방이 아닙니다. 실제 취혈과 자침 여부·깊이는 진료로 확인한 뒤 한의사가 판단합니다.<br>
+    모델은 표준 취혈과 장기 위치를 사람 비율에 맞춰 배치한 학습용 근사이며, 환자 체형에 따라 촌(寸)으로 다시 재야 합니다.<br>
+    <a href="./acupoint-guide-preview.html">2D 경혈 가이드</a> ·
+    <a href="./practitioner-inbox-preview.html">한의사 수신함</a> ·
+    <a href="./pattern-finder-preview.html">환자 화면</a>
+  </p>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ───────────────────────────────────────────────────────────────────────
+  // 아주 작은 3D 렌더러.
+  // 몸은 뼈대를 따라 놓인 구(球)들로 만들고, 구·장기·경혈을 모두 깊이순으로
+  // 정렬해 뒤에서 앞으로 그린다. 그래서 뒤쪽 경혈은 몸에 자연스럽게 가려진다.
+  // 모델 좌표: x 오른쪽(+), y 아래(+), z 앞(+). 키 780 기준.
+  // ───────────────────────────────────────────────────────────────────────
+  const CX = 210, CY = 400;           // 회전 중심
+  const FOCAL = 1100;
+
+  const body = [];
+  const S = (x, y, z, r) => body.push({ x, y, z, r });
+  // 두 점 사이를 구로 채운다(사지·몸통 세로 방향).
+  function seg(p0, p1, r0, r1, n) {
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      S(p0[0] + (p1[0] - p0[0]) * t,
+        p0[1] + (p1[1] - p0[1]) * t,
+        p0[2] + (p1[2] - p0[2]) * t,
+        r0 + (r1 - r0) * t);
+    }
+  }
+  // 가로로 늘어선 구로 한 층을 만든다 → 넓고 얕은 몸통 단면(타원형)이 된다.
+  function slab(y, halfW, r, z = 0, n = 3) {
+    const span = Math.max(0, halfW - r);
+    for (let i = 0; i < n; i++) {
+      const t = n === 1 ? 0.5 : i / (n - 1);
+      S(210 - span + span * 2 * t, y, z, r);
+    }
+  }
+
+  // 머리 · 목
+  S(210, 118, 2, 45); S(210, 100, -6, 40); S(210, 140, 6, 40);
+  seg([210, 158, 0], [210, 188, 0], 16, 18, 2);
+  // 몸통 — 어깨에서 골반까지
+  slab(206, 80, 30, 0, 4);
+  slab(232, 74, 34, 0, 4);
+  slab(262, 72, 35, 0, 4);
+  slab(292, 68, 34, 0, 4);
+  slab(322, 63, 33, 0, 4);
+  slab(352, 61, 32, 0, 4);
+  slab(382, 64, 33, 0, 4);
+  slab(412, 68, 34, 0, 4);
+  slab(440, 64, 32, 0, 4);
+  // 팔 (좌 · 우)
+  for (const s of [-1, 1]) {
+    seg([210 + s * 74, 212, 0], [210 + s * 96, 318, 2], 20, 16, 6);
+    seg([210 + s * 96, 322, 2], [210 + s * 112, 412, 4], 15, 12, 6);
+    S(210 + s * 118, 434, 6, 17);
+  }
+  // 다리 (좌 · 우)
+  for (const s of [-1, 1]) {
+    seg([210 + s * 36, 452, 0], [210 + s * 34, 556, 2], 30, 22, 7);
+    seg([210 + s * 34, 562, 2], [210 + s * 33, 686, 4], 20, 13, 8);
+    seg([210 + s * 33, 700, 8], [210 + s * 33, 706, 34], 13, 12, 2);
+  }
+
+  // ── 장기 ────────────────────────────────────────────────────────────────
+  // x < 210 = 환자의 오른쪽(정면에서 볼 때 화면 왼쪽). 간이 여기에 온다.
+  const ORGANS = [
+    { id:'heart', ko:'심', han:'心', color:'#C75B5B',
+      blobs:[[206,258,12,25],[200,272,10,19]],
+      fn:'혈을 돌리고 정신(神)을 간직한다. 두근거림·불면·불안과 관련.',
+      pat:'혈허 · 음허', pts:'내관 PC6 · 음극 HT6 · 신문 HT7' },
+    { id:'lung', ko:'폐', han:'肺', color:'#D8A6AC',
+      blobs:[[168,242,4,33],[252,242,4,33],[172,278,2,26],[248,278,2,26]],
+      fn:'기를 주관하고 호흡을 다스린다. 피부와 땀 조절에도 관여.',
+      pat:'기허', pts:'폐수 BL13 · 태연 LU9 · 열결 LU7' },
+    { id:'liver', ko:'간', han:'肝', color:'#8C5A4A',
+      blobs:[[176,308,10,32],[200,300,8,24],[160,326,6,22]],
+      fn:'기를 소통시키고 혈을 갈무리한다. 스트레스·옆구리 결림·눈과 관련.',
+      pat:'간기울결 · 혈허 · 어혈', pts:'태충 LR3 · 기문 LR14 · 간수 BL18' },
+    { id:'gb', ko:'담', han:'膽', color:'#7FA05B',
+      blobs:[[186,330,18,11]],
+      fn:'결단을 주관한다. 입쓴맛·옆구리 통증·잘 놀람과 관련.',
+      pat:'간기울결', pts:'양릉천 GB34 · 담수 BL19' },
+    { id:'spleen', ko:'비', han:'脾', color:'#A0708C',
+      blobs:[[254,312,-4,21]],
+      fn:'운화를 주관해 기혈을 만든다. 습을 다스리고 사지를 채운다.',
+      pat:'기허 · 습담 · 혈허', pts:'족삼리 ST36 · 비수 BL20 · 태백 SP3' },
+    { id:'stomach', ko:'위', han:'胃', color:'#C79A5B',
+      blobs:[[228,330,14,25],[214,348,12,19]],
+      fn:'음식을 받아 삭인다. 더부룩함·식욕과 직결.',
+      pat:'기허 · 습담', pts:'중완 CV12 · 족삼리 ST36 · 위수 BL21' },
+    { id:'kidney', ko:'신', han:'腎', color:'#5B7FA0',
+      blobs:[[184,372,-26,17],[236,372,-26,17]],
+      fn:'정(精)을 간직하고 뼈와 생식을 주관한다. 음과 양의 뿌리.',
+      pat:'양허 · 음허', pts:'태계 KI3 · 신수 BL23 · 명문 GV4' },
+    { id:'li', ko:'대장', han:'大腸', color:'#B08A6A',
+      blobs:[[176,418,16,14],[176,384,16,14],[196,368,18,13],[224,368,18,13],[244,384,16,14],[244,418,16,14]],
+      fn:'찌꺼기를 내보낸다. 변비·설사와 직결.',
+      pat:'습담 · 양허', pts:'합곡 LI4 · 천추 ST25 · 대장수 BL25' },
+    { id:'si', ko:'소장', han:'小腸', color:'#C7A98A',
+      blobs:[[210,404,20,20],[192,420,18,16],[228,420,18,16],[210,432,18,15]],
+      fn:'맑고 흐린 것을 갈라낸다. 소화 흡수의 마무리.',
+      pat:'기허', pts:'관원 CV4 · 소장수 BL27' },
+    { id:'bladder', ko:'방광', han:'膀胱', color:'#6A93A8',
+      blobs:[[210,444,14,18]],
+      fn:'수액을 모아 내보낸다. 소변 이상과 관련.',
+      pat:'양허', pts:'중극 CV3 · 방광수 BL28 · 위중 BL40' },
+  ];
+
+  // ── 경혈 (3D) ───────────────────────────────────────────────────────────
+  const P = {
+    CV17:{ko:'전중',han:'膻中',m:'임맥',loc:'양 젖꼭지 사이, 흉골 정중선',use:'기가 모이는 기회혈. 가슴 답답함과 한숨에.',at:[[210,258,38]]},
+    CV12:{ko:'중완',han:'中脘',m:'임맥',loc:'배꼽 위 4촌',use:'위의 모혈. 소화를 돕는다.',at:[[210,330,36]]},
+    CV6:{ko:'기해',han:'氣海',m:'임맥',loc:'배꼽 아래 1.5촌',use:'원기를 북돋운다. 뜸을 자주 쓴다.',at:[[210,382,37]]},
+    CV4:{ko:'관원',han:'關元',m:'임맥',loc:'배꼽 아래 3촌',use:'원기와 양기를 채운다.',at:[[210,404,37]]},
+    GV14:{ko:'대추',han:'大椎',m:'독맥',loc:'제7경추 극돌기 아래',use:'양경이 모이는 자리. 양기를 통하게 한다.',at:[[210,200,-32]]},
+    GV4:{ko:'명문',han:'命門',m:'독맥',loc:'제2요추 극돌기 아래',use:'신양을 덥힌다. 냉증에 뜸.',at:[[210,388,-36]]},
+    BL17:{ko:'격수',han:'膈兪',m:'방광경',loc:'제7흉추 아래 옆 1.5촌',use:'혈이 모이는 혈회. 혈허·어혈에.',at:[[192,292,-34],[228,292,-34]]},
+    BL18:{ko:'간수',han:'肝兪',m:'방광경',loc:'제9흉추 아래 옆 1.5촌',use:'간의 배수혈. 울결을 푼다.',at:[[192,314,-34],[228,314,-34]]},
+    BL20:{ko:'비수',han:'脾兪',m:'방광경',loc:'제11흉추 아래 옆 1.5촌',use:'비의 배수혈. 기혈을 만든다.',at:[[192,340,-33],[228,340,-33]]},
+    BL21:{ko:'위수',han:'胃兪',m:'방광경',loc:'제12흉추 아래 옆 1.5촌',use:'위의 배수혈. 소화를 돕는다.',at:[[192,356,-33],[228,356,-33]]},
+    BL23:{ko:'신수',han:'腎兪',m:'방광경',loc:'제2요추 아래 옆 1.5촌',use:'신의 배수혈. 음양을 함께 보한다.',at:[[192,388,-35],[228,388,-35]]},
+    LR14:{ko:'기문',han:'期門',m:'간경',loc:'유두 아래 제6늑간',use:'간의 모혈. 옆구리 결림에.',at:[[176,288,30],[244,288,30]]},
+    LR3:{ko:'태충',han:'太衝',m:'간경',loc:'발등 제1·2 중족골 사이',use:'간의 원혈. 오르는 기를 내린다.',at:[[180,704,26],[240,704,26]]},
+    LI4:{ko:'합곡',han:'合谷',m:'대장경',loc:'엄지와 검지 뼈 사이, 손등 쪽',use:'태충과 함께 사관. 기혈을 크게 소통시킨다.',caution:'임신 중에는 쓰지 않는다.',at:[[93,436,8],[327,436,8]]},
+    PC6:{ko:'내관',han:'內關',m:'심포경',loc:'손목 주름 위 2촌, 두 힘줄 사이',use:'가슴 답답함·구역·불안을 가라앉힌다.',at:[[104,392,14],[316,392,14]]},
+    HT6:{ko:'음극',han:'陰郄',m:'심경',loc:'손목 주름 위 0.5촌',use:'밤에 나는 식은땀을 멎게 한다.',at:[[108,412,12],[312,412,12]]},
+    ST36:{ko:'족삼리',han:'足三里',m:'위경',loc:'무릎 아래 3촌, 정강뼈 바깥 한 손가락',use:'기혈을 보하는 대표 보익혈.',at:[[160,578,18],[260,578,18]]},
+    ST40:{ko:'풍륭',han:'豐隆',m:'위경',loc:'무릎과 바깥 복사뼈 중간, 정강뼈 바깥 두 손가락',use:'담을 삭이는 요혈.',at:[[157,622,12],[263,622,12]]},
+    SP3:{ko:'태백',han:'太白',m:'비경',loc:'엄지발가락 뿌리 안쪽',use:'비의 원혈. 비기를 세운다.',at:[[192,708,20],[228,708,20]]},
+    SP6:{ko:'삼음교',han:'三陰交',m:'비경',loc:'안쪽 복사뼈 위 3촌, 정강뼈 뒤',use:'세 음경이 만나는 자리. 혈과 음을 다스린다.',caution:'임신 중에는 쓰지 않는다.',at:[[190,656,6],[230,656,6]]},
+    SP9:{ko:'음릉천',han:'陰陵泉',m:'비경',loc:'무릎 아래 안쪽 오목한 곳',use:'습을 빼내는 요혈.',at:[[192,572,10],[228,572,10]]},
+    SP10:{ko:'혈해',han:'血海',m:'비경',loc:'무릎뼈 안쪽 위 2촌',use:'혈을 다스린다. 혈허와 어혈 모두에.',at:[[188,500,14],[232,500,14]]},
+    GB34:{ko:'양릉천',han:'陽陵泉',m:'담경',loc:'종아리 바깥, 비골두 앞아래',use:'근이 모이는 근회. 결림과 옆구리 통증에.',at:[[156,558,8],[264,558,8]]},
+    KI3:{ko:'태계',han:'太谿',m:'신경',loc:'안쪽 복사뼈와 아킬레스건 사이',use:'신의 원혈. 뿌리를 채운다.',at:[[190,686,-10],[230,686,-10]]},
+    KI6:{ko:'조해',han:'照海',m:'신경',loc:'안쪽 복사뼈 아래',use:'음을 적셔 입마름을 덜어준다.',at:[[191,698,4],[229,698,4]]},
+    KI7:{ko:'부류',han:'復溜',m:'신경',loc:'태계 위 2촌',use:'음극과 짝지어 도한을 멎게 한다.',at:[[189,668,-6],[231,668,-6]]},
+  };
+
+  const PATTERNS = [
+    { ko:'기허 (기운 부족)', pct:62, rule:'보기건비(補氣健脾) — 비위를 세워 기를 만든다. 보법과 뜸 위주.', pts:['ST36','CV6','CV4','CV12','BL20','BL21','SP3'] },
+    { ko:'양허 (몸이 참)',   pct:0,  rule:'온보신양(溫補腎陽) — 아랫배와 허리를 덥힌다. 뜸을 넉넉히.',      pts:['CV4','CV6','GV4','BL23','ST36','KI3'] },
+    { ko:'음허 (허열·건조)', pct:0,  rule:'자음강화(滋陰降火) — 음을 적시고 허열을 내린다.',              pts:['KI3','KI6','KI7','HT6','SP6','BL23','BL18'] },
+    { ko:'습담 (무겁고 더부룩)', pct:24, rule:'건비화담(健脾化痰) — 비를 세우고 습담을 삭인다.',          pts:['ST40','SP9','CV12','ST36','BL20','SP6'] },
+    { ko:'간기울결 (스트레스)', pct:0, rule:'소간해울(疏肝解鬱) — 막힌 기를 흐르게 한다. 사법 위주.',     pts:['LR3','LI4','LR14','CV17','PC6','BL18','GB34'] },
+    { ko:'어혈 (고정된 통증)', pct:0, rule:'활혈화어(活血化瘀) — 뭉친 혈을 풀어 통증을 없앤다.',         pts:['BL17','SP10','SP6','LR3','LI4','GB34'] },
+    { ko:'혈허 (어지럼·창백)', pct:0, rule:'보혈양혈(補血養血) — 혈을 만들고 갈무리한다.',              pts:['SP10','BL17','BL18','BL20','ST36','SP6'] },
+  ];
+
+  // ── 상태 ────────────────────────────────────────────────────────────────
+  let yaw = 0, pitch = -0.06, zoom = 1, patIdx = 0;
+  let showPoints = true, showOrgans = false, spinning = false;
+  let selPoint = null, selOrgan = null;
+  let hits = [];
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  let W = 0, H = 0;
+
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = cv.getBoundingClientRect();
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function tf(x, y, z) {
+    const dx = x - CX, dy = y - CY, dz = z;
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    const x1 = dx * cy + dz * sy;
+    const z1 = -dx * sy + dz * cy;
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const y1 = dy * cp - z1 * sp;
+    const z2 = dy * sp + z1 * cp;
+    return { x: x1, y: y1, z: z2 };
+  }
+  function proj(t) {
+    const base = Math.min(W / 460, H / 820) * zoom;
+    const s = FOCAL / (FOCAL - t.z) * base;
+    return { sx: W / 2 + t.x * s, sy: H / 2 + t.y * s, s, z: t.z };
+  }
+
+  function sphere(p, radius, colA, colB, alpha) {
+    if (p.sx < -80 || p.sx > W + 80 || p.sy < -80 || p.sy > H + 80) return;
+    const r = radius * p.s;
+    if (r < 0.4) return;
+    const g = ctx.createRadialGradient(
+      p.sx - r * 0.36, p.sy - r * 0.42, r * 0.08, p.sx, p.sy, r * 1.06);
+    g.addColorStop(0, colA); g.addColorStop(1, colB);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.sx, p.sy, r, 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const skinA = css('--skin-a'), skinB = css('--skin-b');
+    const bodyAlpha = showOrgans ? 0.17 : 1;
+    const items = [];
+
+    for (const b of body) {
+      const t = tf(b.x, b.y, b.z);
+      items.push({ z: t.z, kind: 'body', p: proj(t), r: b.r });
+    }
+    if (showOrgans) {
+      for (const o of ORGANS) {
+        const dim = selOrgan && selOrgan !== o.id;
+        for (const [x, y, z, r] of o.blobs) {
+          const t = tf(x, y, z);
+          items.push({ z: t.z, kind: 'organ', p: proj(t), r, o, dim });
+        }
+      }
+    }
+    if (showPoints) {
+      const list = PATTERNS[patIdx].pts;
+      list.forEach((code, i) => {
+        const pt = P[code];
+        if (!pt) return;
+        for (const [x, y, z] of pt.at) {
+          const t = tf(x, y, z);
+          items.push({ z: t.z, kind: 'point', p: proj(t), code, n: i + 1 });
+        }
+      });
+    }
+
+    items.sort((a, b) => a.z - b.z);
+    hits = [];
+
+    for (const it of items) {
+      if (it.kind === 'body') {
+        sphere(it.p, it.r, skinA, skinB, bodyAlpha);
+      } else if (it.kind === 'organ') {
+        const a = it.dim ? 0.3 : 0.95;
+        sphere(it.p, it.r, it.o.color, shade(it.o.color, -34), a);
+        hits.push({ kind: 'organ', id: it.o.id, x: it.p.sx, y: it.p.sy, r: it.r * it.p.s, z: it.z });
+      } else {
+        const sel = selPoint === it.code;
+        const r = Math.max(5, 9 * it.p.s);
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath(); ctx.arc(it.p.sx, it.p.sy, r * 1.75, 0, 6.2832);
+        ctx.fillStyle = sel ? 'rgba(47,90,75,.26)' : 'rgba(226,140,116,.26)'; ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(it.p.sx, it.p.sy, r, 0, 6.2832);
+        ctx.fillStyle = sel ? '#2F5A4B' : '#E28C74'; ctx.fill();
+        ctx.lineWidth = 1.6; ctx.strokeStyle = '#fff'; ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = `800 ${Math.max(8, r * 1.05)}px system-ui, sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(String(it.n), it.p.sx, it.p.sy + 0.5);
+        hits.push({ kind: 'point', id: it.code, x: it.p.sx, y: it.p.sy, r: r * 1.9, z: it.z });
+      }
+    }
+
+    const deg = ((yaw * 180 / Math.PI) % 360 + 360) % 360;
+    const face = deg < 45 || deg >= 315 ? '정면' : deg < 135 ? '좌측면' : deg < 225 ? '후면' : '우측면';
+    $('axis').textContent = `${face} · ${Math.round(deg)}°`;
+  }
+
+  function shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const c = [n >> 16, (n >> 8) & 255, n & 255]
+      .map(v => Math.max(0, Math.min(255, v + amt)));
+    return `rgb(${c[0]},${c[1]},${c[2]})`;
+  }
+
+  // ── UI ──────────────────────────────────────────────────────────────────
+  function renderModes() {
+    $('modes').innerHTML = `
+      <button class="chip ${showPoints ? 'on' : ''}" id="m-pts"><span class="sw" style="background:#E28C74"></span>경혈 보기</button>
+      <button class="chip ${showOrgans ? 'on' : ''}" id="m-org"><span class="sw" style="background:#8C5A4A"></span>장기 보기</button>`;
+    $('m-pts').onclick = () => { showPoints = !showPoints; if (!showPoints) selPoint = null; renderAll(); };
+    $('m-org').onclick = () => { showOrgans = !showOrgans; if (!showOrgans) selOrgan = null; renderAll(); };
+    $('patsect').style.display = showPoints ? '' : 'none';
+  }
+
+  function renderPats() {
+    $('pats').innerHTML = PATTERNS.map((p, i) =>
+      `<button class="chip ${i === patIdx ? 'on' : ''}" data-i="${i}">${p.ko}${p.pct ? ` <span style="opacity:.75;font-weight:600">${p.pct}%</span>` : ''}</button>`).join('');
+    for (const b of $('pats').children) {
+      b.onclick = () => { patIdx = +b.dataset.i; selPoint = null; renderAll(); };
+    }
+    $('rule').textContent = PATTERNS[patIdx].rule;
+  }
+
+  function renderRows() {
+    if (showOrgans) {
+      $('listlabel').textContent = `장기 ${ORGANS.length}곳 — 누르면 그 장기만 밝게 보입니다`;
+      $('rows').innerHTML = ORGANS.map(o => `
+        <button class="row ${selOrgan === o.id ? 'sel' : ''}" data-organ="${o.id}">
+          <span class="sw" style="background:${o.color}"></span>
+          <span><span class="rn">${o.ko}</span> <span class="rc">${o.han}</span></span>
+        </button>`).join('');
+      for (const b of $('rows').children) {
+        b.onclick = () => {
+          selOrgan = selOrgan === b.dataset.organ ? null : b.dataset.organ;
+          selPoint = null; renderAll();
+        };
+      }
+    } else {
+      const list = PATTERNS[patIdx].pts;
+      $('listlabel').textContent = `추천 경혈 ${list.length}곳 — 누르면 그 자리가 보이게 돌아갑니다`;
+      $('rows').innerHTML = list.map((code, i) => {
+        const p = P[code];
+        return `<button class="row ${selPoint === code ? 'sel' : ''}" data-code="${code}">
+          <span class="sw" style="background:${selPoint === code ? '#2F5A4B' : '#E28C74'}"></span>
+          <span><span class="rn">${p.ko}</span> <span class="rc">${p.han} · ${code} · ${p.m}</span></span>
+        </button>`;
+      }).join('');
+      for (const b of $('rows').children) {
+        b.onclick = () => { selPoint = b.dataset.code; faceTo(P[selPoint].at[0]); renderAll(); };
+      }
+    }
+  }
+
+  // 선택한 자리가 화면 앞으로 오도록 몸을 돌린다.
+  function faceTo([x, y, z]) {
+    const target = Math.atan2(x - CX, z) * -1;
+    animateYaw(target);
+  }
+  function animateYaw(target) {
+    let d = target - yaw;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    const from = yaw, t0 = performance.now(), dur = 420;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      yaw = from + d * (1 - Math.pow(1 - k, 3));
+      draw();
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  function renderDetail() {
+    if (selOrgan) {
+      const o = ORGANS.find(v => v.id === selOrgan);
+      $('detail').innerHTML = `
+        <div class="dn">${o.ko} <span style="font-weight:600;color:var(--ink-dim)">${o.han}</span></div>
+        <div class="dc">장부</div>
+        <div class="drow"><b>기능</b> · ${o.fn}</div>
+        <div class="drow"><b>관련 변증</b> · ${o.pat}</div>
+        <div class="drow"><b>자주 쓰는 혈</b> · ${o.pts}</div>`;
+      return;
+    }
+    if (selPoint && P[selPoint]) {
+      const p = P[selPoint];
+      $('detail').innerHTML = `
+        <div class="dn">${p.ko} <span style="font-weight:600;color:var(--ink-dim)">${p.han}</span></div>
+        <div class="dc">${selPoint} · ${p.m}</div>
+        <div class="drow"><b>취혈</b> · ${p.loc}</div>
+        <div class="drow"><b>쓰임</b> · ${p.use}</div>
+        ${p.caution ? `<div class="warn">⚠ ${p.caution}</div>` : ''}`;
+      return;
+    }
+    $('detail').innerHTML = `<div class="dc" style="margin:0">${showOrgans
+      ? '장기를 누르면 기능과 관련 변증이 여기에 나옵니다.'
+      : '경혈을 누르면 취혈 위치와 쓰임이 여기에 나옵니다.'}</div>`;
+  }
+
+  function renderAll() { renderModes(); renderPats(); renderRows(); renderDetail(); draw(); }
+
+  // ── 조작 ────────────────────────────────────────────────────────────────
+  let drag = null, moved = 0;
+  cv.addEventListener('pointerdown', e => {
+    drag = { x: e.clientX, y: e.clientY }; moved = 0;
+    cv.setPointerCapture(e.pointerId); spinning = false; $('spin').classList.remove('on');
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    yaw += dx * 0.011;
+    pitch = Math.max(-0.6, Math.min(0.6, pitch + dy * 0.006));
+    drag = { x: e.clientX, y: e.clientY };
+    draw();
+  });
+  cv.addEventListener('pointerup', e => {
+    if (drag && moved < 6) pick(e);
+    drag = null;
+  });
+  cv.addEventListener('pointercancel', () => { drag = null; });
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    zoom = Math.max(0.6, Math.min(3, zoom * (e.deltaY > 0 ? 0.92 : 1.08)));
+    draw();
+  }, { passive: false });
+
+  function pick(e) {
+    const r = cv.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = null;
+    for (const h of hits) {
+      const d = Math.hypot(h.x - mx, h.y - my);
+      if (d <= h.r && (!best || h.z > best.z)) best = h;
+    }
+    if (!best) return;
+    if (best.kind === 'point') { selPoint = best.id; selOrgan = null; }
+    else { selOrgan = selOrgan === best.id ? null : best.id; selPoint = null; }
+    renderAll();
+  }
+
+  for (const b of document.querySelectorAll('[data-view]')) {
+    b.onclick = () => {
+      spinning = false; $('spin').classList.remove('on');
+      const map = { front: 0, left: Math.PI / 2, back: Math.PI, right: -Math.PI / 2 };
+      pitch = -0.06; animateYaw(map[b.dataset.view]);
+    };
+  }
+  $('zin').onclick = () => { zoom = Math.min(3, zoom * 1.18); draw(); };
+  $('zout').onclick = () => { zoom = Math.max(0.6, zoom / 1.18); draw(); };
+  $('reset').onclick = () => { yaw = 0; pitch = -0.06; zoom = 1; draw(); };
+  $('spin').onclick = () => {
+    spinning = !spinning;
+    $('spin').classList.toggle('on', spinning);
+    if (spinning) requestAnimationFrame(tick);
+  };
+  let last = 0;
+  function tick(now) {
+    if (!spinning) return;
+    if (last) yaw += (now - last) * 0.0006;
+    last = now; draw();
+    requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('resize', resize);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+
+  renderAll();
+  resize();
+})();
+</script>
+</body>
+</html>
