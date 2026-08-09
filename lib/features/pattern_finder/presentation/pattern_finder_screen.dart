@@ -29,7 +29,7 @@ class PatternFinderScreen extends StatefulWidget {
   State<PatternFinderScreen> createState() => _PatternFinderScreenState();
 }
 
-enum _Stage { intro, basicInfo, questions, result }
+enum _Stage { intro, basicInfo, questions, deepCheckpoint, result }
 
 class _PatternFinderScreenState extends State<PatternFinderScreen> {
   final ClinicDataStore _store = ClinicDataStore.instance;
@@ -155,6 +155,13 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
   }
 
   void _advance() {
+    // After Chapter 1, pause on the checkpoint so the patient chooses whether
+    // to keep answering for a more precise result.
+    if (_engine.atDeepCheckpoint) {
+      _stage = _Stage.deepCheckpoint;
+      _currentQuestion = null;
+      return;
+    }
     final next = _engine.nextQuestion();
     if (next == null) {
       _stage = _Stage.result;
@@ -164,15 +171,60 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
     }
   }
 
+  /// The patient's answer to "would you like to keep answering?" at the
+  /// checkpoint. Yes → personalized Chapter 2; No → straight to the result.
+  void _chooseDeepDive(bool keepGoing) {
+    setState(() {
+      _engine.chooseDeepDive(keepGoing);
+      if (keepGoing) {
+        _currentQuestion = _engine.nextQuestion();
+        _stage = _Stage.questions;
+      } else {
+        _currentQuestion = null;
+        _stage = _Stage.result;
+      }
+    });
+  }
+
+  /// "Stop here and see my result" from within Chapter 2.
+  void _stopAndSeeResult() {
+    setState(() {
+      _currentQuestion = null;
+      _stage = _Stage.result;
+    });
+  }
+
   void _back() {
     setState(() {
+      // Stepping back from the first Chapter 2 question reopens the checkpoint.
+      if (_engine.deepDiveChoice == true &&
+          _engine.answeredCount ==
+              PatternFinderService.commonQuestionCount) {
+        _engine.clearDeepDiveChoice();
+        _currentQuestion = null;
+        _stage = _Stage.deepCheckpoint;
+        return;
+      }
       if (_engine.answeredCount == 0) {
         _stage = _Stage.basicInfo;
         _currentQuestion = null;
       } else {
         _engine.undo();
+        if (_engine.answeredCount < PatternFinderService.commonQuestionCount) {
+          _engine.clearDeepDiveChoice();
+        }
         _currentQuestion = _engine.nextQuestion();
       }
+    });
+  }
+
+  /// Back button on the checkpoint itself — undo the last Chapter 1 answer.
+  void _backFromCheckpoint() {
+    setState(() {
+      _engine.clearDeepDiveChoice();
+      _engine.undo();
+      _currentQuestion = _engine.nextQuestion();
+      _stage = _Stage.questions;
     });
   }
 
@@ -281,13 +333,21 @@ class _PatternFinderScreenState extends State<PatternFinderScreen> {
           key: ValueKey(_currentQuestion!.id),
           question: _currentQuestion!,
           answered: _engine.answeredCount,
-          total: PatternFinderService.questionsPerSession,
+          total: _engine.plannedTotal,
           chapter: _engine.currentChapter,
           isChapterStart: _engine.answeredCount ==
               PatternFinderService.commonQuestionCount,
           onChoose: _choose,
           onChooseFreeText: _chooseFreeText,
           onBack: _back,
+          onStop: _engine.currentChapter == 2 ? _stopAndSeeResult : null,
+        ),
+        _Stage.deepCheckpoint => _DeepCheckpointView(
+          leadPattern: _engine.result().top?.pattern,
+          deepDiveCap: PatternFinderService.deepDiveCap,
+          onContinue: () => _chooseDeepDive(true),
+          onStop: () => _chooseDeepDive(false),
+          onBack: _backFromCheckpoint,
         ),
         _Stage.result => _ResultView(
           result: _engine.result(),
@@ -357,8 +417,8 @@ class _IntroView extends StatelessWidget {
               children: [
                 Text(
                   lang.tr(
-                    'Find your body pattern in ${PatternFinderService.questionsPerSession} questions',
-                    '${PatternFinderService.questionsPerSession}개의 질문으로 내 몸의 패턴 방향을 찾아봐요',
+                    'Find your body pattern in a few questions',
+                    '몇 가지 질문으로 내 몸의 패턴 방향을 찾아봐요',
                   ),
                   style: const TextStyle(
                     fontSize: 20,
@@ -368,12 +428,11 @@ class _IntroView extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   lang.tr(
-                    'Answer one question at a time. Each answer decides the '
-                    'next question, and at the end you get the pattern '
-                    'direction your answers point to — with the research '
-                    'behind it.',
-                    '한 번에 하나씩만 답하면 돼요. 답할 때마다 다음 질문이 달라지고, '
-                    '마지막에 내 답변이 가리키는 패턴 방향과 그 근거 연구를 보여드려요.',
+                    'Answer a few common questions first, then, if you like, '
+                    'go deeper with questions tailored to you for a more '
+                    'precise result. Each answer decides the next question.',
+                    '먼저 공통 질문 몇 개에 답하고, 원하면 나에게 맞춘 심화 질문으로 '
+                    '더 정교하게 이어갈 수 있어요. 답할 때마다 다음 질문이 달라져요.',
                   ),
                   style: const TextStyle(fontSize: 14, height: 1.5),
                 ),
@@ -596,6 +655,7 @@ class _QuestionView extends StatefulWidget {
     required this.onChoose,
     required this.onChooseFreeText,
     required this.onBack,
+    this.onStop,
   });
 
   final PatternQuestion question;
@@ -606,6 +666,9 @@ class _QuestionView extends StatefulWidget {
   final ValueChanged<int> onChoose;
   final ValueChanged<String> onChooseFreeText;
   final VoidCallback onBack;
+
+  /// Shown in Chapter 2 as "stop here and see my result"; null hides it.
+  final VoidCallback? onStop;
 
   @override
   State<_QuestionView> createState() => _QuestionViewState();
@@ -767,6 +830,143 @@ class _QuestionViewState extends State<_QuestionView> {
             ],
           ),
         ],
+        if (widget.onStop != null && !_showFreeText) ...[
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: widget.onStop,
+              child: Text(
+                lang.tr('Stop here and see my result', '여기서 멈추고 결과 볼래요'),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.ink.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// The "would you like to keep answering?" checkpoint shown between Chapter 1
+/// and Chapter 2. Choosing to continue connects the personalized deep-dive
+/// questions; choosing to stop goes straight to the result.
+class _DeepCheckpointView extends StatelessWidget {
+  const _DeepCheckpointView({
+    required this.leadPattern,
+    required this.deepDiveCap,
+    required this.onContinue,
+    required this.onStop,
+    required this.onBack,
+  });
+
+  final TcmPattern? leadPattern;
+  final int deepDiveCap;
+  final VoidCallback onContinue;
+  final VoidCallback onStop;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = AppLanguageController.instance;
+    final leadName = leadPattern == null
+        ? null
+        : lang.tr(leadPattern!.nameEn, leadPattern!.nameKo);
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: IconButton(
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: lang.tr('Back', '이전'),
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text('🧭', style: TextStyle(fontSize: 34)),
+        const SizedBox(height: 6),
+        Text(
+          lang.tr(
+            'A direction is starting to show',
+            '지금까지 답변으로 방향이 잡히고 있어요',
+          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 10),
+        RichText(
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: 14.5,
+              height: 1.6,
+              color: AppTheme.ink.withValues(alpha: 0.7),
+            ),
+            children: [
+              if (leadName != null) ...[
+                TextSpan(
+                  text: lang.tr('Right now it leans toward ', '현재는 '),
+                ),
+                TextSpan(
+                  text: leadName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F766E),
+                  ),
+                ),
+                TextSpan(text: lang.tr('. ', ' 쪽으로 기울고 있어요. ')),
+              ],
+              TextSpan(
+                text: lang.tr(
+                  'If you answer a few more, we’ll ask deeper questions '
+                  'tailored to you and the result is more likely to be precise.',
+                  '몇 가지만 더 답해주시면 나에게 맞춘 심화 질문으로 결과가 더 정교하게 '
+                  '나올 확률이 높아져요.',
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceSoft,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.border),
+          ),
+          child: Text(
+            lang.tr(
+              'Chapter 2 · Personalized questions — they adapt to your answers '
+              '(up to $deepDiveCap, stop anytime).',
+              '2장 · 맞춤 심화 문진 — 답변에 따라 질문이 달라져요 '
+              '(최대 $deepDiveCap문항, 언제든 멈출 수 있어요).',
+            ),
+            style: TextStyle(
+              fontSize: 12.5,
+              height: 1.4,
+              color: AppTheme.ink.withValues(alpha: 0.65),
+            ),
+          ),
+        ),
+        const SizedBox(height: 18),
+        FilledButton(
+          onPressed: onContinue,
+          style: FilledButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          child: Text(lang.tr("Yes, I'll answer more", '네, 더 답변할래요')),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: onStop,
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          child: Text(lang.tr("No, I'll stop here", '아니요, 이쯤에서 멈출래요')),
+        ),
       ],
     );
   }
