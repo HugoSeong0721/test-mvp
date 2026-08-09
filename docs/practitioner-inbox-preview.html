@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>변증 공유 수신함 — 한의사 화면 미리보기</title>
+<style>
+  :root {
+    --ground: #FFFCF4;
+    --card: #FFFFFF;
+    --soft: #FBF6EC;
+    --ink: #20302A;
+    --ink-dim: #5B6B64;
+    --jade: #2F5A4B;
+    --jade-deep: #1E3D33;
+    --mint: #DCE6E0;
+    --copper: #E28C74;
+    --blush: #FFEEE8;
+    --sun: #F3D9A4;
+    --border: #E6DDCE;
+    --shadow: 0 10px 30px rgba(24, 33, 31, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #141E1A;
+      --card: #1D2A25;
+      --soft: #22302A;
+      --ink: #E8EDE9;
+      --ink-dim: #9FB0A8;
+      --jade: #7FB8A0;
+      --jade-deep: #A9D4C2;
+      --mint: #2B3B34;
+      --copper: #E89B85;
+      --blush: #3A2B25;
+      --sun: #4A3E22;
+      --border: #33443C;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #141E1A; --card: #1D2A25; --soft: #22302A; --ink: #E8EDE9;
+    --ink-dim: #9FB0A8; --jade: #7FB8A0; --jade-deep: #A9D4C2; --mint: #2B3B34;
+    --copper: #E89B85; --blush: #3A2B25; --sun: #4A3E22; --border: #33443C;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 60px; }
+  .topbar { display: flex; justify-content: flex-end; gap: 6px; font-size: 12px; margin-bottom: 6px; }
+  .topbar button {
+    background: none; border: none; cursor: pointer; font: inherit;
+    color: var(--ink-dim); padding: 2px 4px;
+  }
+  .topbar button.on { color: var(--jade); font-weight: 800; }
+
+  .kicker {
+    font-size: 12px; letter-spacing: .12em; font-weight: 700;
+    color: var(--ink-dim); text-transform: uppercase; margin: 0 0 6px;
+  }
+  h1 { font-size: 24px; font-weight: 800; margin: 0 0 6px; text-wrap: balance; }
+  .sub { font-size: 13px; color: var(--ink-dim); margin: 0 0 20px; }
+
+  .app {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .app-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--soft);
+  }
+  .app-top .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--jade); flex: none; }
+  .app-top .name { font-size: 13px; font-weight: 800; }
+  .app-top .who { margin-left: auto; font-size: 12px; color: var(--ink-dim); }
+
+  .tools { display: flex; gap: 8px; padding: 12px 18px 0; flex-wrap: wrap; }
+  .tool {
+    font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 99px;
+    border: 1px solid var(--border); background: var(--card); color: var(--ink-dim);
+  }
+  .tool.on { background: var(--jade); border-color: var(--jade); color: #fff; }
+
+  .panel { padding: 16px 18px 22px; }
+  .panel-head { display: flex; align-items: center; gap: 10px; }
+  .panel-head h2 { font-size: 17px; font-weight: 800; margin: 0; flex: 1; }
+  .badge {
+    background: var(--copper); color: #fff; font-size: 11px; font-weight: 800;
+    padding: 4px 10px; border-radius: 99px; white-space: nowrap;
+  }
+  .panel-note { font-size: 12.5px; color: var(--ink-dim); margin: 6px 0 14px; }
+
+  .share {
+    border: 1px solid var(--border); background: var(--card);
+    border-radius: 16px; padding: 14px; margin-bottom: 10px;
+  }
+  .share.new { background: color-mix(in srgb, var(--sun) 26%, var(--card)); border-color: var(--copper); }
+  .share-head { display: flex; align-items: center; gap: 8px; }
+  .share-head .pname { font-size: 15px; font-weight: 800; flex: 1; }
+  .tag-new { background: var(--copper); color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 99px; }
+  .when { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .dirs { font-size: 14px; font-weight: 700; margin-top: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    font-size: 11.5px; padding: 4px 10px; border-radius: 99px;
+    background: var(--mint); color: var(--ink); border: 1px solid var(--border);
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button.act {
+    font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    padding: 8px 14px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); color: var(--ink);
+  }
+  button.act.primary { background: var(--jade); border-color: var(--jade); color: #fff; }
+  button.act:hover { filter: brightness(.97); }
+
+  .empty {
+    border: 1px solid var(--border); border-radius: 16px; padding: 16px;
+    background: var(--soft); font-size: 13px; color: var(--ink-dim);
+  }
+
+  dialog {
+    border: 1px solid var(--border); border-radius: 20px; padding: 0;
+    background: var(--card); color: var(--ink); max-width: 520px; width: calc(100% - 32px);
+    box-shadow: var(--shadow);
+  }
+  dialog::backdrop { background: rgba(12, 20, 17, .45); }
+  .d-head { padding: 18px 20px 10px; font-size: 17px; font-weight: 800; }
+  .d-body { padding: 0 20px 8px; max-height: 62vh; overflow-y: auto; }
+  .d-foot { padding: 12px 20px 18px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+  .sec { font-size: 11.5px; font-weight: 800; color: var(--ink-dim); margin: 14px 0 6px; letter-spacing: .04em; }
+  .qa { margin-bottom: 9px; }
+  .qa .q { font-size: 12px; color: var(--ink-dim); }
+  .qa .a { font-size: 13.5px; font-weight: 600; }
+  .bullet { font-size: 13px; margin-bottom: 4px; }
+  .tongue {
+    margin-top: 8px; border: 1px dashed var(--border); border-radius: 12px;
+    padding: 22px; text-align: center; font-size: 12.5px; color: var(--ink-dim); background: var(--soft);
+  }
+
+  .note { font-size: 12px; color: var(--ink-dim); margin-top: 18px; line-height: 1.6; }
+  .note a { color: var(--jade); font-weight: 700; }
+  .flow {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-top: 14px; font-size: 12px; color: var(--ink-dim);
+  }
+  .flow span.step {
+    background: var(--soft); border: 1px solid var(--border);
+    border-radius: 99px; padding: 6px 12px; font-weight: 700; color: var(--ink);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <button id="ko" class="on" onclick="setLang('ko')">한국어</button>
+    <span style="color:var(--ink-dim)">·</span>
+    <button id="en" onclick="setLang('en')">English</button>
+  </div>
+
+  <p class="kicker">Design Preview · test-mvp</p>
+  <h1 data-ko="변증 공유 수신함" data-en="Shared finder results">변증 공유 수신함</h1>
+  <p class="sub"
+     data-ko="환자가 &laquo;내 몸 패턴 찾기&raquo;를 마치고 «한의사에게 공유하기»를 누르면, 결과가 한의사 대시보드의 이 화면으로 도착합니다. 아래 카드를 눌러 실제 동작을 확인해 보세요."
+     data-en="When a patient finishes the pattern finder and taps &laquo;Share with my practitioner&raquo;, the result arrives on this practitioner dashboard screen. Tap a card below to try it.">
+  </p>
+
+  <div class="app">
+    <div class="app-top">
+      <span class="dot"></span>
+      <span class="name" data-ko="한의사 대시보드" data-en="Practitioner dashboard">한의사 대시보드</span>
+      <span class="who" data-ko="봄결한의원 · 김한의 원장" data-en="Bomgyeol Clinic · Dr. Kim">봄결한의원 · 김한의 원장</span>
+    </div>
+
+    <div class="tools">
+      <span class="tool on" data-ko="Questions" data-en="Questions">Questions</span>
+      <span class="tool" data-ko="Patients" data-en="Patients">Patients</span>
+      <span class="tool" data-ko="TCM View" data-en="TCM View">TCM View</span>
+      <span class="tool" data-ko="Clinic" data-en="Clinic">Clinic</span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2 data-ko="변증 공유 수신함" data-en="Shared finder results">변증 공유 수신함</h2>
+        <span class="badge" id="badge" hidden></span>
+      </div>
+      <p class="panel-note"
+         data-ko="환자가 변증 파인더를 마치고 «한의사에게 공유하기»를 누르면 결과가 여기로 도착합니다."
+         data-en="When a patient finishes the pattern finder and taps &laquo;Share with my practitioner&raquo;, the result arrives here."></p>
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <div class="flow">
+    <span class="step" data-ko="환자: 질문 답변" data-en="Patient answers">환자: 질문 답변</span>
+    <span>→</span>
+    <span class="step" data-ko="한의사에게 공유하기" data-en="Share with practitioner">한의사에게 공유하기</span>
+    <span>→</span>
+    <span class="step" data-ko="한의사: 새 공유 도착" data-en="Practitioner: new share">한의사: 새 공유 도착</span>
+    <span>→</span>
+    <span class="step" data-ko="실제 변증 기록" data-en="Confirm syndrome">실제 변증 기록</span>
+  </div>
+
+  <p class="note"
+     data-ko="이 페이지는 한의사 화면의 디자인 미리보기입니다. 실제 앱에서는 Firebase를 통해 공유가 실시간으로 도착합니다. 환자 화면은 <a href=&quot;./pattern-finder-preview.html&quot;>여기</a>에서 볼 수 있어요.<br>변증 방향은 진단이 아니며, 최종 판단은 한의사의 진료로 확인합니다."
+     data-en="This page is a design preview of the practitioner screen. In the real app, shares arrive live over Firebase. The patient screen is <a href=&quot;./pattern-finder-preview.html&quot;>here</a>.<br>Pattern directions are not a diagnosis; the practitioner confirms in person.">
+  </p>
+</div>
+
+<dialog id="detail">
+  <div class="d-head" id="d-title"></div>
+  <div class="d-body" id="d-body"></div>
+  <div class="d-foot" id="d-foot"></div>
+</dialog>
+
+<script>
+// Mirrors the practitioner inbox in
+// lib/features/practitioner_dashboard/presentation/practitioner_dashboard_screen.dart
+// (_buildPatternShareInboxPanel / _showPatternShareDetail).
+const T = {
+  ko: {
+    newCount: n => `새 공유 ${n}건`, tagNew: "새 공유", open: "자세히 보기",
+    confirm: "실제 변증 기록", reviewed: "확인 완료", close: "닫기",
+    tongue: "혀 사진", empty: "아직 공유된 변증 결과가 없어요.",
+    secDir: "패턴 방향", secConf: "확신도", secCtx: "환자 기본 정보",
+    secAns: n => `답변 내용 (${n}개)`, secNext: "진료 때 물어보면 좋은 질문",
+    combined: "두 방향이 함께 나타나요 (겸증 가능).",
+    tonguePlaceholder: "환자가 첨부한 혀 사진 (미리보기에서는 표시되지 않습니다)",
+    saved: "실제 변증이 기록되었습니다. 앱 예측과 비교되어 규칙 개선에 쓰입니다.",
+    conf: { clear: "뚜렷한 방향", moderate: "중간 확신", unclear: "진료로 확인 필요" },
+  },
+  en: {
+    newCount: n => `${n} new`, tagNew: "NEW", open: "Open",
+    confirm: "Confirm syndrome", reviewed: "Reviewed", close: "Close",
+    tongue: "Tongue photo", empty: "No shared results yet.",
+    secDir: "Pattern direction", secConf: "Confidence", secCtx: "Patient context",
+    secAns: n => `Answers (${n})`, secNext: "Suggested follow-up questions",
+    combined: "Two directions appear together (combined pattern).",
+    tonguePlaceholder: "Tongue photo attached by the patient (not shown in this preview)",
+    saved: "Confirmed syndrome recorded. It is compared against the app's prediction to improve the rules.",
+    conf: { clear: "Clear direction", moderate: "Moderate", unclear: "Needs in-person review" },
+  },
+};
+
+const SHARES = [
+  {
+    id: "s1", status: "new",
+    name: { ko: "이서연", en: "Seoyeon Lee" },
+    when: { ko: "오늘 오전 9:24", en: "Today 9:24 AM" },
+    dirs: { ko: ["기허(기운 부족) 62%", "습담(무겁고 더부룩) 24%"],
+            en: ["Qi deficiency 62%", "Damp phlegm 24%"] },
+    confidence: "clear", combined: false, tongue: true,
+    ctx: { ko: ["나이대: 30대", "성별: 여성", "키/몸무게: 163cm / 54kg"],
+           en: ["Age range: 30s", "Sex: female", "Height/weight: 163cm / 54kg"] },
+    answers: {
+      ko: [
+        ["피로감이 가장 심한 때는 언제인가요?", "아침부터 하루 종일 기운이 없어요"],
+        ["땀은 어떤가요?", "조금만 움직여도 땀이 나요"],
+        ["소화는 어떤가요?", "먹고 나면 더부룩하고 몸이 무거워요"],
+        ["잠은 어떻게 주무시나요?", "많이 자도 개운하지 않아요"],
+        ["평소 추위나 더위는 어떤가요?", "추위를 타고 손발이 차요"],
+        ["더 하고 싶은 말이 있나요?", "(직접 입력) 계단 오를 때 숨이 많이 차요"],
+      ],
+      en: [
+        ["When is your fatigue worst?", "Low energy from morning, all day"],
+        ["How is your sweating?", "I sweat with only light movement"],
+        ["How is your digestion?", "Bloated and heavy after eating"],
+        ["How do you sleep?", "Never refreshed even after long sleep"],
+        ["How do you handle cold or heat?", "I feel cold, hands and feet are cold"],
+        ["Anything else to add?", "(typed) I get short of breath on stairs"],
+      ],
+    },
+    next: {
+      ko: ["설태가 두껍고 이빨자국이 있는지 확인", "식후 더부룩함이 언제부터인지 확인",
+           "혀와 맥을 진료에서 직접 확인", "주요 증상이 얼마나 지속되었는지 질문"],
+      en: ["Check for a thick coat and scalloped tongue edges", "Ask when the post-meal bloating began",
+           "Confirm tongue and pulse findings in person", "Ask how long the leading symptoms have lasted"],
+    },
+  },
+  {
+    id: "s2", status: "new",
+    name: { ko: "박준호", en: "Junho Park" },
+    when: { ko: "오늘 오전 8:51", en: "Today 8:51 AM" },
+    dirs: { ko: ["간기울결(스트레스·긴장) 48%", "어혈(고정된 통증) 31%"],
+            en: ["Liver qi stagnation 48%", "Blood stasis 31%"] },
+    confidence: "moderate", combined: true, tongue: false,
+    ctx: { ko: ["나이대: 40대", "성별: 남성", "키/몸무게: 176cm / 78kg"],
+           en: ["Age range: 40s", "Sex: male", "Height/weight: 176cm / 78kg"] },
+    answers: {
+      ko: [
+        ["증상이 스트레스와 관련이 있나요?", "스트레스 받으면 확실히 심해져요"],
+        ["통증이 있다면 어떤 느낌인가요?", "한 자리가 콕콕 찌르듯 아프고 밤에 심해요"],
+        ["소화는 어떤가요?", "스트레스 받으면 체하거나 답답해요"],
+        ["잠은 어떻게 주무시나요?", "생각이 많아 잠들기 어려워요"],
+        ["평소 추위나 더위는 어떤가요?", "스트레스 받으면 가슴이 답답하고 열이 올라요"],
+      ],
+      en: [
+        ["Are your symptoms linked to stress?", "Clearly worse under stress"],
+        ["If you have pain, what does it feel like?", "Fixed stabbing pain, worse at night"],
+        ["How is your digestion?", "Indigestion and tightness when stressed"],
+        ["How do you sleep?", "Hard to fall asleep, racing thoughts"],
+        ["How do you handle cold or heat?", "Chest tightness and heat when stressed"],
+      ],
+    },
+    next: {
+      ko: ["통증 부위가 고정되어 있는지 촉진으로 확인", "설하정맥 확장 여부 확인",
+           "혀와 맥을 진료에서 직접 확인", "주요 증상이 얼마나 지속되었는지 질문"],
+      en: ["Palpate to confirm the pain stays in one fixed spot", "Check for distended sublingual veins",
+           "Confirm tongue and pulse findings in person", "Ask how long the leading symptoms have lasted"],
+    },
+  },
+  {
+    id: "s3", status: "reviewed",
+    name: { ko: "최민아", en: "Mina Choi" },
+    when: { ko: "어제 오후 4:10", en: "Yesterday 4:10 PM" },
+    dirs: { ko: ["음허(허열·건조) 55%"], en: ["Yin deficiency 55%"] },
+    confidence: "moderate", combined: false, tongue: false,
+    ctx: { ko: ["나이대: 50대", "성별: 여성"], en: ["Age range: 50s", "Sex: female"] },
+    answers: {
+      ko: [
+        ["잠은 어떻게 주무시나요?", "새벽에 깨고 식은땀이나 입마름이 있어요"],
+        ["평소 추위나 더위는 어떤가요?", "밤이나 저녁에 얼굴이 달아오르고 더워요"],
+        ["입마름이나 갈증은 어떤가요?", "입이 마르고 시원한 물이 당겨요"],
+      ],
+      en: [
+        ["How do you sleep?", "Wake at dawn with night sweats or dry mouth"],
+        ["How do you handle cold or heat?", "Face flushes and feels hot in the evening"],
+        ["How is your thirst?", "Dry mouth, craving cool water"],
+      ],
+    },
+    next: {
+      ko: ["설질이 붉고 태가 적은지 확인", "혀와 맥을 진료에서 직접 확인"],
+      en: ["Check for a red tongue body with little coat", "Confirm tongue and pulse findings in person"],
+    },
+  },
+];
+
+let lang = "ko";
+const state = new Map(SHARES.map(s => [s.id, s.status]));
+
+function setLang(next) {
+  lang = next;
+  document.getElementById("ko").classList.toggle("on", next === "ko");
+  document.getElementById("en").classList.toggle("on", next === "en");
+  document.documentElement.lang = next;
+  for (const el of document.querySelectorAll("[data-ko]")) {
+    el.innerHTML = next === "ko" ? el.dataset.ko : el.dataset.en;
+  }
+  render();
+}
+
+function render() {
+  const t = T[lang];
+  const list = document.getElementById("list");
+  const badge = document.getElementById("badge");
+  const newCount = SHARES.filter(s => state.get(s.id) !== "reviewed").length;
+
+  badge.hidden = newCount === 0;
+  badge.textContent = t.newCount(newCount);
+
+  if (!SHARES.length) {
+    list.innerHTML = `<div class="empty">${t.empty}</div>`;
+    return;
+  }
+
+  list.innerHTML = SHARES.map(s => {
+    const isNew = state.get(s.id) !== "reviewed";
+    return `
+      <div class="share ${isNew ? "new" : ""}">
+        <div class="share-head">
+          <span class="pname">${s.name[lang]}</span>
+          ${isNew ? `<span class="tag-new">${t.tagNew}</span>` : ""}
+        </div>
+        <div class="when">${s.when[lang]}</div>
+        <div class="dirs">${s.dirs[lang].join(" · ")}</div>
+        <div class="chips">
+          <span class="chip">${t.conf[s.confidence]}</span>
+          ${s.tongue ? `<span class="chip">📷 ${t.tongue}</span>` : ""}
+        </div>
+        <div class="actions">
+          <button class="act primary" onclick="openDetail('${s.id}')">${t.open}</button>
+          <button class="act" onclick="confirmSyndrome('${s.id}')">${t.confirm}</button>
+          ${isNew ? `<button class="act" onclick="markReviewed('${s.id}')">${t.reviewed}</button>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function markReviewed(id) {
+  state.set(id, "reviewed");
+  render();
+}
+
+function confirmSyndrome(id) {
+  markReviewed(id);
+  alert(T[lang].saved);
+}
+
+function openDetail(id) {
+  const t = T[lang];
+  const s = SHARES.find(x => x.id === id);
+  markReviewed(id); // opening a share clears its unread badge, same as the app
+
+  document.getElementById("d-title").textContent =
+    `${s.name[lang]} · ${lang === "ko" ? "공유된 변증 결과" : "Shared result"}`;
+
+  document.getElementById("d-body").innerHTML = `
+    <div class="when">${s.when[lang]}</div>
+    <div class="sec">${t.secDir}</div>
+    <div style="font-weight:700">${s.dirs[lang].join(" · ")}</div>
+    ${s.combined ? `<div style="font-size:12px;margin-top:4px">${t.combined}</div>` : ""}
+    <div class="sec">${t.secConf}</div>
+    <div>${t.conf[s.confidence]}</div>
+    <div class="sec">${t.secCtx}</div>
+    ${s.ctx[lang].map(c => `<div class="bullet">${c}</div>`).join("")}
+    <div class="sec">${t.secAns(s.answers[lang].length)}</div>
+    ${s.answers[lang].map(([q, a]) => `<div class="qa"><div class="q">${q}</div><div class="a">${a}</div></div>`).join("")}
+    <div class="sec">${t.secNext}</div>
+    ${s.next[lang].map(q => `<div class="bullet">• ${q}</div>`).join("")}
+    ${s.tongue ? `<div class="tongue">${t.tonguePlaceholder}</div>` : ""}
+  `;
+
+  document.getElementById("d-foot").innerHTML = `
+    <button class="act" onclick="document.getElementById('detail').close(); confirmSyndrome('${s.id}')">${t.confirm}</button>
+    <button class="act primary" onclick="document.getElementById('detail').close()">${t.close}</button>
+  `;
+
+  document.getElementById("detail").showModal();
+  render();
+}
+
+setLang("ko");
+</script>
+</body>
+</html>
