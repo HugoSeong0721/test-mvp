@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>불길 탈출 — 멈추면 타 죽는다</title>
 </head>
 <body>
@@ -232,8 +232,8 @@
         발판을 밟고 <b>계속 위로</b> 도망치세요.
       </div>
       <div class="controls">
-        마우스를 좌우로 움직이거나 <kbd>←</kbd> <kbd>→</kbd><br>
-        모바일은 화면 <b>왼쪽 / 오른쪽</b>을 누른 채로<br>
+        화면에 손가락을 대고 <b>가고 싶은 쪽으로</b> 끌어주세요<br>
+        PC는 마우스를 움직이거나 <kbd>←</kbd> <kbd>→</kbd><br>
         점프는 자동 · 양옆 벽은 통과합니다
       </div>
       <button class="btn" id="start-btn">도망친다</button>
@@ -372,6 +372,24 @@
   }
 
   // ── 도전 상대 (공유 링크에 실려 오는 기록) ───────────────
+  // 오르는 동안 지나가는 구간 — 다음 목표가 계속 눈앞에 있게 한다
+  const MILESTONES = [
+    { m: 100,  label: '연기층 돌파' },
+    { m: 250,  label: '중턱' },
+    { m: 500,  label: '불길이 멀어진다' },
+    { m: 1000, label: '구름 높이' },
+    { m: 2000, label: '아무도 못 온 곳' },
+  ];
+  let nextMilestone = 0;
+
+  function flashBanner(text) {
+    const banner = document.getElementById('pass-banner');
+    banner.textContent = text;
+    banner.classList.remove('show');
+    void banner.offsetWidth;            // 애니메이션 재시작
+    banner.classList.add('show');
+  }
+
   let challengeM = 0, challengeBeaten = false;
 
   function readHashChallenge() {
@@ -525,26 +543,24 @@
 
   function localX(e) { return e.clientX - shaftEl.getBoundingClientRect().left; }
 
+  // 마우스든 손가락이든 가리킨 x를 그대로 목표로 삼는다.
+  // (예전엔 화면 좌/우를 '누른 채 유지'해야 했는데, 모바일에서 탭하면
+  //  방향이 즉시 풀려 캐릭터가 거의 움직이지 않았다.)
+  function aimAtPointer(e) {
+    targetX = Math.max(0, Math.min(W, localX(e)));
+    inputLeft = inputRight = false;
+  }
   shaftEl.addEventListener('pointermove', (e) => {
     if (!running) return;
-    if (e.pointerType === 'mouse') { targetX = localX(e); inputLeft = inputRight = false; }
-    else if (e.buttons) { setTouchSide(localX(e)); }
+    if (e.pointerType === 'mouse' || e.buttons) aimAtPointer(e);
   });
   shaftEl.addEventListener('pointerdown', (e) => {
     if (!running) return;
     e.preventDefault();
-    if (e.pointerType === 'mouse') targetX = localX(e);
-    else setTouchSide(localX(e));
+    // 손가락이 굴 밖으로 나가도 계속 따라오도록
+    try { shaftEl.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
+    aimAtPointer(e);
   });
-  shaftEl.addEventListener('pointerup', () => { inputLeft = inputRight = false; });
-  shaftEl.addEventListener('pointercancel', () => { inputLeft = inputRight = false; });
-  shaftEl.addEventListener('pointerleave', () => { inputLeft = inputRight = false; });
-
-  function setTouchSide(x) {
-    targetX = null;
-    inputLeft = x < W / 2;
-    inputRight = !inputLeft;
-  }
 
   // ── 시작 / 종료 ─────────────────────────────────────────
   function startGame() {
@@ -565,6 +581,7 @@
 
     lavaY = player.y + LAVA_LEASH;
     challengeBeaten = false;
+    nextMilestone = 0;
     document.getElementById('pass-banner').classList.remove('show');
     running = true;
     startOverlay.classList.add('hidden');
@@ -683,12 +700,17 @@
     // 도전 기록 추월
     if (challengeM > 0 && !challengeBeaten && altM > challengeM) {
       challengeBeaten = true;
-      const banner = document.getElementById('pass-banner');
-      banner.classList.remove('show');
-      void banner.offsetWidth;          // 애니메이션 재시작
-      banner.classList.add('show');
+      flashBanner('기록 추월!');
       tone(700, .12, 'triangle', .08);
       tone(950, .16, 'triangle', .07, .07);
+    }
+
+    // 눈에 보이는 다음 목표 — 지금 뭘 향해 오르는지 알려준다
+    while (nextMilestone < MILESTONES.length && altM >= MILESTONES[nextMilestone].m) {
+      flashBanner(MILESTONES[nextMilestone].m + 'm — ' + MILESTONES[nextMilestone].label);
+      tone(520, .12, 'triangle', .07);
+      tone(780, .18, 'triangle', .06, .08);
+      nextMilestone++;
     }
 
     // 불길 상승 — 높이 올라갈수록 빨라진다
