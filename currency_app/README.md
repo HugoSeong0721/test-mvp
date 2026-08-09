@@ -3,7 +3,15 @@
 경쟁사 **My Currency Converter & Rates** (JRustonApps B.V., ★4.9 / 128K 리뷰)를 분석해서
 유지할 것 / 추가할 것 / 뺄 것을 정리하고, 세련된 UI로 재해석한 인터랙티브 프로토타입입니다.
 
-- 프로토타입: [`currency-app-preview.html`](./currency-app-preview.html) — 브라우저에서 바로 열면 동작합니다 (모바일 화면 기준).
+두 가지 빌드가 있습니다 (둘 다 브라우저에서 바로 열면 동작, 모바일 화면 기준).
+
+| 빌드 | 파일 | 차이 |
+|---|---|---|
+| **출시용** | [`currency-app-v1.html`](./currency-app-v1.html) | 첫 실행 때 **기준 통화를 물어보고** 고른 통화를 맨 위에 고정. 러시아 루블·카자흐 텡게·우즈벡 숨 포함. 저장 키 `fx-app-v1` |
+| 프로토타입 | [`currency-app-preview.html`](./currency-app-preview.html) | 온보딩 없이 KGS 기준으로 바로 시작 (UI 실험용). 저장 키 `fx-proto-v3` |
+
+- 출시용 온보딩을 다시 보려면 주소 뒤에 `?onboard=1`.
+- 두 빌드는 저장 키가 달라 서로 설정이 섞이지 않습니다.
 
 ---
 
