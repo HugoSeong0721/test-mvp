@@ -4,13 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>침술의 달인 — 경혈 타이밍 게임</title>
+</head>
+<body>
 <style>
+  /* 아케이드 화면이라는 하나의 세계관에 확정 — 라이트/다크 분기 없이 모든 색을 명시 */
+  :root {
+    --ground:    #0d1219;   /* 먹빛 바탕 */
+    --ground-up: #1c2733;   /* 먹빛 상단 */
+    --body-fill: #243242;   /* 인체 실루엣 */
+    --body-line: #3d5266;
+    --meridian:  #33475c;   /* 경락선 */
+    --gold:      #ffd76e;   /* 금침 */
+    --gold-deep: #dfa93f;
+    --jade:      #7ee8a2;   /* 기(氣) */
+    --jade-deep: #4fae6e;
+    --cinnabar:  #ff6b5e;   /* 주사 — 금침 자리 */
+    --hanji:     #e8e2d0;   /* 한지 글자색 */
+    --hanji-dim: #cfc9b8;
+    --sage:      #8fa08a;   /* 라벨용 중성색 (약간 녹색 편향) */
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
   body {
     font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    background: radial-gradient(ellipse at 50% 30%, #1c2733 0%, #0d1219 70%);
-    color: #e8e2d0;
+    background: radial-gradient(ellipse at 50% 30%, var(--ground-up) 0%, var(--ground) 70%);
+    color: var(--hanji);
     display: flex; align-items: center; justify-content: center;
     user-select: none; -webkit-user-select: none; touch-action: manipulation;
   }
@@ -18,7 +37,6 @@
     position: relative;
     width: min(100vw, 420px);
     height: min(100vh, 780px);
-    max-height: 100vh;
     overflow: hidden;
   }
 
@@ -28,16 +46,19 @@
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 14px 16px; pointer-events: none;
   }
+  .hud-label { font-size: 11px; letter-spacing: 2px; color: var(--sage); }
+  .hud-value {
+    font-size: 26px; font-weight: 800; color: var(--hanji);
+    font-variant-numeric: tabular-nums;
+  }
   .hud-box { text-align: center; }
-  .hud-label { font-size: 11px; letter-spacing: 2px; color: #8fa08a; }
-  .hud-value { font-size: 26px; font-weight: 800; color: #f3edda; font-variant-numeric: tabular-nums; }
-  #timer-value.low { color: #ff6b5e; animation: blink .5s infinite alternate; }
+  #timer-value.low { color: var(--cinnabar); animation: blink .5s infinite alternate; }
   @keyframes blink { to { opacity: .4; } }
 
   #combo-banner {
     position: absolute; top: 74px; left: 0; right: 0; z-index: 5;
     text-align: center; pointer-events: none;
-    font-weight: 900; font-size: 20px; color: #ffd76e;
+    font-weight: 900; font-size: 20px; color: var(--gold);
     text-shadow: 0 0 12px rgba(255, 200, 80, .6);
     opacity: 0; transition: opacity .15s;
   }
@@ -46,7 +67,7 @@
   #fever-banner {
     position: absolute; top: 104px; left: 0; right: 0; z-index: 5;
     text-align: center; pointer-events: none;
-    font-weight: 900; font-size: 15px; letter-spacing: 4px; color: #7ee8a2;
+    font-weight: 900; font-size: 15px; letter-spacing: 4px; color: var(--jade);
     text-shadow: 0 0 14px rgba(90, 240, 150, .8);
     display: none;
   }
@@ -57,15 +78,14 @@
   #ki-wrap {
     position: absolute; top: 58px; left: 50%; transform: translateX(-50%);
     width: 150px; height: 8px; border-radius: 4px; z-index: 5;
-    background: rgba(255,255,255,.08); overflow: hidden; pointer-events: none;
+    background: rgba(255, 255, 255, .08); overflow: hidden; pointer-events: none;
   }
   #ki-bar {
     height: 100%; width: 0%; border-radius: 4px;
-    background: linear-gradient(90deg, #4fae6e, #7ee8a2);
+    background: linear-gradient(90deg, var(--jade-deep), var(--jade));
     transition: width .2s;
   }
 
-  /* ── 몸 실루엣 ─────────────────────── */
   #body-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
 
   /* ── 경혈점 ────────────────────────── */
@@ -77,7 +97,7 @@
   }
   .acupoint .ring {
     position: absolute; inset: 0; border-radius: 50%;
-    border: 3px solid #ffd76e;
+    border: 3px solid var(--gold);
     animation: shrink linear forwards;
   }
   @keyframes shrink { from { transform: scale(1.5); opacity: .9; } to { transform: scale(.62); opacity: 1; } }
@@ -90,14 +110,13 @@
     animation: pulse .7s infinite alternate;
   }
   @keyframes pulse { to { transform: scale(1.12); } }
-  .acupoint.bad .ring { border-color: #ff6b5e; }
+  .acupoint.bad .ring { border-color: var(--cinnabar); }
   .acupoint.bad .core {
     background: radial-gradient(circle at 35% 30%, #ffb0a8, #d84438 70%);
     box-shadow: 0 0 18px rgba(255, 90, 70, .8);
-    color: #fff;
+    color: #fff; font-size: 15px;
   }
 
-  /* 타격 이펙트 */
   .hit-fx {
     position: absolute; z-index: 6; pointer-events: none;
     font-weight: 900; font-size: 18px;
@@ -105,55 +124,61 @@
     animation: rise .7s ease-out forwards;
   }
   @keyframes rise { to { transform: translate(-50%, -160%); opacity: 0; } }
-  .hit-fx.perfect { color: #7ee8a2; text-shadow: 0 0 10px rgba(120,255,170,.8); }
-  .hit-fx.good { color: #ffd76e; }
-  .hit-fx.miss { color: #ff6b5e; }
+  .hit-fx.perfect { color: var(--jade); text-shadow: 0 0 10px rgba(120, 255, 170, .8); }
+  .hit-fx.good { color: var(--gold); }
+  .hit-fx.miss { color: var(--cinnabar); }
 
-  /* ── 오버레이 (시작 / 종료) ─────────── */
+  /* ── 오버레이 ──────────────────────── */
   .overlay {
     position: absolute; inset: 0; z-index: 10;
-    background: rgba(10, 14, 20, .88); backdrop-filter: blur(4px);
+    background: rgba(10, 14, 20, .9); backdrop-filter: blur(4px);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; padding: 28px; gap: 14px;
   }
   .overlay.hidden { display: none; }
-  .title-main { font-size: 40px; font-weight: 900; color: #f3edda; letter-spacing: 2px; }
-  .title-sub { font-size: 14px; color: #8fa08a; letter-spacing: 6px; margin-top: -6px; }
+  .title-main { font-size: 40px; font-weight: 900; color: var(--hanji); letter-spacing: 2px; text-wrap: balance; }
+  .title-sub { font-size: 13px; color: var(--sage); letter-spacing: 6px; margin-top: 2px; }
   .rules {
-    font-size: 13.5px; line-height: 1.9; color: #cfc9b8;
-    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
-    border-radius: 14px; padding: 14px 18px; text-align: left;
+    font-size: 13.5px; line-height: 1.9; color: var(--hanji-dim);
+    background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 14px; padding: 14px 18px; text-align: left; max-width: 34em;
   }
-  .rules b.gold { color: #ffd76e; } .rules b.red { color: #ff6b5e; } .rules b.green { color: #7ee8a2; }
+  .rules b.gold { color: var(--gold); }
+  .rules b.red { color: var(--cinnabar); }
+  .rules b.green { color: var(--jade); }
   .btn {
     font: inherit; font-size: 19px; font-weight: 800; letter-spacing: 2px;
-    color: #1d1408; background: linear-gradient(180deg, #ffd76e, #dfa93f);
+    color: #1d1408; background: linear-gradient(180deg, var(--gold), var(--gold-deep));
     border: none; border-radius: 999px; padding: 15px 52px; cursor: pointer;
     box-shadow: 0 4px 20px rgba(255, 200, 80, .35);
   }
   .btn:active { transform: scale(.96); }
-  #final-rank { font-size: 30px; font-weight: 900; color: #ffd76e; }
-  #final-score { font-size: 17px; color: #cfc9b8; }
-  #final-detail { font-size: 13px; color: #8fa08a; line-height: 1.8; }
+  .btn:focus-visible { outline: 3px solid var(--jade); outline-offset: 4px; }
+  #final-rank { font-size: 30px; font-weight: 900; color: var(--gold); text-wrap: balance; }
+  #final-score { font-size: 17px; color: var(--hanji-dim); font-variant-numeric: tabular-nums; }
+  #final-detail { font-size: 13px; color: var(--sage); line-height: 1.8; font-variant-numeric: tabular-nums; }
+
+  /* 링 수축은 게임의 판정 그 자체라 유지하고, 장식성 점멸만 정지 */
+  @media (prefers-reduced-motion: reduce) {
+    #timer-value.low, #stage.fever #fever-banner, .acupoint .core { animation: none; }
+    .hit-fx { animation-duration: .3s; }
+  }
 </style>
-</head>
-<body>
+
 <div id="stage">
-  <!-- 몸 실루엣 -->
-  <svg id="body-svg" viewBox="0 0 420 780" preserveAspectRatio="xMidYMid meet">
+  <svg id="body-svg" viewBox="0 0 420 780" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <g fill="#243242" stroke="#3d5266" stroke-width="2">
-      <circle cx="210" cy="120" r="46"/>                                   <!-- 머리 -->
-      <rect x="196" y="160" width="28" height="24" rx="8"/>                <!-- 목 -->
-      <path d="M138 196 Q210 172 282 196 L294 340 Q292 420 262 452 L158 452 Q128 420 126 340 Z"/> <!-- 몸통 -->
-      <path d="M138 200 Q104 216 96 300 L84 396 Q82 416 100 418 Q116 420 120 402 L136 316 Z"/>    <!-- 왼팔 -->
-      <path d="M282 200 Q316 216 324 300 L336 396 Q338 416 320 418 Q304 420 300 402 L284 316 Z"/> <!-- 오른팔 -->
-      <ellipse cx="92" cy="436" rx="17" ry="21"/>                          <!-- 왼손 -->
-      <ellipse cx="328" cy="436" rx="17" ry="21"/>                         <!-- 오른손 -->
-      <path d="M162 452 L150 600 Q148 660 158 700 L196 700 Q200 650 198 600 L204 480 L216 480 L222 600 Q220 650 224 700 L262 700 Q272 660 270 600 L258 452 Z"/> <!-- 다리 -->
-      <ellipse cx="177" cy="714" rx="30" ry="15"/>                         <!-- 왼발 -->
-      <ellipse cx="243" cy="714" rx="30" ry="15"/>                         <!-- 오른발 -->
+      <circle cx="210" cy="120" r="46"/>
+      <rect x="196" y="160" width="28" height="24" rx="8"/>
+      <path d="M138 196 Q210 172 282 196 L294 340 Q292 420 262 452 L158 452 Q128 420 126 340 Z"/>
+      <path d="M138 200 Q104 216 96 300 L84 396 Q82 416 100 418 Q116 420 120 402 L136 316 Z"/>
+      <path d="M282 200 Q316 216 324 300 L336 396 Q338 416 320 418 Q304 420 300 402 L284 316 Z"/>
+      <ellipse cx="92" cy="436" rx="17" ry="21"/>
+      <ellipse cx="328" cy="436" rx="17" ry="21"/>
+      <path d="M162 452 L150 600 Q148 660 158 700 L196 700 Q200 650 198 600 L204 480 L216 480 L222 600 Q220 650 224 700 L262 700 Q272 660 270 600 L258 452 Z"/>
+      <ellipse cx="177" cy="714" rx="30" ry="15"/>
+      <ellipse cx="243" cy="714" rx="30" ry="15"/>
     </g>
-    <!-- 경락선 -->
     <g stroke="#33475c" stroke-width="1.5" fill="none" stroke-dasharray="4 6" opacity=".7">
       <path d="M210 74 L210 452"/>
       <path d="M138 200 Q100 260 92 420"/>
@@ -163,7 +188,6 @@
     </g>
   </svg>
 
-  <!-- HUD -->
   <div id="hud">
     <div class="hud-box"><div class="hud-label">점수</div><div class="hud-value" id="score-value">0</div></div>
     <div class="hud-box"><div class="hud-label">남은 시간</div><div class="hud-value" id="timer-value">45</div></div>
@@ -172,7 +196,6 @@
   <div id="combo-banner"></div>
   <div id="fever-banner">氣 폭발 — 점수 2배!</div>
 
-  <!-- 시작 화면 -->
   <div class="overlay" id="start-overlay">
     <div>
       <div class="title-main">침술의 달인</div>
@@ -188,9 +211,8 @@
     <button class="btn" id="start-btn">수련 시작</button>
   </div>
 
-  <!-- 종료 화면 -->
   <div class="overlay hidden" id="end-overlay">
-    <div class="title-sub" style="letter-spacing:3px">수련 결과</div>
+    <div class="title-sub">수련 결과</div>
     <div id="final-rank"></div>
     <div id="final-score"></div>
     <div id="final-detail"></div>
@@ -202,7 +224,6 @@
 (() => {
   'use strict';
 
-  // 경혈 좌표: viewBox(420x780) 기준 비율로 저장해 화면 크기에 맞춰 배치
   const POINTS = [
     { name: '백회', x: 210, y: 74 },
     { name: '인당', x: 210, y: 112 },
@@ -229,10 +250,9 @@
   let running = false;
   let score, combo, maxCombo, hits, perfects, misses, timeLeft;
   let feverUntil = 0;
-  let activePoints = new Map(); // index -> {el, deadline, bad}
+  const activePoints = new Map();
   let spawnTimer = null, tickTimer = null;
 
-  // ── 사운드 (WebAudio 비프) ──────────────
   let audioCtx = null;
   function beep(freq, dur, type = 'sine', gainVal = .12) {
     try {
@@ -243,16 +263,16 @@
       g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + dur);
       o.connect(g); g.connect(audioCtx.destination);
       o.start(); o.stop(audioCtx.currentTime + dur);
-    } catch (e) { /* 사운드 실패는 무시 */ }
+    } catch (e) { /* 사운드가 막힌 환경에서도 게임은 계속 */ }
   }
 
   function pxPos(p) {
     const r = stage.getBoundingClientRect();
-    // preserveAspectRatio 계산: SVG가 컨테이너에 contain 방식으로 맞춰짐
     const scale = Math.min(r.width / 420, r.height / 780);
-    const offX = (r.width - 420 * scale) / 2;
-    const offY = (r.height - 780 * scale) / 2;
-    return { x: offX + p.x * scale, y: offY + p.y * scale };
+    return {
+      x: (r.width - 420 * scale) / 2 + p.x * scale,
+      y: (r.height - 780 * scale) / 2 + p.y * scale,
+    };
   }
 
   function isFever() { return Date.now() < feverUntil; }
@@ -261,7 +281,7 @@
     scoreEl.textContent = score;
     timerEl.textContent = timeLeft;
     timerEl.classList.toggle('low', timeLeft <= 10);
-    kiBar.style.width = Math.min(100, (combo % 10) * 10 + (isFever() ? 100 : 0)) + '%';
+    kiBar.style.width = (isFever() ? 100 : (combo % 10) * 10) + '%';
     if (combo >= 3) {
       comboBanner.textContent = combo + ' COMBO!';
       comboBanner.classList.add('show');
@@ -275,7 +295,8 @@
     const fx = document.createElement('div');
     fx.className = 'hit-fx ' + cls;
     fx.textContent = text;
-    fx.style.left = x + 'px'; fx.style.top = y + 'px';
+    fx.style.left = x + 'px';
+    fx.style.top = y + 'px';
     stage.appendChild(fx);
     setTimeout(() => fx.remove(), 700);
   }
@@ -293,48 +314,53 @@
     const el = document.createElement('div');
     el.className = 'acupoint' + (bad ? ' bad' : '');
     const pos = pxPos(p);
-    el.style.left = pos.x + 'px'; el.style.top = pos.y + 'px';
+    el.style.left = pos.x + 'px';
+    el.style.top = pos.y + 'px';
     el.innerHTML = '<div class="ring" style="animation-duration:' + life + 'ms"></div>' +
                    '<div class="core">' + (bad ? '禁' : p.name) + '</div>';
 
     const entry = { el, bad, born: Date.now(), life };
     activePoints.set(idx, entry);
 
-    const onTap = (e) => {
+    el.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       if (!running || !activePoints.has(idx)) return;
-      const pos2 = pxPos(p);
+      const at = pxPos(p);
       if (bad) {
         combo = 0; misses++;
         score = Math.max(0, score - 150);
-        showFx(pos2.x, pos2.y, '禁鍼! -150', 'miss');
+        showFx(at.x, at.y, '禁鍼! -150', 'miss');
         beep(140, .25, 'sawtooth', .18);
       } else {
-        const progress = (Date.now() - entry.born) / life; // 1에 가까울수록 링이 점에 근접
+        const progress = (Date.now() - entry.born) / life;
         const mult = (1 + Math.floor(combo / 5)) * (isFever() ? 2 : 1);
-        let base, label, cls;
-        if (progress > 0.62) { base = 100; label = 'PERFECT +' + base * mult; cls = 'perfect'; perfects++; beep(880, .12); beep(1320, .18); }
-        else { base = 50; label = 'GOOD +' + base * mult; cls = 'good'; beep(660, .1); }
+        let base, cls;
+        if (progress > 0.62) {
+          base = 100; cls = 'perfect'; perfects++;
+          beep(880, .12); beep(1320, .18);
+        } else {
+          base = 50; cls = 'good';
+          beep(660, .1);
+        }
         score += base * mult;
         combo++; hits++;
         maxCombo = Math.max(maxCombo, combo);
-        if (combo > 0 && combo % 10 === 0) {
+        if (combo % 10 === 0) {
           feverUntil = Date.now() + 5000;
           beep(523, .1); beep(659, .1); beep(784, .2);
         }
-        showFx(pos2.x, pos2.y, label, cls);
+        showFx(at.x, at.y, (cls === 'perfect' ? 'PERFECT +' : 'GOOD +') + base * mult, cls);
       }
       removePoint(idx);
       updateHud();
-    };
-    el.addEventListener('pointerdown', onTap);
+    });
 
     entry.timeout = setTimeout(() => {
       if (!activePoints.has(idx)) return;
-      if (!bad) { // 금빛 점을 놓치면 콤보 리셋
+      if (!bad) {
         combo = 0; misses++;
-        const pos2 = pxPos(p);
-        showFx(pos2.x, pos2.y, '놓침!', 'miss');
+        const at = pxPos(p);
+        showFx(at.x, at.y, '놓침!', 'miss');
         beep(220, .15, 'triangle');
       }
       removePoint(idx);
@@ -365,7 +391,7 @@
   }
 
   function rankFor(s) {
-    if (s < 800) return ['견습생', '아직 침 잡는 법부터... 다시 도전!'];
+    if (s < 800)  return ['견습생', '아직 침 잡는 법부터... 다시 도전!'];
     if (s < 2000) return ['수련의', '기본기가 잡혀갑니다. 조금만 더!'];
     if (s < 4000) return ['침구사', '손끝에 기가 흐르기 시작했군요.'];
     if (s < 6500) return ['한의사', '환자들이 줄을 서는 실력입니다!'];
@@ -374,7 +400,8 @@
 
   function endGame() {
     running = false;
-    clearTimeout(spawnTimer); clearInterval(tickTimer);
+    clearTimeout(spawnTimer);
+    clearInterval(tickTimer);
     clearAllPoints();
     stage.classList.remove('fever');
     const [rank, msg] = rankFor(score);
