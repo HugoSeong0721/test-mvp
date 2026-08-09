@@ -1,0 +1,62 @@
+name: Auto-merge branches
+
+# Every 4 hours, pull the latest main and the doctor-management branch and merge
+# them into the syndrome-paper feature branch, then push. If a merge conflicts,
+# the run aborts and fails loudly (no partial/garbage commit) so it can be
+# resolved by hand.
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-merge-branches
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: claude/tcm-syndrome-paper-automation-0itj0j
+  SOURCE_BRANCHES: "main claude/tcm-doctor-management-automation-vflyi9"
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Merge source branches
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin $SOURCE_BRANCHES
+
+          changed=0
+          for br in $SOURCE_BRANCHES; do
+            echo "::group::Merging origin/$br"
+            if git merge --no-edit "origin/$br"; then
+              echo "merged (or already up to date)"
+            else
+              git merge --abort || true
+              echo "::error::Merge conflict while merging origin/$br into $TARGET_BRANCH. Resolve manually."
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
+
+          if [ -n "$(git rev-list origin/$TARGET_BRANCH..HEAD)" ]; then
+            changed=1
+          fi
+
+          if [ "$changed" = "1" ]; then
+            git push origin HEAD:$TARGET_BRANCH
+            echo "Pushed merged changes to $TARGET_BRANCH."
+          else
+            echo "Nothing new to merge."
+          fi
