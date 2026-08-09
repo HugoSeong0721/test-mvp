@@ -166,7 +166,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   overflow:hidden;white-space:nowrap;color:var(--text);
 }
 .crow .amt.small{font-size:22px}
-.crow .amt::after{
+/* 캐럿은 키패드가 열려 입력 중일 때만 */
+.crow.editing .amt::after{
   content:"";display:inline-block;width:2px;height:.9em;margin-left:2px;
   background:var(--accent);vertical-align:-.12em;
   animation:blink 1.1s steps(1) infinite;
@@ -208,10 +209,26 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   font-size:15px;font-weight:600;line-height:1;color:var(--text);
 }
 
-/* ---- 키패드 ---- */
-.kbd{
+/* ---- 키패드 (기본은 숨김, 금액을 눌러야 올라옴) ---- */
+.kbdwrap{
   margin-top:auto;
-  padding:12px 16px 8px;
+  border-top:1px solid var(--line);
+  background:var(--app-bg);
+  animation:kbdup .2s cubic-bezier(.3,.8,.3,1);
+}
+.kbdwrap[hidden]{display:none}
+@keyframes kbdup{from{transform:translateY(18px);opacity:0}}
+.kbdbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 20px 2px;
+}
+.kbdbar .hint{font-size:10.5px;color:var(--muted)}
+.kbdbar .done{
+  font-size:13px;font-weight:700;color:var(--accent);
+  padding:4px 8px;border-radius:10px;
+}
+.kbd{
+  padding:8px 16px 8px;
   display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
 }
 .key{
@@ -225,7 +242,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 .key:active{background:var(--key-press)}
 .key.fn{color:var(--text-2);font-size:18px}
 .key svg{width:22px;height:22px}
-.kbd-hint{text-align:center;font-size:10.5px;color:var(--muted);padding:2px 0 8px}
 
 /* ---- 차트 화면 ---- */
 .chart-head{padding:8px 22px 2px}
@@ -369,7 +385,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
             <span class="flag" id="fl-base"></span>
             <span class="who"><span class="code mono" id="cd-base"></span><span class="name" id="nm-base"></span></span>
           </button>
-          <div class="amt num" id="amt-base" aria-label="기준 금액"></div>
+          <button class="amt num" id="amt-base" aria-label="기준 금액 입력"></button>
         </div>
       </div>
       <div class="scroll nopad">
@@ -379,6 +395,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
             <span class="plus">＋</span> 국가 추가
           </button>
         </div>
+      </div>
+      <div class="kbdwrap" id="kbdwrap" hidden>
+      <div class="kbdbar">
+        <span class="hint">⌫ 길게 누르면 전체 지우기</span>
+        <button class="done" id="btn-done">완료</button>
       </div>
       <div class="kbd" id="kbd">
         <button class="key num" data-k="7">7</button>
@@ -396,7 +417,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h11a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H9L2.5 12.7a1 1 0 0 1 0-1.4L9 4z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>
         </button>
       </div>
-      <div class="kbd-hint">⌫ 길게 누르면 전체 지우기 · 통화를 누르면 변경</div>
+      </div>
     </section>
 
     <!-- ============ 차트 ============ -->
@@ -559,6 +580,15 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
+/* ================= 키패드 열고 닫기 =================
+   첫 화면은 숫자판 없이 목록만 — 금액을 눌러야 올라온다 */
+let kbdOpen = false;
+function setKbd(open){
+  kbdOpen = open;
+  $('kbdwrap').hidden = !open;
+  document.querySelector('#view-convert .crow').classList.toggle('editing', open);
+}
+
 /* ================= 변환 화면 ================= */
 function renderConvert(){
   const base = BY[S.base];
@@ -588,6 +618,12 @@ function renderConvert(){
   }).join('');
 }
 
+$('amt-base').addEventListener('click', ()=>setKbd(!kbdOpen));
+$('btn-done').addEventListener('click', ()=>setKbd(false));
+/* 목록을 만지기 시작하면 자연스럽게 키패드는 내려간다 */
+$('tlist').addEventListener('pointerdown', ()=>setKbd(false));
+$('btn-add').addEventListener('pointerdown', ()=>setKbd(false));
+
 $('kbd').addEventListener('click', e=>{
   const k = e.target.closest('[data-k]')?.dataset.k;
   if(!k) return;
@@ -609,6 +645,7 @@ for(const ev of ['pointerup','pointerleave']) bsKey.addEventListener(ev, ()=>cle
    pickMode: 'base' | 'add' | 숫자(교체할 targets 인덱스) */
 let pickMode = 'base';
 function openSheet(mode){
+  setKbd(false);
   pickMode = mode;
   $('sheet-title').textContent =
     mode === 'base' ? '기준 통화 변경' :
