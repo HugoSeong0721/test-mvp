@@ -86,7 +86,7 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{
   background:var(--page-bg);
   background-image:radial-gradient(90rem 60rem at 50% -20rem, var(--accent-soft), transparent 60%);
@@ -305,6 +305,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   background:rgba(233,235,241,.08);padding:7px 11px;border-radius:999px;
 }
 .lane{flex:1;min-height:0;position:relative;overflow:hidden;touch-action:none}
+/* 건반을 화면 가장자리에서 살짝 띄운다 — 아이폰 홈 인디케이터·엣지 스와이프 오작동 방지 */
+#playKb{margin:0 8px calc(8px + env(safe-area-inset-bottom))}
+#freeKb{margin-bottom:env(safe-area-inset-bottom)}
 .lane .grid{position:absolute;inset:0}
 .lane .grid i{position:absolute;top:0;bottom:0;width:1px;background:rgba(233,235,241,.05)}
 .hitline{
@@ -652,6 +655,9 @@ function audio(){
 // 첫 터치(제스처)에서 미리 초기화해 둔다
 document.addEventListener("pointerdown",()=>{try{audio()}catch(e){}},{once:true});
 // 누르는 동안 지속되는 음 — 손을 떼면 부드럽게 잦아든다
+// 동시 발음 수를 제한해 오디오 노드 폭증(→ 사파리 탭 크래시)을 막는다
+const VOICES=[];
+const MAX_VOICES=12;
 function startVoice(name){
   try{
     const ac=audio(), t=ac.currentTime, f=FREQ(name);
@@ -666,16 +672,20 @@ function startVoice(name){
     const g2=ac.createGain(); g2.gain.value=0.25;
     o1.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(ac.destination);
     o1.start(t); o2.start(t);
-    o1.stop(t+12); o2.stop(t+12); // 안전 상한
+    o1.stop(t+8); o2.stop(t+8); // 안전 상한
     let stopped=false;
-    return {stop(){
+    const v={stop(){
       if(stopped) return; stopped=true;
+      const i=VOICES.indexOf(v); if(i>-1) VOICES.splice(i,1);
       const t2=ac.currentTime;
       g.gain.cancelScheduledValues(t2);
       g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t2);
       g.gain.exponentialRampToValueAtTime(0.0001,t2+0.28);
       o1.stop(t2+0.32); o2.stop(t2+0.32);
     }};
+    VOICES.push(v);
+    while(VOICES.length>MAX_VOICES) VOICES[0].stop(); // 가장 오래된 음부터 정리
+    return v;
   }catch(e){ return {stop(){}}; /* 오디오 미지원 환경에서도 앱은 동작 */ }
 }
 
@@ -708,7 +718,7 @@ function buildKb(el, onPress, onRelease){
   function press(k,pid){
     if(!k||!k.dataset.note) return;
     const n=k.dataset.note;
-    byPointer.set(pid,{k,voice:startVoice(n)});
+    byPointer.set(pid,{k,voice:startVoice(n),t:performance.now()});
     heldCount.set(n,(heldCount.get(n)||0)+1);
     k.classList.add("press");
     onPress&&onPress(n,k);
@@ -736,6 +746,8 @@ function buildKb(el, onPress, onRelease){
   el.addEventListener("pointermove",e=>{
     const h=byPointer.get(e.pointerId);
     if(!h) return;
+    // 경계에서 손가락이 미세하게 떨릴 때 음이 연속 재생성되는 것을 방지 (최소 60ms 간격)
+    if(performance.now()-h.t<60) return;
     const k=keyAt(e);
     if(k&&k!==h.k){ release(e.pointerId); press(k,e.pointerId); } // 손가락 위치를 따라간다
   });
@@ -743,6 +755,9 @@ function buildKb(el, onPress, onRelease){
   el.addEventListener("pointerup",up);
   el.addEventListener("pointercancel",up);
   el.addEventListener("contextmenu",e=>e.preventDefault());
+  // iOS: 스크롤·엣지 스와이프·확대 등 브라우저 기본 동작을 건반 위에서는 전부 차단
+  el.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+  el.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
   return {
     keyOf:n=>el.querySelector(`.k[data-note="${n}"]`),
     held,
@@ -1133,6 +1148,9 @@ document.addEventListener("touchmove",e=>{
   if(e.scale!==undefined && e.scale!==1) e.preventDefault();
 },{passive:false});
 document.addEventListener("dblclick",e=>e.preventDefault());
+// 노트 레인 위에서도 브라우저 기본 터치 동작 차단
+["touchstart","touchmove"].forEach(ev=>
+  $("#lane").addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 
 // 프로토타입 검증용 훅 (헤드리스 테스트에서 사용)
 window.__piano={ get L(){return L}, startLesson, SONGS, S };
