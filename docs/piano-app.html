@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
 <title>피아노 레슨 · Piano</title>
 <style>
 /* ============================================================
@@ -94,8 +94,12 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
   display:flex;align-items:center;justify-content:center;
   -webkit-font-smoothing:antialiased;
-  touch-action:manipulation;
+  user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none;
 }
+/* iOS 더블탭 확대 방지: 모든 요소에 걸고, 건반·레인은 완전 차단 */
+.phone,.phone *{touch-action:manipulation}
+.kb,.kb *,.lane,.lane *{touch-action:none}
 button{
   font:inherit;color:inherit;background:none;border:none;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -635,10 +639,18 @@ const save = ()=>store.write(S);
    ============================================================ */
 let AC=null;
 function audio(){
-  if(!AC){ AC = new (window.AudioContext||window.webkitAudioContext)(); }
+  if(!AC){
+    AC = new (window.AudioContext||window.webkitAudioContext)();
+    // iOS 오디오 잠금 해제 + 엔진 예열: 첫 음에서 버벅이지 않게 무음 재생
+    const b=AC.createBuffer(1,1,22050);
+    const s=AC.createBufferSource(); s.buffer=b;
+    s.connect(AC.destination); s.start(0);
+  }
   if(AC.state==="suspended") AC.resume();
   return AC;
 }
+// 첫 터치(제스처)에서 미리 초기화해 둔다
+document.addEventListener("pointerdown",()=>{try{audio()}catch(e){}},{once:true});
 // 누르는 동안 지속되는 음 — 손을 떼면 부드럽게 잦아든다
 function startVoice(name){
   try{
@@ -872,15 +884,20 @@ let rafId=0, lastTs=0;
 
 const playKb=buildKb($("#playKb"),(note)=>onLessonPress(note));
 
-function waitText(t){ $("#waitmsg").textContent=t; }
+function waitText(t){
+  const el=$("#waitmsg");
+  if(el.textContent!==t) el.textContent=t; // 매 프레임 불필요한 레이아웃 방지
+}
 
+// 레인 크기는 캐시해 두고 리사이즈 때만 다시 잰다 — 매 프레임 재계산하면 끊긴다
+const M={h:0,hitY:0};
 function laneMetrics(){
   const lane=$("#lane");
-  const h=lane.clientHeight;
-  const hitY=h-16;
-  $("#hitline").style.top=hitY+"px";
-  $("#waitmsg").style.top=(hitY-46)+"px";
-  return {h,hitY};
+  M.h=lane.clientHeight;
+  M.hitY=M.h-16;
+  $("#hitline").style.top=M.hitY+"px";
+  $("#waitmsg").style.top=(M.hitY-46)+"px";
+  return M;
 }
 function keyRect(note){
   const k=playKb.keyOf(note);
@@ -926,11 +943,12 @@ function startLesson(id,opt){
   });
 
   const m=laneMetrics();
+  const speed=song.tempo/60*PPB; // px/초
   L={
     song, notes, opt:opt||{},
     idx:0, hits:0, wrong:0,
-    scrollY:-m.h*0.92,          // 첫 노트가 위에서 내려올 시간
-    speed:song.tempo/60*PPB,    // px/초
+    scrollY:-Math.min(m.h*0.92, speed*2.2), // 카운트다운 후 2.2초 안에 첫 노트 도착
+    speed,
     waiting:false, holding:false, done:false,
     startAt:performance.now(), lastSec:performance.now(),
     counting:true,
@@ -1002,8 +1020,7 @@ function loop(ts){
     } else {
       L.scrollY+=L.speed*dt;
     }
-    const m=laneMetrics();
-    $("#notes").style.transform=`translateY(${L.scrollY+m.hitY}px)`;
+    $("#notes").style.transform=`translateY(${L.scrollY+M.hitY}px)`;
   }
   rafId=requestAnimationFrame(loop);
 }
@@ -1108,6 +1125,14 @@ $("#rDone").addEventListener("click",()=>{
    ============================================================ */
 renderPath(); renderGoal(); renderSongs();
 window.addEventListener("resize",()=>{ if(L) laneMetrics(); });
+
+// iOS 사파리 확대 방지: 핀치(gesture)와 스케일 변화 동반 터치무브를 막는다
+document.addEventListener("gesturestart",e=>e.preventDefault());
+document.addEventListener("gesturechange",e=>e.preventDefault());
+document.addEventListener("touchmove",e=>{
+  if(e.scale!==undefined && e.scale!==1) e.preventDefault();
+},{passive:false});
+document.addEventListener("dblclick",e=>e.preventDefault());
 
 // 프로토타입 검증용 훅 (헤드리스 테스트에서 사용)
 window.__piano={ get L(){return L}, startLesson, SONGS, S };
