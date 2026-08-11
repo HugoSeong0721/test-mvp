@@ -317,6 +317,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   box-shadow:0 2px 10px rgba(0,0,0,.35);
 }
 .note.next{outline:2px solid rgba(255,255,255,.55);outline-offset:1.5px}
+.note.active{background:var(--pos);color:#06130C;box-shadow:0 0 16px rgba(76,195,138,.7);outline:none}
 .note.hit{background:var(--pos);color:#06130C;opacity:0;transform:scale(1.25);transition:opacity .3s ease,transform .3s ease}
 .note.shake{animation:shake .3s ease}
 @keyframes shake{25%{margin-left:-5px}75%{margin-left:5px}}
@@ -473,7 +474,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
     <!-- ============ 자유 연주 ============ -->
     <div class="view" id="v-free">
       <div class="free">
-        <div class="tip">🎹 <b>자유 연주</b> — 건반을 눌러 소리를 들어보세요. 여러 손가락으로 동시에 눌러도 됩니다.</div>
+        <div class="tip">🎹 <b>자유 연주</b> — 건반을 누르는 동안 소리가 이어져요. 여러 손가락으로 동시에 눌러도 됩니다.</div>
         <div class="spacer"></div>
         <button class="lbl-toggle on" id="lblToggle">계이름 표시 켜짐</button>
         <div class="kb" id="freeKb"></div>
@@ -638,13 +639,14 @@ function audio(){
   if(AC.state==="suspended") AC.resume();
   return AC;
 }
-function playNote(name){
+// 누르는 동안 지속되는 음 — 손을 떼면 부드럽게 잦아든다
+function startVoice(name){
   try{
     const ac=audio(), t=ac.currentTime, f=FREQ(name);
     const g=ac.createGain();
     g.gain.setValueAtTime(0.0001,t);
     g.gain.exponentialRampToValueAtTime(0.5,t+0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001,t+1.4);
+    g.gain.exponentialRampToValueAtTime(0.22,t+0.8); // 서스테인
     const lp=ac.createBiquadFilter();
     lp.type="lowpass"; lp.frequency.value=Math.min(f*6,7000); lp.Q.value=0.4;
     const o1=ac.createOscillator(); o1.type="triangle"; o1.frequency.value=f;
@@ -652,14 +654,23 @@ function playNote(name){
     const g2=ac.createGain(); g2.gain.value=0.25;
     o1.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(ac.destination);
     o1.start(t); o2.start(t);
-    o1.stop(t+1.5); o2.stop(t+1.5);
-  }catch(e){/* 오디오 미지원 환경에서도 앱은 동작 */}
+    o1.stop(t+12); o2.stop(t+12); // 안전 상한
+    let stopped=false;
+    return {stop(){
+      if(stopped) return; stopped=true;
+      const t2=ac.currentTime;
+      g.gain.cancelScheduledValues(t2);
+      g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t2);
+      g.gain.exponentialRampToValueAtTime(0.0001,t2+0.28);
+      o1.stop(t2+0.32); o2.stop(t2+0.32);
+    }};
+  }catch(e){ return {stop(){}}; /* 오디오 미지원 환경에서도 앱은 동작 */ }
 }
 
 /* ============================================================
    건반 렌더링 (자유 연주·레슨 공용)
    ============================================================ */
-function buildKb(el, onPress){
+function buildKb(el, onPress, onRelease){
   el.innerHTML="";
   const W=100/WHITE.length;
   WHITE.forEach((n,i)=>{
@@ -675,22 +686,54 @@ function buildKb(el, onPress){
     k.style.left=((b.after+1)*W - W*0.32)+"%"; k.style.width=(W*0.64)+"%";
     el.appendChild(k);
   });
-  // 터치: 손가락이 닿은 위치의 건반이 그대로 눌린다 (멀티터치 지원)
-  const press=(k)=>{
+
+  // 터치: 손가락이 닿은 건반이 눌리고, 떼거나 옆으로 밀면 그 건반은 놓인다.
+  // 멀티터치 지원 — pointerId별로 어떤 건반을 잡고 있는지 추적한다.
+  const byPointer=new Map();   // pointerId → {k, voice}
+  const heldCount=new Map();   // note → 잡고 있는 손가락 수
+  const held=n=>(heldCount.get(n)||0)>0;
+
+  function press(k,pid){
     if(!k||!k.dataset.note) return;
+    const n=k.dataset.note;
+    byPointer.set(pid,{k,voice:startVoice(n)});
+    heldCount.set(n,(heldCount.get(n)||0)+1);
     k.classList.add("press");
-    setTimeout(()=>k.classList.remove("press"),140);
-    playNote(k.dataset.note);
-    onPress&&onPress(k.dataset.note,k);
+    onPress&&onPress(n,k);
+  }
+  function release(pid){
+    const h=byPointer.get(pid);
+    if(!h) return;
+    byPointer.delete(pid);
+    const n=h.k.dataset.note;
+    const c=(heldCount.get(n)||1)-1;
+    heldCount.set(n,c);
+    if(c<=0) h.k.classList.remove("press");
+    h.voice.stop();
+    onRelease&&onRelease(n,h.k);
+  }
+  const keyAt=e=>{
+    const t=document.elementFromPoint(e.clientX,e.clientY);
+    return t&&t.closest? t.closest(".k"):null;
   };
   el.addEventListener("pointerdown",e=>{
     e.preventDefault();
-    const t=document.elementFromPoint(e.clientX,e.clientY);
-    press(t&&t.closest? t.closest(".k"):null);
+    try{el.setPointerCapture(e.pointerId)}catch(_){}
+    press(keyAt(e),e.pointerId);
   });
+  el.addEventListener("pointermove",e=>{
+    const h=byPointer.get(e.pointerId);
+    if(!h) return;
+    const k=keyAt(e);
+    if(k&&k!==h.k){ release(e.pointerId); press(k,e.pointerId); } // 손가락 위치를 따라간다
+  });
+  const up=e=>release(e.pointerId);
+  el.addEventListener("pointerup",up);
+  el.addEventListener("pointercancel",up);
+  el.addEventListener("contextmenu",e=>e.preventDefault());
   return {
     keyOf:n=>el.querySelector(`.k[data-note="${n}"]`),
-    press,
+    held,
   };
 }
 
@@ -818,8 +861,9 @@ $("#lblToggle").addEventListener("click",()=>{
 });
 
 /* ============================================================
-   레슨 엔진 — 노트가 내려오고, 판정선에 닿으면 맞는 건반을
-   누를 때까지 기다린다 (심플리 피아노 연습 모드 방식)
+   레슨 엔진 — 노트가 판정선에 닿으면 맞는 건반을 누르고,
+   노트 길이가 다 지나갈 때까지 꾹 누르고 있어야 한다.
+   중간에 손을 떼면 멈추고, 다시 누르면 이어서 진행된다.
    ============================================================ */
 const PPB=88;          // 박자당 픽셀
 const GAP=5;           // 노트 사이 시각적 틈
@@ -827,6 +871,8 @@ let L=null;            // 현재 레슨 상태
 let rafId=0, lastTs=0;
 
 const playKb=buildKb($("#playKb"),(note)=>onLessonPress(note));
+
+function waitText(t){ $("#waitmsg").textContent=t; }
 
 function laneMetrics(){
   const lane=$("#lane");
@@ -885,7 +931,7 @@ function startLesson(id,opt){
     idx:0, hits:0, wrong:0,
     scrollY:-m.h*0.92,          // 첫 노트가 위에서 내려올 시간
     speed:song.tempo/60*PPB,    // px/초
-    waiting:false, done:false,
+    waiting:false, holding:false, done:false,
     startAt:performance.now(), lastSec:performance.now(),
     counting:true,
   };
@@ -931,10 +977,28 @@ function loop(ts){
     if(ts-L.lastSec>=1000){ L.lastSec=ts; S.secToday++; if(S.secToday%10===0) save(); }
 
     const cur=L.notes[L.idx];
-    if(cur && L.scrollY + L.speed*dt >= cur.startPx){
+    if(cur && L.holding){
+      if(!playKb.held(cur.n)){
+        // 노트가 끝나기 전에 손을 뗐다 → 멈추고 다시 누를 때까지 대기
+        L.holding=false; L.waiting=true;
+        cur.el.classList.remove("active");
+        if(!cur.penalized){
+          cur.penalized=true; L.wrong++;
+          $("#playAcc").textContent=accuracy()+"%";
+          cur.el.classList.remove("shake"); void cur.el.offsetWidth; cur.el.classList.add("shake");
+        }
+        setTargetKey(true); waitText("음이 끝날 때까지 꾹 누르고 있어요");
+      } else {
+        // 누르고 있는 동안 노트가 소모된다
+        L.scrollY+=L.speed*dt;
+        if(L.scrollY >= cur.startPx + cur.d*PPB) completeNote(cur);
+      }
+    } else if(cur && L.scrollY + L.speed*dt >= cur.startPx){
       // 판정선 도달 → 맞는 건반을 누를 때까지 대기
       L.scrollY=cur.startPx;
       if(!L.waiting){ L.waiting=true; setTargetKey(true); }
+      // 같은 음이 연달아 나올 때: 계속 누르고 있으면 뗐다 다시 눌러야 한다
+      waitText(playKb.held(cur.n)?"손을 뗐다가 다시 눌러요":"표시된 건반을 꾹 눌러요");
     } else {
       L.scrollY+=L.speed*dt;
     }
@@ -944,6 +1008,17 @@ function loop(ts){
   rafId=requestAnimationFrame(loop);
 }
 
+function completeNote(cur){
+  cur.hit=true;
+  cur.el.classList.remove("active");
+  cur.el.classList.add("hit");
+  L.hits++; L.idx++; L.holding=false; L.waiting=false;
+  markNext();
+  $("#playBar").style.width=(L.idx/L.notes.length*100)+"%";
+  $("#playAcc").textContent=accuracy()+"%";
+  if(L.idx>=L.notes.length) finishLesson();
+}
+
 function accuracy(){
   const total=L.hits+L.wrong;
   return total?Math.round(L.hits/total*100):100;
@@ -951,14 +1026,13 @@ function accuracy(){
 function onLessonPress(note){
   if(!L||L.done||L.counting) return;
   const cur=L.notes[L.idx];
-  if(!cur) return;
+  if(!cur||L.holding) return;
   const early = L.scrollY >= cur.startPx - PPB*0.45; // 살짝 이른 입력도 인정
   if(note===cur.n && (L.waiting||early)){
-    cur.hit=true; cur.el.classList.add("hit");
-    L.hits++; L.idx++; L.waiting=false;
-    setTargetKey(false); markNext();
-    $("#playBar").style.width=(L.idx/L.notes.length*100)+"%";
-    if(L.idx>=L.notes.length) finishLesson();
+    // 홀드 시작 — 노트 길이만큼 누르고 있으면 loop()에서 완료 처리된다
+    L.holding=true; L.waiting=false;
+    cur.el.classList.add("active");
+    setTargetKey(false);
   } else if(L.waiting && note!==cur.n){
     L.wrong++;
     const k=playKb.keyOf(note);
@@ -1036,5 +1110,5 @@ renderPath(); renderGoal(); renderSongs();
 window.addEventListener("resize",()=>{ if(L) laneMetrics(); });
 
 // 프로토타입 검증용 훅 (헤드리스 테스트에서 사용)
-window.__piano={ get L(){return L}, startLesson, press:n=>{playNote(n);onLessonPress(n)}, SONGS, S };
+window.__piano={ get L(){return L}, startLesson, SONGS, S };
 </script>
