@@ -286,7 +286,7 @@
   const GRAVITY   = 1200;
   const BOUNCE    = -600;    // 기본 점프 (약 150px 상승)
   const SPRING    = -1030;   // 스프링 발판 (약 440px)
-  const MOVE_SPD  = 430;
+  const MOVE_SPD  = 390;
   const MOVE_EASE = 14;
   const PLAYER_R  = 13;
   // 플레이어를 화면 위쪽에 두어 발밑 시야를 넓게 — 불길이 늘 보이게 하는 장치
@@ -565,6 +565,16 @@
     aimAtPointer(e);
   });
 
+  // 손가락을 떼면 그 자리에 선다.
+  // (떼도 목표가 남아 있으면 한 번 탭한 것만으로 화면 끝까지 날아가 버린다.)
+  function releaseAim(e) {
+    if (!running) return;
+    if (e && e.pointerType === 'mouse') return;   // 마우스는 커서를 계속 따라간다
+    targetX = player.x;
+  }
+  shaftEl.addEventListener('pointerup', releaseAim);
+  shaftEl.addEventListener('pointercancel', releaseAim);
+
   // ── 시작 / 종료 ─────────────────────────────────────────
   function startGame() {
     resize();
@@ -635,7 +645,7 @@
     let want = 0;
     if (targetX !== null) {
       const d = targetX - player.x;
-      want = Math.max(-1, Math.min(1, d / 26));
+      want = Math.max(-1, Math.min(1, d / 40));
     } else {
       want = (inputRight ? 1 : 0) - (inputLeft ? 1 : 0);
     }
