@@ -1,0 +1,1040 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>피아노 레슨 · Piano</title>
+<style>
+/* ============================================================
+   피아노 학습 앱 UI 프로토타입 — 다크 퍼스트, 블루 악센트
+   참고: 심플리 피아노(학습 경로·대기형 연습), 플로우키(곡 라이브러리·프리미엄),
+        유시션(스트릭·일일 목표)
+   ============================================================ */
+:root{
+  --page-bg:#0A0C12;
+  --app-bg:#0E1119;
+  --surface:#161A26;
+  --surface-2:#1D2331;
+  --surface-3:#252C3D;
+  --line:#232A3A;
+  --text:#E9EBF1;
+  --text-2:#9AA3B5;
+  --muted:#6A7386;
+  --accent:#6E8DF7;
+  --accent-ink:#0B1024;
+  --accent-soft:rgba(110,141,247,.14);
+  --gold:#E8B44C;
+  --pos:#4CC38A;
+  --neg:#E5645F;
+  --white-key:#F4F1EA;
+  --white-key-press:#D9D4C8;
+  --black-key:#14161C;
+  --black-key-press:#2E3340;
+  --key-ink:#3A404E;
+  --lane-bg:#0B0E15;
+  --sheet-scrim:rgba(4,6,10,.62);
+  --shadow:0 24px 80px rgba(0,0,0,.55);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --page-bg:#E8E9EE;
+    --app-bg:#F5F6F9;
+    --surface:#FFFFFF;
+    --surface-2:#EEF0F5;
+    --surface-3:#E2E5EE;
+    --line:#E1E4EC;
+    --text:#1B2130;
+    --text-2:#59627A;
+    --muted:#8A92A6;
+    --accent:#3D5FD9;
+    --accent-ink:#F7F9FF;
+    --accent-soft:rgba(61,95,217,.11);
+    --gold:#A97C1F;
+    --pos:#178A55;
+    --neg:#C74540;
+    --white-key:#FFFFFF;
+    --white-key-press:#DDE0E8;
+    --black-key:#20242E;
+    --black-key-press:#3A4152;
+    --key-ink:#59627A;
+    --lane-bg:#12151E;
+    --sheet-scrim:rgba(27,33,48,.38);
+    --shadow:0 24px 60px rgba(27,33,48,.18);
+  }
+}
+:root[data-theme="light"]{
+  --page-bg:#E8E9EE;
+  --app-bg:#F5F6F9;
+  --surface:#FFFFFF;
+  --surface-2:#EEF0F5;
+  --surface-3:#E2E5EE;
+  --line:#E1E4EC;
+  --text:#1B2130;
+  --text-2:#59627A;
+  --muted:#8A92A6;
+  --accent:#3D5FD9;
+  --accent-ink:#F7F9FF;
+  --accent-soft:rgba(61,95,217,.11);
+  --gold:#A97C1F;
+  --pos:#178A55;
+  --neg:#C74540;
+  --white-key:#FFFFFF;
+  --white-key-press:#DDE0E8;
+  --black-key:#20242E;
+  --black-key-press:#3A4152;
+  --key-ink:#59627A;
+  --lane-bg:#12151E;
+  --sheet-scrim:rgba(27,33,48,.38);
+  --shadow:0 24px 60px rgba(27,33,48,.18);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--page-bg);
+  background-image:radial-gradient(90rem 60rem at 50% -20rem, var(--accent-soft), transparent 60%);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;
+  touch-action:manipulation;
+}
+button{
+  font:inherit;color:inherit;background:none;border:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---- 폰 프레임 ---- */
+.phone{
+  width:min(420px,100vw);
+  height:100dvh;
+  background:var(--app-bg);
+  display:flex;flex-direction:column;
+  overflow:hidden;position:relative;
+}
+@media (min-width:481px) and (min-height:760px){
+  .phone{
+    height:min(860px,94dvh);
+    border-radius:32px;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+  }
+}
+
+/* ---- 헤더 ---- */
+.hd{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px}
+.hd .brand{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.hd .brand small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+.hd .right{display:flex;gap:8px;align-items:center}
+.chip{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;color:var(--text-2);
+  background:var(--surface);border:1px solid var(--line);
+  padding:7px 11px;border-radius:999px;
+}
+.chip .fire{font-size:13px}
+.chip b{color:var(--text)}
+
+/* ---- 뷰 공통 ---- */
+.views{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;display:none;flex-direction:column;min-height:0}
+.view.on{display:flex}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px}
+.eyebrow{
+  font-size:10.5px;font-weight:700;color:var(--muted);
+  letter-spacing:.13em;text-transform:uppercase;
+  padding:10px 8px 8px;
+}
+
+/* ---- 홈: 일일 목표 ---- */
+.goal{
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:20px;padding:14px 16px;
+}
+.ring{position:relative;width:56px;height:56px;flex-shrink:0}
+.ring svg{width:56px;height:56px;transform:rotate(-90deg)}
+.ring .bg{stroke:var(--surface-3);fill:none;stroke-width:6}
+.ring .fg{stroke:var(--accent);fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring .mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.goal .txt{flex:1;min-width:0}
+.goal .t1{font-size:14.5px;font-weight:700}
+.goal .t2{font-size:12px;color:var(--text-2);margin-top:3px}
+
+/* ---- 홈: 학습 경로 ---- */
+.path{position:relative;padding:2px 8px 8px}
+.path::before{
+  content:"";position:absolute;left:35px;top:14px;bottom:20px;
+  width:3px;border-radius:2px;background:var(--surface-3);
+}
+.node{
+  position:relative;display:flex;align-items:center;gap:14px;
+  width:100%;text-align:left;padding:10px 8px 10px 0;border-radius:16px;
+}
+.node .dot{
+  position:relative;z-index:1;flex-shrink:0;
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;
+  background:var(--surface-2);border:2px solid var(--line);color:var(--muted);
+}
+.node.done .dot{background:var(--pos);border-color:var(--pos);color:#06130C;font-size:19px}
+.node.now .dot{
+  background:var(--accent);border-color:var(--accent);color:var(--accent-ink);
+  box-shadow:0 0 0 6px var(--accent-soft);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{50%{box-shadow:0 0 0 11px var(--accent-soft)}}
+.node .info{flex:1;min-width:0}
+.node .name{font-size:14.5px;font-weight:700}
+.node.lock .name{color:var(--muted)}
+.node .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.node .stars{font-size:12px;letter-spacing:2px;flex-shrink:0;color:var(--gold)}
+.node .go{
+  flex-shrink:0;font-size:12.5px;font-weight:700;
+  background:var(--accent);color:var(--accent-ink);
+  padding:8px 14px;border-radius:999px;
+}
+.node.now{background:var(--surface);border:1px solid var(--line);padding-left:10px;margin-left:-10px}
+
+/* ---- 곡 라이브러리 ---- */
+.search{
+  display:flex;align-items:center;gap:9px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:11px 14px;margin:8px 0 4px;
+}
+.search svg{flex-shrink:0;opacity:.5}
+.search input{
+  flex:1;min-width:0;background:none;border:none;outline:none;
+  font:inherit;font-size:14px;color:var(--text);
+}
+.search input::placeholder{color:var(--muted)}
+.filters{display:flex;gap:7px;padding:10px 2px 6px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fchip{
+  flex-shrink:0;font-size:12.5px;font-weight:700;color:var(--text-2);
+  background:var(--surface);border:1px solid var(--line);
+  padding:8px 14px;border-radius:999px;
+}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.slist{display:flex;flex-direction:column;gap:8px;padding-top:6px}
+.srow{
+  display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:18px;padding:12px 14px;
+}
+.srow .art{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:21px;
+  background:var(--surface-2);
+}
+.srow .info{flex:1;min-width:0}
+.srow .name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .sub{font-size:11.5px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px}
+.badge{font-size:10px;font-weight:800;padding:2.5px 7px;border-radius:999px;letter-spacing:.02em}
+.badge.d0{background:rgba(76,195,138,.15);color:var(--pos)}
+.badge.d1{background:var(--accent-soft);color:var(--accent)}
+.badge.d2{background:rgba(232,180,76,.16);color:var(--gold)}
+.badge.pro{background:rgba(232,180,76,.16);color:var(--gold)}
+.srow .stars{font-size:11px;letter-spacing:1.5px;color:var(--gold);flex-shrink:0}
+.srow .lockic{flex-shrink:0;font-size:15px;opacity:.6}
+
+/* ---- 자유 연주 탭 ---- */
+.free{flex:1;min-height:0;display:flex;flex-direction:column;padding:4px 16px 16px}
+.free .tip{
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  padding:13px 15px;font-size:13px;color:var(--text-2);line-height:1.55;
+}
+.free .tip b{color:var(--text)}
+.free .spacer{flex:1}
+.lbl-toggle{
+  align-self:flex-end;margin:10px 0;
+  font-size:12px;font-weight:700;color:var(--text-2);
+  background:var(--surface);border:1px solid var(--line);
+  padding:8px 13px;border-radius:999px;
+}
+.lbl-toggle.on{color:var(--accent);border-color:var(--accent)}
+
+/* ---- 건반 ---- */
+.kb{
+  position:relative;height:190px;flex-shrink:0;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+}
+.kb .wk{
+  position:absolute;top:0;bottom:0;
+  background:var(--white-key);
+  border:1px solid #B9B4A8;border-top:none;
+  border-radius:0 0 7px 7px;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:9px;
+  font-size:11px;font-weight:700;color:var(--key-ink);
+}
+.kb .wk.press{background:var(--white-key-press)}
+.kb .bk{
+  position:absolute;top:0;height:58%;z-index:2;
+  background:var(--black-key);
+  border-radius:0 0 5px 5px;
+  box-shadow:inset 0 -5px 0 rgba(255,255,255,.07);
+}
+.kb .bk.press{background:var(--black-key-press)}
+.kb .k.target{box-shadow:inset 0 0 0 3px var(--accent), 0 0 14px var(--accent);}
+.kb .wk.target{background:var(--accent-soft);
+  background-image:linear-gradient(var(--accent-soft),var(--accent-soft));background-color:var(--white-key)}
+.kb .k.wrong{box-shadow:inset 0 0 0 3px var(--neg)}
+.kb .wk span{pointer-events:none}
+.kb.hide-lbl .wk span{visibility:hidden}
+.kb.hide-lbl .wk.target span{visibility:visible}
+
+/* ---- 연주(레슨) 화면 ---- */
+#play{background:var(--lane-bg)}
+.play-hd{display:flex;align-items:center;gap:12px;padding:14px 16px 10px}
+.play-hd .x{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:rgba(233,235,241,.08);color:#E9EBF1;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.play-hd .mid{flex:1;min-width:0}
+.play-hd .song{font-size:14px;font-weight:700;color:#E9EBF1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbar{height:5px;border-radius:3px;background:rgba(233,235,241,.12);margin-top:7px;overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;border-radius:3px;background:var(--accent);transition:width .25s ease}
+.play-hd .acc{
+  flex-shrink:0;font-size:12px;font-weight:800;color:#E9EBF1;
+  background:rgba(233,235,241,.08);padding:7px 11px;border-radius:999px;
+}
+.lane{flex:1;min-height:0;position:relative;overflow:hidden;touch-action:none}
+.lane .grid{position:absolute;inset:0}
+.lane .grid i{position:absolute;top:0;bottom:0;width:1px;background:rgba(233,235,241,.05)}
+.hitline{
+  position:absolute;left:0;right:0;height:2px;z-index:3;
+  background:var(--accent);opacity:.85;
+  box-shadow:0 0 12px var(--accent);
+}
+.notes{position:absolute;left:0;top:0;right:0;height:0;will-change:transform}
+.note{
+  position:absolute;border-radius:9px;
+  background:var(--accent);color:var(--accent-ink);
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:5px;font-size:12px;font-weight:800;
+  box-shadow:0 2px 10px rgba(0,0,0,.35);
+}
+.note.next{outline:2px solid rgba(255,255,255,.55);outline-offset:1.5px}
+.note.hit{background:var(--pos);color:#06130C;opacity:0;transform:scale(1.25);transition:opacity .3s ease,transform .3s ease}
+.note.shake{animation:shake .3s ease}
+@keyframes shake{25%{margin-left:-5px}75%{margin-left:5px}}
+.waitmsg{
+  position:absolute;left:50%;transform:translateX(-50%);z-index:4;
+  font-size:12px;font-weight:700;color:#E9EBF1;
+  background:rgba(14,17,25,.85);border:1px solid rgba(233,235,241,.15);
+  padding:7px 13px;border-radius:999px;white-space:nowrap;
+  opacity:0;transition:opacity .3s ease;pointer-events:none;
+}
+.waitmsg.on{opacity:1}
+.count{
+  position:absolute;inset:0;z-index:5;display:none;
+  align-items:center;justify-content:center;
+  font-size:64px;font-weight:800;color:#E9EBF1;
+}
+.count.on{display:flex}
+
+/* ---- 결과 오버레이 ---- */
+.result{
+  position:absolute;inset:0;z-index:20;display:none;
+  align-items:center;justify-content:center;
+  background:var(--sheet-scrim);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:24px;
+}
+.result.on{display:flex}
+.rcard{
+  width:100%;max-width:320px;text-align:center;
+  background:var(--app-bg);border:1px solid var(--line);
+  border-radius:26px;padding:26px 22px 20px;
+  box-shadow:var(--shadow);
+}
+.rcard .big-stars{font-size:34px;letter-spacing:6px;color:var(--gold)}
+.rcard .big-stars .off{opacity:.22}
+.rcard h2{font-size:19px;font-weight:800;margin:12px 0 4px}
+.rcard .msg{font-size:13px;color:var(--text-2)}
+.rstats{display:flex;gap:8px;margin:18px 0 16px}
+.rstats .st{
+  flex:1;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:11px 6px;
+}
+.rstats .v{font-size:17px;font-weight:800}
+.rstats .k{font-size:10.5px;color:var(--muted);margin-top:3px}
+.rbtns{display:flex;flex-direction:column;gap:8px}
+.btn{
+  width:100%;padding:13px;border-radius:14px;
+  font-size:14.5px;font-weight:800;
+}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn.sec{background:var(--surface);border:1px solid var(--line);color:var(--text)}
+
+/* ---- 프리미엄 시트 ---- */
+.sheet-wrap{position:absolute;inset:0;z-index:30;display:none}
+.sheet-wrap.on{display:block}
+.sheet-wrap .scrim{position:absolute;inset:0;background:var(--sheet-scrim)}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;
+  background:var(--app-bg);border:1px solid var(--line);border-bottom:none;
+  border-radius:24px 24px 0 0;padding:14px 20px 26px;
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.3,.9,.3,1);
+}
+.sheet-wrap.on .sheet{transform:translateY(0)}
+.sheet .grab{width:38px;height:4px;border-radius:2px;background:var(--surface-3);margin:0 auto 16px}
+.sheet .hero{font-size:34px;text-align:center}
+.sheet h3{font-size:18px;font-weight:800;text-align:center;margin:8px 0 6px}
+.sheet p{font-size:13px;color:var(--text-2);text-align:center;line-height:1.6;margin-bottom:18px}
+.sheet .btn + .btn{margin-top:8px}
+
+/* ---- 토스트 ---- */
+.toast{
+  position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);
+  z-index:40;font-size:13px;font-weight:700;color:var(--text);
+  background:var(--surface);border:1px solid var(--line);
+  padding:11px 17px;border-radius:999px;box-shadow:var(--shadow);
+  opacity:0;transition:opacity .25s ease,transform .25s ease;
+  pointer-events:none;white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---- 하단 탭 ---- */
+.tabs{
+  display:flex;flex-shrink:0;
+  border-top:1px solid var(--line);background:var(--app-bg);
+  padding:6px 8px calc(10px + env(safe-area-inset-bottom));
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 0 4px;color:var(--muted);border-radius:14px;
+}
+.tab.on{color:var(--accent)}
+.tab svg{width:22px;height:22px}
+.tab span{font-size:10.5px;font-weight:700}
+</style>
+
+<div class="phone" id="phone">
+  <div class="hd">
+    <div class="brand">피아노 레슨<small>Piano · Prototype</small></div>
+    <div class="right">
+      <div class="chip"><span class="fire">🔥</span><b class="num" id="streak">0</b>일</div>
+    </div>
+  </div>
+
+  <div class="views">
+    <!-- ============ 배우기 ============ -->
+    <div class="view on" id="v-learn">
+      <div class="scroll">
+        <div class="goal">
+          <div class="ring">
+            <svg viewBox="0 0 56 56">
+              <circle class="bg" cx="28" cy="28" r="24"></circle>
+              <circle class="fg" id="goalFg" cx="28" cy="28" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8"></circle>
+            </svg>
+            <div class="mid num" id="goalPct">0%</div>
+          </div>
+          <div class="txt">
+            <div class="t1">오늘의 연습 목표</div>
+            <div class="t2"><b class="num" id="goalMin">0</b>분 / 10분 · 매일 조금씩이 실력을 만들어요</div>
+          </div>
+        </div>
+
+        <div class="eyebrow">코스 · 피아노 기초 1</div>
+        <div class="path" id="path"></div>
+
+        <div class="eyebrow">다음 코스</div>
+        <div class="path">
+          <button class="node lock" data-locked-course>
+            <div class="dot">🔒</div>
+            <div class="info">
+              <div class="name">피아노 기초 2</div>
+              <div class="sub">양손 연주 · 화음 · 8곡</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 곡 라이브러리 ============ -->
+    <div class="view" id="v-songs">
+      <div class="scroll">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input id="q" type="search" placeholder="곡 이름으로 검색" autocomplete="off">
+        </div>
+        <div class="filters" id="filters">
+          <button class="fchip on" data-f="all">전체</button>
+          <button class="fchip" data-f="0">입문</button>
+          <button class="fchip" data-f="1">초급</button>
+          <button class="fchip" data-f="2">중급</button>
+        </div>
+        <div class="slist" id="slist"></div>
+      </div>
+    </div>
+
+    <!-- ============ 자유 연주 ============ -->
+    <div class="view" id="v-free">
+      <div class="free">
+        <div class="tip">🎹 <b>자유 연주</b> — 건반을 눌러 소리를 들어보세요. 여러 손가락으로 동시에 눌러도 됩니다.</div>
+        <div class="spacer"></div>
+        <button class="lbl-toggle on" id="lblToggle">계이름 표시 켜짐</button>
+        <div class="kb" id="freeKb"></div>
+      </div>
+    </div>
+
+    <!-- ============ 연주(레슨) ============ -->
+    <div class="view" id="play">
+      <div class="play-hd">
+        <button class="x" id="playX" aria-label="나가기">✕</button>
+        <div class="mid">
+          <div class="song" id="playTitle">곡 제목</div>
+          <div class="pbar"><i id="playBar"></i></div>
+        </div>
+        <div class="acc num" id="playAcc">100%</div>
+      </div>
+      <div class="lane" id="lane">
+        <div class="grid" id="grid"></div>
+        <div class="notes" id="notes"></div>
+        <div class="hitline" id="hitline"></div>
+        <div class="waitmsg" id="waitmsg">표시된 건반을 눌러보세요</div>
+        <div class="count" id="count">3</div>
+      </div>
+      <div class="kb" id="playKb"></div>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div class="result" id="result">
+    <div class="rcard">
+      <div class="big-stars" id="rStars">★★★</div>
+      <h2 id="rTitle">레슨 완료!</h2>
+      <div class="msg" id="rMsg"></div>
+      <div class="rstats">
+        <div class="st"><div class="v num" id="rAcc">100%</div><div class="k">정확도</div></div>
+        <div class="st"><div class="v num" id="rNotes">0</div><div class="k">연주한 음</div></div>
+        <div class="st"><div class="v num" id="rTime">0:00</div><div class="k">걸린 시간</div></div>
+      </div>
+      <div class="rbtns">
+        <button class="btn pri" id="rNext">다음 레슨</button>
+        <button class="btn sec" id="rRetry">다시 연습</button>
+        <button class="btn sec" id="rDone">목록으로</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 프리미엄 시트 -->
+  <div class="sheet-wrap" id="proSheet">
+    <div class="scrim" data-close-sheet></div>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="hero">👑</div>
+      <h3>프리미엄 곡이에요</h3>
+      <p>클래식 명곡과 인기곡 전체는 프리미엄에서 열려요.<br>기초 코스의 모든 곡은 계속 무료입니다.</p>
+      <button class="btn pri" data-close-sheet>7일 무료로 시작하기 (데모)</button>
+      <button class="btn sec" data-close-sheet>나중에</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 하단 탭 -->
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-v="v-learn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5L12 4l9 7.5"></path><path d="M5.5 10v9.5h13V10"></path></svg>
+      <span>배우기</span>
+    </button>
+    <button class="tab" data-v="v-songs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5.5L20 3v12.5"></path><circle cx="6.5" cy="18" r="2.5"></circle><circle cx="17.5" cy="15.5" r="2.5"></circle></svg>
+      <span>곡</span>
+    </button>
+    <button class="tab" data-v="v-free">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M8.5 5v8M15.5 5v8M12 13v6M12 5v8"></path></svg>
+      <span>자유 연주</span>
+    </button>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   데이터
+   ============================================================ */
+// 계이름 표기
+const SOL = {C:"도",D:"레",E:"미",F:"파",G:"솔",A:"라",B:"시"};
+// 건반 배치: C4~E5 (흰건반 10개)
+const WHITE = ["C4","D4","E4","F4","G4","A4","B4","C5","D5","E5"];
+const BLACK = [
+  {n:"C#4",after:0},{n:"D#4",after:1},
+  {n:"F#4",after:3},{n:"G#4",after:4},{n:"A#4",after:5},
+  {n:"C#5",after:7},{n:"D#5",after:8},
+];
+const MIDI = (()=>{ // 음이름 → 미디 번호
+  const base={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+  return n=>{
+    const m=n.match(/^([A-G])(#?)(\d)$/);
+    return 12*(+m[3]+1)+base[m[1]]+(m[2]?1:0);
+  };
+})();
+const FREQ = n => 440*Math.pow(2,(MIDI(n)-69)/12);
+
+// 곡 데이터: [음, 박자]
+const SONGS = [
+  {id:"doremi", title:"도·레·미 배우기", sub:"기초 연습", icon:"🎯", diff:0, tempo:70, ex:true,
+   notes:[["C4",1],["D4",1],["E4",1],["D4",1],["C4",2],["C4",1],["D4",1],["E4",2],["E4",1],["D4",1],["C4",2]]},
+  {id:"airplane", title:"비행기", sub:"동요 · 입문", icon:"✈️", diff:0, tempo:90,
+   notes:[["E4",1],["D4",1],["C4",1],["D4",1],["E4",1],["E4",1],["E4",2],
+          ["D4",1],["D4",1],["D4",2],["E4",1],["G4",1],["G4",2],
+          ["E4",1],["D4",1],["C4",1],["D4",1],["E4",1],["E4",1],["E4",1],["E4",1],
+          ["D4",1],["D4",1],["E4",1],["D4",1],["C4",4]]},
+  {id:"school", title:"학교종", sub:"동요 · 입문", icon:"🔔", diff:0, tempo:90,
+   notes:[["G4",1],["G4",1],["A4",1],["A4",1],["G4",1],["G4",1],["E4",2],
+          ["G4",1],["G4",1],["E4",1],["E4",1],["D4",4],
+          ["G4",1],["G4",1],["A4",1],["A4",1],["G4",1],["G4",1],["E4",2],
+          ["G4",1],["E4",1],["D4",1],["E4",1],["C4",4]]},
+  {id:"star", title:"반짝반짝 작은 별", sub:"동요 · 입문", icon:"⭐", diff:0, tempo:92,
+   notes:[["C4",1],["C4",1],["G4",1],["G4",1],["A4",1],["A4",1],["G4",2],
+          ["F4",1],["F4",1],["E4",1],["E4",1],["D4",1],["D4",1],["C4",2],
+          ["G4",1],["G4",1],["F4",1],["F4",1],["E4",1],["E4",1],["D4",2],
+          ["C4",1],["C4",1],["G4",1],["G4",1],["A4",1],["A4",1],["G4",2],
+          ["F4",1],["F4",1],["E4",1],["E4",1],["D4",1],["D4",1],["C4",2]]},
+  {id:"butterfly", title:"나비야", sub:"동요 · 초급", icon:"🦋", diff:1, tempo:96,
+   notes:[["G4",1],["E4",1],["E4",2],["F4",1],["D4",1],["D4",2],
+          ["C4",1],["D4",1],["E4",1],["F4",1],["G4",1],["G4",1],["G4",2],
+          ["G4",1],["E4",1],["E4",1],["E4",1],["F4",1],["D4",1],["D4",1],["D4",1],
+          ["C4",1],["E4",1],["G4",1],["G4",1],["E4",1],["E4",1],["E4",2]]},
+  {id:"joy", title:"환희의 송가", sub:"베토벤 · 초급", icon:"🎼", diff:1, tempo:100,
+   notes:[["E4",1],["E4",1],["F4",1],["G4",1],["G4",1],["F4",1],["E4",1],["D4",1],
+          ["C4",1],["C4",1],["D4",1],["E4",1],["E4",1.5],["D4",0.5],["D4",2],
+          ["E4",1],["E4",1],["F4",1],["G4",1],["G4",1],["F4",1],["E4",1],["D4",1],
+          ["C4",1],["C4",1],["D4",1],["E4",1],["D4",1.5],["C4",0.5],["C4",2]]},
+  {id:"fasol", title:"파·솔 익히기", sub:"기초 연습", icon:"🎯", diff:0, tempo:80, ex:true,
+   notes:[["C4",1],["D4",1],["E4",1],["F4",1],["G4",2],["G4",1],["G4",1],
+          ["F4",1],["E4",1],["D4",1],["C4",2],["F4",1],["G4",1],["F4",1],
+          ["G4",1],["F4",1],["E4",1],["D4",1],["C4",4]]},
+  {id:"elise", title:"엘리제를 위하여", sub:"베토벤 · 중급", icon:"👑", diff:2, pro:true},
+  {id:"canon", title:"캐논 변주곡", sub:"파헬벨 · 중급", icon:"👑", diff:2, pro:true},
+];
+const byId = id => SONGS.find(s=>s.id===id);
+
+// 코스: 학습 경로 순서
+const COURSE = ["doremi","airplane","school","star","butterfly","fasol","joy"];
+
+/* ============================================================
+   저장/진행 상태
+   ============================================================ */
+const store = {
+  read(){ try{return JSON.parse(localStorage.getItem("piano-proto")||"{}")}catch(e){return{}} },
+  write(d){ try{localStorage.setItem("piano-proto",JSON.stringify(d))}catch(e){} },
+};
+const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:""}, store.read());
+const today = new Date().toISOString().slice(0,10);
+if(S.dayOf!==today){ S.dayOf=today; S.secToday=0; }
+const save = ()=>store.write(S);
+
+/* ============================================================
+   오디오 — 간단한 피아노 톤 (오실레이터 2개 + 감쇠)
+   ============================================================ */
+let AC=null;
+function audio(){
+  if(!AC){ AC = new (window.AudioContext||window.webkitAudioContext)(); }
+  if(AC.state==="suspended") AC.resume();
+  return AC;
+}
+function playNote(name){
+  try{
+    const ac=audio(), t=ac.currentTime, f=FREQ(name);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.5,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+1.4);
+    const lp=ac.createBiquadFilter();
+    lp.type="lowpass"; lp.frequency.value=Math.min(f*6,7000); lp.Q.value=0.4;
+    const o1=ac.createOscillator(); o1.type="triangle"; o1.frequency.value=f;
+    const o2=ac.createOscillator(); o2.type="sine"; o2.frequency.value=f*2;
+    const g2=ac.createGain(); g2.gain.value=0.25;
+    o1.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(ac.destination);
+    o1.start(t); o2.start(t);
+    o1.stop(t+1.5); o2.stop(t+1.5);
+  }catch(e){/* 오디오 미지원 환경에서도 앱은 동작 */}
+}
+
+/* ============================================================
+   건반 렌더링 (자유 연주·레슨 공용)
+   ============================================================ */
+function buildKb(el, onPress){
+  el.innerHTML="";
+  const W=100/WHITE.length;
+  WHITE.forEach((n,i)=>{
+    const k=document.createElement("div");
+    k.className="k wk"; k.dataset.note=n;
+    k.style.left=(i*W)+"%"; k.style.width=W+"%";
+    k.innerHTML=`<span>${SOL[n[0]]}</span>`;
+    el.appendChild(k);
+  });
+  BLACK.forEach(b=>{
+    const k=document.createElement("div");
+    k.className="k bk"; k.dataset.note=b.n;
+    k.style.left=((b.after+1)*W - W*0.32)+"%"; k.style.width=(W*0.64)+"%";
+    el.appendChild(k);
+  });
+  // 터치: 손가락이 닿은 위치의 건반이 그대로 눌린다 (멀티터치 지원)
+  const press=(k)=>{
+    if(!k||!k.dataset.note) return;
+    k.classList.add("press");
+    setTimeout(()=>k.classList.remove("press"),140);
+    playNote(k.dataset.note);
+    onPress&&onPress(k.dataset.note,k);
+  };
+  el.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    const t=document.elementFromPoint(e.clientX,e.clientY);
+    press(t&&t.closest? t.closest(".k"):null);
+  });
+  return {
+    keyOf:n=>el.querySelector(`.k[data-note="${n}"]`),
+    press,
+  };
+}
+
+/* ============================================================
+   화면 전환
+   ============================================================ */
+const $=s=>document.querySelector(s);
+const views=[...document.querySelectorAll(".view")];
+function show(id){
+  views.forEach(v=>v.classList.toggle("on",v.id===id));
+  [...document.querySelectorAll(".tab")].forEach(t=>t.classList.toggle("on",t.dataset.v===id));
+}
+$("#tabs").addEventListener("click",e=>{
+  const t=e.target.closest(".tab"); if(!t) return;
+  stopLesson();
+  show(t.dataset.v);
+});
+
+let toastTimer=null;
+function toast(msg){
+  const el=$("#toast"); el.textContent=msg; el.classList.add("on");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("on"),1900);
+}
+
+/* ============================================================
+   배우기 탭 — 학습 경로 + 일일 목표
+   ============================================================ */
+function starStr(n,max=3){ let s=""; for(let i=0;i<max;i++) s+= i<n?"★":"☆"; return s; }
+function renderPath(){
+  const path=$("#path"); path.innerHTML="";
+  const firstOpen = COURSE.findIndex(id=>!S.stars[id]);
+  COURSE.forEach((id,i)=>{
+    const song=byId(id);
+    const done=!!S.stars[id];
+    const now = i===(firstOpen===-1?COURSE.length-1:firstOpen) && !done;
+    const locked = firstOpen!==-1 && i>firstOpen;
+    const b=document.createElement("button");
+    b.className="node"+(done?" done":now?" now":locked?" lock":"");
+    b.dataset.song=id;
+    b.innerHTML=`
+      <div class="dot">${done?"✓":locked?"🔒":i+1}</div>
+      <div class="info">
+        <div class="name">${song.title}</div>
+        <div class="sub">${song.ex?"연습 · ":""}${song.notes.length}음 · 약 ${Math.round(song.notes.reduce((a,n)=>a+n[1],0)/song.tempo*60)}초</div>
+      </div>
+      ${done?`<div class="stars">${starStr(S.stars[id])}</div>`:now?`<div class="go">시작</div>`:""}
+    `;
+    path.appendChild(b);
+  });
+}
+$("#path").addEventListener("click",e=>{
+  const n=e.target.closest(".node"); if(!n) return;
+  if(n.classList.contains("lock")){ toast("이전 레슨을 먼저 완료하세요"); return; }
+  startLesson(n.dataset.song,{fromCourse:true});
+});
+document.querySelector("[data-locked-course]").addEventListener("click",()=>toast("피아노 기초 1을 먼저 완료하세요"));
+
+function renderGoal(){
+  const min=Math.floor(S.secToday/60);
+  const pct=Math.min(1,S.secToday/600);
+  $("#goalMin").textContent=min;
+  $("#goalPct").textContent=Math.round(pct*100)+"%";
+  $("#goalFg").style.strokeDashoffset=String(150.8*(1-pct));
+  $("#streak").textContent=S.streak;
+}
+
+/* ============================================================
+   곡 탭 — 검색 + 난이도 필터 + 프리미엄
+   ============================================================ */
+const DIFF=["입문","초급","중급"];
+let filter="all";
+function renderSongs(){
+  const q=($("#q").value||"").trim().toLowerCase();
+  const list=$("#slist"); list.innerHTML="";
+  SONGS.filter(s=>{
+    if(filter!=="all" && s.diff!==+filter) return false;
+    if(q && !(s.title+s.sub).toLowerCase().includes(q)) return false;
+    return true;
+  }).forEach(s=>{
+    const b=document.createElement("button");
+    b.className="srow"; b.dataset.song=s.id;
+    const stars=S.stars[s.id];
+    b.innerHTML=`
+      <div class="art">${s.icon}</div>
+      <div class="info">
+        <div class="name">${s.title}</div>
+        <div class="sub"><span class="badge d${s.diff}">${DIFF[s.diff]}</span>${s.pro?'<span class="badge pro">프리미엄</span>':""}<span>${s.sub}</span></div>
+      </div>
+      ${s.pro?'<div class="lockic">🔒</div>':stars?`<div class="stars">${starStr(stars)}</div>`:""}
+    `;
+    list.appendChild(b);
+  });
+  if(!list.children.length){
+    list.innerHTML=`<div style="text-align:center;color:var(--muted);font-size:13px;padding:30px 0">검색 결과가 없어요</div>`;
+  }
+}
+$("#q").addEventListener("input",renderSongs);
+$("#filters").addEventListener("click",e=>{
+  const c=e.target.closest(".fchip"); if(!c) return;
+  filter=c.dataset.f;
+  [...$("#filters").children].forEach(x=>x.classList.toggle("on",x===c));
+  renderSongs();
+});
+$("#slist").addEventListener("click",e=>{
+  const r=e.target.closest(".srow"); if(!r) return;
+  const s=byId(r.dataset.song);
+  if(s.pro){ $("#proSheet").classList.add("on"); return; }
+  startLesson(s.id,{fromCourse:false});
+});
+$("#proSheet").addEventListener("click",e=>{
+  if(e.target.closest("[data-close-sheet]")) $("#proSheet").classList.remove("on");
+});
+
+/* ============================================================
+   자유 연주 탭
+   ============================================================ */
+const freeKb=buildKb($("#freeKb"));
+$("#lblToggle").addEventListener("click",()=>{
+  const kb=$("#freeKb");
+  kb.classList.toggle("hide-lbl");
+  const on=!kb.classList.contains("hide-lbl");
+  const t=$("#lblToggle");
+  t.classList.toggle("on",on);
+  t.textContent="계이름 표시 "+(on?"켜짐":"꺼짐");
+});
+
+/* ============================================================
+   레슨 엔진 — 노트가 내려오고, 판정선에 닿으면 맞는 건반을
+   누를 때까지 기다린다 (심플리 피아노 연습 모드 방식)
+   ============================================================ */
+const PPB=88;          // 박자당 픽셀
+const GAP=5;           // 노트 사이 시각적 틈
+let L=null;            // 현재 레슨 상태
+let rafId=0, lastTs=0;
+
+const playKb=buildKb($("#playKb"),(note)=>onLessonPress(note));
+
+function laneMetrics(){
+  const lane=$("#lane");
+  const h=lane.clientHeight;
+  const hitY=h-16;
+  $("#hitline").style.top=hitY+"px";
+  $("#waitmsg").style.top=(hitY-46)+"px";
+  return {h,hitY};
+}
+function keyRect(note){
+  const k=playKb.keyOf(note);
+  return {left:parseFloat(k.style.left), width:parseFloat(k.style.width), black:k.classList.contains("bk")};
+}
+
+function startLesson(id,opt){
+  const song=byId(id);
+  if(!song||!song.notes) return;
+  stopLesson();
+  show("play");
+  $("#playTitle").textContent=song.title;
+  $("#playBar").style.width="0%";
+  $("#playAcc").textContent="100%";
+  $("#result").classList.remove("on");
+
+  // 그리드(흰건반 경계선)
+  const grid=$("#grid"); grid.innerHTML="";
+  for(let i=1;i<WHITE.length;i++){
+    const g=document.createElement("i");
+    g.style.left=(i*100/WHITE.length)+"%";
+    grid.appendChild(g);
+  }
+
+  // 노트 생성
+  const wrap=$("#notes"); wrap.innerHTML="";
+  let beat=0;
+  const notes=song.notes.map(([n,d],i)=>{
+    const el=document.createElement("div");
+    el.className="note";
+    const r=keyRect(n);
+    const inset=r.black?0.05:0.14;
+    el.style.left=(r.left+r.width*inset)+"%";
+    el.style.width=(r.width*(1-inset*2))+"%";
+    const h=Math.max(30,d*PPB-GAP);
+    el.style.height=h+"px";
+    el.textContent=SOL[n[0]];
+    const startPx=beat*PPB;
+    el.style.top=(-(startPx)-h)+"px";
+    wrap.appendChild(el);
+    beat+=d;
+    return {n,d,el,startPx,h,hit:false};
+  });
+
+  const m=laneMetrics();
+  L={
+    song, notes, opt:opt||{},
+    idx:0, hits:0, wrong:0,
+    scrollY:-m.h*0.92,          // 첫 노트가 위에서 내려올 시간
+    speed:song.tempo/60*PPB,    // px/초
+    waiting:false, done:false,
+    startAt:performance.now(), lastSec:performance.now(),
+    counting:true,
+  };
+  markNext();
+
+  // 3·2·1 카운트다운
+  const cnt=$("#count"); let c=3;
+  cnt.textContent=c; cnt.classList.add("on");
+  const tick=setInterval(()=>{
+    if(!L){ clearInterval(tick); cnt.classList.remove("on"); return; }
+    c--;
+    if(c<1){
+      clearInterval(tick); cnt.classList.remove("on");
+      L.counting=false; L.startAt=performance.now(); L.lastSec=performance.now();
+    } else cnt.textContent=c;
+  },650);
+
+  lastTs=0;
+  rafId=requestAnimationFrame(loop);
+}
+
+function markNext(){
+  L.notes.forEach((n,i)=>n.el.classList.toggle("next",i===L.idx&&!n.hit));
+  const k=$("#playKb").querySelector(".k.target");
+  if(k) k.classList.remove("target");
+}
+function setTargetKey(on){
+  const cur=$("#playKb").querySelector(".k.target");
+  if(cur) cur.classList.remove("target");
+  if(on&&L&&L.idx<L.notes.length){
+    playKb.keyOf(L.notes[L.idx].n).classList.add("target");
+  }
+  $("#waitmsg").classList.toggle("on",!!on);
+}
+
+function loop(ts){
+  if(!L) return;
+  if(!lastTs) lastTs=ts;
+  const dt=Math.min(0.05,(ts-lastTs)/1000); lastTs=ts;
+
+  if(!L.counting&&!L.done){
+    // 연습 시간 적립 (일일 목표)
+    if(ts-L.lastSec>=1000){ L.lastSec=ts; S.secToday++; if(S.secToday%10===0) save(); }
+
+    const cur=L.notes[L.idx];
+    if(cur && L.scrollY + L.speed*dt >= cur.startPx){
+      // 판정선 도달 → 맞는 건반을 누를 때까지 대기
+      L.scrollY=cur.startPx;
+      if(!L.waiting){ L.waiting=true; setTargetKey(true); }
+    } else {
+      L.scrollY+=L.speed*dt;
+    }
+    const m=laneMetrics();
+    $("#notes").style.transform=`translateY(${L.scrollY+m.hitY}px)`;
+  }
+  rafId=requestAnimationFrame(loop);
+}
+
+function accuracy(){
+  const total=L.hits+L.wrong;
+  return total?Math.round(L.hits/total*100):100;
+}
+function onLessonPress(note){
+  if(!L||L.done||L.counting) return;
+  const cur=L.notes[L.idx];
+  if(!cur) return;
+  const early = L.scrollY >= cur.startPx - PPB*0.45; // 살짝 이른 입력도 인정
+  if(note===cur.n && (L.waiting||early)){
+    cur.hit=true; cur.el.classList.add("hit");
+    L.hits++; L.idx++; L.waiting=false;
+    setTargetKey(false); markNext();
+    $("#playBar").style.width=(L.idx/L.notes.length*100)+"%";
+    if(L.idx>=L.notes.length) finishLesson();
+  } else if(L.waiting && note!==cur.n){
+    L.wrong++;
+    const k=playKb.keyOf(note);
+    if(k){ k.classList.add("wrong"); setTimeout(()=>k.classList.remove("wrong"),320); }
+    cur.el.classList.remove("shake"); void cur.el.offsetWidth; cur.el.classList.add("shake");
+  }
+  $("#playAcc").textContent=accuracy()+"%";
+}
+
+function finishLesson(){
+  L.done=true;
+  const acc=accuracy();
+  const stars=acc>=90?3:acc>=70?2:1;
+  const sec=Math.round((performance.now()-L.startAt)/1000);
+  const id=L.song.id;
+
+  // 진행 저장 + 스트릭
+  if(!S.stars[id]||S.stars[id]<stars) S.stars[id]=stars;
+  if(S.lastDay!==today){
+    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    S.streak=(S.lastDay===y)?S.streak+1:1;
+    S.lastDay=today;
+  }
+  save();
+
+  $("#rStars").innerHTML=[1,2,3].map(i=>`<span class="${i<=stars?"":"off"}">★</span>`).join("");
+  $("#rTitle").textContent=stars===3?"완벽해요!":stars===2?"잘했어요!":"레슨 완료!";
+  $("#rMsg").textContent=stars===3?"모든 음을 정확하게 연주했어요.":"다시 연습하면 별 3개를 받을 수 있어요.";
+  $("#rAcc").textContent=acc+"%";
+  $("#rNotes").textContent=L.notes.length;
+  $("#rTime").textContent=Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");
+
+  // 다음 레슨 버튼: 코스에서 왔고 다음 곡이 있을 때만
+  const ci=COURSE.indexOf(id);
+  const next=(L.opt.fromCourse&&ci>-1&&ci<COURSE.length-1)?COURSE[ci+1]:null;
+  $("#rNext").style.display=next?"":"none";
+  $("#rNext").dataset.song=next||"";
+
+  setTimeout(()=>$("#result").classList.add("on"),550);
+}
+
+function stopLesson(){
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId=0; L=null;
+  $("#result").classList.remove("on");
+  $("#waitmsg").classList.remove("on");
+  $("#count").classList.remove("on");
+}
+
+$("#playX").addEventListener("click",()=>{
+  const from=L&&L.opt.fromCourse;
+  stopLesson(); save();
+  renderPath(); renderGoal(); renderSongs();
+  show(from?"v-learn":"v-songs");
+});
+$("#rRetry").addEventListener("click",()=>{
+  const id=L.song.id, opt=L.opt;
+  startLesson(id,opt);
+});
+$("#rNext").addEventListener("click",e=>{
+  const n=e.currentTarget.dataset.song;
+  if(n) startLesson(n,{fromCourse:true});
+});
+$("#rDone").addEventListener("click",()=>{
+  const from=L&&L.opt.fromCourse;
+  stopLesson();
+  renderPath(); renderGoal(); renderSongs();
+  show(from?"v-learn":"v-songs");
+});
+
+/* ============================================================
+   초기 렌더
+   ============================================================ */
+renderPath(); renderGoal(); renderSongs();
+window.addEventListener("resize",()=>{ if(L) laneMetrics(); });
+
+// 프로토타입 검증용 훅 (헤드리스 테스트에서 사용)
+window.__piano={ get L(){return L}, startLesson, press:n=>{playNote(n);onLessonPress(n)}, SONGS, S };
+</script>
