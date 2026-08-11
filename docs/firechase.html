@@ -281,17 +281,20 @@
   const endOverlay = document.getElementById('end-overlay');
 
   // ── 상수 ────────────────────────────────────────────────
-  const GRAVITY   = 2100;
-  const BOUNCE    = -790;    // 기본 점프 (약 148px 상승)
-  const SPRING    = -1360;   // 스프링 발판
+  // 중력을 낮춰 체공 시간을 늘린다. 점프 높이(약 150px)는 그대로 두어
+  // 발판 도달 거리는 유지하면서 한 사이클이 0.75초 -> 1.0초로 느긋해진다.
+  const GRAVITY   = 1200;
+  const BOUNCE    = -600;    // 기본 점프 (약 150px 상승)
+  const SPRING    = -1030;   // 스프링 발판 (약 440px)
   const MOVE_SPD  = 430;
-  const MOVE_EASE = 12;
+  const MOVE_EASE = 14;
   const PLAYER_R  = 13;
   // 플레이어를 화면 위쪽에 두어 발밑 시야를 넓게 — 불길이 늘 보이게 하는 장치
-  const CAM_ANCHOR = 0.44;
+  const CAM_ANCHOR = 0.34;
   // 불길이 이보다 더 뒤처지지 않는다. 화면 아래쪽 여백(약 0.42H)보다 짧게 잡아
   // 아무리 잘 도망쳐도 불길이 늘 발밑에 보이도록 — 긴장감의 핵심
-  const LAVA_LEASH = 330;
+  const LAVA_LEASH = 440;
+  const LAVA_GRACE = 3;      // 시작 직후 이 시간 동안은 불길이 오르지 않는다
   const PX_PER_M  = 12;
 
   let W = 420, H = 620, dpr = 1;
@@ -300,7 +303,7 @@
   let camY, topSpawnY, lavaY, lavaShake;
   let bestM = 0, altM = 0, peakY = 0;
   let inputLeft = false, inputRight = false, targetX = null;
-  let heat = 0, beatT = 0;
+  let heat = 0, beatT = 0, runTime = 0;
 
   // ── 저장 ────────────────────────────────────────────────
   function loadBest() {
@@ -498,22 +501,22 @@
 
   // ── 발판 ────────────────────────────────────────────────
   // y는 위로 갈수록 작아진다 (캔버스와 같은 방향)
-  function platWidth(height) { return Math.max(52, 74 - height / 260); }
+  function platWidth(height) { return Math.max(80, 118 - height / 400); }
 
   function spawnPlatform(y) {
     const h = Math.max(0, -y / PX_PER_M);
     const w = platWidth(h);
     const roll = Math.random();
     let kind = 'solid';
-    if (h > 120) {
-      if (roll < 0.07) kind = 'spring';
-      else if (roll < 0.28) kind = 'fragile';
-      else if (roll < 0.48) kind = 'moving';
+    if (h > 250) {                       // 한참 오른 뒤에야 까다로운 발판이 섞인다
+      if (roll < 0.10) kind = 'spring';
+      else if (roll < 0.24) kind = 'fragile';
+      else if (roll < 0.38) kind = 'moving';
     }
     const p = {
       x: 20 + Math.random() * (W - 40 - w), y, w, kind,
       dir: Math.random() < .5 ? -1 : 1,
-      spd: 60 + Math.random() * 70 + Math.min(90, h / 12),
+      spd: 40 + Math.random() * 45 + Math.min(55, h / 18),
       broken: 0,
     };
     platforms.push(p);
@@ -523,7 +526,7 @@
   function fillPlatforms() {
     while (topSpawnY > camY - 260) {
       const h = Math.max(0, -topSpawnY / PX_PER_M);
-      const gap = 66 + Math.random() * 34 + Math.min(30, h / 90);
+      const gap = 42 + Math.random() * 20 + Math.min(14, h / 180);
       topSpawnY -= gap;
       spawnPlatform(topSpawnY);
     }
@@ -569,7 +572,7 @@
     camY = -H * (1 - CAM_ANCHOR);
     player = { x: W / 2, y: 0, py: 0, vx: 0, vy: -300, face: 1 };
     peakY = 0; altM = 0;
-    heat = 0; beatT = 0; lavaShake = 0;
+    heat = 0; beatT = 0; lavaShake = 0; runTime = 0;
     inputLeft = inputRight = false; targetX = null;
 
     // 시작 바닥은 화면 전체 폭 — 첫 착지를 보장해 시작하자마자 추락하는 일이 없도록
@@ -713,12 +716,15 @@
       nextMilestone++;
     }
 
-    // 불길 상승 — 높이 올라갈수록 빨라진다
-    const lavaSpd = 55 + Math.min(230, altM * 0.30);
-    lavaY -= lavaSpd * dt;
+    // 불길 상승 — 처음엔 느긋하고, 한참 오른 뒤부터 빨라진다
+    runTime += dt;
+    if (runTime > LAVA_GRACE) {
+      const lavaSpd = 34 + Math.min(130, Math.max(0, altM - 150) * 0.12);
+      lavaY -= lavaSpd * dt;
+    }
     // 너무 뒤처지면 따라붙는다
     const leash = player.y + LAVA_LEASH;
-    if (lavaY > leash) lavaY += (leash - lavaY) * Math.min(1, dt * 1.9);
+    if (lavaY > leash) lavaY += (leash - lavaY) * Math.min(1, dt * 1.2);
 
     // 위험도
     const lavaScreen = lavaY - camY;
@@ -838,7 +844,19 @@
 
   function drawLava() {
     const y = lavaY - camY;
-    if (y > H + 40) return;
+    // 불길이 화면 아래로 내려가 있어도 존재감은 남긴다 — 가까울수록 붉게 달아오른다
+    if (y > H) {
+      const near = Math.max(0, Math.min(1, 1 - (y - H) / 200));
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const g = ctx.createLinearGradient(0, H - 110, 0, H);
+      g.addColorStop(0, 'rgba(255,90,31,0)');
+      g.addColorStop(1, 'rgba(255,125,42,' + (0.18 + 0.5 * near).toFixed(3) + ')');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, H - 110, W, 110);
+      ctx.restore();
+      return;
+    }
     ctx.save();
     const top = y + Math.sin(performance.now() / 220) * 1.5;
 
