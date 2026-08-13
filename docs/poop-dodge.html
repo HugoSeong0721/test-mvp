@@ -52,7 +52,7 @@
   var PLAYER_H = 74;           // 졸라맨 키
   var PLAYER_HIT_R = 14;       // 충돌 반경(관대하게)
 
-  var player = { x: 0, targetX: 0, face: 1, walk: 0 };
+  var player = { x: 0, vx: 0, targetX: 0, face: 1, walk: 0 };
   var poops = [];              // 떨어지는 똥
   var splats = [];             // 바닥에 튄 자국
   var score = 0;               // 버틴 시간(초)
@@ -62,10 +62,12 @@
   var deathAnim = 0;           // 게임오버 연출 타이머
   var shake = 0;
   var spawnTimer = 0;
+  var burstLeft = 0;           // 이번 물결에서 남은 똥 개수
   var overAt = 0;              // 게임오버 시각(재시작 오터치 방지)
 
   function reset() {
     player.x = W / 2;
+    player.vx = 0;
     player.targetX = W / 2;
     player.face = 1;
     player.walk = 0;
@@ -75,12 +77,18 @@
     isNewBest = false;
     deathAnim = 0;
     shake = 0;
-    spawnTimer = 0;
+    spawnTimer = 0.8;
+    burstLeft = 0;
   }
 
   // ---------- 난이도 ----------
-  function fallSpeed() { return 150 + score * 6; }           // px/s, 시간 갈수록 빨라짐
-  function spawnInterval() { return Math.max(0.18, 0.62 - score * 0.007); }
+  // 중력: 떨어질수록 빨라진다 (천천- 하다가 훅 떨어지는 느낌)
+  function gravity() { return 290 + score * 6.5; }
+  function maxFall() { return 560 + score * 10; }
+  // 물결(burst) 리듬: 후두둑... 쉬고... 후두두두둑
+  function waveGap() { return Math.max(0.42, 1.18 - score * 0.01); }
+  function waveSize() { return 2 + Math.floor(score / 9) + Math.floor(Math.random() * 3); }
+  function burstGap() { return 0.06 + Math.random() * 0.1; }
 
   function spawnPoop() {
     var big = Math.random() < Math.min(0.2, 0.04 + score * 0.004);
@@ -91,9 +99,10 @@
     x = Math.max(16, Math.min(W - 16, x));
     poops.push({
       x: x,
-      y: -30,
+      y: -30 - Math.random() * 40,
       r: big ? 22 : 15,
-      spd: fallSpeed() * (0.85 + Math.random() * 0.35),
+      vy: 20 + Math.random() * 50,
+      g: gravity() * (0.85 + Math.random() * 0.3),
       wob: Math.random() * Math.PI * 2,
       spin: (Math.random() - 0.5) * 4
     });
@@ -157,25 +166,44 @@
 
     score += dt;
 
-    // 이동
-    var moveSpd = 420;
-    if (keys.left) player.targetX = player.x - moveSpd * dt * 1.5;
-    if (keys.right) player.targetX = player.x + moveSpd * dt * 1.5;
-    player.targetX = Math.max(18, Math.min(W - 18, player.targetX));
-
-    var dx = player.targetX - player.x;
-    var step = Math.sign(dx) * Math.min(Math.abs(dx), moveSpd * dt * 2.2);
-    player.x += step;
-    if (Math.abs(step) > 0.5) {
-      player.face = step > 0 ? 1 : -1;
-      player.walk += Math.abs(step) * 0.09;
+    // 이동: 관성 — 밀면 가속, 놓으면 미끄러지며 멈춘다
+    var ACCEL = 2600, MAXV = 560;
+    var input = 0;
+    if (keys.left) input -= 1;
+    if (keys.right) input += 1;
+    if (input !== 0) {
+      player.vx += input * ACCEL * dt;
+      player.targetX = player.x; // 키 조작 중엔 터치 목표 무시
+    } else if (dragging) {
+      // 손가락 따라가되 스프링처럼 미끄러지는 감속
+      var want = Math.max(-MAXV * 1.4, Math.min(MAXV * 1.4, (player.targetX - player.x) * 10));
+      player.vx += (want - player.vx) * Math.min(1, dt * 12);
+    } else {
+      // 입력 없음: 관성으로 주-욱 미끄러지다 멈춤
+      player.vx *= Math.exp(-dt * 3.2);
+    }
+    player.vx = Math.max(-MAXV * 1.4, Math.min(MAXV * 1.4, player.vx));
+    player.x += player.vx * dt;
+    if (player.x < 18) { player.x = 18; player.vx = 0; }
+    if (player.x > W - 18) { player.x = W - 18; player.vx = 0; }
+    if (Math.abs(player.vx) > 20) {
+      player.face = player.vx > 0 ? 1 : -1;
+      player.walk += Math.abs(player.vx * dt) * 0.09;
     }
 
-    // 똥 생성
+    // 똥 생성: 물결 리듬 (후두둑 쏟아지고 잠깐 쉼)
     spawnTimer -= dt;
     if (spawnTimer <= 0) {
-      spawnPoop();
-      spawnTimer = spawnInterval();
+      if (burstLeft > 0) {
+        spawnPoop();
+        burstLeft--;
+        spawnTimer = burstLeft > 0 ? burstGap() : waveGap();
+      } else {
+        burstLeft = waveSize();
+        spawnPoop();
+        burstLeft--;
+        spawnTimer = burstLeft > 0 ? burstGap() : waveGap();
+      }
     }
 
     // 똥 낙하 + 충돌
@@ -184,7 +212,8 @@
     var bodyY = groundY - PLAYER_H / 2;
     for (var i = poops.length - 1; i >= 0; i--) {
       var p = poops[i];
-      p.y += p.spd * dt;
+      p.vy = Math.min(p.vy + p.g * dt, maxFall());
+      p.y += p.vy * dt;
       p.wob += dt * 6;
 
       // 충돌: 머리/몸통 두 점과 원 거리
