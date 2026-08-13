@@ -137,6 +137,22 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 }
 .chip .fire{font-size:13px}
 .chip b{color:var(--text)}
+button.chip{font-size:15px;padding:6px 10px}
+
+/* ---- 안내 배너 (크래시 감지 등) ---- */
+.notice{
+  display:flex;align-items:center;gap:8px;
+  margin:0 16px 8px;padding:10px 12px;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  font-size:12px;color:var(--text-2);line-height:1.45;
+}
+.notice span{flex:1;min-width:0}
+.notice .nb{
+  flex-shrink:0;font-size:12px;font-weight:700;
+  padding:7px 11px;border-radius:999px;
+  background:var(--surface-2);color:var(--text);
+}
+.notice .nb.pri{background:var(--accent);color:var(--accent-ink)}
 
 /* ---- 뷰 공통 ---- */
 .views{flex:1;min-height:0;position:relative}
@@ -423,8 +439,15 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   <div class="hd">
     <div class="brand">피아노 레슨<small>Piano · Prototype</small></div>
     <div class="right">
+      <button class="chip" id="sndChip" aria-label="소리 켜기/끄기">🔊</button>
       <div class="chip"><span class="fire">🔥</span><b class="num" id="streak">0</b>일</div>
     </div>
+  </div>
+
+  <div class="notice" id="notice" hidden>
+    <span id="noticeText"></span>
+    <button class="nb pri" id="noticeBtn">소리 켜기</button>
+    <button class="nb" id="noticeX">닫기</button>
   </div>
 
   <div class="views">
@@ -632,10 +655,25 @@ const store = {
   read(){ try{return JSON.parse(localStorage.getItem("piano-proto")||"{}")}catch(e){return{}} },
   write(d){ try{localStorage.setItem("piano-proto",JSON.stringify(d))}catch(e){} },
 };
-const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:""}, store.read());
+const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:"", mute:false}, store.read());
 const today = new Date().toISOString().slice(0,10);
 if(S.dayOf!==today){ S.dayOf=today; S.secToday=0; }
 const save = ()=>store.write(S);
+
+/* ============================================================
+   크래시 감지 — 위험 구간에 들어가기 전 표시를 남기고, 무사히
+   지나가면 지운다. 표시가 남은 채 다시 열렸다면 그 구간에서
+   앱이 죽은 것이므로, 소리가 원인이면 무음 모드로 실행한다.
+   ============================================================ */
+const CR=(()=>{try{return JSON.parse(localStorage.getItem("piano-crash")||"{}")}catch(e){return{}}})();
+function saveCR(){try{localStorage.setItem("piano-crash",JSON.stringify(CR))}catch(e){}}
+let clearTimer=null;
+function markOp(op){ if(CR.pending!==op){ CR.pending=op; saveCR(); } }
+function clearOp(){ if(CR.pending){ CR.pending=""; saveCR(); } }
+function armClear(){ clearTimeout(clearTimer); clearTimer=setTimeout(clearOp,600); }
+// 사용자가 정상적으로 앱을 벗어나는 경우는 크래시가 아니다
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) clearOp(); });
+window.addEventListener("pagehide",clearOp);
 
 /* ============================================================
    오디오 — 간단한 피아노 톤 (오실레이터 2개 + 감쇠)
@@ -653,7 +691,12 @@ function audio(){
   return AC;
 }
 // 첫 터치(제스처)에서 미리 초기화해 둔다
-document.addEventListener("pointerdown",()=>{try{audio()}catch(e){}},{once:true});
+document.addEventListener("pointerdown",()=>{
+  if(S.mute) return;
+  markOp("audio");
+  try{audio()}catch(e){}
+  armClear();
+},{once:true});
 // 누르는 동안 지속되는 음 — 손을 떼면 부드럽게 잦아든다
 // 동시 발음 수를 제한해 오디오 노드 폭증(→ 사파리 탭 크래시)을 막는다
 const VOICES=[];
@@ -677,11 +720,13 @@ function startVoice(name){
     const v={stop(){
       if(stopped) return; stopped=true;
       const i=VOICES.indexOf(v); if(i>-1) VOICES.splice(i,1);
-      const t2=ac.currentTime;
-      g.gain.cancelScheduledValues(t2);
-      g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t2);
-      g.gain.exponentialRampToValueAtTime(0.0001,t2+0.28);
-      o1.stop(t2+0.32); o2.stop(t2+0.32);
+      try{
+        const t2=ac.currentTime;
+        g.gain.cancelScheduledValues(t2);
+        g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t2);
+        g.gain.exponentialRampToValueAtTime(0.0001,t2+0.28);
+        o1.stop(t2+0.32); o2.stop(t2+0.32);
+      }catch(e){}
     }};
     VOICES.push(v);
     while(VOICES.length>MAX_VOICES) VOICES[0].stop(); // 가장 오래된 음부터 정리
@@ -718,10 +763,14 @@ function buildKb(el, onPress, onRelease){
   function press(k,pid){
     if(!k||!k.dataset.note) return;
     const n=k.dataset.note;
-    byPointer.set(pid,{k,voice:startVoice(n),t:performance.now()});
+    markOp("audio"); // 이 표시가 남은 채 죽으면 소리 재생이 원인
+    const voice=S.mute?{stop(){}}:startVoice(n);
+    markOp("logic"); // 이 표시가 남으면 이후 처리(판정·화면)가 원인
+    byPointer.set(pid,{k,voice,t:performance.now()});
     heldCount.set(n,(heldCount.get(n)||0)+1);
     k.classList.add("press");
     onPress&&onPress(n,k);
+    armClear();
   }
   function release(pid){
     const h=byPointer.get(pid);
@@ -740,7 +789,6 @@ function buildKb(el, onPress, onRelease){
   };
   el.addEventListener("pointerdown",e=>{
     e.preventDefault();
-    try{el.setPointerCapture(e.pointerId)}catch(_){}
     press(keyAt(e),e.pointerId);
   });
   el.addEventListener("pointermove",e=>{
@@ -751,9 +799,10 @@ function buildKb(el, onPress, onRelease){
     const k=keyAt(e);
     if(k&&k!==h.k){ release(e.pointerId); press(k,e.pointerId); } // 손가락 위치를 따라간다
   });
+  // 손을 떼는 이벤트는 window에서 받는다 (건반 밖에서 떼도 확실히 놓이도록)
   const up=e=>release(e.pointerId);
-  el.addEventListener("pointerup",up);
-  el.addEventListener("pointercancel",up);
+  window.addEventListener("pointerup",up);
+  window.addEventListener("pointercancel",up);
   el.addEventListener("contextmenu",e=>e.preventDefault());
   // iOS: 스크롤·엣지 스와이프·확대 등 브라우저 기본 동작을 건반 위에서는 전부 차단
   el.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
@@ -1140,6 +1189,30 @@ $("#rDone").addEventListener("click",()=>{
    ============================================================ */
 renderPath(); renderGoal(); renderSongs();
 window.addEventListener("resize",()=>{ if(L) laneMetrics(); });
+
+/* ---- 소리 토글 + 크래시 감지 결과 처리 ---- */
+function updateSnd(){ $("#sndChip").textContent=S.mute?"🔇":"🔊"; }
+$("#sndChip").addEventListener("click",()=>{
+  S.mute=!S.mute; save(); updateSnd();
+  if(!S.mute){ try{audio()}catch(e){} }
+  toast(S.mute?"소리를 껐어요":"소리를 켰어요");
+});
+if(CR.pending){
+  const wasAudio=CR.pending==="audio";
+  CR.pending=""; CR.count=(CR.count||0)+1; saveCR();
+  if(wasAudio){ S.mute=true; save(); }
+  $("#noticeText").textContent=wasAudio
+    ? "지난번 소리 재생 중 앱이 종료된 흔적이 있어서, 소리를 끄고 실행해요."
+    : "지난번 터치 처리 중 앱이 종료된 흔적이 있어요. 문제가 계속되면 알려주세요.";
+  $("#noticeBtn").hidden=!wasAudio;
+  $("#notice").hidden=false;
+}
+$("#noticeBtn").addEventListener("click",()=>{
+  S.mute=false; save(); updateSnd();
+  $("#notice").hidden=true; toast("소리를 다시 켰어요");
+});
+$("#noticeX").addEventListener("click",()=>$("#notice").hidden=true);
+updateSnd();
 
 // iOS 사파리 확대 방지: 핀치(gesture)와 스케일 변화 동반 터치무브를 막는다
 document.addEventListener("gesturestart",e=>e.preventDefault());
