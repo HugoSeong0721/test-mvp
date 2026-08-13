@@ -90,11 +90,13 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 /* 인앱 브라우저(시트)에서 아래로 끌기가 '창 닫기'로 먹히는 것 방지:
-   문서를 2px만 스크롤 가능하게 만들고 JS에서 스크롤을 1px에 고정한다.
-   스크롤 여지가 있으면 아래로 끌기가 시트 닫기 대신 스크롤로 소비된다. */
+   앱은 position:fixed 레이어로 화면에 고정하고, 문서에는 보이지 않는
+   240px짜리 스크롤 완충지대를 깔아 스크롤을 120px 지점에 걸어 둔다.
+   손가락이 아래로 쓸리면 시트 닫기 대신 이 완충지대가 스크롤로 소비한다.
+   (여유가 1~2px면 iOS가 바닥에 닿는 순간 끌기를 이어받아 소용없다) */
 html{height:100%;overflow:auto;overscroll-behavior:none;scrollbar-width:none}
 html::-webkit-scrollbar{display:none}
-body{height:calc(100% + 2px);overflow:hidden;overscroll-behavior:none}
+body{height:calc(100% + 240px);overflow:hidden;overscroll-behavior:none}
 body{
   background:var(--page-bg);
   background-image:radial-gradient(90rem 60rem at 50% -20rem, var(--accent-soft), transparent 60%);
@@ -116,12 +118,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 .num{font-variant-numeric:tabular-nums}
 
 /* ---- 폰 프레임 ---- */
+/* 문서 스크롤(완충지대)과 무관하게 화면에 붙어 있도록 고정 레이어로 */
 .phone{
   width:min(420px,100vw);
   height:100dvh;
   background:var(--app-bg);
   display:flex;flex-direction:column;
-  overflow:hidden;position:relative;
+  overflow:hidden;
+  position:fixed;inset:0;margin:auto;
 }
 @media (min-width:481px) and (min-height:760px){
   .phone{
@@ -167,7 +171,7 @@ button.chip{font-size:15px;padding:6px 10px}
 .views{flex:1;min-height:0;position:relative}
 .view{position:absolute;inset:0;display:none;flex-direction:column;min-height:0}
 .view.on{display:flex}
-.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px;overscroll-behavior:contain}
 .eyebrow{
   font-size:10.5px;font-weight:700;color:var(--muted);
   letter-spacing:.13em;text-transform:uppercase;
@@ -1215,6 +1219,14 @@ if(CR.pending){
     : "지난번 터치 처리 중 앱이 종료된 흔적이 있어요. 문제가 계속되면 알려주세요.";
   $("#noticeBtn").hidden=!wasAudio;
   $("#notice").hidden=false;
+} else if(CR.hide){
+  const dy=CR.hide.dy;
+  CR.hide=null; saveCR();
+  $("#noticeText").textContent = dy>8
+    ? `진단: 직전에 창이 닫힐 때 터치가 아래로 ${dy}px 쓸렸어요 — 시트 끌어내리기가 맞아요.`
+    : `진단: 직전에 창이 닫힐 때 터치 이동은 ${dy}px뿐이었어요 — 끌기 없이 닫혔어요.`;
+  $("#noticeBtn").hidden=true;
+  $("#notice").hidden=false;
 }
 $("#noticeBtn").addEventListener("click",()=>{
   S.mute=false; save(); updateSnd();
@@ -1234,18 +1246,40 @@ document.addEventListener("dblclick",e=>e.preventDefault());
 ["touchstart","touchmove"].forEach(ev=>
   $("#lane").addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 
-// 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 항상 1px에 고정
-// (0이면 아래로 끌기가 시트 닫기 제스처로 넘어간다)
+// 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 완충지대 중간(120px)에 걸어 둔다.
+// 손가락이 쓸려도 120px을 다 소모하기 전엔 시트 끌기로 넘어가지 않는다.
+// 제스처 도중에는 건드리지 않고, 새 터치 시작 시와 스크롤이 잠잠해진 뒤 다시 건다.
 const SE=document.scrollingElement||document.documentElement;
+const PIN=120;
+let pinT=null;
 function pinScroll(){
   const max=SE.scrollHeight-SE.clientHeight;
   if(max<=0) return;
-  if(SE.scrollTop<1) SE.scrollTop=1;
-  else if(SE.scrollTop>max-1) SE.scrollTop=Math.max(1,max-1);
+  SE.scrollTop=Math.min(PIN,Math.max(1,max-1));
 }
-window.addEventListener("scroll",pinScroll,{passive:true});
 document.addEventListener("touchstart",pinScroll,{passive:true});
+window.addEventListener("scroll",()=>{
+  clearTimeout(pinT); pinT=setTimeout(pinScroll,250);
+},{passive:true});
 pinScroll();
+
+// 창이 닫히기 직전의 터치 움직임을 기록해 다음에 열 때 진단으로 보여준다
+let lastTouch={t:0,y0:0,y1:0};
+document.addEventListener("touchstart",e=>{
+  const t=e.touches[0];
+  if(t) lastTouch={t:Date.now(),y0:t.clientY,y1:t.clientY};
+},{passive:true});
+document.addEventListener("touchmove",e=>{
+  const t=e.touches[0];
+  if(t) lastTouch.y1=t.clientY;
+},{passive:true});
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden) return;
+  if(Date.now()-lastTouch.t<3000){
+    CR.hide={dy:Math.round(lastTouch.y1-lastTouch.y0)};
+    saveCR();
+  }
+});
 
 // 프로토타입 검증용 훅 (헤드리스 테스트에서 사용)
 window.__piano={ get L(){return L}, startLesson, SONGS, S };
