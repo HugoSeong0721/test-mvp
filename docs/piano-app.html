@@ -107,9 +107,11 @@ body{
   user-select:none;-webkit-user-select:none;
   -webkit-touch-callout:none;
 }
-/* iOS 더블탭 확대 방지: 모든 요소에 걸고, 건반·레인은 완전 차단 */
+/* iOS 더블탭 확대 방지. 건반·레인은 세로 팬만 허용(pan-y):
+   세로로 쓸리는 손가락을 '막으면' iOS가 그 끌기를 시트 닫기로 가져가 버린다.
+   대신 문서의 완충지대 스크롤로 소비되게 흘려보낸다 (앱 화면은 고정이라 안 움직임). */
 .phone,.phone *{touch-action:manipulation}
-.kb,.kb *,.lane,.lane *{touch-action:none}
+.kb,.kb *,.lane,.lane *{touch-action:pan-y}
 button{
   font:inherit;color:inherit;background:none;border:none;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -164,8 +166,10 @@ button.chip{font-size:15px;padding:6px 10px}
   flex-shrink:0;font-size:12px;font-weight:700;
   padding:7px 11px;border-radius:999px;
   background:var(--surface-2);color:var(--text);
+  text-decoration:none;
 }
 .notice .nb.pri{background:var(--accent);color:var(--accent-ink)}
+.notice .nb[hidden]{display:none}
 
 /* ---- 뷰 공통 ---- */
 .views{flex:1;min-height:0;position:relative}
@@ -460,6 +464,7 @@ button.chip{font-size:15px;padding:6px 10px}
   <div class="notice" id="notice" hidden>
     <span id="noticeText"></span>
     <button class="nb pri" id="noticeBtn">소리 켜기</button>
+    <a class="nb pri" id="noticeLink" hidden href="x-safari-https://hugoseong0721.github.io/test-mvp/piano-app.html">Safari로 열기</a>
     <button class="nb" id="noticeX">닫기</button>
   </div>
 
@@ -668,7 +673,7 @@ const store = {
   read(){ try{return JSON.parse(localStorage.getItem("piano-proto")||"{}")}catch(e){return{}} },
   write(d){ try{localStorage.setItem("piano-proto",JSON.stringify(d))}catch(e){} },
 };
-const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:"", mute:false}, store.read());
+const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:"", mute:false, safariTip:false}, store.read());
 const today = new Date().toISOString().slice(0,10);
 if(S.dayOf!==today){ S.dayOf=today; S.secToday=0; }
 const save = ()=>store.write(S);
@@ -813,13 +818,14 @@ function buildKb(el, onPress, onRelease){
     if(k&&k!==h.k){ release(e.pointerId); press(k,e.pointerId); } // 손가락 위치를 따라간다
   });
   // 손을 떼는 이벤트는 window에서 받는다 (건반 밖에서 떼도 확실히 놓이도록)
-  const up=e=>release(e.pointerId);
+  // 브라우저가 스크롤을 가져가며 취소(pointercancel)한 경우는 감점하지 않도록 기록
+  const up=e=>{
+    if(e.type==="pointercancel") lastCancel=performance.now();
+    release(e.pointerId);
+  };
   window.addEventListener("pointerup",up);
   window.addEventListener("pointercancel",up);
   el.addEventListener("contextmenu",e=>e.preventDefault());
-  // iOS: 스크롤·엣지 스와이프·확대 등 브라우저 기본 동작을 건반 위에서는 전부 차단
-  el.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
-  el.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
   return {
     keyOf:n=>el.querySelector(`.k[data-note="${n}"]`),
     held,
@@ -958,6 +964,7 @@ const PPB=88;          // 박자당 픽셀
 const GAP=5;           // 노트 사이 시각적 틈
 let L=null;            // 현재 레슨 상태
 let rafId=0, lastTs=0;
+let lastCancel=-1e9;   // 브라우저가 터치를 스크롤로 가져간 시각 (감점 면제용)
 
 const playKb=buildKb($("#playKb"),(note)=>onLessonPress(note));
 
@@ -1077,6 +1084,8 @@ function loop(ts){
         // 노트가 끝나기 전에 손을 뗐다 → 멈추고 다시 누를 때까지 대기
         L.holding=false; L.waiting=true;
         cur.el.classList.remove("active");
+        // 사용자가 뗀 게 아니라 브라우저가 스크롤로 가져간 경우는 감점하지 않는다
+        if(performance.now()-lastCancel<300) cur.penalized=true;
         if(!cur.penalized){
           cur.penalized=true; L.wrong++;
           $("#playAcc").textContent=accuracy()+"%";
@@ -1227,12 +1236,21 @@ if(CR.pending){
     : `진단: 직전에 창이 닫힐 때 터치 이동은 ${dy}px뿐이었어요 — 끌기 없이 닫혔어요.`;
   $("#noticeBtn").hidden=true;
   $("#notice").hidden=false;
+} else if(!S.safariTip && /iPhone|iPad/.test(navigator.userAgent)){
+  // 인앱 브라우저(시트)에서 창이 닫히는 문제의 확실한 탈출구
+  $("#noticeText").textContent="창이 자꾸 닫히면 인앱 브라우저 때문이에요. Safari로 열면 안 닫혀요.";
+  $("#noticeBtn").hidden=true;
+  $("#noticeLink").hidden=false;
+  $("#notice").hidden=false;
 }
 $("#noticeBtn").addEventListener("click",()=>{
   S.mute=false; save(); updateSnd();
   $("#notice").hidden=true; toast("소리를 다시 켰어요");
 });
-$("#noticeX").addEventListener("click",()=>$("#notice").hidden=true);
+$("#noticeX").addEventListener("click",()=>{
+  $("#notice").hidden=true;
+  if(!$("#noticeLink").hidden){ S.safariTip=true; save(); } // Safari 안내는 한 번만
+});
 updateSnd();
 
 // iOS 사파리 확대 방지: 핀치(gesture)와 스케일 변화 동반 터치무브를 막는다
@@ -1242,9 +1260,6 @@ document.addEventListener("touchmove",e=>{
   if(e.scale!==undefined && e.scale!==1) e.preventDefault();
 },{passive:false});
 document.addEventListener("dblclick",e=>e.preventDefault());
-// 노트 레인 위에서도 브라우저 기본 터치 동작 차단
-["touchstart","touchmove"].forEach(ev=>
-  $("#lane").addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 
 // 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 완충지대 중간(120px)에 걸어 둔다.
 // 손가락이 쓸려도 120px을 다 소모하기 전엔 시트 끌기로 넘어가지 않는다.
