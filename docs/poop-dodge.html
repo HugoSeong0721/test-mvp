@@ -122,17 +122,24 @@
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
   });
 
-  // 터치: 손가락 x좌표를 그대로 따라간다 (누른 채 유지 X, 탭 위치 추적 O)
+  // 터치: 드래그 상대 이동 — 손가락이 움직인 만큼만 1:1로 따라간다
+  // (탭 위치로 순간이동하지 않음. 화면 아무 데나 잡고 끌면 됨)
+  var dragLastX = 0;
   function pointerDown(x) {
     if (state === STATE_PLAY) {
       dragging = true;
-      player.targetX = x;
+      dragLastX = x;
+      player.targetX = player.x;
     } else {
       tryStart();
     }
   }
   function pointerMove(x) {
-    if (dragging && state === STATE_PLAY) player.targetX = x;
+    if (dragging && state === STATE_PLAY) {
+      // 델타 누적: 벽에서 클램프돼도 반대로 끌면 즉시 반응
+      player.targetX = Math.max(18, Math.min(W - 18, player.targetX + (x - dragLastX)));
+      dragLastX = x;
+    }
   }
   function pointerUp() { dragging = false; }
 
