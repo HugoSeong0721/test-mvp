@@ -35,6 +35,8 @@
   function resize() {
     W = window.innerWidth;
     H = window.innerHeight;
+    // 땅을 넉넉히 올려서 손가락이 캐릭터를 가리지 않게 한다
+    GROUND_H = Math.max(90, Math.round(H * 0.18));
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     canvas.style.width = W + 'px';
@@ -48,7 +50,7 @@
   var STATE_TITLE = 0, STATE_PLAY = 1, STATE_OVER = 2;
   var state = STATE_TITLE;
 
-  var GROUND_H = 64;           // 바닥 높이
+  var GROUND_H;                // 바닥 높이 (resize에서 화면 비율로 계산)
   var PLAYER_H = 74;           // 졸라맨 키
   var PLAYER_HIT_R = 14;       // 충돌 반경(관대하게)
 
