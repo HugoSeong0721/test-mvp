@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>똥피하기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #f5efe0;
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  }
+  #game {
+    display: block;
+    width: 100%; height: 100%;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('game');
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    // 땅을 넉넉히 올려서 손가락이 캐릭터를 가리지 않게 한다
+    GROUND_H = Math.max(90, Math.round(H * 0.18));
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ---------- 상태 ----------
+  var STATE_TITLE = 0, STATE_PLAY = 1, STATE_OVER = 2;
+  var state = STATE_TITLE;
+
+  var GROUND_H;                // 바닥 높이 (resize에서 화면 비율로 계산)
+  var PLAYER_H = 74;           // 졸라맨 키
+  var PLAYER_HIT_R = 14;       // 충돌 반경(관대하게)
+
+  var player = { x: 0, vx: 0, targetX: 0, face: 1, walk: 0 };
+  var poops = [];              // 떨어지는 똥
+  var splats = [];             // 바닥에 튄 자국
+  var score = 0;               // 버틴 시간(초)
+  var best = 0;
+  try { best = parseFloat(localStorage.getItem('poopDodgeBest') || '0') || 0; } catch (e) {}
+  var isNewBest = false;
+  var deathAnim = 0;           // 게임오버 연출 타이머
+  var shake = 0;
+  var spawnTimer = 0;
+  var burstLeft = 0;           // 이번 물결에서 남은 똥 개수
+  var overAt = 0;              // 게임오버 시각(재시작 오터치 방지)
+
+  function reset() {
+    player.x = W / 2;
+    player.vx = 0;
+    player.targetX = W / 2;
+    player.face = 1;
+    player.walk = 0;
+    poops = [];
+    splats = [];
+    score = 0;
+    isNewBest = false;
+    deathAnim = 0;
+    shake = 0;
+    spawnTimer = 0.8;
+    burstLeft = 0;
+  }
+
+  // ---------- 난이도 ----------
+  // 중력: 떨어질수록 빨라진다 (천천- 하다가 훅 떨어지는 느낌)
+  function gravity() { return 290 + score * 6.5; }
+  function maxFall() { return 560 + score * 10; }
+  // 물결(burst) 리듬: 후두둑... 쉬고... 후두두두둑
+  function waveGap() { return Math.max(0.42, 1.18 - score * 0.01); }
+  function waveSize() { return 2 + Math.floor(score / 9) + Math.floor(Math.random() * 3); }
+  function burstGap() { return 0.06 + Math.random() * 0.1; }
+
+  function spawnPoop() {
+    var big = Math.random() < Math.min(0.2, 0.04 + score * 0.004);
+    var aimed = Math.random() < 0.25; // 일부는 플레이어 머리 위로 조준
+    var x = aimed
+      ? player.x + (Math.random() * 120 - 60)
+      : Math.random() * (W - 40) + 20;
+    x = Math.max(16, Math.min(W - 16, x));
+    poops.push({
+      x: x,
+      y: -30 - Math.random() * 40,
+      r: big ? 22 : 15,
+      vy: 20 + Math.random() * 50,
+      g: gravity() * (0.85 + Math.random() * 0.3),
+      wob: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 4
+    });
+  }
+
+  // ---------- 조작 ----------
+  var keys = { left: false, right: false };
+  var dragging = false;
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+    if (state !== STATE_PLAY && (e.key === ' ' || e.key === 'Enter' || e.key.indexOf('Arrow') === 0)) tryStart();
+  });
+  document.addEventListener('keyup', function (e) {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+  });
+
+  // 터치: 드래그 상대 이동 — 손가락이 움직인 만큼만 1:1로 따라간다
+  // (탭 위치로 순간이동하지 않음. 화면 아무 데나 잡고 끌면 됨)
+  var dragLastX = 0;
+  function pointerDown(x) {
+    if (state === STATE_PLAY) {
+      dragging = true;
+      dragLastX = x;
+      player.targetX = player.x;
+    } else {
+      tryStart();
+    }
+  }
+  function pointerMove(x) {
+    if (dragging && state === STATE_PLAY) {
+      // 델타 누적: 벽에서 클램프돼도 반대로 끌면 즉시 반응
+      player.targetX = Math.max(18, Math.min(W - 18, player.targetX + (x - dragLastX)));
+      dragLastX = x;
+    }
+  }
+  function pointerUp() { dragging = false; }
+
+  canvas.addEventListener('touchstart', function (e) {
+    e.preventDefault();
+    pointerDown(e.touches[0].clientX);
+  }, { passive: false });
+  canvas.addEventListener('touchmove', function (e) {
+    e.preventDefault();
+    pointerMove(e.touches[0].clientX);
+  }, { passive: false });
+  canvas.addEventListener('touchend', function (e) { e.preventDefault(); pointerUp(); }, { passive: false });
+  canvas.addEventListener('touchcancel', function () { pointerUp(); });
+
+  canvas.addEventListener('mousedown', function (e) { pointerDown(e.clientX); });
+  canvas.addEventListener('mousemove', function (e) { pointerMove(e.clientX); });
+  canvas.addEventListener('mouseup', pointerUp);
+
+  function tryStart() {
+    if (state === STATE_OVER && performance.now() - overAt < 600) return; // 오터치 방지
+    reset();
+    state = STATE_PLAY;
+  }
+
+  // ---------- 업데이트 ----------
+  function update(dt) {
+    if (state !== STATE_PLAY) {
+      if (state === STATE_OVER) deathAnim += dt;
+      return;
+    }
+
+    score += dt;
+
+    // 이동: 관성 — 밀면 가속, 놓으면 미끄러지며 멈춘다
+    var ACCEL = 2600, MAXV = 560;
+    var input = 0;
+    if (keys.left) input -= 1;
+    if (keys.right) input += 1;
+    if (input !== 0) {
+      player.vx += input * ACCEL * dt;
+      player.targetX = player.x; // 키 조작 중엔 터치 목표 무시
+    } else if (dragging) {
+      // 손가락 따라가되 스프링처럼 미끄러지는 감속
+      var want = Math.max(-MAXV * 1.4, Math.min(MAXV * 1.4, (player.targetX - player.x) * 10));
+      player.vx += (want - player.vx) * Math.min(1, dt * 12);
+    } else {
+      // 입력 없음: 관성으로 주-욱 미끄러지다 멈춤
+      player.vx *= Math.exp(-dt * 3.2);
+    }
+    player.vx = Math.max(-MAXV * 1.4, Math.min(MAXV * 1.4, player.vx));
+    player.x += player.vx * dt;
+    if (player.x < 18) { player.x = 18; player.vx = 0; }
+    if (player.x > W - 18) { player.x = W - 18; player.vx = 0; }
+    if (Math.abs(player.vx) > 20) {
+      player.face = player.vx > 0 ? 1 : -1;
+      player.walk += Math.abs(player.vx * dt) * 0.09;
+    }
+
+    // 똥 생성: 물결 리듬 (후두둑 쏟아지고 잠깐 쉼)
+    spawnTimer -= dt;
+    if (spawnTimer <= 0) {
+      if (burstLeft > 0) {
+        spawnPoop();
+        burstLeft--;
+        spawnTimer = burstLeft > 0 ? burstGap() : waveGap();
+      } else {
+        burstLeft = waveSize();
+        spawnPoop();
+        burstLeft--;
+        spawnTimer = burstLeft > 0 ? burstGap() : waveGap();
+      }
+    }
+
+    // 똥 낙하 + 충돌
+    var groundY = H - GROUND_H;
+    var headY = groundY - PLAYER_H + 12; // 머리 중심
+    var bodyY = groundY - PLAYER_H / 2;
+    for (var i = poops.length - 1; i >= 0; i--) {
+      var p = poops[i];
+      p.vy = Math.min(p.vy + p.g * dt, maxFall());
+      p.y += p.vy * dt;
+      p.wob += dt * 6;
+
+      // 충돌: 머리/몸통 두 점과 원 거리
+      var hit =
+        dist2(p.x, p.y, player.x, headY) < sq(p.r + PLAYER_HIT_R) ||
+        dist2(p.x, p.y, player.x, bodyY) < sq(p.r + PLAYER_HIT_R - 3);
+      if (hit) {
+        gameOver();
+        return;
+      }
+
+      if (p.y > groundY - 4) {
+        splats.push({ x: p.x, y: groundY + Math.random() * 30 + 4, r: p.r, t: 0 });
+        if (splats.length > 40) splats.shift();
+        poops.splice(i, 1);
+      }
+    }
+    for (var s = 0; s < splats.length; s++) splats[s].t += dt;
+
+    if (shake > 0) shake = Math.max(0, shake - dt * 30);
+  }
+
+  function dist2(ax, ay, bx, by) { var dx = ax - bx, dy = ay - by; return dx * dx + dy * dy; }
+  function sq(v) { return v * v; }
+
+  function gameOver() {
+    state = STATE_OVER;
+    overAt = performance.now();
+    deathAnim = 0;
+    shake = 12;
+    if (score > best) {
+      best = score;
+      isNewBest = true;
+      try { localStorage.setItem('poopDodgeBest', String(best)); } catch (e) {}
+    }
+  }
+
+  // ---------- 그리기 ----------
+  function drawPoop(x, y, r, wob) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(wob) * 0.15);
+    ctx.fillStyle = '#7a4a21';
+    // 3단 소프트 아이스크림 모양
+    blob(0, r * 0.45, r, r * 0.55);
+    blob(0, 0, r * 0.78, r * 0.5);
+    blob(0, -r * 0.42, r * 0.52, r * 0.42);
+    // 꼭지
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.18, -r * 0.72);
+    ctx.quadraticCurveTo(r * 0.05, -r * 1.15, r * 0.3, -r * 0.6);
+    ctx.fill();
+    // 하이라이트
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.3, -r * 0.1, r * 0.2, r * 0.32, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    // 눈 (귀엽게)
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-r * 0.25, r * 0.05, r * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r * 0.25, r * 0.05, r * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2b1a0c';
+    ctx.beginPath(); ctx.arc(-r * 0.22, r * 0.08, r * 0.07, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r * 0.28, r * 0.08, r * 0.07, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  function blob(cx, cy, rx, ry) {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawStickman(x, groundY, dead) {
+    var h = PLAYER_H;
+    var headR = 13;
+    var hipY = groundY - h * 0.42;
+    var neckY = groundY - h + headR * 2 + 4;
+    var headCY = groundY - h + headR;
+    var swing = dead ? 0 : Math.sin(player.walk);
+
+    ctx.save();
+    ctx.translate(x, 0);
+    if (dead) {
+      // 뻗은 연출: 옆으로 기울어짐
+      ctx.translate(0, groundY);
+      ctx.rotate(Math.min(deathAnim * 3, Math.PI / 2) * (player.face >= 0 ? 1 : -1));
+      ctx.translate(0, -groundY);
+    }
+
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+
+    // 다리
+    ctx.beginPath();
+    ctx.moveTo(0, hipY);
+    ctx.lineTo(-8 - swing * 6, groundY);
+    ctx.moveTo(0, hipY);
+    ctx.lineTo(8 + swing * 6, groundY);
+    ctx.stroke();
+    // 몸통
+    ctx.beginPath();
+    ctx.moveTo(0, hipY);
+    ctx.lineTo(0, neckY);
+    ctx.stroke();
+    // 팔 (달릴 때 흔들, 죽으면 만세)
+    ctx.beginPath();
+    if (dead) {
+      ctx.moveTo(0, neckY + 6); ctx.lineTo(-14, neckY - 12);
+      ctx.moveTo(0, neckY + 6); ctx.lineTo(14, neckY - 12);
+    } else {
+      ctx.moveTo(0, neckY + 6); ctx.lineTo(-12 + swing * 5, neckY + 22);
+      ctx.moveTo(0, neckY + 6); ctx.lineTo(12 - swing * 5, neckY + 22);
+    }
+    ctx.stroke();
+    // 머리
+    ctx.beginPath();
+    ctx.arc(0, headCY, headR, 0, Math.PI * 2);
+    ctx.fillStyle = '#f5efe0';
+    ctx.fill();
+    ctx.stroke();
+    // 얼굴
+    if (dead) {
+      // X X 눈
+      ctx.lineWidth = 2;
+      xEye(-5, headCY - 2); xEye(5, headCY - 2);
+      ctx.beginPath();
+      ctx.arc(0, headCY + 6, 3, 0, Math.PI * 2);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(player.face * 4 - 3, headCY - 3, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(player.face * 4 + 3, headCY - 3, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(player.face * 3, headCY + 3, 4, 0.15 * Math.PI, 0.85 * Math.PI);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function xEye(ox, oy) {
+    ctx.beginPath();
+    ctx.moveTo(ox - 3, oy - 3); ctx.lineTo(ox + 3, oy + 3);
+    ctx.moveTo(ox + 3, oy - 3); ctx.lineTo(ox - 3, oy + 3);
+    ctx.stroke();
+  }
+
+  function draw() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (shake > 0) {
+      ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    }
+
+    // 하늘
+    ctx.fillStyle = '#f5efe0';
+    ctx.fillRect(-20, -20, W + 40, H + 40);
+
+    var groundY = H - GROUND_H;
+
+    // 바닥
+    ctx.fillStyle = '#d9cba8';
+    ctx.fillRect(-20, groundY, W + 40, GROUND_H + 20);
+    ctx.strokeStyle = '#b7a577';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-20, groundY);
+    ctx.lineTo(W + 20, groundY);
+    ctx.stroke();
+
+    // 바닥 자국
+    for (var s = 0; s < splats.length; s++) {
+      var sp = splats[s];
+      var a = Math.max(0, 0.55 - sp.t * 0.08);
+      if (a <= 0) continue;
+      ctx.fillStyle = 'rgba(122,74,33,' + a.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.ellipse(sp.x, sp.y, sp.r * 1.1, sp.r * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 똥
+    for (var i = 0; i < poops.length; i++) {
+      var p = poops[i];
+      drawPoop(p.x, p.y, p.r, p.wob);
+    }
+
+    // 졸라맨
+    drawStickman(player.x, groundY, state === STATE_OVER);
+
+    // UI
+    ctx.textAlign = 'center';
+    if (state === STATE_PLAY) {
+      ctx.fillStyle = '#222';
+      ctx.font = 'bold 42px -apple-system, sans-serif';
+      ctx.fillText(score.toFixed(1) + '초', W / 2, 64);
+      ctx.font = '15px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(34,34,34,0.5)';
+      ctx.fillText('최고 ' + best.toFixed(1) + '초', W / 2, 88);
+    } else if (state === STATE_TITLE) {
+      ctx.fillStyle = '#222';
+      ctx.font = 'bold 52px -apple-system, sans-serif';
+      ctx.fillText('💩 똥피하기', W / 2, H * 0.3);
+      ctx.font = '20px -apple-system, sans-serif';
+      ctx.fillText('떨어지는 똥을 좌우로 피하세요!', W / 2, H * 0.3 + 42);
+      ctx.font = '17px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(34,34,34,0.6)';
+      ctx.fillText('손가락으로 끌거나 ← → 키', W / 2, H * 0.3 + 74);
+      if (best > 0) {
+        ctx.fillText('최고 기록: ' + best.toFixed(1) + '초', W / 2, H * 0.3 + 102);
+      }
+      blinkText('화면을 터치하면 시작!', H * 0.62);
+    } else if (state === STATE_OVER) {
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(-20, -20, W + 40, H + 40);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 46px -apple-system, sans-serif';
+      ctx.fillText('💩 맞았다!', W / 2, H * 0.32);
+      ctx.font = 'bold 34px -apple-system, sans-serif';
+      ctx.fillText(score.toFixed(1) + '초 버팀', W / 2, H * 0.32 + 52);
+      ctx.font = '19px -apple-system, sans-serif';
+      if (isNewBest) {
+        ctx.fillStyle = '#ffd34d';
+        ctx.fillText('🎉 신기록!', W / 2, H * 0.32 + 88);
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText('최고 기록 ' + best.toFixed(1) + '초', W / 2, H * 0.32 + 88);
+      }
+      if (performance.now() - overAt > 600) {
+        ctx.fillStyle = '#fff';
+        blinkText('터치해서 다시 시작', H * 0.62);
+      }
+    }
+  }
+
+  function blinkText(text, y) {
+    var a = 0.55 + 0.45 * Math.sin(performance.now() / 350);
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.font = 'bold 22px -apple-system, sans-serif';
+    ctx.fillText(text, W / 2, y);
+    ctx.restore();
+  }
+
+  // ---------- 루프 ----------
+  var last = performance.now();
+  function loop(now) {
+    var dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+  reset();
+  requestAnimationFrame(loop);
+
+  // 헤드리스 테스트용 훅 (#debug 해시로 열었을 때만)
+  if (location.hash === '#debug') {
+    window.__game = {
+      get state() { return state; },
+      get score() { return score; },
+      get poops() { return poops; },
+      get player() { return player; },
+      get W() { return W; },
+      get H() { return H; }
+    };
+  }
+})();
+</script>
+</body>
+</html>

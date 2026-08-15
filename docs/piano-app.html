@@ -1,5 +1,8 @@
+<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>피아노 레슨 · Piano</title>
 <style>
 /* ============================================================
@@ -86,7 +89,14 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+/* 인앱 브라우저(시트)에서 아래로 끌기가 '창 닫기'로 먹히는 것 방지:
+   앱은 position:fixed 레이어로 화면에 고정하고, 문서에는 보이지 않는
+   240px짜리 스크롤 완충지대를 깔아 스크롤을 120px 지점에 걸어 둔다.
+   손가락이 아래로 쓸리면 시트 닫기 대신 이 완충지대가 스크롤로 소비한다.
+   (여유가 1~2px면 iOS가 바닥에 닿는 순간 끌기를 이어받아 소용없다) */
+html{height:100%;overflow:auto;overscroll-behavior:none;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{height:calc(100% + 240px);overflow:hidden;overscroll-behavior:none}
 body{
   background:var(--page-bg);
   background-image:radial-gradient(90rem 60rem at 50% -20rem, var(--accent-soft), transparent 60%);
@@ -97,9 +107,11 @@ body{
   user-select:none;-webkit-user-select:none;
   -webkit-touch-callout:none;
 }
-/* iOS 더블탭 확대 방지: 모든 요소에 걸고, 건반·레인은 완전 차단 */
+/* iOS 더블탭 확대 방지. 건반·레인은 세로 팬만 허용(pan-y):
+   세로로 쓸리는 손가락을 '막으면' iOS가 그 끌기를 시트 닫기로 가져가 버린다.
+   대신 문서의 완충지대 스크롤로 소비되게 흘려보낸다 (앱 화면은 고정이라 안 움직임). */
 .phone,.phone *{touch-action:manipulation}
-.kb,.kb *,.lane,.lane *{touch-action:none}
+.kb,.kb *,.lane,.lane *{touch-action:pan-y}
 button{
   font:inherit;color:inherit;background:none;border:none;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
@@ -108,12 +120,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 .num{font-variant-numeric:tabular-nums}
 
 /* ---- 폰 프레임 ---- */
+/* 문서 스크롤(완충지대)과 무관하게 화면에 붙어 있도록 고정 레이어로 */
 .phone{
   width:min(420px,100vw);
   height:100dvh;
   background:var(--app-bg);
   display:flex;flex-direction:column;
-  overflow:hidden;position:relative;
+  overflow:hidden;
+  position:fixed;inset:0;margin:auto;
 }
 @media (min-width:481px) and (min-height:760px){
   .phone{
@@ -137,12 +151,31 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 }
 .chip .fire{font-size:13px}
 .chip b{color:var(--text)}
+button.chip{font-size:15px;padding:6px 10px}
+
+/* ---- 안내 배너 (크래시 감지 등) ---- */
+.notice[hidden]{display:none}
+.notice{
+  display:flex;align-items:center;gap:8px;
+  margin:0 16px 8px;padding:10px 12px;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  font-size:12px;color:var(--text-2);line-height:1.45;
+}
+.notice span{flex:1;min-width:0}
+.notice .nb{
+  flex-shrink:0;font-size:12px;font-weight:700;
+  padding:7px 11px;border-radius:999px;
+  background:var(--surface-2);color:var(--text);
+  text-decoration:none;
+}
+.notice .nb.pri{background:var(--accent);color:var(--accent-ink)}
+.notice .nb[hidden]{display:none}
 
 /* ---- 뷰 공통 ---- */
 .views{flex:1;min-height:0;position:relative}
 .view{position:absolute;inset:0;display:none;flex-direction:column;min-height:0}
 .view.on{display:flex}
-.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px;overscroll-behavior:contain}
 .eyebrow{
   font-size:10.5px;font-weight:700;color:var(--muted);
   letter-spacing:.13em;text-transform:uppercase;
@@ -423,8 +456,16 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   <div class="hd">
     <div class="brand">피아노 레슨<small>Piano · Prototype</small></div>
     <div class="right">
+      <button class="chip" id="sndChip" aria-label="소리 켜기/끄기">🔊</button>
       <div class="chip"><span class="fire">🔥</span><b class="num" id="streak">0</b>일</div>
     </div>
+  </div>
+
+  <div class="notice" id="notice" hidden>
+    <span id="noticeText"></span>
+    <button class="nb pri" id="noticeBtn">소리 켜기</button>
+    <a class="nb pri" id="noticeLink" hidden href="x-safari-https://hugoseong0721.github.io/test-mvp/piano-app.html">Safari로 열기</a>
+    <button class="nb" id="noticeX">닫기</button>
   </div>
 
   <div class="views">
@@ -632,10 +673,25 @@ const store = {
   read(){ try{return JSON.parse(localStorage.getItem("piano-proto")||"{}")}catch(e){return{}} },
   write(d){ try{localStorage.setItem("piano-proto",JSON.stringify(d))}catch(e){} },
 };
-const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:""}, store.read());
+const S = Object.assign({stars:{}, streak:0, lastDay:"", secToday:0, dayOf:"", mute:false, safariTip:false}, store.read());
 const today = new Date().toISOString().slice(0,10);
 if(S.dayOf!==today){ S.dayOf=today; S.secToday=0; }
 const save = ()=>store.write(S);
+
+/* ============================================================
+   크래시 감지 — 위험 구간에 들어가기 전 표시를 남기고, 무사히
+   지나가면 지운다. 표시가 남은 채 다시 열렸다면 그 구간에서
+   앱이 죽은 것이므로, 소리가 원인이면 무음 모드로 실행한다.
+   ============================================================ */
+const CR=(()=>{try{return JSON.parse(localStorage.getItem("piano-crash")||"{}")}catch(e){return{}}})();
+function saveCR(){try{localStorage.setItem("piano-crash",JSON.stringify(CR))}catch(e){}}
+let clearTimer=null;
+function markOp(op){ if(CR.pending!==op){ CR.pending=op; saveCR(); } }
+function clearOp(){ if(CR.pending){ CR.pending=""; saveCR(); } }
+function armClear(){ clearTimeout(clearTimer); clearTimer=setTimeout(clearOp,600); }
+// 사용자가 정상적으로 앱을 벗어나는 경우는 크래시가 아니다
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) clearOp(); });
+window.addEventListener("pagehide",clearOp);
 
 /* ============================================================
    오디오 — 간단한 피아노 톤 (오실레이터 2개 + 감쇠)
@@ -653,7 +709,12 @@ function audio(){
   return AC;
 }
 // 첫 터치(제스처)에서 미리 초기화해 둔다
-document.addEventListener("pointerdown",()=>{try{audio()}catch(e){}},{once:true});
+document.addEventListener("pointerdown",()=>{
+  if(S.mute) return;
+  markOp("audio");
+  try{audio()}catch(e){}
+  armClear();
+},{once:true});
 // 누르는 동안 지속되는 음 — 손을 떼면 부드럽게 잦아든다
 // 동시 발음 수를 제한해 오디오 노드 폭증(→ 사파리 탭 크래시)을 막는다
 const VOICES=[];
@@ -677,11 +738,13 @@ function startVoice(name){
     const v={stop(){
       if(stopped) return; stopped=true;
       const i=VOICES.indexOf(v); if(i>-1) VOICES.splice(i,1);
-      const t2=ac.currentTime;
-      g.gain.cancelScheduledValues(t2);
-      g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t2);
-      g.gain.exponentialRampToValueAtTime(0.0001,t2+0.28);
-      o1.stop(t2+0.32); o2.stop(t2+0.32);
+      try{
+        const t2=ac.currentTime;
+        g.gain.cancelScheduledValues(t2);
+        g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t2);
+        g.gain.exponentialRampToValueAtTime(0.0001,t2+0.28);
+        o1.stop(t2+0.32); o2.stop(t2+0.32);
+      }catch(e){}
     }};
     VOICES.push(v);
     while(VOICES.length>MAX_VOICES) VOICES[0].stop(); // 가장 오래된 음부터 정리
@@ -718,10 +781,14 @@ function buildKb(el, onPress, onRelease){
   function press(k,pid){
     if(!k||!k.dataset.note) return;
     const n=k.dataset.note;
-    byPointer.set(pid,{k,voice:startVoice(n),t:performance.now()});
+    markOp("audio"); // 이 표시가 남은 채 죽으면 소리 재생이 원인
+    const voice=S.mute?{stop(){}}:startVoice(n);
+    markOp("logic"); // 이 표시가 남으면 이후 처리(판정·화면)가 원인
+    byPointer.set(pid,{k,voice,t:performance.now()});
     heldCount.set(n,(heldCount.get(n)||0)+1);
     k.classList.add("press");
     onPress&&onPress(n,k);
+    armClear();
   }
   function release(pid){
     const h=byPointer.get(pid);
@@ -740,7 +807,6 @@ function buildKb(el, onPress, onRelease){
   };
   el.addEventListener("pointerdown",e=>{
     e.preventDefault();
-    try{el.setPointerCapture(e.pointerId)}catch(_){}
     press(keyAt(e),e.pointerId);
   });
   el.addEventListener("pointermove",e=>{
@@ -751,13 +817,15 @@ function buildKb(el, onPress, onRelease){
     const k=keyAt(e);
     if(k&&k!==h.k){ release(e.pointerId); press(k,e.pointerId); } // 손가락 위치를 따라간다
   });
-  const up=e=>release(e.pointerId);
-  el.addEventListener("pointerup",up);
-  el.addEventListener("pointercancel",up);
+  // 손을 떼는 이벤트는 window에서 받는다 (건반 밖에서 떼도 확실히 놓이도록)
+  // 브라우저가 스크롤을 가져가며 취소(pointercancel)한 경우는 감점하지 않도록 기록
+  const up=e=>{
+    if(e.type==="pointercancel") lastCancel=performance.now();
+    release(e.pointerId);
+  };
+  window.addEventListener("pointerup",up);
+  window.addEventListener("pointercancel",up);
   el.addEventListener("contextmenu",e=>e.preventDefault());
-  // iOS: 스크롤·엣지 스와이프·확대 등 브라우저 기본 동작을 건반 위에서는 전부 차단
-  el.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
-  el.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
   return {
     keyOf:n=>el.querySelector(`.k[data-note="${n}"]`),
     held,
@@ -896,6 +964,7 @@ const PPB=88;          // 박자당 픽셀
 const GAP=5;           // 노트 사이 시각적 틈
 let L=null;            // 현재 레슨 상태
 let rafId=0, lastTs=0;
+let lastCancel=-1e9;   // 브라우저가 터치를 스크롤로 가져간 시각 (감점 면제용)
 
 const playKb=buildKb($("#playKb"),(note)=>onLessonPress(note));
 
@@ -964,7 +1033,7 @@ function startLesson(id,opt){
     idx:0, hits:0, wrong:0,
     scrollY:-Math.min(m.h*0.92, speed*2.2), // 카운트다운 후 2.2초 안에 첫 노트 도착
     speed,
-    waiting:false, holding:false, done:false,
+    waiting:false, holding:false, ghost:false, done:false,
     startAt:performance.now(), lastSec:performance.now(),
     counting:true,
   };
@@ -1011,27 +1080,38 @@ function loop(ts){
 
     const cur=L.notes[L.idx];
     if(cur && L.holding){
-      if(!playKb.held(cur.n)){
-        // 노트가 끝나기 전에 손을 뗐다 → 멈추고 다시 누를 때까지 대기
-        L.holding=false; L.waiting=true;
-        cur.el.classList.remove("active");
-        if(!cur.penalized){
-          cur.penalized=true; L.wrong++;
-          $("#playAcc").textContent=accuracy()+"%";
-          cur.el.classList.remove("shake"); void cur.el.offsetWidth; cur.el.classList.add("shake");
-        }
-        setTargetKey(true); waitText("음이 끝날 때까지 꾹 누르고 있어요");
-      } else {
+      let heldNow=playKb.held(cur.n)||L.ghost;
+      // 사용자가 뗀 게 아니라 브라우저가 터치를 스크롤로 가져간 경우(pointercancel):
+      // 손가락은 여전히 건반 위에 있으므로 이번 음은 잡고 있는 것으로 친다
+      if(!heldNow && performance.now()-lastCancel<300){ L.ghost=true; heldNow=true; }
+      if(heldNow){
         // 누르고 있는 동안 노트가 소모된다
         L.scrollY+=L.speed*dt;
         if(L.scrollY >= cur.startPx + cur.d*PPB) completeNote(cur);
+      } else {
+        const consumed=(L.scrollY-cur.startPx)/(cur.d*PPB);
+        if(consumed>=0.65){
+          // 음 길이의 65% 이상 눌렀으면 충분 — 흐름을 끊지 않고 완료로 인정
+          completeNote(cur);
+        } else {
+          // 너무 일찍 뗐다 → 멈추고 다시 누를 때까지 대기
+          L.holding=false; L.waiting=true;
+          cur.el.classList.remove("active");
+          if(!cur.penalized){
+            cur.penalized=true; L.wrong++;
+            $("#playAcc").textContent=accuracy()+"%";
+            cur.el.classList.remove("shake"); void cur.el.offsetWidth; cur.el.classList.add("shake");
+          }
+          setTargetKey(true); waitText("음이 끝날 때까지 꾹 누르고 있어요");
+        }
       }
     } else if(cur && L.scrollY + L.speed*dt >= cur.startPx){
       // 판정선 도달 → 맞는 건반을 누를 때까지 대기
       L.scrollY=cur.startPx;
       if(!L.waiting){ L.waiting=true; setTargetKey(true); }
       // 같은 음이 연달아 나올 때: 계속 누르고 있으면 뗐다 다시 눌러야 한다
-      waitText(playKb.held(cur.n)?"손을 뗐다가 다시 눌러요":"표시된 건반을 꾹 눌러요");
+      waitText(playKb.held(cur.n)?"손을 뗐다가 다시 눌러요"
+        :cur.d>=2?"긴 음 — 꾹 누르고 있어요":"표시된 건반을 눌러요");
     } else {
       L.scrollY+=L.speed*dt;
     }
@@ -1044,7 +1124,7 @@ function completeNote(cur){
   cur.hit=true;
   cur.el.classList.remove("active");
   cur.el.classList.add("hit");
-  L.hits++; L.idx++; L.holding=false; L.waiting=false;
+  L.hits++; L.idx++; L.holding=false; L.waiting=false; L.ghost=false;
   markNext();
   $("#playBar").style.width=(L.idx/L.notes.length*100)+"%";
   $("#playAcc").textContent=accuracy()+"%";
@@ -1061,10 +1141,15 @@ function onLessonPress(note){
   if(!cur||L.holding) return;
   const early = L.scrollY >= cur.startPx - PPB*0.45; // 살짝 이른 입력도 인정
   if(note===cur.n && (L.waiting||early)){
-    // 홀드 시작 — 노트 길이만큼 누르고 있으면 loop()에서 완료 처리된다
-    L.holding=true; L.waiting=false;
-    cur.el.classList.add("active");
-    setTargetKey(false);
+    if(cur.d<2){
+      // 짧은 음은 탭으로 바로 완료 — 홀드를 강요하면 흐름이 뚝뚝 끊긴다
+      completeNote(cur);
+    } else {
+      // 긴 음만 홀드 — 노트 길이만큼 누르고 있으면 loop()에서 완료 처리된다
+      L.holding=true; L.waiting=false;
+      cur.el.classList.add("active");
+      setTargetKey(false);
+    }
   } else if(L.waiting && note!==cur.n){
     L.wrong++;
     const k=playKb.keyOf(note);
@@ -1141,6 +1226,47 @@ $("#rDone").addEventListener("click",()=>{
 renderPath(); renderGoal(); renderSongs();
 window.addEventListener("resize",()=>{ if(L) laneMetrics(); });
 
+/* ---- 소리 토글 + 크래시 감지 결과 처리 ---- */
+function updateSnd(){ $("#sndChip").textContent=S.mute?"🔇":"🔊"; }
+$("#sndChip").addEventListener("click",()=>{
+  S.mute=!S.mute; save(); updateSnd();
+  if(!S.mute){ try{audio()}catch(e){} }
+  toast(S.mute?"소리를 껐어요":"소리를 켰어요");
+});
+if(CR.pending){
+  const wasAudio=CR.pending==="audio";
+  CR.pending=""; CR.count=(CR.count||0)+1; saveCR();
+  if(wasAudio){ S.mute=true; save(); }
+  $("#noticeText").textContent=wasAudio
+    ? "지난번 소리 재생 중 앱이 종료된 흔적이 있어서, 소리를 끄고 실행해요."
+    : "지난번 터치 처리 중 앱이 종료된 흔적이 있어요. 문제가 계속되면 알려주세요.";
+  $("#noticeBtn").hidden=!wasAudio;
+  $("#notice").hidden=false;
+} else if(CR.hide){
+  const dy=CR.hide.dy;
+  CR.hide=null; saveCR();
+  $("#noticeText").textContent = dy>8
+    ? `진단: 직전에 창이 닫힐 때 터치가 아래로 ${dy}px 쓸렸어요 — 시트 끌어내리기가 맞아요.`
+    : `진단: 직전에 창이 닫힐 때 터치 이동은 ${dy}px뿐이었어요 — 끌기 없이 닫혔어요.`;
+  $("#noticeBtn").hidden=true;
+  $("#notice").hidden=false;
+} else if(!S.safariTip && /iPhone|iPad/.test(navigator.userAgent)){
+  // 인앱 브라우저(시트)에서 창이 닫히는 문제의 확실한 탈출구
+  $("#noticeText").textContent="창이 자꾸 닫히면 인앱 브라우저 때문이에요. Safari로 열면 안 닫혀요.";
+  $("#noticeBtn").hidden=true;
+  $("#noticeLink").hidden=false;
+  $("#notice").hidden=false;
+}
+$("#noticeBtn").addEventListener("click",()=>{
+  S.mute=false; save(); updateSnd();
+  $("#notice").hidden=true; toast("소리를 다시 켰어요");
+});
+$("#noticeX").addEventListener("click",()=>{
+  $("#notice").hidden=true;
+  if(!$("#noticeLink").hidden){ S.safariTip=true; save(); } // Safari 안내는 한 번만
+});
+updateSnd();
+
 // iOS 사파리 확대 방지: 핀치(gesture)와 스케일 변화 동반 터치무브를 막는다
 document.addEventListener("gesturestart",e=>e.preventDefault());
 document.addEventListener("gesturechange",e=>e.preventDefault());
@@ -1148,9 +1274,41 @@ document.addEventListener("touchmove",e=>{
   if(e.scale!==undefined && e.scale!==1) e.preventDefault();
 },{passive:false});
 document.addEventListener("dblclick",e=>e.preventDefault());
-// 노트 레인 위에서도 브라우저 기본 터치 동작 차단
-["touchstart","touchmove"].forEach(ev=>
-  $("#lane").addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+
+// 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 완충지대 중간(120px)에 걸어 둔다.
+// 손가락이 쓸려도 120px을 다 소모하기 전엔 시트 끌기로 넘어가지 않는다.
+// 제스처 도중에는 건드리지 않고, 새 터치 시작 시와 스크롤이 잠잠해진 뒤 다시 건다.
+const SE=document.scrollingElement||document.documentElement;
+const PIN=120;
+let pinT=null;
+function pinScroll(){
+  const max=SE.scrollHeight-SE.clientHeight;
+  if(max<=0) return;
+  SE.scrollTop=Math.min(PIN,Math.max(1,max-1));
+}
+document.addEventListener("touchstart",pinScroll,{passive:true});
+window.addEventListener("scroll",()=>{
+  clearTimeout(pinT); pinT=setTimeout(pinScroll,250);
+},{passive:true});
+pinScroll();
+
+// 창이 닫히기 직전의 터치 움직임을 기록해 다음에 열 때 진단으로 보여준다
+let lastTouch={t:0,y0:0,y1:0};
+document.addEventListener("touchstart",e=>{
+  const t=e.touches[0];
+  if(t) lastTouch={t:Date.now(),y0:t.clientY,y1:t.clientY};
+},{passive:true});
+document.addEventListener("touchmove",e=>{
+  const t=e.touches[0];
+  if(t) lastTouch.y1=t.clientY;
+},{passive:true});
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden) return;
+  if(Date.now()-lastTouch.t<3000){
+    CR.hide={dy:Math.round(lastTouch.y1-lastTouch.y0)};
+    saveCR();
+  }
+});
 
 // 프로토타입 검증용 훅 (헤드리스 테스트에서 사용)
 window.__piano={ get L(){return L}, startLesson, SONGS, S };
