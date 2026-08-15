@@ -112,6 +112,8 @@
 
   .is-hidden { display: none !important; }
 
+  .drop-hint { font-size: 13px; color: #8fd6ff; }
+
   /* ── 도전 상대 ─────────────────────── */
   #chal-chip {
     align-self: center;
@@ -229,7 +231,8 @@
       </div>
       <div class="pitch">
         불길이 <b>멈추지 않고</b> 올라옵니다.<br>
-        발판을 밟고 <b>계속 위로</b> 도망치세요.
+        발판을 밟고 <b>계속 위로</b> 도망치세요.<br>
+        <span class="drop-hint">물방울을 먹으면 불길이 잠시 멈춥니다</span>
       </div>
       <div class="controls">
         화면에 손가락을 대고 <b>가고 싶은 쪽으로</b> 끌어주세요<br>
@@ -299,11 +302,11 @@
 
   let W = 420, H = 620, dpr = 1;
   let running = false;
-  let player, platforms, embers, shards;
+  let player, platforms, embers, shards, drops, floaters;
   let camY, topSpawnY, lavaY, lavaShake;
   let bestM = 0, altM = 0, peakY = 0;
   let inputLeft = false, inputRight = false, targetX = null;
-  let heat = 0, beatT = 0, runTime = 0;
+  let heat = 0, beatT = 0, runTime = 0, lavaFreeze = 0;
 
   // ── 저장 ────────────────────────────────────────────────
   function loadBest() {
@@ -520,6 +523,8 @@
       broken: 0,
     };
     platforms.push(p);
+    // 물방울은 이 게임에서 유일하게 불길에 직접 작용하는 요소다
+    if (h > 30 && Math.random() < 0.15) drops.push({ x: p.x + p.w / 2, y: y - 34, t: 0 });
     return p;
   }
 
@@ -578,11 +583,11 @@
   // ── 시작 / 종료 ─────────────────────────────────────────
   function startGame() {
     resize();
-    platforms = []; embers = []; shards = [];
+    platforms = []; embers = []; shards = []; drops = []; floaters = [];
     camY = -H * (1 - CAM_ANCHOR);
     player = { x: W / 2, y: 0, py: 0, vx: 0, vy: -300, face: 1 };
     peakY = 0; altM = 0;
-    heat = 0; beatT = 0; lavaShake = 0; runTime = 0;
+    heat = 0; beatT = 0; lavaShake = 0; runTime = 0; lavaFreeze = 0;
     inputLeft = inputRight = false; targetX = null;
 
     // 시작 바닥은 화면 전체 폭 — 첫 착지를 보장해 시작하자마자 추락하는 일이 없도록
@@ -696,6 +701,23 @@
         break;
       }
     }
+    // 물방울 획득 — 불길이 멈추고 눈에 보이게 파랗게 식는다
+    for (let i = drops.length - 1; i >= 0; i--) {
+      const k = drops[i];
+      k.t += dt;
+      if (k.y > camY + H + 240) { drops.splice(i, 1); continue; }
+      const dx = k.x - player.x, dy = k.y - player.y;
+      if (dx * dx + dy * dy > 30 * 30) continue;
+      drops.splice(i, 1);
+      lavaFreeze = Math.min(6, lavaFreeze + 2.6);
+      floaters.push({ x: k.x, y: k.y, text: '불길 정지!', life: 1 });
+      for (let n = 0; n < 14; n++) {
+        shards.push({ x: k.x, y: k.y, vx: (Math.random()-.5)*180, vy: -60 + Math.random()*120,
+                      life: .6, r: 2 + Math.random()*2, blue: true });
+      }
+      tone(880, .1, 'sine', .07); tone(1240, .16, 'sine', .06, .06);
+    }
+
     // 부서진 발판 제거
     for (let i = platforms.length - 1; i >= 0; i--) {
       const p = platforms[i];
@@ -728,13 +750,16 @@
 
     // 불길 상승 — 처음엔 느긋하고, 한참 오른 뒤부터 빨라진다
     runTime += dt;
-    if (runTime > LAVA_GRACE) {
-      const lavaSpd = 34 + Math.min(130, Math.max(0, altM - 150) * 0.12);
-      lavaY -= lavaSpd * dt;
+    if (lavaFreeze > 0) {
+      lavaFreeze = Math.max(0, lavaFreeze - dt);   // 멈춘 동안은 따라붙지도 않는다
+    } else {
+      if (runTime > LAVA_GRACE) {
+        const lavaSpd = 34 + Math.min(130, Math.max(0, altM - 150) * 0.12);
+        lavaY -= lavaSpd * dt;
+      }
+      const leash = player.y + LAVA_LEASH;   // 너무 뒤처지면 따라붙는다
+      if (lavaY > leash) lavaY += (leash - lavaY) * Math.min(1, dt * 1.2);
     }
-    // 너무 뒤처지면 따라붙는다
-    const leash = player.y + LAVA_LEASH;
-    if (lavaY > leash) lavaY += (leash - lavaY) * Math.min(1, dt * 1.2);
 
     // 위험도
     const lavaScreen = lavaY - camY;
@@ -762,6 +787,10 @@
       e.life -= dt;
       if (e.life <= 0) { embers.splice(i, 1); continue; }
       e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 30 * dt;
+    }
+    for (let i = floaters.length - 1; i >= 0; i--) {
+      floaters[i].life -= dt;
+      if (floaters[i].life <= 0) floaters.splice(i, 1);
     }
     for (let i = shards.length - 1; i >= 0; i--) {
       const s = shards[i];
@@ -832,6 +861,27 @@
     c.closePath();
   }
 
+  function drawDrop(k) {
+    const y = k.y - camY;
+    if (y < -40 || y > H + 40) return;
+    const x = k.x, yy = y + Math.sin(k.t * 3.4) * 3;
+    ctx.save();
+    const g = ctx.createRadialGradient(x, yy - 3, 1, x, yy, 14);
+    g.addColorStop(0, 'rgba(190,235,255,.55)');
+    g.addColorStop(1, 'rgba(120,200,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, yy, 14, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#8fd6ff';
+    ctx.beginPath();
+    ctx.moveTo(x, yy - 10);
+    ctx.bezierCurveTo(x + 7, yy - 2, x + 6, yy + 7, x, yy + 7);
+    ctx.bezierCurveTo(x - 6, yy + 7, x - 7, yy - 2, x, yy - 10);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.beginPath(); ctx.arc(x - 2, yy + 1, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   function drawPlayer() {
     const x = player.x, y = player.y - camY;
     ctx.save();
@@ -871,7 +921,7 @@
     const top = y + Math.sin(performance.now() / 220) * 1.5;
 
     const g = ctx.createLinearGradient(0, top - 26, 0, H);
-    g.addColorStop(0, 'rgba(255,210,74,.95)');
+    g.addColorStop(0, lavaFreeze > 0 ? 'rgba(150,220,255,.95)' : 'rgba(255,210,74,.95)');
     g.addColorStop(.18, '#ff7a1f');
     g.addColorStop(1, '#8c1405');
     ctx.fillStyle = g;
@@ -931,13 +981,24 @@
     }
 
     for (const p of platforms) drawPlatform(p);
+    for (const k of drops) drawDrop(k);
 
-    ctx.fillStyle = '#c8bdb2';
     for (const s of shards) {
       ctx.globalAlpha = Math.max(0, s.life / .8);
+      ctx.fillStyle = s.blue ? '#8fd6ff' : '#c8bdb2';
       ctx.fillRect(s.x, s.y - camY, s.r, s.r);
     }
     ctx.globalAlpha = 1;
+
+    for (const f of floaters) {
+      ctx.globalAlpha = Math.min(1, f.life * 1.6);
+      ctx.fillStyle = '#8fd6ff';
+      ctx.font = '800 15px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(f.text, f.x, f.y - camY - (1 - f.life) * 30);
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
 
     if (running) drawPlayer();
 
@@ -1004,11 +1065,10 @@
 
   resize();
   // 시작 화면 뒤에서도 불길이 일렁이도록 최소 상태를 만들어 둔다
-  platforms = []; embers = []; shards = [];
+  platforms = []; embers = []; shards = []; drops = []; floaters = [];
   camY = -H * (1 - CAM_ANCHOR); lavaY = camY + H - 60;
   player = { x: W / 2, y: 0, py: 0, vx: 0, vy: 0, face: 1 };
   requestAnimationFrame(frame);
 })();
-</script>
-</body>
+</script></body>
 </html>
