@@ -221,7 +221,7 @@
   <div id="hud">
     <div>
       <div class="stat-label">고도</div>
-      <div id="alt-value">0<span class="unit">m</span></div>
+      <div id="alt-value"><span id="alt-num">0</span><span class="unit">m</span></div>
       <div id="water-count" class="is-hidden"><span class="drop"></span><b>0</b></div>
     </div>
     <div id="chal-chip" class="is-hidden">도전 <b></b></div>
@@ -292,7 +292,9 @@
   const canvas = document.getElementById('game-canvas');
   const ctx = canvas.getContext('2d');
   const heatEl = document.getElementById('heat');
-  const altEl = document.getElementById('alt-value');
+  const altNumEl = document.getElementById('alt-num');
+  const waterEl = document.getElementById('water-count');
+  const waterNumEl = waterEl.querySelector('b');
   const bestEl = document.getElementById('best-value');
   const startOverlay = document.getElementById('start-overlay');
   const endOverlay = document.getElementById('end-overlay');
@@ -321,6 +323,11 @@
   let bestM = 0, altM = 0, peakY = 0;
   let inputLeft = false, inputRight = false, targetX = null;
   let heat = 0, beatT = 0, runTime = 0;
+  // 고정 스텝 물리를 화면 주사율에 맞춰 보간해 그린다.
+  // 보간이 없으면 프레임마다 물리 스텝 수가 1~2개로 흔들려 미세하게 버벅인다.
+  let viewCam = 0, viewX = 0, viewY = 0;
+  let prevCam = 0, prevX = 0, prevY = 0;
+  let lastHeatOpacity = -1, lastAltShown = -1, lastWaterShown = -1;
   let waterCount = 0, lavaFreeze = 0;
 
   // ── 저장 ────────────────────────────────────────────────
@@ -622,6 +629,9 @@
     challengeBeaten = false;
     nextMilestone = 0;
     document.getElementById('pass-banner').classList.remove('show');
+    prevCam = camY; prevX = player.x; prevY = player.y;
+    viewCam = camY; viewX = player.x; viewY = player.y;
+    lastAltShown = -1; lastWaterShown = -1; lastHeatOpacity = -1;
     running = true;
     startOverlay.classList.add('hidden');
     endOverlay.classList.add('hidden');
@@ -802,7 +812,6 @@
     const lavaScreen = lavaY - camY;
     const near = Math.max(0, Math.min(1, (H * 1.02 - lavaScreen) / (H * 0.55)));
     heat = near;
-    heatEl.style.opacity = (near * 0.85).toFixed(3);
     if (near > 0.45) {
       beatT -= dt;
       if (beatT <= 0) {
@@ -846,7 +855,7 @@
 
   // ── 그리기 ──────────────────────────────────────────────
   function drawPlatform(p) {
-    const y = p.y - camY;
+    const y = p.y - viewCam;
     if (y < -30 || y > H + 30) return;
     const alpha = p.broken ? Math.max(0, 1 - p.broken / .25) : 1;
     ctx.save();
@@ -900,7 +909,7 @@
   }
 
   function drawPickup(k) {
-    const y = k.y - camY;
+    const y = k.y - viewCam;
     if (y < -40 || y > H + 40) return;
     const bob = Math.sin(k.t * 3.4) * 3;
     const x = k.x, yy = y + bob;
@@ -938,7 +947,7 @@
   }
 
   function drawPlayer() {
-    const x = player.x, y = player.y - camY;
+    const x = viewX, y = viewY - viewCam;
     ctx.save();
     // 불빛을 받는 실루엣
     const g = ctx.createRadialGradient(x, y - 3, 2, x, y, PLAYER_R + 3);
@@ -958,7 +967,7 @@
   }
 
   function drawLava() {
-    const y = lavaY - camY;
+    const y = lavaY - viewCam;
     // 불길이 화면 아래로 내려가 있어도 존재감은 남긴다 — 가까울수록 붉게 달아오른다
     if (y > H) {
       const near = Math.max(0, Math.min(1, 1 - (y - H) / 200));
@@ -1003,7 +1012,16 @@
     ctx.restore();
   }
 
-  function render() {
+  function render(alpha) {
+    const t = Math.max(0, Math.min(1, alpha || 0));
+    viewCam = prevCam + (camY - prevCam) * t;
+    viewX   = prevX   + (player.x - prevX) * t;
+    viewY   = prevY   + (player.y - prevY) * t;
+
+    // 발열 표시는 값이 달라질 때만 쓴다 (매 프레임 스타일 쓰기는 렉을 만든다)
+    const ho = Math.round(heat * 85) / 100;
+    if (ho !== lastHeatOpacity) { heatEl.style.opacity = ho; lastHeatOpacity = ho; }
+
     ctx.clearRect(0, 0, W, H);
     ctx.save();
     if (lavaShake > 0) ctx.translate((Math.random() - .5) * lavaShake, 0);
@@ -1012,14 +1030,14 @@
     ctx.strokeStyle = 'rgba(255,255,255,.035)';
     ctx.lineWidth = 1;
     const step = 48;
-    const off = ((-camY % step) + step) % step;
+    const off = ((-viewCam % step) + step) % step;
     for (let y = off - step; y < H; y += step) {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
 
     // 도전 상대의 기록선 — 넘어야 할 높이를 눈으로 보여준다
     if (challengeM > 0) {
-      const cy = -challengeM * PX_PER_M - camY;
+      const cy = -challengeM * PX_PER_M - viewCam;
       if (cy > -30 && cy < H + 30) {
         ctx.save();
         ctx.setLineDash([9, 7]);
@@ -1041,7 +1059,7 @@
     for (const s of shards) {
       ctx.globalAlpha = Math.max(0, s.life / .8);
       ctx.fillStyle = s.blue ? '#8fd6ff' : s.green ? '#8ef0b4' : '#c8bdb2';
-      ctx.fillRect(s.x, s.y - camY, s.r, s.r);
+      ctx.fillRect(s.x, s.y - viewCam, s.r, s.r);
     }
     ctx.globalAlpha = 1;
 
@@ -1051,7 +1069,7 @@
       ctx.fillStyle = f.color;
       ctx.font = '800 15px system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(f.text, f.x, f.y - camY - (1 - f.life) * 30);
+      ctx.fillText(f.text, f.x, f.y - viewCam - (1 - f.life) * 30);
     }
     ctx.globalAlpha = 1;
     ctx.textAlign = 'left';
@@ -1065,7 +1083,7 @@
     for (const e of embers) {
       ctx.globalAlpha = Math.max(0, Math.min(1, e.life));
       ctx.fillStyle = e.life > .6 ? '#ffd24a' : '#ff5a1f';
-      ctx.beginPath(); ctx.arc(e.x, e.y - camY, e.r, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(e.x, e.y - viewCam, e.r, 0, Math.PI * 2); ctx.fill();
     }
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
@@ -1085,13 +1103,20 @@
     if (running) {
       acc += dt;
       let guard = 0;
-      while (acc >= STEP && guard++ < 20 && running) { update(STEP); acc -= STEP; }
-      altEl.innerHTML = altM + '<span class="unit">m</span>';
-      const wc = document.getElementById('water-count');
-      wc.classList.toggle('is-hidden', waterCount === 0);
-      wc.querySelector('b').textContent = waterCount;
+      while (acc >= STEP && guard++ < 20 && running) {
+        prevCam = camY; prevX = player.x; prevY = player.y;   // 보간용 직전 상태
+        update(STEP);
+        acc -= STEP;
+      }
+      // 숫자가 실제로 바뀔 때만 DOM을 건드린다 (매 프레임 innerHTML은 렉을 만든다)
+      if (altM !== lastAltShown) { altNumEl.textContent = altM; lastAltShown = altM; }
+      if (waterCount !== lastWaterShown) {
+        waterEl.classList.toggle('is-hidden', waterCount === 0);
+        waterNumEl.textContent = waterCount;
+        lastWaterShown = waterCount;
+      }
     }
-    render();
+    render(running ? acc / STEP : 1);
   }
 
   bestM = loadBest();
@@ -1129,6 +1154,5 @@
   player = { x: W / 2, y: 0, py: 0, vx: 0, vy: 0, face: 1 };
   requestAnimationFrame(frame);
 })();
-</script>
-</body>
+</script></body>
 </html>
