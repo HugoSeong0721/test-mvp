@@ -19,10 +19,97 @@
     display: block;
     width: 100%; height: 100%;
   }
+  /* ── 게임오버 패널 (랭킹/공유) ── */
+  #over-panel {
+    position: fixed;
+    left: 50%; top: 44%;
+    transform: translate(-50%, -50%);
+    width: min(320px, 86vw);
+    background: rgba(30, 24, 16, 0.94);
+    color: #fff;
+    border-radius: 16px;
+    padding: 18px 16px 14px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  #over-panel.hidden { display: none; }
+  #over-title { font-size: 26px; font-weight: 800; }
+  #over-score { font-size: 34px; font-weight: 800; margin-top: 4px; }
+  #over-sub { font-size: 15px; margin-top: 4px; min-height: 18px; color: rgba(255,255,255,0.75); }
+  #over-sub.newbest { color: #ffd34d; font-weight: 700; }
+  #over-sub.win { color: #7ee787; font-weight: 700; }
+  #over-sub.lose { color: #ff8f7a; font-weight: 700; }
+  #rank-board {
+    margin: 12px 0 8px;
+    max-height: 168px; overflow-y: auto;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .rank-row {
+    display: flex; gap: 8px; align-items: baseline;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row.me { background: rgba(255, 211, 77, 0.16); }
+  .rank-pos { width: 34px; text-align: left; color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums; }
+  .rank-row.me .rank-pos { color: #ffd34d; }
+  .rank-name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-s { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rank-empty { padding: 14px; font-size: 13px; color: rgba(255,255,255,0.5); }
+  #name-row {
+    display: flex; gap: 8px; align-items: center; justify-content: center;
+    font-size: 13px; color: rgba(255,255,255,0.65);
+    margin-bottom: 10px;
+  }
+  #name-input {
+    width: 92px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 5px 8px;
+    text-align: center;
+  }
+  #over-btns { display: flex; gap: 8px; }
+  #over-btns button {
+    flex: 1;
+    border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 700;
+    padding: 12px 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #retry-btn { background: #ffd34d; color: #3a2c10; }
+  #share-btn { background: rgba(255,255,255,0.14); color: #fff; }
+  #share-note { font-size: 12px; color: #7ee787; min-height: 15px; margin-top: 7px; }
+  #share-fallback {
+    width: 100%; margin-top: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; color: #fff;
+    font-size: 12px; padding: 6px 8px;
+  }
+  #share-fallback.hidden { display: none; }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
+<div id="over-panel" class="hidden">
+  <div id="over-title">💩 맞았다!</div>
+  <div id="over-score"></div>
+  <div id="over-sub"></div>
+  <div id="rank-board"></div>
+  <div id="name-row"><span>이름</span><input id="name-input" maxlength="8" placeholder="나"></div>
+  <div id="over-btns">
+    <button id="share-btn">기록 공유</button>
+    <button id="retry-btn">다시 하기</button>
+  </div>
+  <div id="share-note"></div>
+  <input id="share-fallback" class="hidden" readonly>
+</div>
 <script>
 (function () {
   'use strict';
@@ -61,6 +148,132 @@
   var best = 0;
   try { best = parseFloat(localStorage.getItem('poopDodgeBest') || '0') || 0; } catch (e) {}
   var isNewBest = false;
+
+  // ---------- 랭킹 (이 기기에 남는 기록) ----------
+  var RANK_MAX = 10;
+  var ranks = [], myRankRow = null;
+  function loadRanks() {
+    try {
+      var raw = JSON.parse(localStorage.getItem('poopDodgeRanks') || '[]');
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter(function (r) { return r && typeof r.s === 'number' && isFinite(r.s); })
+        .map(function (r) { return { n: String(r.n || '나').slice(0, 8), s: Math.max(0, Math.round(r.s * 10) / 10), t: r.t || 0 }; })
+        .sort(function (a, b) { return b.s - a.s; })
+        .slice(0, RANK_MAX);
+    } catch (e) { return []; }
+  }
+  function saveRanks() {
+    try { localStorage.setItem('poopDodgeRanks', JSON.stringify(ranks)); } catch (e) {}
+  }
+  function loadName() {
+    try { return (localStorage.getItem('poopDodgeName') || '').slice(0, 8); } catch (e) { return ''; }
+  }
+  function saveName(v) { try { localStorage.setItem('poopDodgeName', v); } catch (e) {} }
+  ranks = loadRanks();
+
+  function renderRanks() {
+    var board = document.getElementById('rank-board');
+    board.textContent = '';
+    if (!ranks.length) {
+      var empty = document.createElement('div');
+      empty.className = 'rank-empty';
+      empty.textContent = '아직 기록이 없습니다.';
+      board.appendChild(empty);
+      return;
+    }
+    ranks.forEach(function (r, i) {
+      var row = document.createElement('div');
+      row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
+      var pos = document.createElement('span');
+      pos.className = 'rank-pos';
+      pos.textContent = (i + 1) + '위';
+      var name = document.createElement('span');
+      name.className = 'rank-name';
+      name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
+      var s = document.createElement('span');
+      s.className = 'rank-s';
+      s.textContent = r.s.toFixed(1) + '초';
+      row.append(pos, name, s);
+      board.appendChild(row);
+    });
+    var me = board.querySelector('.rank-row.me');
+    if (me) me.scrollIntoView({ block: 'nearest' });
+  }
+
+  function recordRank(s) {
+    var entry = { n: loadName() || '나', s: Math.round(s * 10) / 10, t: Date.now() };
+    ranks.push(entry);
+    ranks.sort(function (a, b) { return b.s - a.s; });
+    ranks = ranks.slice(0, RANK_MAX);
+    myRankRow = ranks.indexOf(entry) >= 0 ? entry : null;
+    saveRanks();
+    renderRanks();
+  }
+
+  // ---------- 도전 (공유 링크에 실려 오는 기록) ----------
+  var challengeS = 0;
+  function readHashChallenge() {
+    try {
+      var hit = /(?:^|[#&?])c=(\d{1,7})/.exec(location.hash || '');
+      return hit ? Math.min(99999, (parseInt(hit[1], 10) || 0) / 10) : 0;
+    } catch (e) { return 0; }
+  }
+  challengeS = readHashChallenge();
+  window.addEventListener('hashchange', function () {
+    var s = readHashChallenge();
+    if (s > 0) challengeS = s;
+  });
+
+  // ---------- 공유 ----------
+  function challengeUrl(s) {
+    try {
+      var u = new URL(location.href);
+      u.hash = 'c=' + Math.round(s * 10);
+      return u.href;
+    } catch (e) { return ''; }
+  }
+  function note(msg) {
+    var el = document.getElementById('share-note');
+    el.textContent = msg;
+    clearTimeout(note._t);
+    note._t = setTimeout(function () { el.textContent = ''; }, 3200);
+  }
+  function shareResult() {
+    var s = Math.round(lastScore * 10) / 10;
+    var url = challengeUrl(s);
+    var text = '💩 똥피하기 — ' + s.toFixed(1) + '초 버텼습니다. 이길 수 있나요?\n도전 코드: ' + Math.round(s * 10);
+    var full = url ? text + '\n' + url : text;
+    var done = function () { note('공유했습니다'); };
+    if (navigator.share) {
+      navigator.share(url ? { title: '똥피하기', text: text, url: url } : { title: '똥피하기', text: text })
+        .then(done)
+        .catch(function (e) {
+          if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
+          copyFallback(full);
+        });
+      return;
+    }
+    copyFallback(full);
+  }
+  function copyFallback(full) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(full)
+        .then(function () { note('도전 링크를 복사했습니다'); })
+        .catch(function () { manualCopy(full); });
+      return;
+    }
+    manualCopy(full);
+  }
+  function manualCopy(full) {
+    var fb = document.getElementById('share-fallback');
+    fb.value = full;
+    fb.classList.remove('hidden');
+    fb.focus(); fb.select();
+    note('아래 링크를 복사해 보내세요');
+  }
+
+  var lastScore = 0;
   var deathAnim = 0;           // 게임오버 연출 타이머
   var shake = 0;
   var spawnTimer = 0;
@@ -85,11 +298,11 @@
 
   // ---------- 난이도 ----------
   // 중력: 떨어질수록 빨라진다 (천천- 하다가 훅 떨어지는 느낌)
-  function gravity() { return 290 + score * 6.5; }
-  function maxFall() { return 560 + score * 10; }
+  function gravity() { return 305 + score * 7; }
+  function maxFall() { return 580 + score * 11; }
   // 물결(burst) 리듬: 후두둑... 쉬고... 후두두두둑
-  function waveGap() { return Math.max(0.42, 1.18 - score * 0.01); }
-  function waveSize() { return 2 + Math.floor(score / 9) + Math.floor(Math.random() * 3); }
+  function waveGap() { return Math.max(0.38, 1.1 - score * 0.011); }
+  function waveSize() { return 2 + Math.floor(score / 8) + Math.floor(Math.random() * 3); }
   function burstGap() { return 0.06 + Math.random() * 0.1; }
 
   function spawnPoop() {
@@ -115,11 +328,13 @@
   var dragging = false;
 
   document.addEventListener('keydown', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return; // 이름 입력 중엔 무시
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
     if (state !== STATE_PLAY && (e.key === ' ' || e.key === 'Enter' || e.key.indexOf('Arrow') === 0)) tryStart();
   });
   document.addEventListener('keyup', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return;
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
   });
@@ -162,9 +377,21 @@
 
   function tryStart() {
     if (state === STATE_OVER && performance.now() - overAt < 600) return; // 오터치 방지
+    document.getElementById('over-panel').classList.add('hidden');
     reset();
     state = STATE_PLAY;
   }
+
+  // ---------- 패널 버튼 ----------
+  document.getElementById('retry-btn').addEventListener('click', function () { tryStart(); });
+  document.getElementById('share-btn').addEventListener('click', function () { shareResult(); });
+  var nameInput = document.getElementById('name-input');
+  nameInput.value = loadName();
+  nameInput.addEventListener('input', function () {
+    var v = nameInput.value.slice(0, 8);
+    saveName(v);
+    if (myRankRow) { myRankRow.n = v || '나'; saveRanks(); renderRanks(); }
+  });
 
   // ---------- 업데이트 ----------
   function update(dt) {
@@ -253,11 +480,36 @@
     overAt = performance.now();
     deathAnim = 0;
     shake = 12;
+    lastScore = score;
     if (score > best) {
       best = score;
       isNewBest = true;
       try { localStorage.setItem('poopDodgeBest', String(best)); } catch (e) {}
     }
+    recordRank(score);
+    showOverPanel();
+  }
+
+  function showOverPanel() {
+    document.getElementById('over-score').textContent = lastScore.toFixed(1) + '초 버팀';
+    var sub = document.getElementById('over-sub');
+    sub.className = '';
+    if (challengeS > 0) {
+      if (lastScore > challengeS) {
+        sub.textContent = '🏆 도전 성공! (' + challengeS.toFixed(1) + '초를 이겼다)';
+        sub.className = 'win';
+      } else {
+        sub.textContent = '도전 실패… 목표 ' + challengeS.toFixed(1) + '초';
+        sub.className = 'lose';
+      }
+    } else if (isNewBest) {
+      sub.textContent = '🎉 신기록!';
+      sub.className = 'newbest';
+    } else {
+      sub.textContent = '최고 기록 ' + best.toFixed(1) + '초';
+    }
+    document.getElementById('share-fallback').classList.add('hidden');
+    document.getElementById('over-panel').classList.remove('hidden');
   }
 
   // ---------- 그리기 ----------
@@ -421,6 +673,12 @@
       ctx.font = '15px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(34,34,34,0.5)';
       ctx.fillText('최고 ' + best.toFixed(1) + '초', W / 2, 88);
+      if (challengeS > 0) {
+        var beat = score > challengeS;
+        ctx.fillStyle = beat ? '#1d8a3c' : '#b3543a';
+        ctx.font = 'bold 15px -apple-system, sans-serif';
+        ctx.fillText(beat ? '🏆 도전 상대를 넘었다!' : '도전 ' + challengeS.toFixed(1) + '초', W / 2, 112);
+      }
     } else if (state === STATE_TITLE) {
       ctx.fillStyle = '#222';
       ctx.font = 'bold 52px -apple-system, sans-serif';
@@ -433,33 +691,22 @@
       if (best > 0) {
         ctx.fillText('최고 기록: ' + best.toFixed(1) + '초', W / 2, H * 0.3 + 102);
       }
+      if (challengeS > 0) {
+        ctx.fillStyle = '#b3543a';
+        ctx.font = 'bold 18px -apple-system, sans-serif';
+        ctx.fillText('⚔️ 도전장 도착: ' + challengeS.toFixed(1) + '초를 이겨라!', W / 2, H * 0.3 + 136);
+      }
       blinkText('화면을 터치하면 시작!', H * 0.62);
     } else if (state === STATE_OVER) {
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.fillRect(-20, -20, W + 40, H + 40);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 46px -apple-system, sans-serif';
-      ctx.fillText('💩 맞았다!', W / 2, H * 0.32);
-      ctx.font = 'bold 34px -apple-system, sans-serif';
-      ctx.fillText(score.toFixed(1) + '초 버팀', W / 2, H * 0.32 + 52);
-      ctx.font = '19px -apple-system, sans-serif';
-      if (isNewBest) {
-        ctx.fillStyle = '#ffd34d';
-        ctx.fillText('🎉 신기록!', W / 2, H * 0.32 + 88);
-      } else {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.fillText('최고 기록 ' + best.toFixed(1) + '초', W / 2, H * 0.32 + 88);
-      }
-      if (performance.now() - overAt > 600) {
-        ctx.fillStyle = '#fff';
-        blinkText('터치해서 다시 시작', H * 0.62);
-      }
     }
   }
 
   function blinkText(text, y) {
     var a = 0.55 + 0.45 * Math.sin(performance.now() / 350);
     ctx.save();
+    ctx.fillStyle = '#222';
     ctx.globalAlpha = a;
     ctx.font = 'bold 22px -apple-system, sans-serif';
     ctx.fillText(text, W / 2, y);
