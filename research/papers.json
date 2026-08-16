@@ -2506,5 +2506,22 @@
       "adaptive symptom questionnaire traditional chinese medicine"
     ],
     "first_seen": "2026-08-14"
+  },
+  {
+    "id": "doi:10.1186/s13020-025-01261-4",
+    "title": "The role and therapeutic advances of neutrophils in acute myocardial infarction: from traditional chinese medicine modulation to modern therapeutic strategies.",
+    "authors": [
+      "Wan Y",
+      "Zhang J",
+      "Yang Y."
+    ],
+    "year": "2025",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13020-025-01261-4",
+    "abstract": "Acute Myocardial Infarction (AMI) is one of the leading causes of global mortality, posing a severe threat to human health. Currently, the clinical management of AMI remains a major challenge, and its pathological mechanisms lack systematic elucidation. Neutrophils, as key effector cells in the pathogenesis of AMI, have emerged as a highly promising therapeutic target. This review comprehensively summarizes the origin, subtypes, stage-specific roles, and mechanistic contributions of neutrophils in AMI. Furthermore, it explores how active components of traditional Chinese medicine (TCM) modulate neutrophil function through multi-target interventions, exerting therapeutic effects in anti-inflammation, anti-fibrosis, and pro-angiogenesis. Recent advances highlight significant progress in neutrophil-targeted therapies, including novel drug development, nanoparticle-based delivery systems, and multi-omics biomarker discovery, offering new avenues for precision medicine in AMI. Although translational challenges persist, enhanced collaboration between basic research and clinical applications may unlock innovative treatment strategies for AMI patients.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-08-16"
   }
 ]
