@@ -6,18 +6,30 @@
 <title>똥피하기</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100%; height: 100%;
+  /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
+     아래로 쓸리는 손가락을 시트 닫기 대신 스크롤로 소비시킨다 */
+  html {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    height: calc(100% + 240px);
     overflow: hidden;
+    overscroll-behavior: none;
     background: #f5efe0;
-    touch-action: none;
     -webkit-user-select: none; user-select: none;
     -webkit-touch-callout: none;
     font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   }
   #game {
     display: block;
-    width: 100%; height: 100%;
+    position: fixed;
+    inset: 0;
+    /* 세로 팬은 완충지대 스크롤로 흘려보낸다 — none으로 막으면 iOS가 시트 닫기로 가져간다 */
+    touch-action: pan-y;
   }
   /* ── 게임오버 패널 (랭킹/공유) ── */
   #over-panel {
@@ -360,15 +372,15 @@
   }
   function pointerUp() { dragging = false; }
 
+  // preventDefault를 걸지 않는다 — 세로 팬이 문서 완충지대 스크롤로 소비되어야
+  // 인앱 브라우저 시트가 끌기를 가로채지 않는다 (가로 드래그는 그대로 우리에게 온다)
   canvas.addEventListener('touchstart', function (e) {
-    e.preventDefault();
     pointerDown(e.touches[0].clientX);
-  }, { passive: false });
+  }, { passive: true });
   canvas.addEventListener('touchmove', function (e) {
-    e.preventDefault();
     pointerMove(e.touches[0].clientX);
-  }, { passive: false });
-  canvas.addEventListener('touchend', function (e) { e.preventDefault(); pointerUp(); }, { passive: false });
+  }, { passive: true });
+  canvas.addEventListener('touchend', function () { pointerUp(); }, { passive: true });
   canvas.addEventListener('touchcancel', function () { pointerUp(); });
 
   canvas.addEventListener('mousedown', function (e) { pointerDown(e.clientX); });
@@ -722,6 +734,21 @@
     draw();
     requestAnimationFrame(loop);
   }
+  // 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 완충지대 중간(120px)에 걸어 둔다.
+  // 제스처 도중에는 건드리지 않고, 새 터치 시작 시와 스크롤이 잠잠해진 뒤 다시 건다.
+  var SE = document.scrollingElement || document.documentElement;
+  var PIN = 120, pinT = null;
+  function pinScroll() {
+    var max = SE.scrollHeight - SE.clientHeight;
+    if (max <= 0) return;
+    SE.scrollTop = Math.min(PIN, Math.max(1, max - 1));
+  }
+  document.addEventListener('touchstart', pinScroll, { passive: true });
+  window.addEventListener('scroll', function () {
+    clearTimeout(pinT); pinT = setTimeout(pinScroll, 250);
+  }, { passive: true });
+  pinScroll();
+
   reset();
   requestAnimationFrame(loop);
 
