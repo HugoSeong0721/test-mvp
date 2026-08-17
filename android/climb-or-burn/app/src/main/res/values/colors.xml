@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 게임 배경의 그을음 색. 적응형 아이콘 배경과 스플래시에 같이 쓴다. -->
+    <color name="soot">#0B0908</color>
+    <color name="ic_launcher_background">#140B07</color>
+</resources>

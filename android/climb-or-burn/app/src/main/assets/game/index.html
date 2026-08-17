@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Climb or Burn</title>
+</head>
+<body>
+<style>
+  /* 불타는 수직굴 하나에 확정 — 테마 분기 없이 모든 색을 명시 */
+  :root {
+    --soot:      #0b0908;
+    --soot-up:   #191311;
+    --shaft:     #120d0c;
+    --rim:       #33251f;
+    --stone:     #7d746c;
+    --stone-hi:  #a89c91;
+    --flame:     #ff5a1f;
+    --flame-hi:  #ffd24a;
+    --danger:    #ff3b30;
+    --spring:    #4fbf6a;
+    --text:      #f5ece2;
+    --text-dim:  #b5a89c;
+    --label:     #8a7b6f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+    background: radial-gradient(ellipse at 50% 100%, #2a1208 0%, var(--soot) 65%);
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    user-select: none; -webkit-user-select: none; touch-action: none;
+  }
+
+  #stage {
+    position: relative;
+    width: min(100vw, 440px);
+    height: min(100vh, 860px);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 10px; gap: 8px;
+  }
+
+  #hud { display: flex; align-items: flex-end; justify-content: space-between; padding: 0 6px; }
+  .stat-label { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--label); }
+  #alt-value {
+    font-size: 34px; font-weight: 800; line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  #alt-value .unit { font-size: 15px; font-weight: 600; color: var(--text-dim); margin-left: 2px; }
+  #best-value { font-size: 16px; font-weight: 700; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  #best-box { text-align: right; }
+
+  #shaft {
+    position: relative; flex: 1 1 auto; min-height: 0; max-height: 660px;
+    border: 1px solid var(--rim); border-radius: 14px;
+    background: linear-gradient(180deg, var(--shaft) 0%, #1a0f0a 100%);
+    overflow: hidden;
+    box-shadow: inset 0 -40px 70px rgba(255, 90, 31, .18), 0 10px 40px rgba(0, 0, 0, .55);
+  }
+  #game-canvas { display: block; width: 100%; height: 100%; }
+
+  /* 불길이 가까워지면 화면 가장자리가 달아오른다 */
+  #heat {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    box-shadow: inset 0 0 70px 18px rgba(255, 59, 48, .75);
+    transition: opacity .12s linear;
+  }
+
+  .overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(11, 9, 8, .92); backdrop-filter: blur(5px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 26px; gap: 18px;
+  }
+  .overlay.hidden { display: none; }
+
+  .title-main {
+    font-size: 42px; font-weight: 800; letter-spacing: 3px; text-wrap: balance;
+    background: linear-gradient(180deg, var(--flame-hi), var(--flame));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .title-sub { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--label); margin-top: 6px; }
+
+  .pitch { font-size: 16px; line-height: 1.85; color: var(--text); }
+  .pitch b { color: var(--flame-hi); }
+  .controls {
+    font-size: 12.5px; line-height: 1.9; color: var(--label);
+    border-top: 1px solid var(--rim); padding-top: 12px;
+  }
+  .controls kbd {
+    font: inherit; font-size: 11.5px; color: var(--text-dim);
+    background: rgba(255, 255, 255, .07); border: 1px solid var(--rim);
+    border-radius: 5px; padding: 1px 6px; margin: 0 1px;
+  }
+
+  .btn {
+    font: inherit; font-size: 18px; font-weight: 700; letter-spacing: 3px;
+    color: #2a1004; background: linear-gradient(180deg, var(--flame-hi), var(--flame));
+    border: none; border-radius: 999px; padding: 15px 50px; cursor: pointer;
+    box-shadow: 0 6px 26px rgba(255, 90, 31, .4);
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:focus-visible { outline: 3px solid var(--text); outline-offset: 4px; }
+
+  #death-cause { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--danger); }
+  #final-alt { font-size: 56px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+  #final-alt .unit { font-size: 20px; color: var(--text-dim); margin-left: 3px; }
+  #final-rank { font-size: 19px; font-weight: 700; color: var(--flame-hi); text-wrap: balance; }
+  #final-best { font-size: 12px; color: var(--label); letter-spacing: 1px; }
+
+  .is-hidden { display: none !important; }
+
+  /* 보상 표시 */
+  #water-count { display: flex; align-items: center; gap: 5px; margin-top: 3px; }
+  #water-count b { font-size: 15px; font-weight: 800; color: #8fd6ff; font-variant-numeric: tabular-nums; }
+  #water-count .drop, .pick-hint i {
+    width: 11px; height: 13px; display: inline-block;
+    background: #8fd6ff; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    transform: rotate(180deg);
+  }
+  .pick-hint { font-size: 13px; color: var(--text-dim); }
+  .pick-hint i { vertical-align: -2px; margin-right: 3px; }
+  .pick-hint i.b { background: #8ef0b4; }
+  #water-result { font-size: 13px; font-weight: 700; color: #8fd6ff; }
+
+  /* ── 도전 상대 ─────────────────────── */
+  #chal-chip {
+    align-self: center;
+    font-size: 11px; letter-spacing: 1px; color: var(--text-dim);
+    background: rgba(255, 90, 31, .14); border: 1px solid rgba(255, 90, 31, .45);
+    border-radius: 999px; padding: 4px 11px;
+  }
+  #chal-chip b { color: var(--flame-hi); font-variant-numeric: tabular-nums; }
+
+  #pass-banner {
+    position: absolute; top: 26%; left: 0; right: 0; z-index: 6;
+    text-align: center; pointer-events: none; opacity: 0;
+    font-size: 26px; font-weight: 800; letter-spacing: 2px; color: var(--flame-hi);
+    text-shadow: 0 0 18px rgba(255, 150, 40, .9);
+  }
+  #pass-banner.show { animation: passPop 1.5s ease-out forwards; }
+  @keyframes passPop {
+    0%   { opacity: 0; transform: scale(.7); }
+    18%  { opacity: 1; transform: scale(1.08); }
+    32%  { transform: scale(1); }
+    78%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-26px); }
+  }
+
+  /* ── 결과 화면의 랭킹 ──────────────── */
+  .overlay#end-overlay { gap: 11px; }
+  #challenge-result { font-size: 13px; font-weight: 700; }
+  #challenge-result.win  { color: var(--spring); }
+  #challenge-result.lose { color: var(--danger); }
+
+  .name-row { display: flex; align-items: center; gap: 8px; }
+  .name-row label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--label); }
+  #name-input {
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--text);
+    background: rgba(255, 255, 255, .07); border: 1px solid var(--rim);
+    border-radius: 8px; padding: 7px 11px; width: 132px; text-align: center;
+  }
+  #name-input:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
+
+  #rank-board {
+    width: 100%; max-width: 290px; max-height: 148px; overflow-y: auto;
+    border: 1px solid var(--rim); border-radius: 10px;
+    background: rgba(255, 255, 255, .035);
+  }
+  .rank-row {
+    display: grid; grid-template-columns: 26px 1fr auto;
+    align-items: center; gap: 8px;
+    padding: 7px 11px; font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row.me { background: rgba(255, 90, 31, .16); }
+  .rank-pos { font-size: 11px; font-weight: 700; color: var(--label); font-variant-numeric: tabular-nums; }
+  .rank-row.me .rank-pos { color: var(--flame-hi); }
+  .rank-name { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+  .rank-row.me .rank-name { color: var(--text); font-weight: 700; }
+  .rank-m { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+  .rank-empty { padding: 14px; font-size: 12px; color: var(--label); }
+
+  .btn-row { display: flex; gap: 10px; align-items: center; }
+  .btn.secondary {
+    background: rgba(255, 255, 255, .08); color: var(--text);
+    border: 1px solid var(--rim); box-shadow: none;
+    font-size: 15px; letter-spacing: 1px; padding: 13px 22px;
+  }
+  .btn.secondary:active { transform: scale(.97); }
+
+  #share-note { font-size: 11.5px; color: var(--spring); min-height: 14px; }
+  /* 시작 화면의 도전 코드 입력 — 눈에 띄지 않게, 필요한 사람만 쓰도록 */
+  .code-row { display: flex; align-items: center; gap: 6px; margin-top: -4px; }
+  .code-row label { font-size: 10px; letter-spacing: 1.5px; color: var(--label); }
+  #code-input {
+    font: inherit; font-size: 13px; color: var(--text); width: 82px; text-align: center;
+    background: rgba(255, 255, 255, .06); border: 1px solid var(--rim);
+    border-radius: 7px; padding: 6px 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  #code-btn {
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--text-dim);
+    background: rgba(255, 255, 255, .07); border: 1px solid var(--rim);
+    border-radius: 7px; padding: 7px 12px; cursor: pointer;
+  }
+  #code-btn:active { transform: scale(.96); }
+  #code-input:focus-visible, #code-btn:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
+
+  #share-fallback {
+    font: inherit; font-size: 11px; color: var(--text-dim); width: 100%; max-width: 290px;
+    background: rgba(255, 255, 255, .06); border: 1px solid var(--rim);
+    border-radius: 8px; padding: 7px 9px;
+  }
+</style>
+
+<div id="stage">
+  <div id="hud">
+    <div>
+      <div class="stat-label">ALTITUDE</div>
+      <div id="alt-value"><span id="alt-num">0</span><span class="unit">m</span></div>
+      <div id="water-count" class="is-hidden"><span class="drop"></span><b>0</b></div>
+    </div>
+    <div id="chal-chip" class="is-hidden">RIVAL <b></b></div>
+    <div id="best-box">
+      <div class="stat-label">BEST</div>
+      <div id="best-value">0m</div>
+    </div>
+  </div>
+
+  <div id="shaft">
+    <canvas id="game-canvas"></canvas>
+    <div id="heat"></div>
+    <div id="pass-banner">RECORD BEATEN!</div>
+
+    <div class="overlay" id="start-overlay">
+      <div>
+        <div class="title-main">CLIMB OR BURN</div>
+        <div class="title-sub">don’t stop moving</div>
+      </div>
+      <div class="pitch">
+        The fire <b>never stops</b> rising.<br>
+        Hit the ledges and <b>keep climbing.</b><br>
+        <span class="pick-hint"><i class="w"></i>Water drops hold the fire back,
+        <i class="b"></i>updrafts launch you high</span>
+      </div>
+      <div class="controls">
+        Touch the screen and <b>drag toward where you want to go</b><br>
+        On PC, move the mouse or use <kbd>&larr;</kbd> <kbd>&rarr;</kbd><br>
+        Jumping is automatic &middot; you pass through the side walls
+      </div>
+      <button class="btn" id="start-btn">RUN</button>
+      <div class="code-row">
+        <label for="code-input">Challenge code</label>
+        <input id="code-input" inputmode="numeric" maxlength="6" placeholder="e.g. 420" autocomplete="off">
+        <button id="code-btn" type="button">Apply</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="end-overlay">
+      <div id="death-cause"></div>
+      <div id="final-alt">0<span class="unit">m</span></div>
+      <div id="final-rank"></div>
+      <div id="challenge-result" class="is-hidden"></div>
+      <div id="water-result" class="is-hidden"></div>
+
+      <div class="name-row">
+        <label for="name-input">Name</label>
+        <input id="name-input" maxlength="8" placeholder="Your name" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="rank-board"></div>
+
+      <div class="btn-row">
+        <button class="btn secondary" id="share-btn">Share run</button>
+        <button class="btn" id="retry-btn">Retry</button>
+      </div>
+      <div id="share-note"></div>
+      <input id="share-fallback" class="is-hidden" readonly>
+      <div id="final-best"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const shaftEl = document.getElementById('shaft');
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  const heatEl = document.getElementById('heat');
+  const altNumEl = document.getElementById('alt-num');
+  const waterEl = document.getElementById('water-count');
+  const waterNumEl = waterEl.querySelector('b');
+  const bestEl = document.getElementById('best-value');
+  const startOverlay = document.getElementById('start-overlay');
+  const endOverlay = document.getElementById('end-overlay');
+
+  // ── 상수 ────────────────────────────────────────────────
+  // 중력을 낮춰 체공 시간을 늘린다. 점프 높이(약 150px)는 그대로 두어
+  // 발판 도달 거리는 유지하면서 한 사이클이 0.75초 -> 1.0초로 느긋해진다.
+  const GRAVITY   = 1200;
+  const BOUNCE    = -600;    // 기본 점프 (약 150px 상승)
+  const SPRING    = -1030;   // 스프링 발판 (약 440px)
+  const MOVE_SPD  = 390;
+  const MOVE_EASE = 14;
+  const PLAYER_R  = 13;
+  // 플레이어를 화면 위쪽에 두어 발밑 시야를 넓게 — 불길이 늘 보이게 하는 장치
+  const CAM_ANCHOR = 0.34;
+  // 불길이 이보다 더 뒤처지지 않는다. 화면 아래쪽 여백(약 0.42H)보다 짧게 잡아
+  // 아무리 잘 도망쳐도 불길이 늘 발밑에 보이도록 — 긴장감의 핵심
+  const LAVA_LEASH = 440;
+  const LAVA_GRACE = 3;      // 시작 직후 이 시간 동안은 불길이 오르지 않는다
+  const PX_PER_M  = 12;
+
+  let W = 420, H = 620, dpr = 1;
+  let running = false;
+  let player, platforms, embers, shards, pickups, floaters;
+  let camY, topSpawnY, lavaY, lavaShake;
+  let bestM = 0, altM = 0, peakY = 0;
+  let inputLeft = false, inputRight = false, targetX = null;
+  let heat = 0, beatT = 0, runTime = 0;
+  // 고정 스텝 물리를 화면 주사율에 맞춰 보간해 그린다.
+  // 보간이 없으면 프레임마다 물리 스텝 수가 1~2개로 흔들려 미세하게 버벅인다.
+  let viewCam = 0, viewX = 0, viewY = 0;
+  let prevCam = 0, prevX = 0, prevY = 0;
+  let lastHeatOpacity = -1, lastAltShown = -1, lastWaterShown = -1;
+  let waterCount = 0, lavaFreeze = 0;
+
+  // ── 저장 ────────────────────────────────────────────────
+  function loadBest() {
+    try { return parseInt(localStorage.getItem('firechase-best') || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function saveBest(v) { try { localStorage.setItem('firechase-best', String(v)); } catch (e) { /* 무시 */ } }
+
+  // ── 랭킹 (이 기기에 남는 기록) ──────────────────────────
+  const RANK_MAX = 10;
+  let ranks = [], myRankRow = null;
+
+  function loadRanks() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('firechase-ranks') || '[]');
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter(r => r && typeof r.m === 'number' && isFinite(r.m))
+        .map(r => ({ n: String(r.n || 'You').slice(0, 8), m: Math.max(0, Math.round(r.m)), t: r.t || 0 }))
+        .sort((a, b) => b.m - a.m)
+        .slice(0, RANK_MAX);
+    } catch (e) { return []; }
+  }
+  function saveRanks() {
+    try { localStorage.setItem('firechase-ranks', JSON.stringify(ranks)); } catch (e) { /* 무시 */ }
+  }
+  function loadName() {
+    try { return (localStorage.getItem('firechase-name') || '').slice(0, 8); } catch (e) { return ''; }
+  }
+  function saveName(v) { try { localStorage.setItem('firechase-name', v); } catch (e) { /* 무시 */ } }
+
+  function renderRanks() {
+    const board = document.getElementById('rank-board');
+    board.textContent = '';
+    if (!ranks.length) {
+      const empty = document.createElement('div');
+      empty.className = 'rank-empty';
+      empty.textContent = 'No runs yet.';
+      board.appendChild(empty);
+      return;
+    }
+    ranks.forEach((r, i) => {
+      const row = document.createElement('div');
+      row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
+      const pos = document.createElement('span');
+      pos.className = 'rank-pos';
+      pos.textContent = '#' + (i + 1);
+      const name = document.createElement('span');
+      name.className = 'rank-name';
+      name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
+      const m = document.createElement('span');
+      m.className = 'rank-m';
+      m.textContent = r.m + 'm';
+      row.append(pos, name, m);
+      board.appendChild(row);
+    });
+    const me = board.querySelector('.rank-row.me');
+    if (me) me.scrollIntoView({ block: 'nearest' });
+  }
+
+  function recordRank(m) {
+    const entry = { n: loadName() || 'You', m, t: Date.now() };
+    ranks.push(entry);
+    ranks.sort((a, b) => b.m - a.m);
+    ranks = ranks.slice(0, RANK_MAX);
+    myRankRow = ranks.includes(entry) ? entry : null;
+    saveRanks();
+    renderRanks();
+  }
+
+  // ── 도전 상대 (공유 링크에 실려 오는 기록) ───────────────
+  // 오르는 동안 지나가는 구간 — 다음 목표가 계속 눈앞에 있게 한다
+  const MILESTONES = [
+    { m: 100,  label: 'Through the smoke' },
+    { m: 250,  label: 'Halfway up' },
+    { m: 500,  label: 'The fire falls behind' },
+    { m: 1000, label: 'Cloud height' },
+    { m: 2000, label: 'Where nobody has been' },
+  ];
+  let nextMilestone = 0;
+
+  function flashBanner(text) {
+    const banner = document.getElementById('pass-banner');
+    banner.textContent = text;
+    banner.classList.remove('show');
+    void banner.offsetWidth;            // 애니메이션 재시작
+    banner.classList.add('show');
+  }
+
+  let challengeM = 0, challengeBeaten = false;
+
+  function readHashChallenge() {
+    try {
+      const hit = /(?:^|[#&?])c=(\d{1,6})/.exec(location.hash || '');
+      return hit ? Math.min(999999, parseInt(hit[1], 10) || 0) : 0;
+    } catch (e) { return 0; }
+  }
+
+  function setChallenge(m) {
+    challengeM = Math.max(0, Math.min(999999, Math.round(m) || 0));
+    const chip = document.getElementById('chal-chip');
+    if (challengeM > 0) {
+      chip.querySelector('b').textContent = challengeM + 'm';
+      chip.classList.remove('is-hidden');
+    } else chip.classList.add('is-hidden');
+    const input = document.getElementById('code-input');
+    if (input && challengeM > 0 && input.value !== String(challengeM)) input.value = String(challengeM);
+  }
+
+  // 링크의 프래그먼트는 환경에 따라 전달되지 않을 수 있어 코드 입력도 함께 받는다
+  window.addEventListener('hashchange', () => {
+    const m = readHashChallenge();
+    if (m > 0) setChallenge(m);
+  });
+
+  // ── 공유 ────────────────────────────────────────────────
+  function challengeUrl(m) {
+    try {
+      const u = new URL(location.href);
+      u.hash = 'c=' + m;
+      return u.href;
+    } catch (e) { return ''; }
+  }
+  function note(msg) {
+    const el = document.getElementById('share-note');
+    el.textContent = msg;
+    clearTimeout(note._t);
+    note._t = setTimeout(() => { el.textContent = ''; }, 3200);
+  }
+  async function shareResult() {
+    const url = challengeUrl(altM);
+    // 링크가 막힌 곳에서도 겨룰 수 있도록 도전 코드를 함께 실어 보낸다
+    const text = '🔥 Climb or Burn — I got to ' + altM + 'm. Can you beat it?\nChallenge code: ' + altM;
+    const full = url ? text + '\n' + url : text;
+    if (navigator.share) {
+      try {
+        await navigator.share(url ? { title: 'Climb or Burn', text, url } : { title: 'Climb or Burn', text });
+        return note('Shared');
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(full);
+      return note('Challenge link copied');
+    } catch (e) { /* 아래 수동 복사로 넘어간다 */ }
+    const fb = document.getElementById('share-fallback');
+    fb.value = full;
+    fb.classList.remove('is-hidden');
+    fb.focus(); fb.select();
+    note('Copy the link below and send it');
+  }
+
+  // ── 사운드 ──────────────────────────────────────────────
+  let actx = null;
+  function ac() {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    return actx;
+  }
+  function tone(freq, dur, type = 'sine', gain = .07, delay = 0, slideTo = null) {
+    try {
+      const c = ac(), t0 = c.currentTime + delay;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t0);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+      g.gain.setValueAtTime(gain, t0);
+      g.gain.exponentialRampToValueAtTime(.0008, t0 + dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(t0); o.stop(t0 + dur);
+    } catch (e) { /* 무시 */ }
+  }
+  function noise(dur, gain, cutoff) {
+    try {
+      const c = ac(), n = Math.floor(c.sampleRate * dur);
+      const buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      const s = c.createBufferSource(); s.buffer = buf;
+      const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutoff;
+      const g = c.createGain(); g.gain.value = gain;
+      s.connect(f); f.connect(g); g.connect(c.destination);
+      s.start();
+    } catch (e) { /* 무시 */ }
+  }
+
+  // ── 화면 크기 ───────────────────────────────────────────
+  function resize() {
+    const r = shaftEl.getBoundingClientRect();
+    W = r.width; H = r.height;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ── 발판 ────────────────────────────────────────────────
+  // y는 위로 갈수록 작아진다 (캔버스와 같은 방향)
+  function platWidth(height) { return Math.max(80, 118 - height / 400); }
+
+  function spawnPlatform(y) {
+    const h = Math.max(0, -y / PX_PER_M);
+    const w = platWidth(h);
+    const roll = Math.random();
+    let kind = 'solid';
+    if (h > 250) {                       // 한참 오른 뒤에야 까다로운 발판이 섞인다
+      if (roll < 0.10) kind = 'spring';
+      else if (roll < 0.24) kind = 'fragile';
+      else if (roll < 0.38) kind = 'moving';
+    }
+    const p = {
+      x: 20 + Math.random() * (W - 40 - w), y, w, kind,
+      dir: Math.random() < .5 ? -1 : 1,
+      spd: 40 + Math.random() * 45 + Math.min(55, h / 18),
+      broken: 0,
+    };
+    platforms.push(p);
+
+    // 발판 위에 이따금 보상을 얹는다 — 그 발판을 노릴 이유가 된다
+    if (h > 30) {
+      const r = Math.random();
+      if (r < 0.15) pickups.push({ x: p.x + p.w / 2, y: y - 36, kind: 'water', t: 0 });
+      else if (r < 0.19) pickups.push({ x: p.x + p.w / 2, y: y - 42, kind: 'boost', t: 0 });
+    }
+    return p;
+  }
+
+  function fillPlatforms() {
+    while (topSpawnY > camY - 260) {
+      const h = Math.max(0, -topSpawnY / PX_PER_M);
+      const gap = 42 + Math.random() * 20 + Math.min(14, h / 180);
+      topSpawnY -= gap;
+      spawnPlatform(topSpawnY);
+    }
+  }
+
+  // ── 입력 ────────────────────────────────────────────────
+  window.addEventListener('keydown', (e) => {
+    if (e.target && e.target.tagName === 'INPUT') return;   // 이름 입력 중에는 조작키로 쓰지 않는다
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { inputLeft = true; targetX = null; }
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { inputRight = true; targetX = null; }
+    if ((e.key === ' ' || e.key === 'Enter') && !running) { e.preventDefault(); startGame(); }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') inputLeft = false;
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') inputRight = false;
+  });
+
+  function localX(e) { return e.clientX - shaftEl.getBoundingClientRect().left; }
+
+  // 마우스든 손가락이든 가리킨 x를 그대로 목표로 삼는다.
+  // (예전엔 화면 좌/우를 '누른 채 유지'해야 했는데, 모바일에서 탭하면
+  //  방향이 즉시 풀려 캐릭터가 거의 움직이지 않았다.)
+  function aimAtPointer(e) {
+    targetX = Math.max(0, Math.min(W, localX(e)));
+    inputLeft = inputRight = false;
+  }
+  shaftEl.addEventListener('pointermove', (e) => {
+    if (!running) return;
+    if (e.pointerType === 'mouse' || e.buttons) aimAtPointer(e);
+  });
+  shaftEl.addEventListener('pointerdown', (e) => {
+    if (!running) return;
+    e.preventDefault();
+    // 손가락이 굴 밖으로 나가도 계속 따라오도록
+    try { shaftEl.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
+    aimAtPointer(e);
+  });
+
+  // 손가락을 떼면 그 자리에 선다.
+  // (떼도 목표가 남아 있으면 한 번 탭한 것만으로 화면 끝까지 날아가 버린다.)
+  function releaseAim(e) {
+    if (!running) return;
+    if (e && e.pointerType === 'mouse') return;   // 마우스는 커서를 계속 따라간다
+    targetX = player.x;
+  }
+  shaftEl.addEventListener('pointerup', releaseAim);
+  shaftEl.addEventListener('pointercancel', releaseAim);
+
+  // ── 시작 / 종료 ─────────────────────────────────────────
+  function startGame() {
+    resize();
+    platforms = []; embers = []; shards = []; pickups = []; floaters = [];
+    camY = -H * (1 - CAM_ANCHOR);
+    player = { x: W / 2, y: 0, py: 0, vx: 0, vy: -300, face: 1 };
+    peakY = 0; altM = 0;
+    heat = 0; beatT = 0; lavaShake = 0; runTime = 0;
+    waterCount = 0; lavaFreeze = 0;
+    inputLeft = inputRight = false; targetX = null;
+
+    // 시작 바닥은 화면 전체 폭 — 첫 착지를 보장해 시작하자마자 추락하는 일이 없도록
+    const base = { x: 0, y: 70, w: W, kind: 'solid', dir: 1, spd: 0, broken: 0 };
+    platforms.push(base);
+    topSpawnY = 70;
+    camY = player.y - H * CAM_ANCHOR;
+    fillPlatforms();
+
+    lavaY = player.y + LAVA_LEASH;
+    challengeBeaten = false;
+    nextMilestone = 0;
+    document.getElementById('pass-banner').classList.remove('show');
+    prevCam = camY; prevX = player.x; prevY = player.y;
+    viewCam = camY; viewX = player.x; viewY = player.y;
+    lastAltShown = -1; lastWaterShown = -1; lastHeatOpacity = -1;
+    running = true;
+    startOverlay.classList.add('hidden');
+    endOverlay.classList.add('hidden');
+    heatEl.style.opacity = 0;
+  }
+
+  function rankFor(m) {
+    if (m < 60)   return 'You never cleared the smoke.';
+    if (m < 200)  return 'Your feet are still burning.';
+    if (m < 450)  return 'That is a decent climb.';
+    if (m < 800)  return 'The fire is barely keeping up.';
+    if (m < 1400) return 'You broke above the smoke.';
+    return 'The fire gave up on you.';
+  }
+
+  function endGame(cause) {
+    if (!running) return;
+    running = false;
+    if (altM > bestM) { bestM = altM; saveBest(bestM); }
+    bestEl.textContent = bestM + 'm';
+    document.getElementById('death-cause').textContent = cause;
+    document.getElementById('final-alt').innerHTML = altM + '<span class="unit">m</span>';
+    document.getElementById('final-rank').textContent = rankFor(altM);
+    document.getElementById('final-best').textContent = 'Best on this device \u00b7 ' + bestM + 'm';
+
+    const cr = document.getElementById('challenge-result');
+    if (challengeM > 0) {
+      const won = altM > challengeM;
+      cr.textContent = won
+        ? 'Challenge cleared \u2014 you passed ' + challengeM + 'm'
+        : 'Challenge failed \u2014 ' + (challengeM - altM) + 'm short';
+      cr.className = won ? 'win' : 'lose';
+    } else cr.className = 'is-hidden';
+
+    const wr = document.getElementById('water-result');
+    if (waterCount > 0) { wr.textContent = 'Held the fire back with ' + waterCount + ' water drop' + (waterCount === 1 ? '' : 's'); wr.classList.remove('is-hidden'); }
+    else wr.classList.add('is-hidden');
+
+    recordRank(altM);
+    document.getElementById('share-fallback').classList.add('is-hidden');
+    document.getElementById('share-note').textContent = '';
+    endOverlay.classList.remove('hidden');
+    heatEl.style.opacity = 0;
+    noise(.7, .3, 700);
+    tone(320, .7, 'sawtooth', .1, 0, 60);
+  }
+
+  // ── 갱신 ────────────────────────────────────────────────
+  function update(dt) {
+    // 좌우 이동
+    let want = 0;
+    if (targetX !== null) {
+      const d = targetX - player.x;
+      want = Math.max(-1, Math.min(1, d / 40));
+    } else {
+      want = (inputRight ? 1 : 0) - (inputLeft ? 1 : 0);
+    }
+    const goal = want * MOVE_SPD;
+    player.vx += (goal - player.vx) * Math.min(1, MOVE_EASE * dt);
+    if (Math.abs(player.vx) > 8) player.face = player.vx > 0 ? 1 : -1;
+
+    player.py = player.y;
+    player.x += player.vx * dt;
+    player.vy += GRAVITY * dt;
+    player.y += player.vy * dt;
+
+    // 양옆 벽 통과
+    if (player.x < -PLAYER_R) player.x = W + PLAYER_R;
+    if (player.x > W + PLAYER_R) player.x = -PLAYER_R;
+
+    // 발판 이동 + 충돌
+    for (const p of platforms) {
+      if (p.kind === 'moving' && !p.broken) {
+        p.x += p.dir * p.spd * dt;
+        if (p.x < 8) { p.x = 8; p.dir = 1; }
+        if (p.x + p.w > W - 8) { p.x = W - 8 - p.w; p.dir = -1; }
+      }
+      if (p.broken) { p.broken += dt; continue; }
+      if (player.vy <= 0) continue;
+      const prevBottom = player.py + PLAYER_R;
+      const bottom = player.y + PLAYER_R;
+      if (prevBottom <= p.y && bottom >= p.y && player.x + PLAYER_R * .7 > p.x && player.x - PLAYER_R * .7 < p.x + p.w) {
+        if (p.kind === 'spring') {
+          player.vy = SPRING;
+          tone(420, .18, 'square', .07, 0, 1500);
+        } else {
+          player.vy = BOUNCE;
+          tone(210 + Math.random() * 30, .07, 'triangle', .055);
+        }
+        player.y = p.y - PLAYER_R;
+        if (p.kind === 'fragile') {
+          p.broken = 0.001;
+          for (let i = 0; i < 8; i++) {
+            shards.push({
+              x: p.x + Math.random() * p.w, y: p.y,
+              vx: (Math.random() - .5) * 160, vy: -40 + Math.random() * 90,
+              life: .8, r: 2 + Math.random() * 3,
+            });
+          }
+          noise(.16, .1, 2600);
+        }
+        break;
+      }
+    }
+    // 보상 획득
+    for (let i = pickups.length - 1; i >= 0; i--) {
+      const k = pickups[i];
+      k.t += dt;
+      if (k.y > camY + H + 240) { pickups.splice(i, 1); continue; }
+      const dx = k.x - player.x, dy = k.y - player.y;
+      if (dx * dx + dy * dy > 30 * 30) continue;
+      pickups.splice(i, 1);
+      if (k.kind === 'water') {
+        waterCount++;
+        lavaFreeze = Math.min(6, lavaFreeze + 2.6);
+        floaters.push({ x: k.x, y: k.y, text: 'FIRE HELD!', color: '#8fd6ff', life: 1 });
+        for (let n = 0; n < 14; n++) {
+          shards.push({ x: k.x, y: k.y, vx: (Math.random()-.5)*180, vy: -60 + Math.random()*120,
+                        life: .6, r: 2 + Math.random()*2, blue: true });
+        }
+        tone(880, .1, 'sine', .07); tone(1240, .16, 'sine', .06, .06);
+      } else {
+        player.vy = -1250;
+        floaters.push({ x: k.x, y: k.y, text: 'UPDRAFT!', color: '#8ef0b4', life: 1 });
+        for (let n = 0; n < 16; n++) {
+          shards.push({ x: k.x + (Math.random()-.5)*26, y: k.y, vx: (Math.random()-.5)*60, vy: 120 + Math.random()*140,
+                        life: .5, r: 1.5 + Math.random()*2, green: true });
+        }
+        tone(420, .1, 'triangle', .07); tone(880, .22, 'triangle', .06, .05);
+      }
+    }
+
+    // 부서진 발판 제거
+    for (let i = platforms.length - 1; i >= 0; i--) {
+      const p = platforms[i];
+      if ((p.broken && p.broken > .25) || p.y > camY + H + 260) platforms.splice(i, 1);
+    }
+
+    // 카메라는 위로만
+    camY = Math.min(camY, player.y - H * CAM_ANCHOR);
+    fillPlatforms();
+
+    // 고도
+    peakY = Math.min(peakY, player.y);
+    altM = Math.max(0, Math.round(-peakY / PX_PER_M));
+
+    // 도전 기록 추월
+    if (challengeM > 0 && !challengeBeaten && altM > challengeM) {
+      challengeBeaten = true;
+      flashBanner('RECORD BEATEN!');
+      tone(700, .12, 'triangle', .08);
+      tone(950, .16, 'triangle', .07, .07);
+    }
+
+    // 눈에 보이는 다음 목표 — 지금 뭘 향해 오르는지 알려준다
+    while (nextMilestone < MILESTONES.length && altM >= MILESTONES[nextMilestone].m) {
+      flashBanner(MILESTONES[nextMilestone].m + 'm — ' + MILESTONES[nextMilestone].label);
+      tone(520, .12, 'triangle', .07);
+      tone(780, .18, 'triangle', .06, .08);
+      nextMilestone++;
+    }
+
+    // 불길 상승 — 처음엔 느긋하고, 한참 오른 뒤부터 빨라진다
+    runTime += dt;
+    if (lavaFreeze > 0) {
+      // 물을 맞은 불길은 잠시 멈춘다 — 따라붙지도 않으므로 거리를 실제로 번다
+      lavaFreeze = Math.max(0, lavaFreeze - dt);
+    } else {
+      if (runTime > LAVA_GRACE) {
+        const lavaSpd = 34 + Math.min(130, Math.max(0, altM - 150) * 0.12);
+        lavaY -= lavaSpd * dt;
+      }
+      const leash = player.y + LAVA_LEASH;   // 너무 뒤처지면 따라붙는다
+      if (lavaY > leash) lavaY += (leash - lavaY) * Math.min(1, dt * 1.2);
+    }
+
+    // 위험도
+    const lavaScreen = lavaY - camY;
+    const near = Math.max(0, Math.min(1, (H * 1.02 - lavaScreen) / (H * 0.55)));
+    heat = near;
+    if (near > 0.45) {
+      beatT -= dt;
+      if (beatT <= 0) {
+        beatT = 0.62 - near * 0.32;
+        tone(58, .16, 'sine', .07 + near * .06);
+      }
+    } else beatT = 0;
+
+    // 불티
+    if (Math.random() < 0.12) {
+      embers.push({
+        x: Math.random() * W, y: lavaY - 4,
+        vx: (Math.random() - .5) * 40, vy: -50 - Math.random() * 120,
+        life: .7 + Math.random() * .9, r: 1 + Math.random() * 2.2,
+      });
+    }
+    for (let i = embers.length - 1; i >= 0; i--) {
+      const e = embers[i];
+      e.life -= dt;
+      if (e.life <= 0) { embers.splice(i, 1); continue; }
+      e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 30 * dt;
+    }
+    for (let i = floaters.length - 1; i >= 0; i--) {
+      const f = floaters[i];
+      f.life -= dt;
+      if (f.life <= 0) floaters.splice(i, 1);
+    }
+    for (let i = shards.length - 1; i >= 0; i--) {
+      const s = shards[i];
+      s.life -= dt;
+      if (s.life <= 0) { shards.splice(i, 1); continue; }
+      s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 900 * dt;
+    }
+
+    if (lavaShake > 0) lavaShake = Math.max(0, lavaShake - dt * 40);
+
+    // 죽음
+    if (player.y + PLAYER_R >= lavaY) { endGame('SWALLOWED BY FIRE'); return; }
+    if (player.y - camY > H + 80) { endGame('FELL'); return; }
+  }
+
+  // ── 그리기 ──────────────────────────────────────────────
+  function drawPlatform(p) {
+    const y = p.y - viewCam;
+    if (y < -30 || y > H + 30) return;
+    const alpha = p.broken ? Math.max(0, 1 - p.broken / .25) : 1;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    let base = '#6f665e', hi = '#9c9088';
+    if (p.kind === 'fragile') { base = '#8a4636'; hi = '#c07158'; }
+    if (p.kind === 'moving')  { base = '#5b6b78'; hi = '#8ea3b2'; }
+    if (p.kind === 'spring')  { base = '#2f7f47'; hi = '#5fd47c'; }
+
+    ctx.fillStyle = base;
+    roundRect(ctx, p.x, y, p.w, 11, 5); ctx.fill();
+    ctx.fillStyle = hi;
+    roundRect(ctx, p.x, y, p.w, 4, 2); ctx.fill();
+
+    if (p.kind === 'fragile') {
+      ctx.strokeStyle = 'rgba(20,10,8,.55)'; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(p.x + p.w * .34, y + 1); ctx.lineTo(p.x + p.w * .44, y + 10);
+      ctx.moveTo(p.x + p.w * .66, y + 1); ctx.lineTo(p.x + p.w * .58, y + 10);
+      ctx.stroke();
+    }
+    if (p.kind === 'spring') {
+      ctx.strokeStyle = '#bdf5c9'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      const cx = p.x + p.w / 2;
+      ctx.moveTo(cx - 7, y - 3); ctx.lineTo(cx, y - 9); ctx.lineTo(cx + 7, y - 3);
+      ctx.stroke();
+    }
+    if (p.kind === 'moving') {
+      ctx.fillStyle = 'rgba(220,235,245,.7)';
+      const cx = p.x + p.w / 2;
+      tri(cx - 12, y + 5.5, -4); tri(cx + 12, y + 5.5, 4);
+      function tri(x, yy, d) {
+        ctx.beginPath();
+        ctx.moveTo(x + d, yy); ctx.lineTo(x - d * .3, yy - 3); ctx.lineTo(x - d * .3, yy + 3);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+
+  function drawPickup(k) {
+    const y = k.y - viewCam;
+    if (y < -40 || y > H + 40) return;
+    const bob = Math.sin(k.t * 3.4) * 3;
+    const x = k.x, yy = y + bob;
+    ctx.save();
+    if (k.kind === 'water') {
+      const g = ctx.createRadialGradient(x, yy - 3, 1, x, yy, 14);
+      g.addColorStop(0, 'rgba(190,235,255,.55)');
+      g.addColorStop(1, 'rgba(120,200,255,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, yy, 14, 0, Math.PI * 2); ctx.fill();
+      // 물방울 모양
+      ctx.fillStyle = '#8fd6ff';
+      ctx.beginPath();
+      ctx.moveTo(x, yy - 10);
+      ctx.bezierCurveTo(x + 7, yy - 2, x + 6, yy + 7, x, yy + 7);
+      ctx.bezierCurveTo(x - 6, yy + 7, x - 7, yy - 2, x, yy - 10);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.75)';
+      ctx.beginPath(); ctx.arc(x - 2, yy + 1, 1.8, 0, Math.PI * 2); ctx.fill();
+    } else {
+      const g = ctx.createRadialGradient(x, yy, 1, x, yy, 16);
+      g.addColorStop(0, 'rgba(150,255,190,.5)');
+      g.addColorStop(1, 'rgba(80,220,140,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, yy, 16, 0, Math.PI * 2); ctx.fill();
+      // 위로 솟는 화살표
+      ctx.strokeStyle = '#8ef0b4';
+      ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x - 7, yy + 2); ctx.lineTo(x, yy - 8); ctx.lineTo(x + 7, yy + 2);
+      ctx.moveTo(x - 7, yy + 9); ctx.lineTo(x, yy - 1); ctx.lineTo(x + 7, yy + 9);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawPlayer() {
+    const x = viewX, y = viewY - viewCam;
+    ctx.save();
+    // 불빛을 받는 실루엣
+    const g = ctx.createRadialGradient(x, y - 3, 2, x, y, PLAYER_R + 3);
+    g.addColorStop(0, '#fff6ea');
+    g.addColorStop(1, '#d9c3ae');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, PLAYER_R, 0, Math.PI * 2); ctx.fill();
+    // 아래에서 올라오는 불빛 반사
+    ctx.globalAlpha = .35 + heat * .5;
+    ctx.fillStyle = '#ff7a2a';
+    ctx.beginPath(); ctx.arc(x, y + 3, PLAYER_R * .82, 0, Math.PI); ctx.fill();
+    ctx.globalAlpha = 1;
+    // 눈 — 진행 방향
+    ctx.fillStyle = '#2a1a12';
+    ctx.beginPath(); ctx.arc(x + player.face * 4, y - 3, 2.1, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawLava() {
+    const y = lavaY - viewCam;
+    // 불길이 화면 아래로 내려가 있어도 존재감은 남긴다 — 가까울수록 붉게 달아오른다
+    if (y > H) {
+      const near = Math.max(0, Math.min(1, 1 - (y - H) / 200));
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const g = ctx.createLinearGradient(0, H - 110, 0, H);
+      g.addColorStop(0, 'rgba(255,90,31,0)');
+      g.addColorStop(1, 'rgba(255,125,42,' + (0.18 + 0.5 * near).toFixed(3) + ')');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, H - 110, W, 110);
+      ctx.restore();
+      return;
+    }
+    ctx.save();
+    const top = y + Math.sin(performance.now() / 220) * 1.5;
+
+    const g = ctx.createLinearGradient(0, top - 26, 0, H);
+    g.addColorStop(0, lavaFreeze > 0 ? 'rgba(150,220,255,.95)' : 'rgba(255,210,74,.95)');
+    g.addColorStop(.18, '#ff7a1f');
+    g.addColorStop(1, '#8c1405');
+    ctx.fillStyle = g;
+
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, top);
+    const t = performance.now() / 260;
+    for (let x = 0; x <= W; x += 10) {
+      const wave = Math.sin(x * 0.05 + t) * 5 + Math.sin(x * 0.017 - t * 1.6) * 3.5;
+      ctx.lineTo(x, top + wave);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+
+    // 표면 발광
+    ctx.globalCompositeOperation = 'lighter';
+    const glow = ctx.createLinearGradient(0, top - 60, 0, top + 12);
+    glow.addColorStop(0, 'rgba(255,90,31,0)');
+    glow.addColorStop(1, 'rgba(255,150,50,.5)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, top - 60, W, 72);
+    ctx.restore();
+  }
+
+  function render(alpha) {
+    const t = Math.max(0, Math.min(1, alpha || 0));
+    viewCam = prevCam + (camY - prevCam) * t;
+    viewX   = prevX   + (player.x - prevX) * t;
+    viewY   = prevY   + (player.y - prevY) * t;
+
+    // 발열 표시는 값이 달라질 때만 쓴다 (매 프레임 스타일 쓰기는 렉을 만든다)
+    const ho = Math.round(heat * 85) / 100;
+    if (ho !== lastHeatOpacity) { heatEl.style.opacity = ho; lastHeatOpacity = ho; }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    if (lavaShake > 0) ctx.translate((Math.random() - .5) * lavaShake, 0);
+
+    // 배경 벽돌 결 — 속도감의 기준선
+    ctx.strokeStyle = 'rgba(255,255,255,.035)';
+    ctx.lineWidth = 1;
+    const step = 48;
+    const off = ((-viewCam % step) + step) % step;
+    for (let y = off - step; y < H; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // 도전 상대의 기록선 — 넘어야 할 높이를 눈으로 보여준다
+    if (challengeM > 0) {
+      const cy = -challengeM * PX_PER_M - viewCam;
+      if (cy > -30 && cy < H + 30) {
+        ctx.save();
+        ctx.setLineDash([9, 7]);
+        ctx.strokeStyle = challengeBeaten ? 'rgba(79,191,106,.75)' : 'rgba(255,210,74,.75)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '700 11px system-ui, sans-serif';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+        ctx.fillStyle = challengeBeaten ? '#8ee8a4' : '#ffd24a';
+        ctx.fillText((challengeBeaten ? 'PASSED ' : 'RIVAL ') + challengeM + 'm', W - 8, cy - 4);
+        ctx.restore();
+      }
+    }
+
+    for (const p of platforms) drawPlatform(p);
+    for (const k of pickups) drawPickup(k);
+
+    for (const s of shards) {
+      ctx.globalAlpha = Math.max(0, s.life / .8);
+      ctx.fillStyle = s.blue ? '#8fd6ff' : s.green ? '#8ef0b4' : '#c8bdb2';
+      ctx.fillRect(s.x, s.y - viewCam, s.r, s.r);
+    }
+    ctx.globalAlpha = 1;
+
+    // 획득 안내 문구
+    for (const f of floaters) {
+      ctx.globalAlpha = Math.min(1, f.life * 1.6);
+      ctx.fillStyle = f.color;
+      ctx.font = '800 15px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(f.text, f.x, f.y - viewCam - (1 - f.life) * 30);
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+
+    if (running) drawPlayer();
+
+    drawLava();
+
+    // 불티는 불길 위로
+    ctx.globalCompositeOperation = 'lighter';
+    for (const e of embers) {
+      ctx.globalAlpha = Math.max(0, Math.min(1, e.life));
+      ctx.fillStyle = e.life > .6 ? '#ffd24a' : '#ff5a1f';
+      ctx.beginPath(); ctx.arc(e.x, e.y - viewCam, e.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // ── 루프 ────────────────────────────────────────────────
+  let last = 0, acc = 0;
+  const STEP = 1 / 120;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    if (!last) last = t;
+    let dt = (t - last) / 1000;
+    last = t;
+    if (dt > 0.1) dt = 0.1;
+
+    if (running) {
+      acc += dt;
+      let guard = 0;
+      while (acc >= STEP && guard++ < 20 && running) {
+        prevCam = camY; prevX = player.x; prevY = player.y;   // 보간용 직전 상태
+        update(STEP);
+        acc -= STEP;
+      }
+      // 숫자가 실제로 바뀔 때만 DOM을 건드린다 (매 프레임 innerHTML은 렉을 만든다)
+      if (altM !== lastAltShown) { altNumEl.textContent = altM; lastAltShown = altM; }
+      if (waterCount !== lastWaterShown) {
+        waterEl.classList.toggle('is-hidden', waterCount === 0);
+        waterNumEl.textContent = waterCount;
+        lastWaterShown = waterCount;
+      }
+    }
+    render(running ? acc / STEP : 1);
+  }
+
+  bestM = loadBest();
+  bestEl.textContent = bestM + 'm';
+  ranks = loadRanks();
+  renderRanks();
+  setChallenge(readHashChallenge());
+
+  const codeInput = document.getElementById('code-input');
+  function applyCode() {
+    const v = parseInt((codeInput.value || '').replace(/[^\d]/g, ''), 10);
+    if (v > 0) { setChallenge(v); codeInput.blur(); }
+    else { setChallenge(0); codeInput.value = ''; }
+  }
+  document.getElementById('code-btn').addEventListener('click', applyCode);
+  codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCode(); } });
+
+  const nameInput = document.getElementById('name-input');
+  nameInput.value = loadName();
+  nameInput.addEventListener('input', () => {
+    const v = nameInput.value.trim().slice(0, 8);
+    saveName(v);
+    if (myRankRow) { myRankRow.n = v || 'You'; saveRanks(); renderRanks(); }
+  });
+
+  document.getElementById('share-btn').addEventListener('click', shareResult);
+  document.getElementById('start-btn').addEventListener('click', startGame);
+  document.getElementById('retry-btn').addEventListener('click', startGame);
+  window.addEventListener('resize', () => { resize(); });
+
+  resize();
+  // 시작 화면 뒤에서도 불길이 일렁이도록 최소 상태를 만들어 둔다
+  platforms = []; embers = []; shards = []; pickups = []; floaters = [];
+  camY = -H * (1 - CAM_ANCHOR); lavaY = camY + H - 60;
+  player = { x: W / 2, y: 0, py: 0, vx: 0, vy: 0, face: 1 };
+  requestAnimationFrame(frame);
+})();
+</script></body>
+</html>
