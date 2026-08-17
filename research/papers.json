@@ -2523,5 +2523,27 @@
       "TCM body constitution classification machine learning"
     ],
     "first_seen": "2026-08-16"
+  },
+  {
+    "id": "doi:10.19852/j.cnki.jtcm.20251204.001",
+    "title": "Integrated analysis of plasma metabolomics and proteomics reveals the biological characteristics of damp-heat and stasis-toxin syndrome in colorectal cancer.",
+    "authors": [
+      "Jingyang Q",
+      "Qinchang Z",
+      "Dong Z",
+      "Heweng S",
+      "Xuechen G",
+      "Xiaohe S",
+      "Dongdong S",
+      "Haibo C."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.19852/j.cnki.jtcm.20251204.001",
+    "abstract": "<h4>Objective</h4>To investigate the biological attributes of core syndromes in colorectal cancer, namely, the damp-heat and stasis-toxin syndrome (SRYD).<h4>Methods</h4>Between October 2021 and October 2022, a cohort comprising 40 patients with colorectal cancer (CRC) diagnosed with damp-heat and stasis-toxin syndrome (SRYD group), 40 patients with CRC without this syndrome (non-SRYD group), and 40 healthy controls (Normal group) was recruited at Jiangsu Province Hospital of Chinese Medicine. Untargeted metabolomics analysis was conducted on plasma samples from all 120 participants, while differential protein analysis using four-dimensional data-independent acquisition proteomics was performed on 20 randomly selected samples per group. A combined analysis of proteomics and metabolomics data followed, and the identified potential diagnostic biomarkers were subsequently used to train and validate multiple machine learning models.<h4>Results</h4>Proteomic analysis revealed 130 differential proteins in the colorectal cancer with damp-heat and stasis-toxin syndrome (CRC-SRYD) group, enriched in pathways including complement and coagulation cascades, as well as nuclear factor kappa-B (NF-κB) signaling. Metabolomic analysis identified 584 differential metabolites within the same group, showing enrichment in pathways such as primary bile acid biosynthesis, central carbon metabolism in cancer, and glucagon signaling. Integrated pathway analysis indicated heightened activity of the NF-κB signaling pathway in the CRC-SRYD group. A biomarker panel, comprising 6 proteins and 9 metabolites selected through the ReliefF algorithm, was used to construct a diagnostic model with random forest, achieving an accuracy of 93.33%, sensitivity of 80.00%, and specificity of 100%.<h4>Conclusion</h4>This study systematically elucidates plasma metabolomic and proteomic alterations in patients with CRC, establishing a robust diagnostic model for CRC syndrome (CRC-SRYD). Further investigation is warranted to clarify the underlying molecular mechanisms and biological foundations.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-08-17"
   }
 ]
