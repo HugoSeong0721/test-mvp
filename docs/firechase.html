@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>불길 탈출 — 멈추면 타 죽는다</title>
+<title>Climb or Burn</title>
 </head>
 <body>
 <style>
@@ -27,7 +27,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
   body {
-    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
     background: radial-gradient(ellipse at 50% 100%, #2a1208 0%, var(--soot) 65%);
     color: var(--text);
     display: flex; align-items: center; justify-content: center;
@@ -220,13 +220,13 @@
 <div id="stage">
   <div id="hud">
     <div>
-      <div class="stat-label">고도</div>
+      <div class="stat-label">ALTITUDE</div>
       <div id="alt-value"><span id="alt-num">0</span><span class="unit">m</span></div>
       <div id="water-count" class="is-hidden"><span class="drop"></span><b>0</b></div>
     </div>
-    <div id="chal-chip" class="is-hidden">도전 <b></b></div>
+    <div id="chal-chip" class="is-hidden">RIVAL <b></b></div>
     <div id="best-box">
-      <div class="stat-label">최고</div>
+      <div class="stat-label">BEST</div>
       <div id="best-value">0m</div>
     </div>
   </div>
@@ -234,29 +234,29 @@
   <div id="shaft">
     <canvas id="game-canvas"></canvas>
     <div id="heat"></div>
-    <div id="pass-banner">기록 추월!</div>
+    <div id="pass-banner">RECORD BEATEN!</div>
 
     <div class="overlay" id="start-overlay">
       <div>
-        <div class="title-main">불길 탈출</div>
-        <div class="title-sub">climb or burn</div>
+        <div class="title-main">CLIMB OR BURN</div>
+        <div class="title-sub">don’t stop moving</div>
       </div>
       <div class="pitch">
-        불길이 <b>멈추지 않고</b> 올라옵니다.<br>
-        발판을 밟고 <b>계속 위로</b> 도망치세요.<br>
-        <span class="pick-hint"><i class="w"></i>물방울은 불길을 멈추고
-        <i class="b"></i>기류는 크게 띄웁니다</span>
+        The fire <b>never stops</b> rising.<br>
+        Hit the ledges and <b>keep climbing.</b><br>
+        <span class="pick-hint"><i class="w"></i>Water drops hold the fire back,
+        <i class="b"></i>updrafts launch you high</span>
       </div>
       <div class="controls">
-        화면에 손가락을 대고 <b>가고 싶은 쪽으로</b> 끌어주세요<br>
-        PC는 마우스를 움직이거나 <kbd>←</kbd> <kbd>→</kbd><br>
-        점프는 자동 · 양옆 벽은 통과합니다
+        Touch the screen and <b>drag toward where you want to go</b><br>
+        On PC, move the mouse or use <kbd>&larr;</kbd> <kbd>&rarr;</kbd><br>
+        Jumping is automatic &middot; you pass through the side walls
       </div>
-      <button class="btn" id="start-btn">도망친다</button>
+      <button class="btn" id="start-btn">RUN</button>
       <div class="code-row">
-        <label for="code-input">도전 코드</label>
-        <input id="code-input" inputmode="numeric" maxlength="6" placeholder="예: 420" autocomplete="off">
-        <button id="code-btn" type="button">적용</button>
+        <label for="code-input">Challenge code</label>
+        <input id="code-input" inputmode="numeric" maxlength="6" placeholder="e.g. 420" autocomplete="off">
+        <button id="code-btn" type="button">Apply</button>
       </div>
     </div>
 
@@ -268,14 +268,14 @@
       <div id="water-result" class="is-hidden"></div>
 
       <div class="name-row">
-        <label for="name-input">이름</label>
-        <input id="name-input" maxlength="8" placeholder="이름 입력" autocomplete="off" spellcheck="false">
+        <label for="name-input">Name</label>
+        <input id="name-input" maxlength="8" placeholder="Your name" autocomplete="off" spellcheck="false">
       </div>
       <div id="rank-board"></div>
 
       <div class="btn-row">
-        <button class="btn secondary" id="share-btn">기록 공유</button>
-        <button class="btn" id="retry-btn">다시</button>
+        <button class="btn secondary" id="share-btn">Share run</button>
+        <button class="btn" id="retry-btn">Retry</button>
       </div>
       <div id="share-note"></div>
       <input id="share-fallback" class="is-hidden" readonly>
@@ -347,7 +347,7 @@
       if (!Array.isArray(raw)) return [];
       return raw
         .filter(r => r && typeof r.m === 'number' && isFinite(r.m))
-        .map(r => ({ n: String(r.n || '나').slice(0, 8), m: Math.max(0, Math.round(r.m)), t: r.t || 0 }))
+        .map(r => ({ n: String(r.n || 'You').slice(0, 8), m: Math.max(0, Math.round(r.m)), t: r.t || 0 }))
         .sort((a, b) => b.m - a.m)
         .slice(0, RANK_MAX);
     } catch (e) { return []; }
@@ -366,7 +366,7 @@
     if (!ranks.length) {
       const empty = document.createElement('div');
       empty.className = 'rank-empty';
-      empty.textContent = '아직 기록이 없습니다.';
+      empty.textContent = 'No runs yet.';
       board.appendChild(empty);
       return;
     }
@@ -375,7 +375,7 @@
       row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
       const pos = document.createElement('span');
       pos.className = 'rank-pos';
-      pos.textContent = (i + 1) + '위';
+      pos.textContent = '#' + (i + 1);
       const name = document.createElement('span');
       name.className = 'rank-name';
       name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
@@ -390,7 +390,7 @@
   }
 
   function recordRank(m) {
-    const entry = { n: loadName() || '나', m, t: Date.now() };
+    const entry = { n: loadName() || 'You', m, t: Date.now() };
     ranks.push(entry);
     ranks.sort((a, b) => b.m - a.m);
     ranks = ranks.slice(0, RANK_MAX);
@@ -402,11 +402,11 @@
   // ── 도전 상대 (공유 링크에 실려 오는 기록) ───────────────
   // 오르는 동안 지나가는 구간 — 다음 목표가 계속 눈앞에 있게 한다
   const MILESTONES = [
-    { m: 100,  label: '연기층 돌파' },
-    { m: 250,  label: '중턱' },
-    { m: 500,  label: '불길이 멀어진다' },
-    { m: 1000, label: '구름 높이' },
-    { m: 2000, label: '아무도 못 온 곳' },
+    { m: 100,  label: 'Through the smoke' },
+    { m: 250,  label: 'Halfway up' },
+    { m: 500,  label: 'The fire falls behind' },
+    { m: 1000, label: 'Cloud height' },
+    { m: 2000, label: 'Where nobody has been' },
   ];
   let nextMilestone = 0;
 
@@ -461,25 +461,25 @@
   async function shareResult() {
     const url = challengeUrl(altM);
     // 링크가 막힌 곳에서도 겨룰 수 있도록 도전 코드를 함께 실어 보낸다
-    const text = '🔥 불길 탈출 — ' + altM + 'm까지 도망쳤습니다. 이길 수 있나요?\n도전 코드: ' + altM;
+    const text = '🔥 Climb or Burn — I got to ' + altM + 'm. Can you beat it?\nChallenge code: ' + altM;
     const full = url ? text + '\n' + url : text;
     if (navigator.share) {
       try {
-        await navigator.share(url ? { title: '불길 탈출', text, url } : { title: '불길 탈출', text });
-        return note('공유했습니다');
+        await navigator.share(url ? { title: 'Climb or Burn', text, url } : { title: 'Climb or Burn', text });
+        return note('Shared');
       } catch (e) {
         if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
       }
     }
     try {
       await navigator.clipboard.writeText(full);
-      return note('도전 링크를 복사했습니다');
+      return note('Challenge link copied');
     } catch (e) { /* 아래 수동 복사로 넘어간다 */ }
     const fb = document.getElementById('share-fallback');
     fb.value = full;
     fb.classList.remove('is-hidden');
     fb.focus(); fb.select();
-    note('아래 링크를 복사해 보내세요');
+    note('Copy the link below and send it');
   }
 
   // ── 사운드 ──────────────────────────────────────────────
@@ -639,12 +639,12 @@
   }
 
   function rankFor(m) {
-    if (m < 60)   return '연기도 못 벗어났습니다.';
-    if (m < 200)  return '아직 발끝이 뜨겁습니다.';
-    if (m < 450)  return '제법 올라왔습니다.';
-    if (m < 800)  return '불길이 겨우 따라옵니다.';
-    if (m < 1400) return '연기 위로 솟았습니다.';
-    return '불길이 당신을 포기했습니다.';
+    if (m < 60)   return 'You never cleared the smoke.';
+    if (m < 200)  return 'Your feet are still burning.';
+    if (m < 450)  return 'That is a decent climb.';
+    if (m < 800)  return 'The fire is barely keeping up.';
+    if (m < 1400) return 'You broke above the smoke.';
+    return 'The fire gave up on you.';
   }
 
   function endGame(cause) {
@@ -655,19 +655,19 @@
     document.getElementById('death-cause').textContent = cause;
     document.getElementById('final-alt').innerHTML = altM + '<span class="unit">m</span>';
     document.getElementById('final-rank').textContent = rankFor(altM);
-    document.getElementById('final-best').textContent = '이 기기 최고 ' + bestM + 'm';
+    document.getElementById('final-best').textContent = 'Best on this device \u00b7 ' + bestM + 'm';
 
     const cr = document.getElementById('challenge-result');
     if (challengeM > 0) {
       const won = altM > challengeM;
       cr.textContent = won
-        ? '도전 성공 — 상대 기록 ' + challengeM + 'm를 넘었습니다'
-        : '도전 실패 — 상대 기록까지 ' + (challengeM - altM) + 'm 남았습니다';
+        ? 'Challenge cleared \u2014 you passed ' + challengeM + 'm'
+        : 'Challenge failed \u2014 ' + (challengeM - altM) + 'm short';
       cr.className = won ? 'win' : 'lose';
     } else cr.className = 'is-hidden';
 
     const wr = document.getElementById('water-result');
-    if (waterCount > 0) { wr.textContent = '물방울 ' + waterCount + '개로 불길을 멈춰 세웠습니다'; wr.classList.remove('is-hidden'); }
+    if (waterCount > 0) { wr.textContent = 'Held the fire back with ' + waterCount + ' water drop' + (waterCount === 1 ? '' : 's'); wr.classList.remove('is-hidden'); }
     else wr.classList.add('is-hidden');
 
     recordRank(altM);
@@ -747,7 +747,7 @@
       if (k.kind === 'water') {
         waterCount++;
         lavaFreeze = Math.min(6, lavaFreeze + 2.6);
-        floaters.push({ x: k.x, y: k.y, text: '불길 정지!', color: '#8fd6ff', life: 1 });
+        floaters.push({ x: k.x, y: k.y, text: 'FIRE HELD!', color: '#8fd6ff', life: 1 });
         for (let n = 0; n < 14; n++) {
           shards.push({ x: k.x, y: k.y, vx: (Math.random()-.5)*180, vy: -60 + Math.random()*120,
                         life: .6, r: 2 + Math.random()*2, blue: true });
@@ -755,7 +755,7 @@
         tone(880, .1, 'sine', .07); tone(1240, .16, 'sine', .06, .06);
       } else {
         player.vy = -1250;
-        floaters.push({ x: k.x, y: k.y, text: '상승 기류!', color: '#8ef0b4', life: 1 });
+        floaters.push({ x: k.x, y: k.y, text: 'UPDRAFT!', color: '#8ef0b4', life: 1 });
         for (let n = 0; n < 16; n++) {
           shards.push({ x: k.x + (Math.random()-.5)*26, y: k.y, vx: (Math.random()-.5)*60, vy: 120 + Math.random()*140,
                         life: .5, r: 1.5 + Math.random()*2, green: true });
@@ -781,7 +781,7 @@
     // 도전 기록 추월
     if (challengeM > 0 && !challengeBeaten && altM > challengeM) {
       challengeBeaten = true;
-      flashBanner('기록 추월!');
+      flashBanner('RECORD BEATEN!');
       tone(700, .12, 'triangle', .08);
       tone(950, .16, 'triangle', .07, .07);
     }
@@ -849,8 +849,8 @@
     if (lavaShake > 0) lavaShake = Math.max(0, lavaShake - dt * 40);
 
     // 죽음
-    if (player.y + PLAYER_R >= lavaY) { endGame('불길에 삼켜짐'); return; }
-    if (player.y - camY > H + 80) { endGame('추락'); return; }
+    if (player.y + PLAYER_R >= lavaY) { endGame('SWALLOWED BY FIRE'); return; }
+    if (player.y - camY > H + 80) { endGame('FELL'); return; }
   }
 
   // ── 그리기 ──────────────────────────────────────────────
@@ -1048,7 +1048,7 @@
         ctx.font = '700 11px system-ui, sans-serif';
         ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
         ctx.fillStyle = challengeBeaten ? '#8ee8a4' : '#ffd24a';
-        ctx.fillText((challengeBeaten ? '추월함 ' : '도전 ') + challengeM + 'm', W - 8, cy - 4);
+        ctx.fillText((challengeBeaten ? 'PASSED ' : 'RIVAL ') + challengeM + 'm', W - 8, cy - 4);
         ctx.restore();
       }
     }
@@ -1139,7 +1139,7 @@
   nameInput.addEventListener('input', () => {
     const v = nameInput.value.trim().slice(0, 8);
     saveName(v);
-    if (myRankRow) { myRankRow.n = v || '나'; saveRanks(); renderRanks(); }
+    if (myRankRow) { myRankRow.n = v || 'You'; saveRanks(); renderRanks(); }
   });
 
   document.getElementById('share-btn').addEventListener('click', shareResult);
