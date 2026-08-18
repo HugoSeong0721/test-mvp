@@ -379,6 +379,17 @@ const SONGS=[
   {id:"joy", title:"환희의 송가", icon:"🎼", diff:1,
    notes:["E4","E4","F4","G4","G4","F4","E4","D4","C4","C4","D4","E4","E4","D4","D4",
           "E4","E4","F4","G4","G4","F4","E4","D4","C4","C4","D4","E4","D4","C4","C4"]},
+  // 아래 두 곡은 퍼블릭 도메인 재즈 계열 (조플린 1902 / 전통곡)
+  {id:"saints", title:"성자의 행진", icon:"🎺", diff:1,
+   notes:["C4","E4","F4","G4","C4","E4","F4","G4",
+          "C4","E4","F4","G4","E4","C4","E4","D4",
+          "E4","E4","D4","C4","C4","E4","G4","G4","F4",
+          "E4","F4","G4","E4","C4","D4","C4"]},
+  {id:"entertainer", title:"엔터테이너", icon:"🎩", diff:1,
+   notes:["D4","D#4","E4","C5","E4","C5","E4","C5",
+          "C5","D5","D#5","E5","C5","D5","E5","B4","D5","C5",
+          "D4","D#4","E4","C5","E4","C5","E4","C5",
+          "A4","G4","F#4","A4","C5","E5","D5","C5","A4","D5","C5"]},
 ];
 const byId=id=>SONGS.find(s=>s.id===id);
 
@@ -542,7 +553,7 @@ function startGame(id){
     el.style.width=(100/COLS-1.6)+"%";
     el.style.height=(RH-6)+"px";
     el.style.top=(-(i+1)*RH+3)+"px";
-    el.textContent=SOL[n[0]];
+    el.textContent=SOL[n[0]]+(n.includes("#")?"♯":"");
     wrap.appendChild(el);
     return {n,col:cols[i],el,hit:false};
   });
