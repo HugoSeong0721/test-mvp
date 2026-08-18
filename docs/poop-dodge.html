@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>똥피하기</title>
+<title>Poop Dodge</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
@@ -110,14 +110,14 @@
 <body>
 <canvas id="game"></canvas>
 <div id="over-panel" class="hidden">
-  <div id="over-title">💩 맞았다!</div>
+  <div id="over-title">💩 SPLAT!</div>
   <div id="over-score"></div>
   <div id="over-sub"></div>
   <div id="rank-board"></div>
-  <div id="name-row"><span>이름</span><input id="name-input" maxlength="8" placeholder="나"></div>
+  <div id="name-row"><span>Name</span><input id="name-input" maxlength="8" placeholder="You"></div>
   <div id="over-btns">
-    <button id="share-btn">기록 공유</button>
-    <button id="retry-btn">다시 하기</button>
+    <button id="share-btn">Share</button>
+    <button id="retry-btn">Play Again</button>
   </div>
   <div id="share-note"></div>
   <input id="share-fallback" class="hidden" readonly>
@@ -170,7 +170,7 @@
       if (!Array.isArray(raw)) return [];
       return raw
         .filter(function (r) { return r && typeof r.s === 'number' && isFinite(r.s); })
-        .map(function (r) { return { n: String(r.n || '나').slice(0, 8), s: Math.max(0, Math.round(r.s * 10) / 10), t: r.t || 0 }; })
+        .map(function (r) { return { n: String(r.n || 'You').slice(0, 8), s: Math.max(0, Math.round(r.s * 10) / 10), t: r.t || 0 }; })
         .sort(function (a, b) { return b.s - a.s; })
         .slice(0, RANK_MAX);
     } catch (e) { return []; }
@@ -190,7 +190,7 @@
     if (!ranks.length) {
       var empty = document.createElement('div');
       empty.className = 'rank-empty';
-      empty.textContent = '아직 기록이 없습니다.';
+      empty.textContent = 'No records yet.';
       board.appendChild(empty);
       return;
     }
@@ -199,13 +199,13 @@
       row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
       var pos = document.createElement('span');
       pos.className = 'rank-pos';
-      pos.textContent = (i + 1) + '위';
+      pos.textContent = '#' + (i + 1);
       var name = document.createElement('span');
       name.className = 'rank-name';
       name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
       var s = document.createElement('span');
       s.className = 'rank-s';
-      s.textContent = r.s.toFixed(1) + '초';
+      s.textContent = r.s.toFixed(1) + 's';
       row.append(pos, name, s);
       board.appendChild(row);
     });
@@ -214,7 +214,7 @@
   }
 
   function recordRank(s) {
-    var entry = { n: loadName() || '나', s: Math.round(s * 10) / 10, t: Date.now() };
+    var entry = { n: loadName() || 'You', s: Math.round(s * 10) / 10, t: Date.now() };
     ranks.push(entry);
     ranks.sort(function (a, b) { return b.s - a.s; });
     ranks = ranks.slice(0, RANK_MAX);
@@ -254,11 +254,11 @@
   function shareResult() {
     var s = Math.round(lastScore * 10) / 10;
     var url = challengeUrl(s);
-    var text = '💩 똥피하기 — ' + s.toFixed(1) + '초 버텼습니다. 이길 수 있나요?\n도전 코드: ' + Math.round(s * 10);
+    var text = '💩 Poop Dodge — I survived ' + s.toFixed(1) + 's. Can you beat me?\nChallenge code: ' + Math.round(s * 10);
     var full = url ? text + '\n' + url : text;
-    var done = function () { note('공유했습니다'); };
+    var done = function () { note('Shared!'); };
     if (navigator.share) {
-      navigator.share(url ? { title: '똥피하기', text: text, url: url } : { title: '똥피하기', text: text })
+      navigator.share(url ? { title: 'Poop Dodge', text: text, url: url } : { title: 'Poop Dodge', text: text })
         .then(done)
         .catch(function (e) {
           if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
@@ -271,7 +271,7 @@
   function copyFallback(full) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(full)
-        .then(function () { note('도전 링크를 복사했습니다'); })
+        .then(function () { note('Challenge link copied!'); })
         .catch(function () { manualCopy(full); });
       return;
     }
@@ -282,12 +282,13 @@
     fb.value = full;
     fb.classList.remove('hidden');
     fb.focus(); fb.select();
-    note('아래 링크를 복사해 보내세요');
+    note('Copy the link below and send it');
   }
 
   var lastScore = 0;
   var deathAnim = 0;           // 게임오버 연출 타이머
   var shake = 0;
+  var introT = 0;              // 시작 직후 조작 안내 플래시 남은 시간
   var spawnTimer = 0;
   var burstLeft = 0;           // 이번 물결에서 남은 똥 개수
   var overAt = 0;              // 게임오버 시각(재시작 오터치 방지)
@@ -304,6 +305,7 @@
     isNewBest = false;
     deathAnim = 0;
     shake = 0;
+    introT = 1.8;
     spawnTimer = 0.8;
     burstLeft = 0;
   }
@@ -402,7 +404,7 @@
   nameInput.addEventListener('input', function () {
     var v = nameInput.value.slice(0, 8);
     saveName(v);
-    if (myRankRow) { myRankRow.n = v || '나'; saveRanks(); renderRanks(); }
+    if (myRankRow) { myRankRow.n = v || 'You'; saveRanks(); renderRanks(); }
   });
 
   // ---------- 업데이트 ----------
@@ -413,6 +415,7 @@
     }
 
     score += dt;
+    if (introT > 0) introT -= dt;
 
     // 이동: 관성 — 밀면 가속, 놓으면 미끄러지며 멈춘다
     var ACCEL = 2600, MAXV = 560;
@@ -503,22 +506,22 @@
   }
 
   function showOverPanel() {
-    document.getElementById('over-score').textContent = lastScore.toFixed(1) + '초 버팀';
+    document.getElementById('over-score').textContent = 'Survived ' + lastScore.toFixed(1) + 's';
     var sub = document.getElementById('over-sub');
     sub.className = '';
     if (challengeS > 0) {
       if (lastScore > challengeS) {
-        sub.textContent = '🏆 도전 성공! (' + challengeS.toFixed(1) + '초를 이겼다)';
+        sub.textContent = '🏆 Challenge won! You beat ' + challengeS.toFixed(1) + 's';
         sub.className = 'win';
       } else {
-        sub.textContent = '도전 실패… 목표 ' + challengeS.toFixed(1) + '초';
+        sub.textContent = 'Challenge failed… target was ' + challengeS.toFixed(1) + 's';
         sub.className = 'lose';
       }
     } else if (isNewBest) {
-      sub.textContent = '🎉 신기록!';
+      sub.textContent = '🎉 New record!';
       sub.className = 'newbest';
     } else {
-      sub.textContent = '최고 기록 ' + best.toFixed(1) + '초';
+      sub.textContent = 'Best ' + best.toFixed(1) + 's';
     }
     document.getElementById('share-fallback').classList.add('hidden');
     document.getElementById('over-panel').classList.remove('hidden');
@@ -681,34 +684,55 @@
     if (state === STATE_PLAY) {
       ctx.fillStyle = '#222';
       ctx.font = 'bold 42px -apple-system, sans-serif';
-      ctx.fillText(score.toFixed(1) + '초', W / 2, 64);
+      ctx.fillText(score.toFixed(1) + 's', W / 2, 64);
       ctx.font = '15px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(34,34,34,0.5)';
-      ctx.fillText('최고 ' + best.toFixed(1) + '초', W / 2, 88);
+      ctx.fillText('BEST ' + best.toFixed(1) + 's', W / 2, 88);
       if (challengeS > 0) {
         var beat = score > challengeS;
         ctx.fillStyle = beat ? '#1d8a3c' : '#b3543a';
         ctx.font = 'bold 15px -apple-system, sans-serif';
-        ctx.fillText(beat ? '🏆 도전 상대를 넘었다!' : '도전 ' + challengeS.toFixed(1) + '초', W / 2, 112);
+        ctx.fillText(beat ? '🏆 Challenge beaten!' : 'CHALLENGE ' + challengeS.toFixed(1) + 's', W / 2, 112);
+      }
+      // 시작 직후 급박한 조작 안내 — 잠깐 번쩍이다 사라진다
+      if (introT > 0) {
+        var ia = Math.min(1, introT / 0.35);                       // 끝에서 페이드아웃
+        var blink = 0.55 + 0.45 * Math.sin(performance.now() / 90); // 다급하게 깜빡임
+        var osc = Math.abs(Math.sin(performance.now() / 130)) * 14; // 화살표가 바깥으로 튐
+        ctx.save();
+        ctx.globalAlpha = ia * blink;
+        ctx.fillStyle = '#d1342a';
+        ctx.font = 'bold 32px -apple-system, sans-serif';
+        ctx.fillText('SWIPE LEFT & RIGHT!', W / 2, H * 0.42);
+        ctx.font = 'bold 44px -apple-system, sans-serif';
+        ctx.fillText('◀', W / 2 - W * 0.3 - osc, H * 0.42 + 54);
+        ctx.fillText('▶', W / 2 + W * 0.3 + osc, H * 0.42 + 54);
+        ctx.restore();
       }
     } else if (state === STATE_TITLE) {
       ctx.fillStyle = '#222';
-      ctx.font = 'bold 52px -apple-system, sans-serif';
-      ctx.fillText('💩 똥피하기', W / 2, H * 0.3);
+      // 화면 폭에 맞게 타이틀 크기 조절
+      var ts = 52;
+      ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
+      while (ts > 24 && ctx.measureText('💩 POOP DODGE').width > W * 0.92) {
+        ts -= 2;
+        ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
+      }
+      ctx.fillText('💩 POOP DODGE', W / 2, H * 0.3);
       ctx.font = '20px -apple-system, sans-serif';
-      ctx.fillText('떨어지는 똥을 좌우로 피하세요!', W / 2, H * 0.3 + 42);
+      ctx.fillText('Dodge the falling poop!', W / 2, H * 0.3 + 42);
       ctx.font = '17px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(34,34,34,0.6)';
-      ctx.fillText('손가락으로 끌거나 ← → 키', W / 2, H * 0.3 + 74);
+      ctx.fillText('Drag with your finger, or ← → keys', W / 2, H * 0.3 + 74);
       if (best > 0) {
-        ctx.fillText('최고 기록: ' + best.toFixed(1) + '초', W / 2, H * 0.3 + 102);
+        ctx.fillText('Best: ' + best.toFixed(1) + 's', W / 2, H * 0.3 + 102);
       }
       if (challengeS > 0) {
         ctx.fillStyle = '#b3543a';
         ctx.font = 'bold 18px -apple-system, sans-serif';
-        ctx.fillText('⚔️ 도전장 도착: ' + challengeS.toFixed(1) + '초를 이겨라!', W / 2, H * 0.3 + 136);
+        ctx.fillText('⚔️ CHALLENGE: beat ' + challengeS.toFixed(1) + 's!', W / 2, H * 0.3 + 136);
       }
-      blinkText('화면을 터치하면 시작!', H * 0.62);
+      blinkText('TAP TO START!', H * 0.62);
     } else if (state === STATE_OVER) {
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.fillRect(-20, -20, W + 40, H + 40);
