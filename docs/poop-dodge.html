@@ -308,6 +308,8 @@
     introT = 1.8;
     spawnTimer = 0.8;
     burstLeft = 0;
+    btnL = false; btnR = false;
+    dragId = null; dragging = false;
   }
 
   // ---------- 난이도 ----------
@@ -340,6 +342,23 @@
   // ---------- 조작 ----------
   var keys = { left: false, right: false };
   var dragging = false;
+  var dragId = null;           // 드래그 중인 터치 식별자 (버튼 터치와 구분)
+  var btnL = false, btnR = false; // 땅의 ◀ ▶ 버튼 (누르고 있는 동안 이동)
+
+  function groundTop() { return H - GROUND_H; }
+
+  // 땅 영역에 놓인 손가락들로 버튼 상태를 다시 계산 (멀티터치 대응)
+  function updateButtons(touchList) {
+    btnL = false; btnR = false;
+    if (state !== STATE_PLAY) return;
+    for (var i = 0; i < touchList.length; i++) {
+      var t = touchList[i];
+      if (t.clientY >= groundTop()) {
+        if (t.clientX < W / 2) btnL = true;
+        else btnR = true;
+      }
+    }
+  }
 
   document.addEventListener('keydown', function (e) {
     if (e.target && e.target.tagName === 'INPUT') return; // 이름 입력 중엔 무시
@@ -377,17 +396,53 @@
   // preventDefault를 걸지 않는다 — 세로 팬이 문서 완충지대 스크롤로 소비되어야
   // 인앱 브라우저 시트가 끌기를 가로채지 않는다 (가로 드래그는 그대로 우리에게 온다)
   canvas.addEventListener('touchstart', function (e) {
-    pointerDown(e.touches[0].clientX);
+    if (state !== STATE_PLAY) { tryStart(); return; }
+    updateButtons(e.touches);
+    // 버튼 영역 밖에서 시작한 첫 손가락은 드래그
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      if (t.clientY < groundTop() && dragId === null) {
+        dragId = t.identifier;
+        dragging = true;
+        dragLastX = t.clientX;
+        player.targetX = player.x;
+      }
+    }
   }, { passive: true });
   canvas.addEventListener('touchmove', function (e) {
-    pointerMove(e.touches[0].clientX);
+    updateButtons(e.touches);
+    if (dragId !== null) {
+      for (var i = 0; i < e.changedTouches.length; i++) {
+        var t = e.changedTouches[i];
+        if (t.identifier === dragId) pointerMove(t.clientX);
+      }
+    }
   }, { passive: true });
-  canvas.addEventListener('touchend', function () { pointerUp(); }, { passive: true });
-  canvas.addEventListener('touchcancel', function () { pointerUp(); });
+  function touchEnd(e) {
+    updateButtons(e.touches);
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === dragId) { dragId = null; dragging = false; }
+    }
+  }
+  canvas.addEventListener('touchend', touchEnd, { passive: true });
+  canvas.addEventListener('touchcancel', touchEnd, { passive: true });
 
-  canvas.addEventListener('mousedown', function (e) { pointerDown(e.clientX); });
-  canvas.addEventListener('mousemove', function (e) { pointerMove(e.clientX); });
-  canvas.addEventListener('mouseup', pointerUp);
+  // 데스크톱 마우스: 땅의 버튼도 누를 수 있게
+  canvas.addEventListener('mousedown', function (e) {
+    if (state !== STATE_PLAY) { tryStart(); return; }
+    if (e.clientY >= groundTop()) {
+      if (e.clientX < W / 2) btnL = true; else btnR = true;
+    } else {
+      pointerDown(e.clientX);
+    }
+  });
+  canvas.addEventListener('mousemove', function (e) {
+    if (dragId === null) pointerMove(e.clientX);
+  });
+  canvas.addEventListener('mouseup', function () {
+    if (dragId === null) { dragging = false; }
+    btnL = false; btnR = false;
+  });
 
   function tryStart() {
     if (state === STATE_OVER && performance.now() - overAt < 600) return; // 오터치 방지
@@ -420,8 +475,8 @@
     // 이동: 관성 — 밀면 가속, 놓으면 미끄러지며 멈춘다
     var ACCEL = 2600, MAXV = 560;
     var input = 0;
-    if (keys.left) input -= 1;
-    if (keys.right) input += 1;
+    if (keys.left || btnL) input -= 1;
+    if (keys.right || btnR) input += 1;
     if (input !== 0) {
       player.vx += input * ACCEL * dt;
       player.targetX = player.x; // 키 조작 중엔 터치 목표 무시
@@ -659,6 +714,16 @@
     ctx.lineTo(W + 20, groundY);
     ctx.stroke();
 
+    // 땅의 ◀ ▶ 버튼 (게임 콘솔 방향키처럼 누르고 있으면 이동)
+    drawGroundBtn(0, btnL, -1);
+    drawGroundBtn(W / 2, btnR, 1);
+    ctx.strokeStyle = 'rgba(122,74,33,0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(W / 2, groundY + 8);
+    ctx.lineTo(W / 2, H - 8);
+    ctx.stroke();
+
     // 바닥 자국
     for (var s = 0; s < splats.length; s++) {
       var sp = splats[s];
@@ -703,7 +768,7 @@
         ctx.globalAlpha = ia * blink;
         ctx.fillStyle = '#d1342a';
         ctx.font = 'bold 32px -apple-system, sans-serif';
-        ctx.fillText('SWIPE LEFT & RIGHT!', W / 2, H * 0.42);
+        ctx.fillText('HOLD ◀ ▶ TO MOVE!', W / 2, H * 0.42);
         ctx.font = 'bold 44px -apple-system, sans-serif';
         ctx.fillText('◀', W / 2 - W * 0.3 - osc, H * 0.42 + 54);
         ctx.fillText('▶', W / 2 + W * 0.3 + osc, H * 0.42 + 54);
@@ -723,7 +788,7 @@
       ctx.fillText('Dodge the falling poop!', W / 2, H * 0.3 + 42);
       ctx.font = '17px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(34,34,34,0.6)';
-      ctx.fillText('Drag with your finger, or ← → keys', W / 2, H * 0.3 + 74);
+      ctx.fillText('Hold the ◀ ▶ buttons, drag, or ← → keys', W / 2, H * 0.3 + 74);
       if (best > 0) {
         ctx.fillText('Best: ' + best.toFixed(1) + 's', W / 2, H * 0.3 + 102);
       }
@@ -737,6 +802,23 @@
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.fillRect(-20, -20, W + 40, H + 40);
     }
+  }
+
+  // 땅 절반을 차지하는 방향 버튼: dir -1 = ◀, 1 = ▶
+  function drawGroundBtn(x0, pressed, dir) {
+    var gy = H - GROUND_H;
+    var cx = x0 + W / 4, cy = gy + GROUND_H / 2;
+    ctx.fillStyle = pressed ? 'rgba(122,74,33,0.35)' : 'rgba(122,74,33,0.12)';
+    ctx.fillRect(x0 + 6, gy + 8, W / 2 - 12, GROUND_H - 16);
+    // 화살표 (삼각형)
+    var s = Math.min(26, GROUND_H * 0.22);
+    ctx.fillStyle = pressed ? '#3a2c10' : '#5b4423';
+    ctx.beginPath();
+    ctx.moveTo(cx + dir * s, cy);
+    ctx.lineTo(cx - dir * s * 0.7, cy - s);
+    ctx.lineTo(cx - dir * s * 0.7, cy + s);
+    ctx.closePath();
+    ctx.fill();
   }
 
   function blinkText(text, y) {
