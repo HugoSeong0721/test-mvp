@@ -526,7 +526,7 @@
 
   // ── 발판 ────────────────────────────────────────────────
   // y는 위로 갈수록 작아진다 (캔버스와 같은 방향)
-  function platWidth(height) { return Math.max(76, 106 - height / 400); }
+  function platWidth(height) { return Math.max(80, 118 - height / 400); }
 
   function spawnPlatform(y) {
     const h = Math.max(0, -y / PX_PER_M);
@@ -801,7 +801,7 @@
       lavaFreeze = Math.max(0, lavaFreeze - dt);
     } else {
       if (runTime > LAVA_GRACE) {
-        const lavaSpd = 34 + Math.min(160, Math.max(0, altM - 140) * 0.15);
+        const lavaSpd = 34 + Math.min(130, Math.max(0, altM - 150) * 0.12);
         lavaY -= lavaSpd * dt;
       }
       const leash = player.y + LAVA_LEASH;   // 너무 뒤처지면 따라붙는다
