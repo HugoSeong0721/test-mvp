@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>오늘의 계단</title>
+<title>Daily Stairs</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
@@ -113,15 +113,15 @@
 <body>
 <canvas id="game"></canvas>
 <div id="over-panel" class="hidden">
-  <div id="over-title">☁️ 추락!</div>
+  <div id="over-title">☁️ FALLEN!</div>
   <div id="over-score"></div>
   <div id="over-sub"></div>
   <div id="board-title"></div>
   <div id="rank-board"></div>
-  <div id="name-row"><span>이름</span><input id="name-input" maxlength="8" placeholder="나"></div>
+  <div id="name-row"><span>Name</span><input id="name-input" maxlength="8" placeholder="You"></div>
   <div id="over-btns">
-    <button id="share-btn">⚔️ 도전장 보내기</button>
-    <button id="retry-btn">다시 오르기</button>
+    <button id="share-btn">⚔️ Send Challenge</button>
+    <button id="retry-btn">Climb Again</button>
   </div>
   <div id="share-note"></div>
   <div id="next-note"></div>
@@ -251,7 +251,7 @@
       if (!Array.isArray(raw)) return [];
       return raw
         .filter(function (r) { return r && typeof r.s === 'number' && isFinite(r.s); })
-        .map(function (r) { return { n: String(r.n || '나').slice(0, 8), s: Math.max(0, Math.round(r.s)), f: r.f ? 1 : 0, t: r.t || 0 }; })
+        .map(function (r) { return { n: String(r.n || 'You').slice(0, 8), s: Math.max(0, Math.round(r.s)), f: r.f ? 1 : 0, t: r.t || 0 }; })
         .sort(function (a, b) { return b.s - a.s; })
         .slice(0, RANK_MAX);
     } catch (e) { return []; }
@@ -286,7 +286,7 @@
     if (!ranks.length) {
       var empty = document.createElement('div');
       empty.className = 'rank-empty';
-      empty.textContent = '아직 기록이 없어요.';
+      empty.textContent = 'No records yet.';
       board.appendChild(empty);
       return;
     }
@@ -302,12 +302,12 @@
       if (r.f) {
         var tag = document.createElement('span');
         tag.className = 'rank-friend';
-        tag.textContent = '👥친구';
+        tag.textContent = '👥friend';
         name.appendChild(tag);
       }
       var s = document.createElement('span');
       s.className = 'rank-s';
-      s.textContent = r.s + '층';
+      s.textContent = r.s + 'F';
       row.append(pos, name, s);
       board.appendChild(row);
     });
@@ -317,7 +317,7 @@
 
   function recordRank(s) {
     ranks = loadRanks(courseDay);
-    var entry = { n: loadName() || '나', s: Math.round(s), f: 0, t: Date.now() };
+    var entry = { n: loadName() || 'You', s: Math.round(s), f: 0, t: Date.now() };
     ranks.push(entry);
     ranks.sort(function (a, b) { return b.s - a.s; });
     ranks = ranks.slice(0, RANK_MAX);
@@ -336,9 +336,9 @@
     var md = /(?:^|[#&])d=(\d{8})/.exec(hash);
     chSteps = Math.min(99999, parseInt(mc[1], 10) || 0);
     chDay = md ? md[1] : dayKey();
-    chName = '친구';
+    chName = 'Friend';
     if (mn) {
-      try { chName = decodeURIComponent(mn[1]).slice(0, 8) || '친구'; } catch (e) {}
+      try { chName = decodeURIComponent(mn[1]).slice(0, 8) || 'Friend'; } catch (e) {}
     }
     return chSteps > 0;
   }
@@ -364,7 +364,7 @@
   function challengeUrl(s) {
     try {
       var u = new URL(location.href);
-      var n = loadName() || '나';
+      var n = loadName() || 'You';
       u.hash = 'c=' + Math.round(s) + '&n=' + encodeURIComponent(n) + '&d=' + courseDay;
       return u.href;
     } catch (e) { return ''; }
@@ -378,11 +378,11 @@
   function shareResult() {
     var s = Math.round(lastScore);
     var url = challengeUrl(s);
-    var text = '🪜 오늘의 계단 ' + dayLabel(courseDay) + ' — ' + s + '층 올랐다!\n오늘은 모두 같은 계단이야. 넘어볼래?';
+    var text = '🪜 Daily Stairs ' + dayLabel(courseDay) + ' — I climbed ' + s + ' floors!\nEveryone gets the same stairs today. Can you beat me?';
     var full = url ? text + '\n' + url : text;
-    var done = function () { note('도전장 전송!'); };
+    var done = function () { note('Challenge sent!'); };
     if (navigator.share) {
-      navigator.share(url ? { title: '오늘의 계단', text: text, url: url } : { title: '오늘의 계단', text: text })
+      navigator.share(url ? { title: 'Daily Stairs', text: text, url: url } : { title: 'Daily Stairs', text: text })
         .then(done)
         .catch(function (e) {
           if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
@@ -395,7 +395,7 @@
   function copyFallback(full) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(full)
-        .then(function () { note('도전장 링크 복사됨!'); })
+        .then(function () { note('Challenge link copied!'); })
         .catch(function () { manualCopy(full); });
       return;
     }
@@ -406,7 +406,7 @@
     fb.value = full;
     fb.classList.remove('hidden');
     fb.focus(); fb.select();
-    note('아래 링크를 복사해서 보내세요');
+    note('Copy the link below and send it');
   }
 
   // ---------- 판 리셋 ----------
@@ -448,7 +448,7 @@
       ensureSteps(floors + 60);
       if (chSteps > 0 && !chBeaten && floors > chSteps) {
         chBeaten = true;
-        flashes.push({ text: '🏆 ' + chName + ' 넘어섬!', t: 1.6 });
+        flashes.push({ text: '🏆 Passed ' + chName + '!', t: 1.6 });
         shake = 6;
       }
     } else {
@@ -508,7 +508,7 @@
   nameInput.addEventListener('input', function () {
     var v = nameInput.value.slice(0, 8);
     saveName(v);
-    if (myRankRow) { myRankRow.n = v || '나'; saveRanks(courseDay, ranks); renderRanks(); }
+    if (myRankRow) { myRankRow.n = v || 'You'; saveRanks(courseDay, ranks); renderRanks(); }
   });
 
   // ---------- 게임오버 ----------
@@ -533,29 +533,29 @@
   }
 
   function showOverPanel() {
-    document.getElementById('over-title').textContent = caught ? '☁️ 구름에 삼켜짐!' : '🪂 헛디딤!';
-    document.getElementById('over-score').textContent = lastScore + '층';
+    document.getElementById('over-title').textContent = caught ? '☁️ Swallowed by the cloud!' : '🪂 Missed a step!';
+    document.getElementById('over-score').textContent = lastScore + ' floors';
     var sub = document.getElementById('over-sub');
     sub.className = '';
     if (chSteps > 0) {
       if (lastScore > chSteps) {
-        sub.textContent = '🏆 ' + chName + '(' + chSteps + '층) 꺾음!';
+        sub.textContent = '🏆 You beat ' + chName + ' (' + chSteps + 'F)!';
         sub.className = 'win';
       } else if (lastScore === chSteps) {
-        sub.textContent = '동점! ' + chName + ' ' + chSteps + '층';
+        sub.textContent = 'Tied with ' + chName + ' at ' + chSteps + 'F!';
         sub.className = 'lose';
       } else {
-        sub.textContent = chName + '까지 ' + (chSteps - lastScore) + '층 남았다…';
+        sub.textContent = (chSteps - lastScore) + 'F short of ' + chName + '\u2026';
         sub.className = 'lose';
       }
     } else if (isNewBest) {
-      sub.textContent = '🎉 오늘 신기록!';
+      sub.textContent = '🎉 New daily record!';
       sub.className = 'newbest';
     } else {
-      sub.textContent = '오늘 최고 ' + best + '층 · 역대 ' + bestAll + '층';
+      sub.textContent = 'Best today ' + best + 'F \u00b7 all-time ' + bestAll + 'F';
     }
-    document.getElementById('board-title').textContent = '🏅 오늘의 랭킹 (' + dayLabel(courseDay) + ') — 모두 같은 계단!';
-    document.getElementById('next-note').textContent = '내일 0시(한국)에 새 계단이 열려요 · ' + untilNextCourse() + ' 남음';
+    document.getElementById('board-title').textContent = '🏅 Today\u2019s ranking (' + dayLabel(courseDay) + ') \u2014 same stairs for everyone!';
+    document.getElementById('next-note').textContent = 'New stairs at midnight KST \u00b7 ' + untilNextCourse() + ' left';
     ranks = loadRanks(courseDay);
     renderRanks();
     document.getElementById('share-fallback').classList.add('hidden');
@@ -731,7 +731,7 @@
     ctx.fillStyle = 'rgba(70,140,255,0.95)';
     ctx.font = 'bold 13px -apple-system, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('⚔️ ' + chName + ' ' + chSteps + '층' + (chIsToday() ? '' : ' (다른 날 코스)'), 8, y - 6);
+    ctx.fillText('⚔️ ' + chName + ' ' + chSteps + 'F' + (chIsToday() ? '' : ' (another day\u2019s course)'), 8, y - 6);
     ctx.restore();
   }
 
@@ -806,10 +806,10 @@
     if (state === STATE_PLAY) {
       ctx.fillStyle = '#20242e';
       ctx.font = 'bold 46px -apple-system, sans-serif';
-      ctx.fillText(floors + '층', W / 2, 62);
+      ctx.fillText(floors + 'F', W / 2, 62);
       ctx.font = '14px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(32,36,46,0.55)';
-      ctx.fillText('오늘 최고 ' + best + '층 · ' + dayLabel(courseDay) + ' 코스', W / 2, 86);
+      ctx.fillText('BEST TODAY ' + best + 'F \u00b7 ' + dayLabel(courseDay) + ' course', W / 2, 86);
 
       if (introT > 0) {
         var ia = Math.min(1, introT / 0.35);
@@ -818,7 +818,7 @@
         ctx.globalAlpha = ia * blink;
         ctx.fillStyle = '#d1342a';
         ctx.font = 'bold 26px -apple-system, sans-serif';
-        ctx.fillText('계단이 있는 쪽을 탭!', W / 2, H * 0.36);
+        ctx.fillText('TAP THE SIDE WITH A STAIR!', W / 2, H * 0.36);
         ctx.font = 'bold 40px -apple-system, sans-serif';
         var osc = Math.abs(Math.sin(performance.now() / 130)) * 12;
         ctx.fillText('◀', W * 0.2 - osc, H * 0.36 + 50);
@@ -842,30 +842,36 @@
       ctx.fillStyle = '#20242e';
       var ts = 50;
       ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
-      while (ts > 24 && ctx.measureText('🪜 오늘의 계단').width > W * 0.9) {
+      while (ts > 24 && ctx.measureText('🪜 DAILY STAIRS').width > W * 0.9) {
         ts -= 2;
         ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
       }
-      ctx.fillText('🪜 오늘의 계단', W / 2, H * 0.24);
-      ctx.font = 'bold 18px -apple-system, sans-serif';
+      ctx.fillText('🪜 DAILY STAIRS', W / 2, H * 0.24);
       ctx.fillStyle = '#b3543a';
-      ctx.fillText(dayLabel(dayKey()) + ' 코스 — 오늘은 모두 같은 계단!', W / 2, H * 0.24 + 38);
+      var subMsg = dayLabel(dayKey()) + ' course \u2014 same stairs for everyone today!';
+      var ss = 18;
+      ctx.font = 'bold ' + ss + 'px -apple-system, sans-serif';
+      while (ss > 12 && ctx.measureText(subMsg).width > W * 0.94) {
+        ss -= 1;
+        ctx.font = 'bold ' + ss + 'px -apple-system, sans-serif';
+      }
+      ctx.fillText(subMsg, W / 2, H * 0.24 + 38);
       ctx.font = '16px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(32,36,46,0.7)';
-      ctx.fillText('계단이 꺾이는 쪽을 탭해서 올라가요', W / 2, H * 0.24 + 68);
-      ctx.fillText('밑에서 먹구름이 쫓아와요 — 멈추면 끝!', W / 2, H * 0.24 + 92);
+      ctx.fillText('Tap the side the stairs turn to climb', W / 2, H * 0.24 + 68);
+      ctx.fillText('A storm cloud chases from below \u2014 don\u2019t stop!', W / 2, H * 0.24 + 92);
       if (best > 0 || bestAll > 0) {
-        ctx.fillText('오늘 최고 ' + best + '층 · 역대 ' + bestAll + '층', W / 2, H * 0.24 + 122);
+        ctx.fillText('Best today ' + best + 'F \u00b7 all-time ' + bestAll + 'F', W / 2, H * 0.24 + 122);
       }
       if (chSteps > 0) {
         ctx.fillStyle = '#2f6fd6';
         ctx.font = 'bold 17px -apple-system, sans-serif';
-        ctx.fillText('⚔️ ' + chName + '의 도전장: ' + chSteps + '층을 넘어라!', W / 2, H * 0.24 + 154);
+        ctx.fillText('⚔️ ' + chName + '\u2019s challenge: beat ' + chSteps + ' floors!', W / 2, H * 0.24 + 154);
       }
       ctx.fillStyle = 'rgba(32,36,46,0.5)';
       ctx.font = '13px -apple-system, sans-serif';
-      ctx.fillText('다음 계단까지 ' + untilNextCourse(), W / 2, H * 0.24 + 184);
-      blinkText('탭해서 시작!', H * 0.76);
+      ctx.fillText('Next stairs in ' + untilNextCourse(), W / 2, H * 0.24 + 184);
+      blinkText('TAP TO START!', H * 0.76);
     } else if (state === STATE_OVER) {
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.fillRect(-20, -20, W + 40, H + 40);
