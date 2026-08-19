@@ -472,8 +472,8 @@
     score += dt;
     if (introT > 0) introT -= dt;
 
-    // 이동: 관성 — 밀면 가속, 놓으면 미끄러지며 멈춘다
-    var ACCEL = 2600, MAXV = 560;
+    // 이동: 관성 — 밀면 스으윽 가속, 놓으면 미끄러지며 멈춘다
+    var ACCEL = 1500, MAXV = 440, VCAP = MAXV * 1.12;
     var input = 0;
     if (keys.left || btnL) input -= 1;
     if (keys.right || btnR) input += 1;
@@ -482,13 +482,13 @@
       player.targetX = player.x; // 키 조작 중엔 터치 목표 무시
     } else if (dragging) {
       // 손가락 따라가되 스프링처럼 미끄러지는 감속
-      var want = Math.max(-MAXV * 1.4, Math.min(MAXV * 1.4, (player.targetX - player.x) * 10));
-      player.vx += (want - player.vx) * Math.min(1, dt * 12);
+      var want = Math.max(-VCAP, Math.min(VCAP, (player.targetX - player.x) * 8));
+      player.vx += (want - player.vx) * Math.min(1, dt * 9);
     } else {
       // 입력 없음: 관성으로 주-욱 미끄러지다 멈춤
-      player.vx *= Math.exp(-dt * 3.2);
+      player.vx *= Math.exp(-dt * 2.4);
     }
-    player.vx = Math.max(-MAXV * 1.4, Math.min(MAXV * 1.4, player.vx));
+    player.vx = Math.max(-VCAP, Math.min(VCAP, player.vx));
     player.x += player.vx * dt;
     if (player.x < 18) { player.x = 18; player.vx = 0; }
     if (player.x > W - 18) { player.x = W - 18; player.vx = 0; }
