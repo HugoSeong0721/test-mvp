@@ -155,9 +155,11 @@
   function gapMax()  { return Math.max(150, H - playerY() - 76); } // 개는 항상 화면 안에
 
   // ---------- 상수 ----------
-  var THROW_CD = 0.22;     // 연속 던지기 쿨다운
+  var THROW_CD = 0.16;     // 연속 던지기 쿨다운
   var CATCH_GAP = 30;      // 이보다 가까우면 물린다
   var HOUSE_H = 86;
+  var HIT_TOL = 34;        // 던지기 라인 판정 폭(px) — 이 안에 우편함이 있을 때 탭해야 명중
+  var PERFECT_TOL = 12;    // 정중앙 판정
 
   var HOUSE_COLORS = [
     { body: '#f4e7cf', roof: '#8a5a44', door: '#7a4a2e' },
@@ -197,9 +199,9 @@
   var isNewBest = false;
 
   // ---------- 난이도 ----------
-  function scrollSpeed() { return Math.min(430, 175 + elapsed * 4.2); }
-  function houseGap()    { return Math.max(118, 235 - elapsed * 1.6); }   // 집 사이 거리(px)
-  function dogPressure() { return 20 + elapsed * 1.15; }                  // 초당 개가 좁혀오는 px
+  function scrollSpeed() { return Math.min(560, 205 + elapsed * 6.5); }
+  function houseGap()    { return Math.max(96, 215 - elapsed * 2.4); }    // 집 사이 거리(px)
+  function dogPressure() { return 24 + elapsed * 1.5; }                   // 초당 개가 좁혀오는 px
 
   // ---------- 랭킹 (이 기기 기록 + 친구 도전장 기록) ----------
   var RANK_MAX = 12;
@@ -391,11 +393,11 @@
       ci: Math.floor(Math.random() * HOUSE_COLORS.length),
       // 프리필 집 중 시작하자마자 지나가 버릴 것들은 배달 완료 취급 —
       // 안 그러면 손쓸 새도 없이 '놓침'이 연달아 터진다
-      delivered: !!prefill && y + HOUSE_H > playerY() - 380,
+      delivered: !!prefill && y + HOUSE_H > playerY() - 260,
       missed: false,
-      inFlight: false,
       flagT: 0,
-      cancelT: 0
+      cancelT: 0,
+      smashT: 0
     });
   }
   function spawnTree(side, y) {
@@ -408,36 +410,71 @@
     return { x: x, y: h.y + HOUSE_H - 4 };
   }
 
-  // ---------- 조작: 좌/우 탭 = 그쪽 집에 던지기 ----------
-  function candidate(side) {
-    // 그쪽에서 아직 배달 안 했고, 던질 수 있는 범위(앞쪽)에 있는 가장 가까운 집
-    var bestH = null, bestY = -1e9;
+  // ---------- 조작: 좌/우 탭 = 그쪽으로 수평 투척 (타이밍 게임) ----------
+  // 우편함이 던지기 라인(자전거 옆)을 지나는 순간에 탭해야 명중한다
+  function candidate(side, tol) {
+    var bestH = null, bestD = 1e9;
     for (var i = 0; i < houses.length; i++) {
       var h = houses[i];
-      if (h.side !== side || h.delivered || h.missed || h.inFlight) continue;
-      var my = mailboxPos(h).y;
-      if (my < playerY() - H * 0.62 || my > playerY() + 18) continue;
-      if (my > bestY) { bestY = my; bestH = h; }
+      if (h.side !== side || h.delivered || h.missed) continue;
+      var d = Math.abs(mailboxPos(h).y - playerY());
+      if (d <= tol && d < bestD) { bestD = d; bestH = h; }
     }
     return bestH;
+  }
+  // 라인 위에 집 벽이 걸려 있나 (우편함을 빗나가면 여기 맞아 창문이 깨진다)
+  function wallOnLine(side) {
+    var py = playerY();
+    for (var i = 0; i < houses.length; i++) {
+      var h = houses[i];
+      if (h.side !== side) continue;
+      if (h.y + 18 < py && h.y + HOUSE_H - 6 > py) return h;
+    }
+    return null;
   }
 
   function throwSide(side) {
     if (state !== STATE_PLAY || throwCd > 0) return;
     throwCd = THROW_CD;
     bikeSway = side * 1;
-    var h = candidate(side);
     var px = W / 2, py = playerY();
+    var h = candidate(side, HIT_TOL);
     if (h) {
-      h.inFlight = true;
+      // 명중 — 판정은 던진 순간, 연출(깃발/팝)은 신문이 닿는 순간
+      var dy = Math.abs(mailboxPos(h).y - py);
+      var perfect = dy <= PERFECT_TOL;
+      h.delivered = true;
+      papers++;
+      streak++;
+      dogGap = Math.min(gapMax(), dogGap + (perfect ? 45 : 26));
+      if (streak > 0 && streak % 10 === 0) {
+        flashes.push({ text: streak + ' STREAK! 🚀', t: 1.2, color: '#1d6ed8' });
+        dogGap = Math.min(gapMax(), dogGap + 30);
+      }
+      if (chScore > 0 && !chBeaten && papers > chScore) {
+        chBeaten = true;
+        flashes.push({ text: '🏆 Passed ' + chName + '!', t: 1.6, color: '#1d8a3c' });
+        shake = 6;
+      }
       var m = mailboxPos(h);
-      flights.push({ x0: px, y0: py, tx: m.x, ty: m.y, t: 0, dur: 0.26, house: h, waste: false });
-    } else {
-      // 받을 집이 없다 — 신문이 잔디밭에 처박힌다 (개도 살짝 가까워짐)
-      var wx = side < 0 ? roadL() - SIDEWALK - 26 : roadR() + SIDEWALK + 26;
-      flights.push({ x0: px, y0: py, tx: wx, ty: py - H * 0.3, t: 0, dur: 0.3, house: null, waste: true });
-      dogGap = Math.max(0, dogGap - 8);
+      flights.push({ x0: px, y0: py, tx: m.x, ty: py, t: 0, dur: 0.12, house: h, perfect: perfect });
+      return;
     }
+    var wall = wallOnLine(side);
+    if (wall) {
+      // 창문 깨먹음 — 집주인이 개를 부추긴다
+      dogGap = Math.max(0, dogGap - 45);
+      if (!wall.delivered && !wall.missed) { wall.missed = true; wall.cancelT = 1.4; }
+      streak = 0;
+      shake = 6;
+      var wx = side < 0 ? roadL() - SIDEWALK - 34 : roadR() + SIDEWALK + 34;
+      flights.push({ x0: px, y0: py, tx: wx, ty: py, t: 0, dur: 0.12, smash: wall });
+      return;
+    }
+    // 허공 — 신문이 잔디밭에 처박힌다 (낭비. 개도 살짝 가까워짐)
+    dogGap = Math.max(0, dogGap - 12);
+    var lx = side < 0 ? roadL() - SIDEWALK - 30 : roadR() + SIDEWALK + 30;
+    flights.push({ x0: px, y0: py, tx: lx, ty: py, t: 0, dur: 0.14, waste: true });
   }
 
   function tryStart() {
@@ -547,31 +584,24 @@
     }
     dogLegT += dt * (8 + (1 - dogGap / gapMax()) * 8);
 
-    // 날아가는 신문은 게임오버 뒤에도 마저 그려 준다
+    // 날아가는 신문 — 판정은 이미 던진 순간에 끝났고, 여기선 연출만 마무리한다
+    // (게임오버 뒤에도 마저 그려 준다)
     for (var f = flights.length - 1; f >= 0; f--) {
       var fl = flights[f];
       fl.t += dt;
-      // 목표(우편함)는 화면과 같이 흘러내리므로 좌표를 따라간다
-      if (fl.house) fl.ty = mailboxPos(fl.house).y;
+      // 목표(우편함/집)는 화면과 같이 흘러내리므로 좌표를 따라간다
+      if (fl.house) { var fm = mailboxPos(fl.house); fl.tx = fm.x; fl.ty = fm.y; }
+      if (fl.smash) fl.ty = fl.smash.y + HOUSE_H * 0.5;
       if (fl.t >= fl.dur) {
         if (fl.house) {
-          fl.house.inFlight = false;
-          fl.house.delivered = true;
           fl.house.flagT = 0.8;
-          papers++;
-          streak++;
           var m = mailboxPos(fl.house);
-          pops.push({ x: m.x, y: m.y - 16, t: 0.8, text: '+1' });
-          dogGap = Math.min(gapMax(), dogGap + 30);
-          if (streak > 0 && streak % 10 === 0) {
-            flashes.push({ text: streak + ' STREAK! 🚀', t: 1.2, color: '#1d6ed8' });
-            dogGap = Math.min(gapMax(), dogGap + 25);
-          }
-          if (chScore > 0 && !chBeaten && papers > chScore) {
-            chBeaten = true;
-            flashes.push({ text: '🏆 Passed ' + chName + '!', t: 1.6, color: '#1d8a3c' });
-            shake = 6;
-          }
+          pops.push({ x: m.x, y: m.y - 16, t: 0.8, text: fl.perfect ? 'PERFECT!' : '+1', gold: fl.perfect });
+        } else if (fl.smash) {
+          fl.smash.smashT = 1.2;
+          fl.smash.broken = true;
+          pops.push({ x: fl.tx, y: fl.ty - 10, t: 0.9, text: '💥', gold: false });
+          flashes.push({ text: 'WINDOW! 💥🐕', t: 0.9, color: '#d1342a' });
         }
         flights.splice(f, 1);
       }
@@ -598,8 +628,8 @@
       lastSide = side;
       spawnHouse(side, -HOUSE_H - 30, false);
       // 나중엔 가끔 양쪽 동시에 — 빠른 좌우 탭을 강제한다
-      if (elapsed > 18 && Math.random() < Math.min(0.4, (elapsed - 18) * 0.014)) {
-        spawnHouse(-side, -HOUSE_H - 30 - 46, false);
+      if (elapsed > 8 && Math.random() < Math.min(0.45, (elapsed - 8) * 0.02)) {
+        spawnHouse(-side, -HOUSE_H - 30 - 52, false);
       }
     }
     treeDist += dy;
@@ -614,13 +644,14 @@
       h.y += dy;
       if (h.flagT > 0) h.flagT -= dt;
       if (h.cancelT > 0) h.cancelT -= dt;
-      if (!h.delivered && !h.missed && !h.inFlight && mailboxPos(h).y > playerY() + 26) {
+      if (h.smashT > 0) h.smashT -= dt;
+      if (!h.delivered && !h.missed && mailboxPos(h).y > playerY() + HIT_TOL) {
         h.missed = true;
         h.cancelT = 1.4;
         streak = 0;
         // 첫 배달에 성공하기 전까지는 배우는 시간 — 놓쳐도 개가 점프하지 않는다
         // (개의 기본 추격만으로도 방치하면 10초쯤에 잡힌다)
-        if (papers > 0) dogGap = Math.max(0, dogGap - 85);
+        if (papers > 0) dogGap = Math.max(0, dogGap - 95);
         flashes.push({ text: 'MISSED! 🐕💨', t: 0.9, color: '#d1342a' });
         shake = 5;
       }
@@ -686,6 +717,21 @@
     ctx.moveTo(W / 2, -20); ctx.lineTo(W / 2, H + 20);
     ctx.stroke();
     ctx.setLineDash([]);
+
+    // 던지기 라인 — 우편함이 이 띠 안에 있을 때 탭해야 명중
+    if (state === STATE_PLAY || state === STATE_TITLE) {
+      var py = playerY();
+      ctx.fillStyle = 'rgba(255,255,255,0.10)';
+      ctx.fillRect(0, py - HIT_TOL, W, HIT_TOL * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 8]);
+      ctx.beginPath();
+      ctx.moveTo(0, py - HIT_TOL); ctx.lineTo(W, py - HIT_TOL);
+      ctx.moveTo(0, py + HIT_TOL); ctx.lineTo(W, py + HIT_TOL);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
   }
 
   function drawTree(t) {
@@ -728,7 +774,7 @@
     ctx.fillRect(doorX, bodyY + HOUSE_H - 26 - doorH, doorW, doorH);
     // 창문
     var winX = h.side < 0 ? x + 10 : x + h.w - 26;
-    ctx.fillStyle = '#fdf6cf';
+    ctx.fillStyle = h.broken ? '#4a4a55' : '#fdf6cf';
     ctx.fillRect(winX, bodyY + 12, 16, 14);
     ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     ctx.lineWidth = 1.5;
@@ -736,6 +782,25 @@
     ctx.beginPath();
     ctx.moveTo(winX + 8, bodyY + 12); ctx.lineTo(winX + 8, bodyY + 26);
     ctx.stroke();
+    if (h.broken) {
+      // 깨진 유리 금
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(winX + 3, bodyY + 15); ctx.lineTo(winX + 13, bodyY + 24);
+      ctx.moveTo(winX + 12, bodyY + 14); ctx.lineTo(winX + 5, bodyY + 25);
+      ctx.moveTo(winX + 8, bodyY + 13); ctx.lineTo(winX + 8, bodyY + 25);
+      ctx.stroke();
+    }
+    if (h.smashT > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, h.smashT / 0.5);
+      ctx.fillStyle = '#d1342a';
+      ctx.font = 'bold 15px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('HEY!!', winX + 8, bodyY + 6);
+      ctx.restore();
+    }
 
     // 우편함 — 배달 목표. 아직 배달 전이면 깃발이 접혀 있고 테두리가 깜빡인다
     var m = mailboxPos(h);
@@ -751,13 +816,28 @@
     ctx.lineWidth = 1.5;
     ctx.stroke();
     if (pending) {
-      // 노리는 대상 표시: 은은히 커졌다 작아지는 링
-      var pulse = 0.5 + 0.5 * Math.sin(performance.now() / 240 + h.y);
-      ctx.strokeStyle = 'rgba(29,110,216,' + (0.35 + 0.4 * pulse) + ')';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(m.x, m.y - 11, 15 + pulse * 3, 0, Math.PI * 2);
-      ctx.stroke();
+      var dLine = Math.abs(m.y - playerY());
+      if (dLine <= HIT_TOL) {
+        // 지금이 던질 순간! — 골드로 확 켜진다
+        var hot = 1 - dLine / HIT_TOL;
+        ctx.strokeStyle = 'rgba(255,196,40,' + (0.75 + 0.25 * hot) + ')';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y - 11, 17 + hot * 4, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,196,40,' + (0.18 + 0.2 * hot) + ')';
+        ctx.beginPath();
+        ctx.arc(m.x, m.y - 11, 17 + hot * 4, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // 은은한 예고 링
+        var pulse = 0.5 + 0.5 * Math.sin(performance.now() / 240 + h.y);
+        ctx.strokeStyle = 'rgba(29,110,216,' + (0.25 + 0.3 * pulse) + ')';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y - 11, 14, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     }
     if (h.delivered) {
       // 빨간 깃발이 올라간다
@@ -951,8 +1031,8 @@
       var pp = pops[p];
       ctx.save();
       ctx.globalAlpha = Math.min(1, pp.t / 0.3);
-      ctx.fillStyle = '#1d6ed8';
-      ctx.font = 'bold 20px -apple-system, sans-serif';
+      ctx.fillStyle = pp.gold ? '#e8960c' : '#1d6ed8';
+      ctx.font = 'bold ' + (pp.gold ? 22 : 20) + 'px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(pp.text, pp.x, pp.y);
       ctx.restore();
@@ -970,6 +1050,7 @@
       ctx.font = '12px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(255,255,255,0.75)';
       var subLine = 'best ' + best;
+      if (streak >= 5) subLine = '🔥 streak ' + streak + '  ·  ' + subLine;
       if (chScore > 0 && !chBeaten) subLine = '⚔️ ' + chName + ': ' + chScore + '  ·  ' + subLine;
       ctx.fillText(subLine, W / 2, 67);
     }
@@ -989,11 +1070,11 @@
         ctx.strokeStyle = 'rgba(0,0,0,0.5)';
         ctx.lineWidth = 5;
         ctx.font = 'bold 22px -apple-system, sans-serif';
-        ctx.strokeText('TAP a side to throw!', W / 2, H * 0.32);
-        ctx.fillText('TAP a side to throw!', W / 2, H * 0.32);
+        ctx.strokeText('TAP when a mailbox glows gold!', W / 2, H * 0.32);
+        ctx.fillText('TAP when a mailbox glows gold!', W / 2, H * 0.32);
         ctx.font = 'bold 15px -apple-system, sans-serif';
-        ctx.strokeText("Don't skip a house — the dog is behind you 🐕", W / 2, H * 0.32 + 28);
-        ctx.fillText("Don't skip a house — the dog is behind you 🐕", W / 2, H * 0.32 + 28);
+        ctx.strokeText('Miss a house and the dog gains on you 🐕', W / 2, H * 0.32 + 28);
+        ctx.fillText('Miss a house and the dog gains on you 🐕', W / 2, H * 0.32 + 28);
         ctx.restore();
       }
       for (var fl2 = 0; fl2 < flashes.length; fl2++) {
@@ -1021,20 +1102,21 @@
       ctx.fillText('🗞️ PAPER ROUTE', W / 2, H * 0.22);
       ctx.font = '16px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(43,53,80,0.8)';
-      ctx.fillText('Tap LEFT or RIGHT to throw a paper', W / 2, H * 0.22 + 44);
-      ctx.fillText('to that side’s mailbox 📪', W / 2, H * 0.22 + 68);
+      ctx.fillText('Tap LEFT or RIGHT the moment a mailbox', W / 2, H * 0.22 + 44);
+      ctx.fillText('crosses your line 📪 Dead center = PERFECT', W / 2, H * 0.22 + 68);
       ctx.fillStyle = '#d1342a';
       ctx.font = 'bold 16px -apple-system, sans-serif';
-      ctx.fillText('🐕 Skip a house and the dog gains on you!', W / 2, H * 0.22 + 100);
+      ctx.fillText('💥 Bad timing smashes a window.', W / 2, H * 0.22 + 100);
+      ctx.fillText('🐕 Miss a house and the dog gains on you!', W / 2, H * 0.22 + 124);
       if (best > 0) {
         ctx.fillStyle = 'rgba(43,53,80,0.8)';
         ctx.font = '16px -apple-system, sans-serif';
-        ctx.fillText('Personal best: ' + best + ' papers', W / 2, H * 0.22 + 132);
+        ctx.fillText('Personal best: ' + best + ' papers', W / 2, H * 0.22 + 156);
       }
       if (chScore > 0) {
         ctx.fillStyle = '#2f6fd6';
         ctx.font = 'bold 17px -apple-system, sans-serif';
-        ctx.fillText('⚔️ ' + chName + ' challenged you: beat ' + chScore + '!', W / 2, H * 0.22 + 162);
+        ctx.fillText('⚔️ ' + chName + ' challenged you: beat ' + chScore + '!', W / 2, H * 0.22 + 186);
       }
       blinkText('TAP TO START', H * 0.72);
     }
@@ -1089,7 +1171,12 @@
       get houses() { return houses; },
       get chScore() { return chScore; },
       get chName() { return chName; },
+      get py() { return playerY(); },
+      get flightsN() { return flights.length; },
+      get streak() { return streak; },
+      get hitTol() { return HIT_TOL; },
       candidate: candidate,
+      wallOnLine: wallOnLine,
       throwSide: throwSide,
       tryStart: tryStart
     };
