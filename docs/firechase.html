@@ -313,6 +313,7 @@
   // 불길이 이보다 더 뒤처지지 않는다. 화면 아래쪽 여백(약 0.42H)보다 짧게 잡아
   // 아무리 잘 도망쳐도 불길이 늘 발밑에 보이도록 — 긴장감의 핵심
   const LAVA_LEASH = 440;
+  const STAGE_SEC = 6.5;    // 이 간격마다 한 단계씩 어려워진다
   const LAVA_GRACE = 3;      // 시작 직후 이 시간 동안은 불길이 오르지 않는다
   const PX_PER_M  = 12;
 
@@ -323,6 +324,7 @@
   let bestM = 0, altM = 0, peakY = 0;
   let inputLeft = false, inputRight = false, targetX = null;
   let heat = 0, beatT = 0, runTime = 0;
+  let stage = 0, lastStage = 0;
   // 고정 스텝 물리를 화면 주사율에 맞춰 보간해 그린다.
   // 보간이 없으면 프레임마다 물리 스텝 수가 1~2개로 흔들려 미세하게 버벅인다.
   let viewCam = 0, viewX = 0, viewY = 0;
@@ -526,7 +528,7 @@
 
   // ── 발판 ────────────────────────────────────────────────
   // y는 위로 갈수록 작아진다 (캔버스와 같은 방향)
-  function platWidth(height) { return Math.max(76, 106 - height / 400); }
+  function platWidth(height) { return Math.max(70, 106 - height / 400 - stage * 2.4); }
 
   function spawnPlatform(y) {
     const h = Math.max(0, -y / PX_PER_M);
@@ -558,7 +560,7 @@
   function fillPlatforms() {
     while (topSpawnY > camY - 260) {
       const h = Math.max(0, -topSpawnY / PX_PER_M);
-      const gap = 42 + Math.random() * 20 + Math.min(14, h / 180);
+      const gap = 42 + Math.random() * 20 + Math.min(14, h / 180) + Math.min(24, stage * 2.2);
       topSpawnY -= gap;
       spawnPlatform(topSpawnY);
     }
@@ -614,7 +616,7 @@
     camY = -H * (1 - CAM_ANCHOR);
     player = { x: W / 2, y: 0, py: 0, vx: 0, vy: -300, face: 1 };
     peakY = 0; altM = 0;
-    heat = 0; beatT = 0; lavaShake = 0; runTime = 0;
+    heat = 0; beatT = 0; lavaShake = 0; runTime = 0; stage = 0; lastStage = 0;
     waterCount = 0; lavaFreeze = 0;
     inputLeft = inputRight = false; targetX = null;
 
@@ -796,12 +798,21 @@
 
     // 불길 상승 — 처음엔 느긋하고, 한참 오른 뒤부터 빨라진다
     runTime += dt;
+    // 난이도는 고도가 아니라 시간으로 올린다.
+    // 고도 기준이면 낮은 곳에서 죽는 판에서는 아예 작동하지 않았다.
+    stage = Math.floor(runTime / STAGE_SEC);
+    if (stage > lastStage) {
+      lastStage = stage;
+      lavaShake = 14;                       // 화면이 한 번 흔들려 변화를 알린다
+      tone(90, .34, 'sawtooth', .09);
+      tone(300 + stage * 18, .2, 'triangle', .06, .04);
+    }
     if (lavaFreeze > 0) {
       // 물을 맞은 불길은 잠시 멈춘다 — 따라붙지도 않으므로 거리를 실제로 번다
       lavaFreeze = Math.max(0, lavaFreeze - dt);
     } else {
       if (runTime > LAVA_GRACE) {
-        const lavaSpd = 34 + Math.min(160, Math.max(0, altM - 140) * 0.15);
+        const lavaSpd = 34 + Math.min(240, stage * 14);
         lavaY -= lavaSpd * dt;
       }
       const leash = player.y + LAVA_LEASH;   // 너무 뒤처지면 따라붙는다
