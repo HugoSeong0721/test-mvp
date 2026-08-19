@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Paper Route</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
+     아래로 쓸리는 손가락을 시트 닫기 대신 스크롤로 소비시킨다 */
+  html {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    height: calc(100% + 240px);
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #9fbf6e;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  #game {
+    display: block;
+    position: fixed;
+    inset: 0;
+    /* 세로 팬은 완충지대 스크롤로 흘려보낸다 — none으로 막으면 iOS가 시트 닫기로 가져간다 */
+    touch-action: pan-y;
+  }
+  /* ── 게임오버 패널 (랭킹 / 도전장) ── */
+  #over-panel {
+    position: fixed;
+    left: 50%; top: 46%;
+    transform: translate(-50%, -50%);
+    width: min(330px, 88vw);
+    background: rgba(28, 30, 44, 0.95);
+    color: #fff;
+    border-radius: 16px;
+    padding: 18px 16px 14px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+  }
+  #over-panel.hidden { display: none; }
+  #over-title { font-size: 24px; font-weight: 800; }
+  #over-score { font-size: 36px; font-weight: 800; margin-top: 2px; color: #ffd36e; }
+  #over-sub { font-size: 15px; margin-top: 4px; min-height: 18px; color: rgba(255,255,255,0.75); }
+  #over-sub.newbest { color: #ffd36e; font-weight: 700; }
+  #over-sub.win { color: #7ee787; font-weight: 700; }
+  #over-sub.lose { color: #ff8f7a; font-weight: 700; }
+  #board-title { margin-top: 12px; font-size: 13px; color: rgba(255,255,255,0.6); text-align: left; padding-left: 4px; }
+  #rank-board {
+    margin: 6px 0 8px;
+    max-height: 158px; overflow-y: auto;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .rank-row {
+    display: flex; gap: 8px; align-items: baseline;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row.me { background: rgba(255, 211, 110, 0.18); }
+  .rank-pos { width: 30px; text-align: left; color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums; }
+  .rank-row.me .rank-pos { color: #ffd36e; }
+  .rank-name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-friend { font-size: 11px; color: #8ecbff; margin-left: 4px; }
+  .rank-s { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rank-empty { padding: 14px; font-size: 13px; color: rgba(255,255,255,0.5); }
+  #name-row {
+    display: flex; gap: 8px; align-items: center; justify-content: center;
+    font-size: 13px; color: rgba(255,255,255,0.65);
+    margin-bottom: 10px;
+  }
+  #name-input {
+    width: 92px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 5px 8px;
+    text-align: center;
+  }
+  #over-btns { display: flex; gap: 8px; }
+  #over-btns button {
+    flex: 1;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700;
+    padding: 12px 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #retry-btn { background: #ffd36e; color: #3c2a08; }
+  #share-btn { background: rgba(255,255,255,0.14); color: #fff; }
+  #share-note { font-size: 12px; color: #7ee787; min-height: 15px; margin-top: 7px; }
+  #share-fallback {
+    width: 100%; margin-top: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; color: #fff;
+    font-size: 12px; padding: 6px 8px;
+  }
+  #share-fallback.hidden { display: none; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="over-panel" class="hidden">
+  <div id="over-title">🐕 CAUGHT!</div>
+  <div id="over-score"></div>
+  <div id="over-sub"></div>
+  <div id="board-title"></div>
+  <div id="rank-board"></div>
+  <div id="name-row"><span>Name</span><input id="name-input" maxlength="8" placeholder="you"></div>
+  <div id="over-btns">
+    <button id="share-btn">⚔️ Challenge a friend</button>
+    <button id="retry-btn">Ride again</button>
+  </div>
+  <div id="share-note"></div>
+  <input id="share-fallback" class="hidden" readonly>
+</div>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('game');
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ---------- 레이아웃 ----------
+  function roadW()   { return Math.min(Math.round(W * 0.42), 200); }
+  function roadL()   { return W / 2 - roadW() / 2; }
+  function roadR()   { return W / 2 + roadW() / 2; }
+  var SIDEWALK = 12;
+  function playerY() { return Math.round(H * 0.55); }
+  function gapMax()  { return Math.max(150, H - playerY() - 76); } // 개는 항상 화면 안에
+
+  // ---------- 상수 ----------
+  var THROW_CD = 0.22;     // 연속 던지기 쿨다운
+  var CATCH_GAP = 30;      // 이보다 가까우면 물린다
+  var HOUSE_H = 86;
+
+  var HOUSE_COLORS = [
+    { body: '#f4e7cf', roof: '#8a5a44', door: '#7a4a2e' },
+    { body: '#bcd0e8', roof: '#5b6b80', door: '#3e4f66' },
+    { body: '#f0cfa5', roof: '#7d6552', door: '#6e4a26' },
+    { body: '#cfe4c6', roof: '#5f7a55', door: '#4a6440' },
+    { body: '#e8c9c9', roof: '#7d5252', door: '#6b3d3d' },
+    { body: '#e6e0f2', roof: '#6f6488', door: '#544a70' }
+  ];
+
+  // ---------- 상태 ----------
+  var STATE_TITLE = 0, STATE_PLAY = 1, STATE_OVER = 2;
+  var state = STATE_TITLE;
+
+  var papers = 0;          // 배달 부수 = 점수
+  var streak = 0;          // 연속 배달 (놓치면 끊김)
+  var elapsed = 0, introT = 0;
+  var speed = 0;           // 스크롤 속도 px/s
+  var scrollTotal = 0;     // 배경 패턴용 누적 스크롤
+  var houses = [];         // {side:-1|1, y, w, ci, delivered, missed, inFlight, flagT, cancelT}
+  var flights = [];        // 날아가는 신문 {x0,y0,tx,ty,t,dur,house,waste}
+  var trees = [];          // {side, y, r, tone}
+  var flashes = [];        // {text, t, color}
+  var pops = [];           // 배달 성공 팝 {x, y, t, text}
+  var dogGap = 0;          // 개와의 거리(px). 0에 가까울수록 위험
+  var dogLegT = 0, dogLunge = 0;
+  var spawnDist = 0, nextGap = 260, lastSide = 1;
+  var treeDist = 0;
+  var throwCd = 0;
+  var bikeSway = 0;
+  var shake = 0;
+  var overAt = 0, deathAnim = 0;
+  var lastScore = 0;
+
+  var best = 0;
+  try { best = parseInt(localStorage.getItem('paperRouteBest') || '0', 10) || 0; } catch (e) {}
+  var isNewBest = false;
+
+  // ---------- 난이도 ----------
+  function scrollSpeed() { return Math.min(430, 175 + elapsed * 4.2); }
+  function houseGap()    { return Math.max(118, 235 - elapsed * 1.6); }   // 집 사이 거리(px)
+  function dogPressure() { return 20 + elapsed * 1.15; }                  // 초당 개가 좁혀오는 px
+
+  // ---------- 랭킹 (이 기기 기록 + 친구 도전장 기록) ----------
+  var RANK_MAX = 12;
+  var RANK_KEY = 'paperRouteRanks';
+  var ranks = [], myRankRow = null;
+  function loadRanks() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(RANK_KEY) || '[]');
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter(function (r) { return r && typeof r.s === 'number' && isFinite(r.s); })
+        .map(function (r) { return { n: String(r.n || 'me').slice(0, 8), s: Math.max(0, Math.round(r.s)), f: r.f ? 1 : 0, t: r.t || 0 }; })
+        .sort(function (a, b) { return b.s - a.s; })
+        .slice(0, RANK_MAX);
+    } catch (e) { return []; }
+  }
+  function saveRanks(list) {
+    try { localStorage.setItem(RANK_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function loadName() {
+    try { return (localStorage.getItem('paperRouteName') || '').slice(0, 8); } catch (e) { return ''; }
+  }
+  function saveName(v) { try { localStorage.setItem('paperRouteName', v); } catch (e) {} }
+
+  function renderRanks() {
+    var board = document.getElementById('rank-board');
+    board.textContent = '';
+    if (!ranks.length) {
+      var empty = document.createElement('div');
+      empty.className = 'rank-empty';
+      empty.textContent = 'No scores yet.';
+      board.appendChild(empty);
+      return;
+    }
+    ranks.forEach(function (r, i) {
+      var row = document.createElement('div');
+      row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
+      var pos = document.createElement('span');
+      pos.className = 'rank-pos';
+      pos.textContent = '#' + (i + 1);
+      var name = document.createElement('span');
+      name.className = 'rank-name';
+      name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
+      if (r.f) {
+        var tag = document.createElement('span');
+        tag.className = 'rank-friend';
+        tag.textContent = '👥friend';
+        name.appendChild(tag);
+      }
+      var s = document.createElement('span');
+      s.className = 'rank-s';
+      s.textContent = r.s + ' 🗞️';
+      row.append(pos, name, s);
+      board.appendChild(row);
+    });
+    var me = board.querySelector('.rank-row.me');
+    if (me) me.scrollIntoView({ block: 'nearest' });
+  }
+
+  function recordRank(s) {
+    ranks = loadRanks();
+    var entry = { n: loadName() || 'me', s: Math.round(s), f: 0, t: Date.now() };
+    ranks.push(entry);
+    ranks.sort(function (a, b) { return b.s - a.s; });
+    ranks = ranks.slice(0, RANK_MAX);
+    myRankRow = ranks.indexOf(entry) >= 0 ? entry : null;
+    saveRanks(ranks);
+    renderRanks();
+  }
+
+  // ---------- 도전장 (공유 링크에 실려 오는 친구 기록) ----------
+  var chScore = 0, chName = '', chBeaten = false;
+  function readHashChallenge() {
+    var hash = location.hash || '';
+    var mc = /(?:^|[#&])c=(\d{1,5})/.exec(hash);
+    if (!mc) return false;
+    var mn = /(?:^|[#&])n=([^&]{1,64})/.exec(hash);
+    chScore = Math.min(99999, parseInt(mc[1], 10) || 0);
+    chName = 'friend';
+    if (mn) {
+      try { chName = decodeURIComponent(mn[1]).slice(0, 8) || 'friend'; } catch (e) {}
+    }
+    return chScore > 0;
+  }
+  function absorbChallenge() {
+    // 친구 기록을 랭킹판에 넣어 준다 (중복은 한 번만)
+    if (chScore <= 0) return;
+    var list = loadRanks();
+    var dup = list.some(function (r) { return r.f && r.n === chName && r.s === chScore; });
+    if (!dup) {
+      list.push({ n: chName, s: chScore, f: 1, t: Date.now() });
+      list.sort(function (a, b) { return b.s - a.s; });
+      saveRanks(list.slice(0, RANK_MAX));
+    }
+  }
+  if (readHashChallenge()) absorbChallenge();
+  window.addEventListener('hashchange', function () {
+    if (readHashChallenge()) { absorbChallenge(); chBeaten = false; }
+  });
+
+  // ---------- 공유 ----------
+  function challengeUrl(s) {
+    try {
+      var u = new URL(location.href);
+      var n = loadName() || 'me';
+      u.hash = 'c=' + Math.round(s) + '&n=' + encodeURIComponent(n);
+      return u.href;
+    } catch (e) { return ''; }
+  }
+  function note(msg) {
+    var el = document.getElementById('share-note');
+    el.textContent = msg;
+    clearTimeout(note._t);
+    note._t = setTimeout(function () { el.textContent = ''; }, 3200);
+  }
+  function shareResult() {
+    var s = Math.round(lastScore);
+    var url = challengeUrl(s);
+    var text = '🗞️ I delivered ' + s + ' papers on my route!\nCan you beat me before the dog gets you? 🐕';
+    var full = url ? text + '\n' + url : text;
+    var done = function () { note('Challenge sent!'); };
+    if (navigator.share) {
+      navigator.share(url ? { title: 'Paper Route', text: text, url: url } : { title: 'Paper Route', text: text })
+        .then(done)
+        .catch(function (e) {
+          if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
+          copyFallback(full);
+        });
+      return;
+    }
+    copyFallback(full);
+  }
+  function copyFallback(full) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(full)
+        .then(function () { note('Challenge link copied!'); })
+        .catch(function () { manualCopy(full); });
+      return;
+    }
+    manualCopy(full);
+  }
+  function manualCopy(full) {
+    var fb = document.getElementById('share-fallback');
+    fb.value = full;
+    fb.classList.remove('hidden');
+    fb.focus(); fb.select();
+    note('Copy the link below and send it');
+  }
+
+  // ---------- 판 리셋 ----------
+  function reset() {
+    papers = 0;
+    streak = 0;
+    elapsed = 0;
+    introT = 2.4;
+    speed = scrollSpeed();
+    scrollTotal = 0;
+    houses = [];
+    flights = [];
+    trees = [];
+    flashes = [];
+    pops = [];
+    dogGap = gapMax() * 0.82;
+    dogLegT = 0;
+    dogLunge = 0;
+    spawnDist = 0;
+    nextGap = 200;
+    lastSide = Math.random() < 0.5 ? 1 : -1;
+    treeDist = 0;
+    throwCd = 0;
+    shake = 0;
+    deathAnim = 0;
+    isNewBest = false;
+    chBeaten = false;
+    // 시작 화면부터 동네가 채워져 있도록 미리 깔아 둔다
+    for (var y = -HOUSE_H; y < H; y += 210) {
+      lastSide = -lastSide;
+      spawnHouse(lastSide, y, true);
+      if (Math.random() < 0.6) spawnTree(-lastSide, y + 90);
+    }
+  }
+
+  function spawnHouse(side, y, prefill) {
+    var lawnW = roadL() - SIDEWALK;
+    houses.push({
+      side: side,
+      y: y,
+      w: Math.max(58, Math.min(110, lawnW - 14)),
+      ci: Math.floor(Math.random() * HOUSE_COLORS.length),
+      // 프리필 집 중 시작하자마자 지나가 버릴 것들은 배달 완료 취급 —
+      // 안 그러면 손쓸 새도 없이 '놓침'이 연달아 터진다
+      delivered: !!prefill && y + HOUSE_H > playerY() - 380,
+      missed: false,
+      inFlight: false,
+      flagT: 0,
+      cancelT: 0
+    });
+  }
+  function spawnTree(side, y) {
+    trees.push({ side: side, y: y, r: 14 + Math.random() * 10, tone: Math.random() });
+  }
+
+  // 우편함 위치: 집 앞, 보도 바로 옆
+  function mailboxPos(h) {
+    var x = h.side < 0 ? roadL() - SIDEWALK - 10 : roadR() + SIDEWALK + 10;
+    return { x: x, y: h.y + HOUSE_H - 4 };
+  }
+
+  // ---------- 조작: 좌/우 탭 = 그쪽 집에 던지기 ----------
+  function candidate(side) {
+    // 그쪽에서 아직 배달 안 했고, 던질 수 있는 범위(앞쪽)에 있는 가장 가까운 집
+    var bestH = null, bestY = -1e9;
+    for (var i = 0; i < houses.length; i++) {
+      var h = houses[i];
+      if (h.side !== side || h.delivered || h.missed || h.inFlight) continue;
+      var my = mailboxPos(h).y;
+      if (my < playerY() - H * 0.62 || my > playerY() + 18) continue;
+      if (my > bestY) { bestY = my; bestH = h; }
+    }
+    return bestH;
+  }
+
+  function throwSide(side) {
+    if (state !== STATE_PLAY || throwCd > 0) return;
+    throwCd = THROW_CD;
+    bikeSway = side * 1;
+    var h = candidate(side);
+    var px = W / 2, py = playerY();
+    if (h) {
+      h.inFlight = true;
+      var m = mailboxPos(h);
+      flights.push({ x0: px, y0: py, tx: m.x, ty: m.y, t: 0, dur: 0.26, house: h, waste: false });
+    } else {
+      // 받을 집이 없다 — 신문이 잔디밭에 처박힌다 (개도 살짝 가까워짐)
+      var wx = side < 0 ? roadL() - SIDEWALK - 26 : roadR() + SIDEWALK + 26;
+      flights.push({ x0: px, y0: py, tx: wx, ty: py - H * 0.3, t: 0, dur: 0.3, house: null, waste: true });
+      dogGap = Math.max(0, dogGap - 8);
+    }
+  }
+
+  function tryStart() {
+    if (state === STATE_OVER && performance.now() - overAt < 600) return; // 오터치 방지
+    document.getElementById('over-panel').classList.add('hidden');
+    reset();
+    state = STATE_PLAY;
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return;
+    if (state !== STATE_PLAY) {
+      if (e.key === ' ' || e.key === 'Enter') tryStart();
+      return;
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') throwSide(-1);
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') throwSide(1);
+  });
+
+  // 터치: 화면 좌/우 아무 데나 탭 (탭 전용 — 홀드/드래그 없음)
+  // preventDefault를 걸지 않는다 — 세로 팬이 완충지대 스크롤로 소비되어야
+  // 인앱 브라우저 시트가 끌기를 가로채지 않는다
+  var lastTouchAt = 0; // 터치 뒤에 따라오는 호환용 mousedown 무시 (한 탭 = 한 번)
+  function tapAt(x) {
+    if (state !== STATE_PLAY) { tryStart(); return; }
+    throwSide(x < W / 2 ? -1 : 1);
+  }
+  canvas.addEventListener('touchstart', function (e) {
+    lastTouchAt = performance.now();
+    var t = e.touches && e.touches[0];
+    tapAt(t ? t.clientX : W / 2);
+  }, { passive: true });
+
+  canvas.addEventListener('mousedown', function (e) {
+    if (performance.now() - lastTouchAt < 800) return;
+    tapAt(e.clientX);
+  });
+
+  // ---------- 패널 버튼 ----------
+  document.getElementById('retry-btn').addEventListener('click', function () { tryStart(); });
+  document.getElementById('share-btn').addEventListener('click', function () { shareResult(); });
+  var nameInput = document.getElementById('name-input');
+  nameInput.value = loadName();
+  nameInput.addEventListener('input', function () {
+    var v = nameInput.value.slice(0, 8);
+    saveName(v);
+    if (myRankRow) { myRankRow.n = v || 'me'; saveRanks(ranks); renderRanks(); }
+  });
+
+  // ---------- 게임오버 ----------
+  function gameOver() {
+    state = STATE_OVER;
+    overAt = performance.now();
+    deathAnim = 0;
+    shake = 10;
+    lastScore = papers;
+    if (papers > best) {
+      best = papers;
+      isNewBest = true;
+      try { localStorage.setItem('paperRouteBest', String(best)); } catch (e) {}
+    }
+    recordRank(papers);
+    showOverPanel();
+  }
+
+  function showOverPanel() {
+    document.getElementById('over-title').textContent = '🐕 CAUGHT!';
+    document.getElementById('over-score').textContent = lastScore + ' papers';
+    var sub = document.getElementById('over-sub');
+    sub.className = '';
+    if (chScore > 0) {
+      if (lastScore > chScore) {
+        sub.textContent = '🏆 You beat ' + chName + ' (' + chScore + ')!';
+        sub.className = 'win';
+      } else if (lastScore === chScore) {
+        sub.textContent = 'Tied with ' + chName + ' at ' + chScore;
+        sub.className = 'lose';
+      } else {
+        sub.textContent = (chScore - lastScore) + ' more to beat ' + chName + '…';
+        sub.className = 'lose';
+      }
+    } else if (isNewBest) {
+      sub.textContent = '🎉 New personal best!';
+      sub.className = 'newbest';
+    } else {
+      sub.textContent = 'Best: ' + best + ' papers';
+    }
+    document.getElementById('board-title').textContent = '🏅 Top routes on this street';
+    ranks = loadRanks();
+    renderRanks();
+    document.getElementById('share-fallback').classList.add('hidden');
+    document.getElementById('over-panel').classList.remove('hidden');
+  }
+
+  // ---------- 업데이트 ----------
+  function update(dt) {
+    if (shake > 0) shake = Math.max(0, shake - dt * 26);
+    if (bikeSway !== 0) bikeSway *= Math.max(0, 1 - dt * 9);
+    for (var i = flashes.length - 1; i >= 0; i--) {
+      flashes[i].t -= dt;
+      if (flashes[i].t <= 0) flashes.splice(i, 1);
+    }
+    for (var p = pops.length - 1; p >= 0; p--) {
+      pops[p].t -= dt;
+      pops[p].y -= dt * 34;
+      if (pops[p].t <= 0) pops.splice(p, 1);
+    }
+    dogLegT += dt * (8 + (1 - dogGap / gapMax()) * 8);
+
+    // 날아가는 신문은 게임오버 뒤에도 마저 그려 준다
+    for (var f = flights.length - 1; f >= 0; f--) {
+      var fl = flights[f];
+      fl.t += dt;
+      // 목표(우편함)는 화면과 같이 흘러내리므로 좌표를 따라간다
+      if (fl.house) fl.ty = mailboxPos(fl.house).y;
+      if (fl.t >= fl.dur) {
+        if (fl.house) {
+          fl.house.inFlight = false;
+          fl.house.delivered = true;
+          fl.house.flagT = 0.8;
+          papers++;
+          streak++;
+          var m = mailboxPos(fl.house);
+          pops.push({ x: m.x, y: m.y - 16, t: 0.8, text: '+1' });
+          dogGap = Math.min(gapMax(), dogGap + 30);
+          if (streak > 0 && streak % 10 === 0) {
+            flashes.push({ text: streak + ' STREAK! 🚀', t: 1.2, color: '#1d6ed8' });
+            dogGap = Math.min(gapMax(), dogGap + 25);
+          }
+          if (chScore > 0 && !chBeaten && papers > chScore) {
+            chBeaten = true;
+            flashes.push({ text: '🏆 Passed ' + chName + '!', t: 1.6, color: '#1d8a3c' });
+            shake = 6;
+          }
+        }
+        flights.splice(f, 1);
+      }
+    }
+
+    if (state === STATE_OVER) { deathAnim += dt; return; }
+    if (state !== STATE_PLAY) return;
+
+    elapsed += dt;
+    if (introT > 0) introT -= dt;
+    if (throwCd > 0) throwCd -= dt;
+    speed = scrollSpeed();
+    var dy = speed * dt;
+    scrollTotal += dy;
+
+    // 집/나무 스폰
+    spawnDist += dy;
+    if (spawnDist >= nextGap) {
+      spawnDist = 0;
+      nextGap = houseGap() * (0.85 + Math.random() * 0.4);
+      var side;
+      if (Math.random() < 0.72) { side = -lastSide; }         // 대체로 번갈아
+      else { side = lastSide; }                                // 가끔 같은 쪽 연속
+      lastSide = side;
+      spawnHouse(side, -HOUSE_H - 30, false);
+      // 나중엔 가끔 양쪽 동시에 — 빠른 좌우 탭을 강제한다
+      if (elapsed > 18 && Math.random() < Math.min(0.4, (elapsed - 18) * 0.014)) {
+        spawnHouse(-side, -HOUSE_H - 30 - 46, false);
+      }
+    }
+    treeDist += dy;
+    if (treeDist > 150) {
+      treeDist = 0;
+      if (Math.random() < 0.7) spawnTree(Math.random() < 0.5 ? -1 : 1, -40);
+    }
+
+    // 집 이동 + 놓침 판정
+    for (var hI = houses.length - 1; hI >= 0; hI--) {
+      var h = houses[hI];
+      h.y += dy;
+      if (h.flagT > 0) h.flagT -= dt;
+      if (h.cancelT > 0) h.cancelT -= dt;
+      if (!h.delivered && !h.missed && !h.inFlight && mailboxPos(h).y > playerY() + 26) {
+        h.missed = true;
+        h.cancelT = 1.4;
+        streak = 0;
+        // 첫 배달에 성공하기 전까지는 배우는 시간 — 놓쳐도 개가 점프하지 않는다
+        // (개의 기본 추격만으로도 방치하면 10초쯤에 잡힌다)
+        if (papers > 0) dogGap = Math.max(0, dogGap - 85);
+        flashes.push({ text: 'MISSED! 🐕💨', t: 0.9, color: '#d1342a' });
+        shake = 5;
+      }
+      if (h.y > H + 40) houses.splice(hI, 1);
+    }
+    for (var tI = trees.length - 1; tI >= 0; tI--) {
+      trees[tI].y += dy;
+      if (trees[tI].y > H + 60) trees.splice(tI, 1);
+    }
+
+    // 개가 좁혀 온다
+    dogGap -= dogPressure() * dt;
+    if (dogGap <= CATCH_GAP) {
+      dogGap = 0;
+      dogLunge = 1;
+      gameOver();
+    }
+  }
+
+  // ---------- 그리기 ----------
+  function roundRect(x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawGround() {
+    // 잔디
+    ctx.fillStyle = '#9fbf6e';
+    ctx.fillRect(-20, -20, W + 40, H + 40);
+    // 잔디 결 (은은한 가로 줄, 스크롤 따라 흐름)
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    var off = scrollTotal % 64;
+    for (var y = -64 + off; y < H; y += 64) ctx.fillRect(0, y, W, 22);
+    // 보도
+    ctx.fillStyle = '#cfc9b8';
+    ctx.fillRect(roadL() - SIDEWALK, -20, SIDEWALK, H + 40);
+    ctx.fillRect(roadR(), -20, SIDEWALK, H + 40);
+    // 보도 이음매
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.lineWidth = 1;
+    var so = scrollTotal % 52;
+    for (var sy2 = -52 + so; sy2 < H; sy2 += 52) {
+      ctx.beginPath();
+      ctx.moveTo(roadL() - SIDEWALK, sy2); ctx.lineTo(roadL(), sy2);
+      ctx.moveTo(roadR(), sy2); ctx.lineTo(roadR() + SIDEWALK, sy2);
+      ctx.stroke();
+    }
+    // 도로
+    ctx.fillStyle = '#585c63';
+    ctx.fillRect(roadL(), -20, roadW(), H + 40);
+    // 중앙선
+    ctx.strokeStyle = '#f2d05e';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([26, 22]);
+    ctx.lineDashOffset = -(scrollTotal % 48);
+    ctx.beginPath();
+    ctx.moveTo(W / 2, -20); ctx.lineTo(W / 2, H + 20);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawTree(t) {
+    var x = t.side < 0 ? (roadL() - SIDEWALK) * 0.5 + (t.tone - 0.5) * 26
+                       : roadR() + SIDEWALK + (W - roadR() - SIDEWALK) * 0.5 + (t.tone - 0.5) * 26;
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.beginPath(); ctx.ellipse(x + 4, t.y + 5, t.r, t.r * 0.7, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = t.tone < 0.5 ? '#5f8f4a' : '#6f9c53';
+    ctx.beginPath(); ctx.arc(x, t.y, t.r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.14)';
+    ctx.beginPath(); ctx.arc(x - t.r * 0.3, t.y - t.r * 0.3, t.r * 0.45, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function drawHouse(h) {
+    var col = HOUSE_COLORS[h.ci];
+    var lawnMidL = (roadL() - SIDEWALK) / 2;
+    var lawnMidR = roadR() + SIDEWALK + (W - roadR() - SIDEWALK) / 2;
+    var cx = h.side < 0 ? lawnMidL : lawnMidR;
+    var x = cx - h.w / 2, y = h.y;
+    var bodyY = y + 26;
+
+    // 그림자
+    ctx.fillStyle = 'rgba(0,0,0,0.13)';
+    ctx.fillRect(x + 5, bodyY + 6, h.w, HOUSE_H - 26);
+    // 몸체
+    ctx.fillStyle = col.body;
+    ctx.fillRect(x, bodyY, h.w, HOUSE_H - 26);
+    // 지붕
+    ctx.fillStyle = col.roof;
+    ctx.beginPath();
+    ctx.moveTo(x - 7, bodyY);
+    ctx.lineTo(cx, y);
+    ctx.lineTo(x + h.w + 7, bodyY);
+    ctx.closePath();
+    ctx.fill();
+    // 문 (도로 쪽)
+    var doorW = 14, doorH = 24;
+    var doorX = h.side < 0 ? x + h.w - doorW - 8 : x + 8;
+    ctx.fillStyle = col.door;
+    ctx.fillRect(doorX, bodyY + HOUSE_H - 26 - doorH, doorW, doorH);
+    // 창문
+    var winX = h.side < 0 ? x + 10 : x + h.w - 26;
+    ctx.fillStyle = '#fdf6cf';
+    ctx.fillRect(winX, bodyY + 12, 16, 14);
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(winX, bodyY + 12, 16, 14);
+    ctx.beginPath();
+    ctx.moveTo(winX + 8, bodyY + 12); ctx.lineTo(winX + 8, bodyY + 26);
+    ctx.stroke();
+
+    // 우편함 — 배달 목표. 아직 배달 전이면 깃발이 접혀 있고 테두리가 깜빡인다
+    var m = mailboxPos(h);
+    var pending = !h.delivered && !h.missed;
+    // 기둥
+    ctx.fillStyle = '#7a5a3a';
+    ctx.fillRect(m.x - 2, m.y - 6, 4, 16);
+    // 함
+    ctx.fillStyle = h.missed ? '#8a8a8a' : '#e8e8ee';
+    roundRect(m.x - 10, m.y - 18, 20, 13, 5);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    if (pending) {
+      // 노리는 대상 표시: 은은히 커졌다 작아지는 링
+      var pulse = 0.5 + 0.5 * Math.sin(performance.now() / 240 + h.y);
+      ctx.strokeStyle = 'rgba(29,110,216,' + (0.35 + 0.4 * pulse) + ')';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(m.x, m.y - 11, 15 + pulse * 3, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    if (h.delivered) {
+      // 빨간 깃발이 올라간다
+      var up = h.flagT > 0 ? 1 - Math.max(0, h.flagT / 0.8) : 1;
+      ctx.strokeStyle = '#d1342a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(m.x + 8, m.y - 14);
+      ctx.lineTo(m.x + 8 + 8 * (1 - up), m.y - 14 - 9 * up);
+      ctx.stroke();
+      ctx.fillStyle = '#d1342a';
+      ctx.beginPath();
+      ctx.arc(m.x + 8 + 8 * (1 - up), m.y - 14 - 9 * up, 3, 0, Math.PI * 2);
+      ctx.fill();
+      // 놓인 신문
+      ctx.save();
+      ctx.translate(m.x - (h.side < 0 ? -16 : 16), m.y + 2);
+      ctx.rotate(0.5);
+      ctx.fillStyle = '#f7f3e8';
+      ctx.fillRect(-7, -3, 14, 6);
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-7, -3, 14, 6);
+      ctx.restore();
+    }
+    if (h.missed && h.cancelT > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, h.cancelT / 0.4);
+      ctx.fillStyle = '#d1342a';
+      ctx.font = 'bold 20px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('✗', m.x, m.y - 24);
+      ctx.restore();
+    }
+  }
+
+  function drawBike() {
+    var px = W / 2 + bikeSway * 6, py = playerY();
+    var pedal = Math.sin(performance.now() / 110);
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(bikeSway * 0.12);
+    // 그림자
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath(); ctx.ellipse(3, 6, 15, 26, 0, 0, Math.PI * 2); ctx.fill();
+    // 바퀴 (위/아래)
+    ctx.fillStyle = '#2b2b2b';
+    roundRect(-4, -30, 8, 16, 4); ctx.fill();
+    roundRect(-4, 14, 8, 16, 4); ctx.fill();
+    // 프레임
+    ctx.strokeStyle = '#d1342a';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(0, 18); ctx.stroke();
+    // 핸들바
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(-13, -16); ctx.lineTo(13, -16); ctx.stroke();
+    // 몸통 (어깨) + 팔
+    ctx.fillStyle = '#2f6fd6';
+    roundRect(-11, -8, 22, 20, 8); ctx.fill();
+    ctx.strokeStyle = '#2f6fd6';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-9, -2); ctx.lineTo(-12, -14); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(9, -2); ctx.lineTo(12, -14); ctx.stroke();
+    // 다리 페달질
+    ctx.strokeStyle = '#39496b';
+    ctx.beginPath(); ctx.moveTo(-5, 10); ctx.lineTo(-7, 18 + pedal * 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(5, 10); ctx.lineTo(7, 18 - pedal * 4); ctx.stroke();
+    // 머리 + 챙모자
+    ctx.fillStyle = '#e8b88a';
+    ctx.beginPath(); ctx.arc(0, -6, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d1342a';
+    ctx.beginPath(); ctx.arc(0, -7, 8, Math.PI, 0); ctx.fill();
+    ctx.fillRect(-8, -8, 16, 3);
+    // 신문 가방 (어깨 옆 흰 뭉치)
+    ctx.fillStyle = '#f7f3e8';
+    roundRect(-16, 0, 9, 12, 3); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-16, 0, 9, 12);
+    ctx.restore();
+  }
+
+  function drawDog() {
+    var gy = playerY() + CATCH_GAP + dogGap;
+    if (state === STATE_OVER) {
+      // 물었다 — 개가 자전거 위로 덮친다
+      gy = playerY() + 18 - Math.min(1, deathAnim * 3) * 8;
+    }
+    var run = Math.sin(dogLegT * 2.4);
+    var x = W / 2 + Math.sin(dogLegT * 0.7) * 10;
+    ctx.save();
+    ctx.translate(x, gy);
+    // 그림자
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath(); ctx.ellipse(2, 6, 14, 20, 0, 0, Math.PI * 2); ctx.fill();
+    // 꼬리
+    ctx.strokeStyle = '#6b4a2e';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, 16);
+    ctx.quadraticCurveTo(6 + run * 4, 24, run * 6, 30);
+    ctx.stroke();
+    // 몸통
+    ctx.fillStyle = '#7d572f';
+    roundRect(-11, -14, 22, 32, 10); ctx.fill();
+    // 다리 (달리기)
+    ctx.strokeStyle = '#6b4a2e';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-8, -8); ctx.lineTo(-13, -14 + run * 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8, -8); ctx.lineTo(13, -14 - run * 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-8, 12); ctx.lineTo(-13, 18 - run * 6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8, 12); ctx.lineTo(13, 18 + run * 6); ctx.stroke();
+    // 머리 (위쪽 = 달려드는 방향)
+    ctx.fillStyle = '#8a6134';
+    ctx.beginPath(); ctx.arc(0, -18, 11, 0, Math.PI * 2); ctx.fill();
+    // 귀
+    ctx.fillStyle = '#5f4023';
+    ctx.beginPath(); ctx.ellipse(-9, -22, 4, 7, -0.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(9, -22, 4, 7, 0.5, 0, Math.PI * 2); ctx.fill();
+    // 눈 (성난)
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-4, -20, 2.6, 0, Math.PI * 2); ctx.arc(4, -20, 2.6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(-4, -21, 1.3, 0, Math.PI * 2); ctx.arc(4, -21, 1.3, 0, Math.PI * 2); ctx.fill();
+    // 코
+    ctx.fillStyle = '#2b1d10';
+    ctx.beginPath(); ctx.arc(0, -26, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // 가까울 때 경고
+    if (state === STATE_PLAY && dogGap < 90) {
+      var danger = 1 - dogGap / 90;
+      var blink = 0.5 + 0.5 * Math.sin(performance.now() / 110);
+      ctx.save();
+      ctx.globalAlpha = danger * blink;
+      ctx.fillStyle = '#d1342a';
+      ctx.font = 'bold 22px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🐕 WOOF!!', x, gy - 44);
+      ctx.restore();
+      // 붉은 비네트
+      ctx.save();
+      ctx.globalAlpha = danger * 0.28;
+      var g = ctx.createLinearGradient(0, H, 0, H * 0.55);
+      g.addColorStop(0, 'rgba(209,52,42,0.9)');
+      g.addColorStop(1, 'rgba(209,52,42,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, H * 0.55, W, H * 0.45);
+      ctx.restore();
+    }
+  }
+
+  function drawFlights() {
+    for (var i = 0; i < flights.length; i++) {
+      var f = flights[i];
+      var k = Math.min(1, f.t / f.dur);
+      var x = f.x0 + (f.tx - f.x0) * k;
+      var y = f.y0 + (f.ty - f.y0) * k - Math.sin(Math.PI * k) * 26;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(k * 7);
+      var s = 1 + Math.sin(Math.PI * k) * 0.35;  // 포물선 높이감
+      ctx.scale(s, s);
+      ctx.fillStyle = '#f7f3e8';
+      ctx.fillRect(-7, -4, 14, 8);
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(-7, -4, 14, 8);
+      ctx.beginPath();
+      ctx.moveTo(-7, 0); ctx.lineTo(7, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function draw() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (shake > 0) ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+
+    drawGround();
+    for (var t = 0; t < trees.length; t++) drawTree(trees[t]);
+    for (var h = 0; h < houses.length; h++) drawHouse(houses[h]);
+    drawBike();
+    drawDog();
+    drawFlights();
+
+    // 배달 성공 팝
+    for (var p = 0; p < pops.length; p++) {
+      var pp = pops[p];
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, pp.t / 0.3);
+      ctx.fillStyle = '#1d6ed8';
+      ctx.font = 'bold 20px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(pp.text, pp.x, pp.y);
+      ctx.restore();
+    }
+
+    // UI
+    ctx.textAlign = 'center';
+    if (state === STATE_PLAY || state === STATE_OVER) {
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      roundRect(W / 2 - 74, 14, 148, 58, 14);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 34px -apple-system, sans-serif';
+      ctx.fillText('🗞️ ' + papers, W / 2, 52);
+      ctx.font = '12px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      var subLine = 'best ' + best;
+      if (chScore > 0 && !chBeaten) subLine = '⚔️ ' + chName + ': ' + chScore + '  ·  ' + subLine;
+      ctx.fillText(subLine, W / 2, 67);
+    }
+
+    if (state === STATE_PLAY) {
+      if (introT > 0) {
+        var ia = Math.min(1, introT / 0.35);
+        var blink2 = 0.55 + 0.45 * Math.sin(performance.now() / 90);
+        ctx.save();
+        ctx.globalAlpha = ia;
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.font = 'bold 30px -apple-system, sans-serif';
+        ctx.fillText('◀', W * 0.14, playerY() + 6);
+        ctx.fillText('▶', W * 0.86, playerY() + 6);
+        ctx.globalAlpha = ia * blink2;
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+        ctx.lineWidth = 5;
+        ctx.font = 'bold 22px -apple-system, sans-serif';
+        ctx.strokeText('TAP a side to throw!', W / 2, H * 0.32);
+        ctx.fillText('TAP a side to throw!', W / 2, H * 0.32);
+        ctx.font = 'bold 15px -apple-system, sans-serif';
+        ctx.strokeText("Don't skip a house — the dog is behind you 🐕", W / 2, H * 0.32 + 28);
+        ctx.fillText("Don't skip a house — the dog is behind you 🐕", W / 2, H * 0.32 + 28);
+        ctx.restore();
+      }
+      for (var fl2 = 0; fl2 < flashes.length; fl2++) {
+        var fl = flashes[fl2];
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, fl.t / 0.4);
+        ctx.fillStyle = fl.color;
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.lineWidth = 5;
+        ctx.font = 'bold 26px -apple-system, sans-serif';
+        ctx.strokeText(fl.text, W / 2, H * 0.24 - fl2 * 30);
+        ctx.fillText(fl.text, W / 2, H * 0.24 - fl2 * 30);
+        ctx.restore();
+      }
+    } else if (state === STATE_TITLE) {
+      ctx.fillStyle = 'rgba(255,255,255,0.78)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#2b3550';
+      var ts = 52;
+      ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
+      while (ts > 24 && ctx.measureText('🗞️ PAPER ROUTE').width > W * 0.92) {
+        ts -= 2;
+        ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
+      }
+      ctx.fillText('🗞️ PAPER ROUTE', W / 2, H * 0.22);
+      ctx.font = '16px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(43,53,80,0.8)';
+      ctx.fillText('Tap LEFT or RIGHT to throw a paper', W / 2, H * 0.22 + 44);
+      ctx.fillText('to that side’s mailbox 📪', W / 2, H * 0.22 + 68);
+      ctx.fillStyle = '#d1342a';
+      ctx.font = 'bold 16px -apple-system, sans-serif';
+      ctx.fillText('🐕 Skip a house and the dog gains on you!', W / 2, H * 0.22 + 100);
+      if (best > 0) {
+        ctx.fillStyle = 'rgba(43,53,80,0.8)';
+        ctx.font = '16px -apple-system, sans-serif';
+        ctx.fillText('Personal best: ' + best + ' papers', W / 2, H * 0.22 + 132);
+      }
+      if (chScore > 0) {
+        ctx.fillStyle = '#2f6fd6';
+        ctx.font = 'bold 17px -apple-system, sans-serif';
+        ctx.fillText('⚔️ ' + chName + ' challenged you: beat ' + chScore + '!', W / 2, H * 0.22 + 162);
+      }
+      blinkText('TAP TO START', H * 0.72);
+    }
+  }
+
+  function blinkText(text, y) {
+    var a = 0.55 + 0.45 * Math.sin(performance.now() / 350);
+    ctx.save();
+    ctx.fillStyle = '#2b3550';
+    ctx.globalAlpha = a;
+    ctx.font = 'bold 22px -apple-system, sans-serif';
+    ctx.fillText(text, W / 2, y);
+    ctx.restore();
+  }
+
+  // ---------- 루프 ----------
+  var last = performance.now();
+  function loop(now) {
+    var dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 완충지대 중간(120px)에 걸어 둔다.
+  var SE = document.scrollingElement || document.documentElement;
+  var PIN = 120, pinT = null;
+  function pinScroll() {
+    var max = SE.scrollHeight - SE.clientHeight;
+    if (max <= 0) return;
+    SE.scrollTop = Math.min(PIN, Math.max(1, max - 1));
+  }
+  document.addEventListener('touchstart', pinScroll, { passive: true });
+  window.addEventListener('scroll', function () {
+    clearTimeout(pinT); pinT = setTimeout(pinScroll, 250);
+  }, { passive: true });
+  pinScroll();
+
+  reset(); // 타이틀 화면 뒤 배경으로 동네를 미리 깔아 둔다
+  state = STATE_TITLE;
+  requestAnimationFrame(loop);
+
+  // 헤드리스 테스트용 훅 (해시에 debug가 있을 때만)
+  if ((location.hash || '').indexOf('debug') >= 0) {
+    window.__game = {
+      get state() { return state; },
+      get papers() { return papers; },
+      get dogGap() { return dogGap; },
+      get gapMax() { return gapMax(); },
+      get elapsed() { return elapsed; },
+      get houses() { return houses; },
+      get chScore() { return chScore; },
+      get chName() { return chName; },
+      candidate: candidate,
+      throwSide: throwSide,
+      tryStart: tryStart
+    };
+  }
+})();
+</script>
+</body>
+</html>
