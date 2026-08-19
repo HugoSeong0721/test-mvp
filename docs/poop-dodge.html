@@ -478,12 +478,15 @@
     if (keys.left || btnL) input -= 1;
     if (keys.right || btnR) input += 1;
     if (input !== 0) {
-      player.vx += input * ACCEL * dt;
+      // 방향 전환은 휙 — 반대로 꺾을 땐 강하게 제동+가속, 같은 방향은 스으윽
+      var a = (input * player.vx < 0) ? ACCEL * 3 : ACCEL;
+      player.vx += input * a * dt;
       player.targetX = player.x; // 키 조작 중엔 터치 목표 무시
     } else if (dragging) {
-      // 손가락 따라가되 스프링처럼 미끄러지는 감속
+      // 손가락 따라가되 스프링처럼 미끄러지는 감속 (되끌면 빠릿하게 반응)
       var want = Math.max(-VCAP, Math.min(VCAP, (player.targetX - player.x) * 8));
-      player.vx += (want - player.vx) * Math.min(1, dt * 9);
+      var blend = (want * player.vx < 0) ? 16 : 9;
+      player.vx += (want - player.vx) * Math.min(1, dt * blend);
     } else {
       // 입력 없음: 관성으로 주-욱 미끄러지다 멈춤
       player.vx *= Math.exp(-dt * 2.4);
