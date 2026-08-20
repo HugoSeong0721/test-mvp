@@ -146,20 +146,20 @@
   resize();
   window.addEventListener('resize', resize);
 
-  // ---------- 레이아웃 ----------
-  function roadW()   { return Math.min(Math.round(W * 0.42), 200); }
+  // ---------- 레이아웃 (조종할 공간이 필요해서 도로가 넓다) ----------
+  function roadW()   { return Math.min(Math.round(W * 0.62), 300); }
   function roadL()   { return W / 2 - roadW() / 2; }
   function roadR()   { return W / 2 + roadW() / 2; }
   var SIDEWALK = 12;
-  function playerY() { return Math.round(H * 0.55); }
-  function gapMax()  { return Math.max(150, H - playerY() - 76); } // 개는 항상 화면 안에
+  function bikeY()   { return Math.round(H * 0.62); }
+  function gapMax()  { return Math.max(120, H - bikeY() - 70); } // 개는 항상 화면 안에
 
   // ---------- 상수 ----------
-  var THROW_CD = 0.16;     // 연속 던지기 쿨다운
-  var CATCH_GAP = 30;      // 이보다 가까우면 물린다
+  var CATCH_GAP = 28;      // 이보다 가까우면 물린다
   var HOUSE_H = 86;
-  var HIT_TOL = 34;        // 던지기 라인 판정 폭(px) — 이 안에 우편함이 있을 때 탭해야 명중
-  var PERFECT_TOL = 12;    // 정중앙 판정
+  var BIKE_R = 14;         // 충돌 반경
+  function deliverR() { return roadW() * 0.40; }   // 그쪽 절반에 확실히 붙어 있어야 배달됨
+  function perfectR() { return roadW() * 0.2 ; }   // 바짝 붙으면 퍼펙트
 
   var HOUSE_COLORS = [
     { body: '#f4e7cf', roof: '#8a5a44', door: '#7a4a2e' },
@@ -169,33 +169,35 @@
     { body: '#e8c9c9', roof: '#7d5252', door: '#6b3d3d' },
     { body: '#e6e0f2', roof: '#6f6488', door: '#544a70' }
   ];
+  var CAR_COLORS = ['#c94f42', '#4f7ac9', '#c9a23f', '#5aa06b', '#8a68b8'];
 
   // ---------- 상태 ----------
   var STATE_TITLE = 0, STATE_PLAY = 1, STATE_OVER = 2;
   var state = STATE_TITLE;
 
   var papers = 0;          // 배달 부수 = 점수
-  var streak = 0;          // 연속 배달 (놓치면 끊김)
+  var streak = 0;
   var elapsed = 0, introT = 0;
-  var speed = 0;           // 스크롤 속도 px/s
-  var scrollTotal = 0;     // 배경 패턴용 누적 스크롤
-  var houses = [];         // {side:-1|1, y, w, ci, delivered, missed, inFlight, flagT, cancelT}
-  var flights = [];        // 날아가는 신문 {x0,y0,tx,ty,t,dur,house,waste}
-  var trees = [];          // {side, y, r, tone}
-  var flashes = [];        // {text, t, color}
-  var pops = [];           // 배달 성공/실패 팝 {x, y, t, text, gold, big}
-  var parts = [];          // 유리 파편/흙먼지 입자 {x, y, vx, vy, rot, vr, t, kind}
-  var hitstop = 0;         // 창문 깨진 순간 잠깐 슬로모
-  var dogGap = 0;          // 개와의 거리(px). 0에 가까울수록 위험
-  var dogPend = 0;         // 아직 적용 안 된 벌점 — 개가 '달려와서' 좁히는 연출용
-  var dogSprint = 0;       // 개 전력질주 연출 타이머
-  var dogLegT = 0, dogLunge = 0;
-  var spawnDist = 0, nextGap = 260, lastSide = 1;
+  var speed = 0;
+  var scrollTotal = 0;
+  var bikeX = 0, bikeTargetX = 0, bikeVX = 0;
+  var houses = [];         // {side, y, w, ci, delivered, missed, flagT, cancelT}
+  var obstacles = [];      // {kind:'trash'|'car', x, y, vx, ci, warnT}
+  var flights = [];        // 자동 투척 신문 {x0,y0,t,dur,house}
+  var trees = [];
+  var flashes = [];
+  var pops = [];
+  var parts = [];          // 충돌 파편/흙먼지
+  var hitstop = 0;
+  var dogGap = 0;
+  var dogPend = 0;
+  var dogSprint = 0;
+  var dogLegT = 0;
+  var spawnDist = 0, nextGap = 220, lastSide = 1;
+  var obsDist = 0, nextObsGap = 400;
   var treeDist = 0;
-  var throwCd = 0;
-  var bikeSway = 0;
   var shake = 0;
-  var overAt = 0, deathAnim = 0;
+  var overAt = 0, deathAnim = 0, overReason = 'dog';
   var lastScore = 0;
 
   var best = 0;
@@ -203,9 +205,10 @@
   var isNewBest = false;
 
   // ---------- 난이도 ----------
-  function scrollSpeed() { return Math.min(560, 205 + elapsed * 6.5); }
-  function houseGap()    { return Math.max(96, 215 - elapsed * 2.4); }    // 집 사이 거리(px)
-  function dogPressure() { return 24 + elapsed * 1.5; }                   // 초당 개가 좁혀오는 px
+  function scrollSpeed() { return Math.min(520, 200 + elapsed * 5.5); }
+  function houseGap()    { return Math.max(120, 230 - elapsed * 2); }
+  function obsGap()      { return Math.max(170, 440 - elapsed * 5.5); }   // 장애물 간격(px)
+  function dogPressure() { return 16 + elapsed * 1.0; }
 
   // ---------- 랭킹 (이 기기 기록 + 친구 도전장 기록) ----------
   var RANK_MAX = 12;
@@ -291,7 +294,6 @@
     return chScore > 0;
   }
   function absorbChallenge() {
-    // 친구 기록을 랭킹판에 넣어 준다 (중복은 한 번만)
     if (chScore <= 0) return;
     var list = loadRanks();
     var dup = list.some(function (r) { return r.f && r.n === chName && r.s === chScore; });
@@ -324,7 +326,7 @@
   function shareResult() {
     var s = Math.round(lastScore);
     var url = challengeUrl(s);
-    var text = '🗞️ I delivered ' + s + ' papers on my route!\nCan you beat me before the dog gets you? 🐕';
+    var text = '🗞️ I delivered ' + s + ' papers on my route!\nCan you beat me before you wipe out? 🚲';
     var full = url ? text + '\n' + url : text;
     var done = function () { note('Challenge sent!'); };
     if (navigator.share) {
@@ -360,32 +362,35 @@
     papers = 0;
     streak = 0;
     elapsed = 0;
-    introT = 2.4;
+    introT = 2.6;
     speed = scrollSpeed();
     scrollTotal = 0;
+    bikeX = W / 2; bikeTargetX = W / 2; bikeVX = 0;
     houses = [];
+    obstacles = [];
     flights = [];
     trees = [];
     flashes = [];
     pops = [];
     parts = [];
     hitstop = 0;
+    dogGap = gapMax() * 0.82;
     dogPend = 0;
     dogSprint = 0;
-    dogGap = gapMax() * 0.82;
     dogLegT = 0;
-    dogLunge = 0;
     spawnDist = 0;
-    nextGap = 200;
+    nextGap = 210;
     lastSide = Math.random() < 0.5 ? 1 : -1;
+    obsDist = 0;
+    nextObsGap = 420;
     treeDist = 0;
-    throwCd = 0;
     shake = 0;
     deathAnim = 0;
     isNewBest = false;
     chBeaten = false;
+    overReason = 'dog';
     // 시작 화면부터 동네가 채워져 있도록 미리 깔아 둔다
-    for (var y = -HOUSE_H; y < H; y += 210) {
+    for (var y = -HOUSE_H; y < H; y += 220) {
       lastSide = -lastSide;
       spawnHouse(lastSide, y, true);
       if (Math.random() < 0.6) spawnTree(-lastSide, y + 90);
@@ -397,19 +402,40 @@
     houses.push({
       side: side,
       y: y,
-      w: Math.max(58, Math.min(110, lawnW - 14)),
+      w: Math.max(52, Math.min(104, lawnW - 12)),
       ci: Math.floor(Math.random() * HOUSE_COLORS.length),
-      // 프리필 집 중 시작하자마자 지나가 버릴 것들은 배달 완료 취급 —
-      // 안 그러면 손쓸 새도 없이 '놓침'이 연달아 터진다
-      delivered: !!prefill && y + HOUSE_H > playerY() - 260,
+      // 프리필 집 중 시작하자마자 지나가 버릴 것들은 배달 완료 취급
+      delivered: !!prefill && y + HOUSE_H > bikeY() - 260,
       missed: false,
       flagT: 0,
-      cancelT: 0,
-      smashT: 0
+      cancelT: 0
     });
   }
   function spawnTree(side, y) {
-    trees.push({ side: side, y: y, r: 14 + Math.random() * 10, tone: Math.random() });
+    trees.push({ side: side, y: y, r: 13 + Math.random() * 9, tone: Math.random() });
+  }
+  function spawnObstacle() {
+    // 배달 판정 지점(집 우편함 근처)과 겹치지 않게 자리를 고른다
+    var kind = Math.random() < (elapsed > 12 ? 0.45 : 0.25) ? 'car' : 'trash';
+    if (kind === 'trash') {
+      obstacles.push({
+        kind: 'trash',
+        x: roadL() + 22 + Math.random() * (roadW() - 44),
+        y: -50,
+        vx: 0,
+        ci: 0
+      });
+    } else {
+      // 진입로에서 후진해 나오는 차 — 도로를 천천히 가로지른다
+      var fromLeft = Math.random() < 0.5;
+      obstacles.push({
+        kind: 'car',
+        x: fromLeft ? roadL() - 34 : roadR() + 34,
+        y: -60,
+        vx: (fromLeft ? 1 : -1) * (42 + Math.random() * 36 + elapsed * 0.7),
+        ci: Math.floor(Math.random() * CAR_COLORS.length)
+      });
+    }
   }
 
   // 우편함 위치: 집 앞, 보도 바로 옆
@@ -422,78 +448,74 @@
       ? (roadL() - SIDEWALK) / 2
       : roadR() + SIDEWALK + (W - roadR() - SIDEWALK) / 2;
   }
-  // 창문 위치 — 빗나간 신문이 실제로 여길 때려야 뭘 깼는지 보인다
-  function windowPos(h) {
-    var x = houseCx(h) - h.w / 2;
-    var winX = h.side < 0 ? x + 10 : x + h.w - 26;
-    return { x: winX + 8, y: h.y + 26 + 19 };
-  }
 
-  // ---------- 조작: 좌/우 탭 = 그쪽으로 수평 투척 (타이밍 게임) ----------
-  // 우편함이 던지기 라인(자전거 옆)을 지나는 순간에 탭해야 명중한다
-  function candidate(side, tol) {
-    var bestH = null, bestD = 1e9;
-    for (var i = 0; i < houses.length; i++) {
-      var h = houses[i];
-      if (h.side !== side || h.delivered || h.missed) continue;
-      var d = Math.abs(mailboxPos(h).y - playerY());
-      if (d <= tol && d < bestD) { bestD = d; bestH = h; }
-    }
-    return bestH;
-  }
-  // 라인 위에 집 벽이 걸려 있나 (우편함을 빗나가면 여기 맞아 창문이 깨진다)
-  function wallOnLine(side) {
-    var py = playerY();
-    for (var i = 0; i < houses.length; i++) {
-      var h = houses[i];
-      if (h.side !== side) continue;
-      if (h.y + 18 < py && h.y + HOUSE_H - 6 > py) return h;
-    }
-    return null;
-  }
+  // ---------- 조작: 드래그 = 자전거 조종 (손가락 만큼 1:1 이동) ----------
+  var keys = { left: false, right: false };
+  var dragging = false, dragId = null, dragLastX = 0;
 
-  function throwSide(side) {
-    if (state !== STATE_PLAY || throwCd > 0) return;
-    throwCd = THROW_CD;
-    bikeSway = side * 1;
-    var px = W / 2, py = playerY();
-    var h = candidate(side, HIT_TOL);
-    if (h) {
-      // 명중 — 판정은 던진 순간, 연출(깃발/팝)은 신문이 닿는 순간
-      var dy = Math.abs(mailboxPos(h).y - py);
-      var perfect = dy <= PERFECT_TOL;
-      h.delivered = true;
-      papers++;
-      streak++;
-      dogGap = Math.min(gapMax(), dogGap + (perfect ? 45 : 26));
-      if (streak > 0 && streak % 10 === 0) {
-        flashes.push({ text: streak + ' STREAK! 🚀', t: 1.2, color: '#1d6ed8' });
-        dogGap = Math.min(gapMax(), dogGap + 30);
-      }
-      if (chScore > 0 && !chBeaten && papers > chScore) {
-        chBeaten = true;
-        flashes.push({ text: '🏆 Passed ' + chName + '!', t: 1.6, color: '#1d8a3c' });
-        shake = 6;
-      }
-      var m = mailboxPos(h);
-      flights.push({ x0: px, y0: py, tx: m.x, ty: py, t: 0, dur: 0.12, house: h, perfect: perfect });
-      return;
+  function pointerDown(x) {
+    if (state === STATE_PLAY) {
+      dragging = true;
+      dragLastX = x;
+      bikeTargetX = bikeX;
+    } else {
+      tryStart();
     }
-    var wall = wallOnLine(side);
-    if (wall) {
-      // 창문 깨먹음 — 집주인이 개를 부추긴다 (벌점은 개가 달려와서 좁히는 걸로 보여 준다)
-      dogPend += 45;
-      if (!wall.delivered && !wall.missed) { wall.missed = true; wall.cancelT = 1.4; }
-      streak = 0;
-      var wp = windowPos(wall);
-      flights.push({ x0: px, y0: py, tx: wp.x, ty: wp.y, t: 0, dur: 0.12, smash: wall });
-      return;
-    }
-    // 허공 — 신문이 잔디밭에 처박힌다 (낭비. 개도 살짝 가까워짐)
-    dogPend += 12;
-    var lx = side < 0 ? roadL() - SIDEWALK - 30 : roadR() + SIDEWALK + 30;
-    flights.push({ x0: px, y0: py, tx: lx, ty: py, t: 0, dur: 0.14, waste: true });
   }
+  function pointerMove(x) {
+    if (dragging && state === STATE_PLAY) {
+      // 델타 누적: 벽에서 클램프돼도 반대로 끌면 즉시 반응
+      bikeTargetX = Math.max(roadL() + BIKE_R + 2, Math.min(roadR() - BIKE_R - 2, bikeTargetX + (x - dragLastX)));
+      dragLastX = x;
+    }
+  }
+  function pointerUp() { dragging = false; }
+
+  // preventDefault를 걸지 않는다 — 세로 팬이 문서 완충지대 스크롤로 소비되어야
+  // 인앱 브라우저 시트가 끌기를 가로채지 않는다 (가로 드래그는 그대로 우리에게 온다)
+  canvas.addEventListener('touchstart', function (e) {
+    if (state !== STATE_PLAY) { tryStart(); return; }
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      if (dragId === null) {
+        dragId = t.identifier;
+        dragging = true;
+        dragLastX = t.clientX;
+        bikeTargetX = bikeX;
+      }
+    }
+  }, { passive: true });
+  canvas.addEventListener('touchmove', function (e) {
+    if (dragId !== null) {
+      for (var i = 0; i < e.changedTouches.length; i++) {
+        var t = e.changedTouches[i];
+        if (t.identifier === dragId) pointerMove(t.clientX);
+      }
+    }
+  }, { passive: true });
+  function touchEnd(e) {
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === dragId) { dragId = null; dragging = false; }
+    }
+  }
+  canvas.addEventListener('touchend', touchEnd, { passive: true });
+  canvas.addEventListener('touchcancel', touchEnd, { passive: true });
+
+  canvas.addEventListener('mousedown', function (e) { pointerDown(e.clientX); });
+  canvas.addEventListener('mousemove', function (e) { if (dragId === null) pointerMove(e.clientX); });
+  canvas.addEventListener('mouseup', function () { if (dragId === null) dragging = false; });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+    if (state !== STATE_PLAY && (e.key === ' ' || e.key === 'Enter' || e.key.indexOf('Arrow') === 0)) tryStart();
+  });
+  document.addEventListener('keyup', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+  });
 
   function tryStart() {
     if (state === STATE_OVER && performance.now() - overAt < 600) return; // 오터치 방지
@@ -501,35 +523,6 @@
     reset();
     state = STATE_PLAY;
   }
-
-  document.addEventListener('keydown', function (e) {
-    if (e.target && e.target.tagName === 'INPUT') return;
-    if (state !== STATE_PLAY) {
-      if (e.key === ' ' || e.key === 'Enter') tryStart();
-      return;
-    }
-    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') throwSide(-1);
-    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') throwSide(1);
-  });
-
-  // 터치: 화면 좌/우 아무 데나 탭 (탭 전용 — 홀드/드래그 없음)
-  // preventDefault를 걸지 않는다 — 세로 팬이 완충지대 스크롤로 소비되어야
-  // 인앱 브라우저 시트가 끌기를 가로채지 않는다
-  var lastTouchAt = 0; // 터치 뒤에 따라오는 호환용 mousedown 무시 (한 탭 = 한 번)
-  function tapAt(x) {
-    if (state !== STATE_PLAY) { tryStart(); return; }
-    throwSide(x < W / 2 ? -1 : 1);
-  }
-  canvas.addEventListener('touchstart', function (e) {
-    lastTouchAt = performance.now();
-    var t = e.touches && e.touches[0];
-    tapAt(t ? t.clientX : W / 2);
-  }, { passive: true });
-
-  canvas.addEventListener('mousedown', function (e) {
-    if (performance.now() - lastTouchAt < 800) return;
-    tapAt(e.clientX);
-  });
 
   // ---------- 패널 버튼 ----------
   document.getElementById('retry-btn').addEventListener('click', function () { tryStart(); });
@@ -543,11 +536,12 @@
   });
 
   // ---------- 게임오버 ----------
-  function gameOver() {
+  function gameOver(reason) {
     state = STATE_OVER;
+    overReason = reason;
     overAt = performance.now();
     deathAnim = 0;
-    shake = 10;
+    shake = 12;
     lastScore = papers;
     if (papers > best) {
       best = papers;
@@ -559,7 +553,7 @@
   }
 
   function showOverPanel() {
-    document.getElementById('over-title').textContent = '🐕 CAUGHT!';
+    document.getElementById('over-title').textContent = overReason === 'crash' ? '💥 WIPEOUT!' : '🐕 CAUGHT!';
     document.getElementById('over-score').textContent = lastScore + ' papers';
     var sub = document.getElementById('over-sub');
     sub.className = '';
@@ -587,23 +581,77 @@
     document.getElementById('over-panel').classList.remove('hidden');
   }
 
+  // ---------- 배달 판정: 우편함이 자전거 옆을 지나는 순간 거리로 결정 ----------
+  function judgeHouse(h) {
+    var edge = h.side < 0 ? roadL() : roadR();
+    var dist = Math.abs(bikeX - edge);
+    if (dist <= deliverR()) {
+      var perfect = dist <= perfectR();
+      h.delivered = true;
+      papers++;
+      streak++;
+      dogGap = Math.min(gapMax(), dogGap + (perfect ? 48 : 30));
+      if (streak > 0 && streak % 10 === 0) {
+        flashes.push({ text: streak + ' STREAK! 🚀', t: 1.2, color: '#1d6ed8' });
+        dogGap = Math.min(gapMax(), dogGap + 30);
+      }
+      if (chScore > 0 && !chBeaten && papers > chScore) {
+        chBeaten = true;
+        flashes.push({ text: '🏆 Passed ' + chName + '!', t: 1.6, color: '#1d8a3c' });
+        shake = 6;
+      }
+      flights.push({ x0: bikeX, y0: bikeY(), t: 0, dur: 0.2, house: h, perfect: perfect });
+    } else {
+      h.missed = true;
+      h.cancelT = 1.4;
+      streak = 0;
+      // 첫 배달에 성공하기 전까지는 배우는 시간 — 놓쳐도 개가 점프하지 않는다
+      // (장애물 회피 때문에 어쩔 수 없이 놓치는 경우가 있어 벌점은 과하지 않게)
+      if (papers > 0) dogPend += 40;
+      flashes.push({ text: 'MISSED! 🐕💨', t: 0.9, color: '#d1342a' });
+      shake = 5;
+    }
+  }
+
+  // ---------- 충돌 → 크래시 ----------
+  function crash(ob) {
+    hitstop = 0.28;
+    shake = 14;
+    // 신문과 파편이 사방으로 튄다
+    for (var i = 0; i < 14; i++) {
+      var a = Math.random() * Math.PI * 2, s = 110 + Math.random() * 220;
+      parts.push({
+        x: bikeX, y: bikeY(),
+        vx: Math.cos(a) * s, vy: Math.sin(a) * s - 80,
+        rot: Math.random() * 6, vr: (Math.random() - 0.5) * 16,
+        t: 1.1, kind: i % 3 === 0 ? 'paper' : 'dust'
+      });
+    }
+    pops.push({ x: Math.max(74, Math.min(W - 74, bikeX)), y: bikeY() - 40, t: 1.4, text: 'CRASH!', big: true });
+    gameOver('crash');
+  }
+
+  function hitTest(ob) {
+    if (ob.kind === 'trash') {
+      var dx = ob.x - bikeX, dy = ob.y - bikeY();
+      return dx * dx + dy * dy < (BIKE_R + 13) * (BIKE_R + 13);
+    }
+    // car: 가로로 긴 사각형
+    var hw = 30, hh = 16;
+    var cx = Math.max(ob.x - hw, Math.min(bikeX, ob.x + hw));
+    var cy = Math.max(ob.y - hh, Math.min(bikeY(), ob.y + hh));
+    var ddx = bikeX - cx, ddy = bikeY() - cy;
+    return ddx * ddx + ddy * ddy < BIKE_R * BIKE_R;
+  }
+
   // ---------- 업데이트 ----------
   function update(dt) {
-    // 창문 깨진 직후 잠깐 슬로모 — 뭘 깼는지 눈에 들어오게
+    // 충돌 직후 잠깐 슬로모
     if (hitstop > 0) { hitstop -= dt; dt *= 0.15; }
     if (shake > 0) shake = Math.max(0, shake - dt * 26);
     if (dogSprint > 0) dogSprint -= dt;
-    // 입자 (유리 파편)
-    for (var pa = parts.length - 1; pa >= 0; pa--) {
-      var q = parts[pa];
-      q.t -= dt;
-      q.vy += 620 * dt;
-      q.x += q.vx * dt;
-      q.y += q.vy * dt;
-      q.rot += q.vr * dt;
-      if (q.t <= 0) parts.splice(pa, 1);
-    }
-    if (bikeSway !== 0) bikeSway *= Math.max(0, 1 - dt * 9);
+    dogLegT += dt * (8 + (1 - dogGap / gapMax()) * 8);
+
     for (var i = flashes.length - 1; i >= 0; i--) {
       flashes[i].t -= dt;
       if (flashes[i].t <= 0) flashes.splice(i, 1);
@@ -613,35 +661,23 @@
       pops[p].y -= dt * 34;
       if (pops[p].t <= 0) pops.splice(p, 1);
     }
-    dogLegT += dt * (8 + (1 - dogGap / gapMax()) * 8);
-
-    // 날아가는 신문 — 판정은 이미 던진 순간에 끝났고, 여기선 연출만 마무리한다
-    // (게임오버 뒤에도 마저 그려 준다)
+    for (var pa = parts.length - 1; pa >= 0; pa--) {
+      var q = parts[pa];
+      q.t -= dt;
+      q.vy += 620 * dt;
+      q.x += q.vx * dt;
+      q.y += q.vy * dt;
+      q.rot += q.vr * dt;
+      if (q.t <= 0) parts.splice(pa, 1);
+    }
+    // 자동 투척 신문 연출
     for (var f = flights.length - 1; f >= 0; f--) {
       var fl = flights[f];
       fl.t += dt;
-      // 목표(우편함/집)는 화면과 같이 흘러내리므로 좌표를 따라간다
-      if (fl.house) { var fm = mailboxPos(fl.house); fl.tx = fm.x; fl.ty = fm.y; }
-      if (fl.smash) { var fw = windowPos(fl.smash); fl.tx = fw.x; fl.ty = fw.y; }
       if (fl.t >= fl.dur) {
-        if (fl.house) {
-          fl.house.flagT = 0.8;
-          var m = mailboxPos(fl.house);
-          pops.push({ x: m.x, y: m.y - 16, t: 0.8, text: fl.perfect ? 'PERFECT!' : '+1', gold: fl.perfect });
-        } else if (fl.smash) {
-          // 쨍그랑 — 잠깐 슬로모 걸고, 유리가 사방으로 튀고, CRASH가 크게 뜬다
-          fl.smash.smashT = 1.4;
-          fl.smash.broken = true;
-          hitstop = 0.22;
-          shake = 11;
-          for (var g = 0; g < 12; g++) {
-            var ga = Math.random() * Math.PI * 2, gs = 90 + Math.random() * 190;
-            parts.push({ x: fl.tx, y: fl.ty, vx: Math.cos(ga) * gs, vy: Math.sin(ga) * gs - 60,
-                         rot: Math.random() * 6, vr: (Math.random() - 0.5) * 14, t: 0.9, kind: 'glass' });
-          }
-          pops.push({ x: Math.max(74, Math.min(W - 74, fl.tx)), y: fl.ty - 26, t: 1.3, text: 'CRASH!', big: true });
-          flashes.push({ text: '💥 You smashed a window!', t: 1.3, color: '#d1342a' });
-        }
+        fl.house.flagT = 0.8;
+        var m = mailboxPos(fl.house);
+        pops.push({ x: Math.max(52, Math.min(W - 52, m.x)), y: m.y - 16, t: 0.8, text: fl.perfect ? 'PERFECT!' : '+1', gold: fl.perfect });
         flights.splice(f, 1);
       }
     }
@@ -651,25 +687,37 @@
 
     elapsed += dt;
     if (introT > 0) introT -= dt;
-    if (throwCd > 0) throwCd -= dt;
     speed = scrollSpeed();
     var dy = speed * dt;
     scrollTotal += dy;
 
-    // 집/나무 스폰
+    // 자전거 이동 (키보드는 홀드 이동, 터치는 드래그 타깃 추적)
+    if (keys.left)  bikeTargetX -= 300 * dt;
+    if (keys.right) bikeTargetX += 300 * dt;
+    bikeTargetX = Math.max(roadL() + BIKE_R + 2, Math.min(roadR() - BIKE_R - 2, bikeTargetX));
+    var prevX = bikeX;
+    bikeX += (bikeTargetX - bikeX) * Math.min(1, dt * 16);
+    bikeVX = (bikeX - prevX) / Math.max(dt, 0.001);
+
+    // 집/나무/장애물 스폰
     spawnDist += dy;
     if (spawnDist >= nextGap) {
       spawnDist = 0;
       nextGap = houseGap() * (0.85 + Math.random() * 0.4);
-      var side;
-      if (Math.random() < 0.72) { side = -lastSide; }         // 대체로 번갈아
-      else { side = lastSide; }                                // 가끔 같은 쪽 연속
+      var side = Math.random() < 0.7 ? -lastSide : lastSide;
       lastSide = side;
       spawnHouse(side, -HOUSE_H - 30, false);
-      // 나중엔 가끔 양쪽 동시에 — 빠른 좌우 탭을 강제한다
-      if (elapsed > 8 && Math.random() < Math.min(0.45, (elapsed - 8) * 0.02)) {
-        spawnHouse(-side, -HOUSE_H - 30 - 52, false);
+      // 나중엔 가끔 양쪽 거의 동시에 — 좌우로 크게 휘저어야 한다
+      if (elapsed > 14 && Math.random() < Math.min(0.4, (elapsed - 14) * 0.018)) {
+        spawnHouse(-side, -HOUSE_H - 30 - 130, false);
       }
+    }
+    obsDist += dy;
+    // 처음 4.5초는 장애물 없음 — 조종을 익힐 시간
+    if (elapsed > 4.5 && obsDist >= nextObsGap) {
+      obsDist = 0;
+      nextObsGap = obsGap() * (0.8 + Math.random() * 0.5);
+      spawnObstacle();
     }
     treeDist += dy;
     if (treeDist > 150) {
@@ -677,31 +725,39 @@
       if (Math.random() < 0.7) spawnTree(Math.random() < 0.5 ? -1 : 1, -40);
     }
 
-    // 집 이동 + 놓침 판정
+    // 집 이동 + 배달/놓침 판정 (우편함이 자전거 y를 지나는 순간)
     for (var hI = houses.length - 1; hI >= 0; hI--) {
       var h = houses[hI];
+      var prevMy = mailboxPos(h).y;
       h.y += dy;
       if (h.flagT > 0) h.flagT -= dt;
       if (h.cancelT > 0) h.cancelT -= dt;
-      if (h.smashT > 0) h.smashT -= dt;
-      if (!h.delivered && !h.missed && mailboxPos(h).y > playerY() + HIT_TOL) {
-        h.missed = true;
-        h.cancelT = 1.4;
-        streak = 0;
-        // 첫 배달에 성공하기 전까지는 배우는 시간 — 놓쳐도 개가 점프하지 않는다
-        // (개의 기본 추격만으로도 방치하면 10초쯤에 잡힌다)
-        if (papers > 0) dogPend += 95;
-        flashes.push({ text: 'MISSED! 🐕💨', t: 0.9, color: '#d1342a' });
-        shake = 5;
+      if (!h.delivered && !h.missed && prevMy <= bikeY() && mailboxPos(h).y > bikeY()) {
+        judgeHouse(h);
       }
       if (h.y > H + 40) houses.splice(hI, 1);
+    }
+
+    // 장애물 이동 + 충돌
+    for (var oI = obstacles.length - 1; oI >= 0; oI--) {
+      var ob = obstacles[oI];
+      ob.y += dy;
+      if (ob.kind === 'car') {
+        ob.x += ob.vx * dt;
+        if (ob.x < roadL() - 90 || ob.x > roadR() + 90) { obstacles.splice(oI, 1); continue; }
+      }
+      if (ob.y > H + 60) { obstacles.splice(oI, 1); continue; }
+      if (ob.y > bikeY() - 60 && ob.y < bikeY() + 60 && hitTest(ob)) {
+        crash(ob);
+        return;
+      }
     }
     for (var tI = trees.length - 1; tI >= 0; tI--) {
       trees[tI].y += dy;
       if (trees[tI].y > H + 60) trees.splice(tI, 1);
     }
 
-    // 벌점은 즉시가 아니라 개가 전력질주로 달려와서 좁힌다 — 원인과 결과가 눈에 보이게
+    // 벌점은 즉시가 아니라 개가 전력질주로 달려와서 좁힌다
     if (dogPend > 0) {
       var sprintStep = Math.min(dogPend, 300 * dt);
       dogPend -= sprintStep;
@@ -713,8 +769,7 @@
     dogGap -= dogPressure() * dt;
     if (dogGap <= CATCH_GAP) {
       dogGap = 0;
-      dogLunge = 1;
-      gameOver();
+      gameOver('dog');
     }
   }
 
@@ -731,18 +786,14 @@
   }
 
   function drawGround() {
-    // 잔디
     ctx.fillStyle = '#9fbf6e';
     ctx.fillRect(-20, -20, W + 40, H + 40);
-    // 잔디 결 (은은한 가로 줄, 스크롤 따라 흐름)
     ctx.fillStyle = 'rgba(255,255,255,0.05)';
     var off = scrollTotal % 64;
     for (var y = -64 + off; y < H; y += 64) ctx.fillRect(0, y, W, 22);
-    // 보도
     ctx.fillStyle = '#cfc9b8';
     ctx.fillRect(roadL() - SIDEWALK, -20, SIDEWALK, H + 40);
     ctx.fillRect(roadR(), -20, SIDEWALK, H + 40);
-    // 보도 이음매
     ctx.strokeStyle = 'rgba(0,0,0,0.12)';
     ctx.lineWidth = 1;
     var so = scrollTotal % 52;
@@ -752,10 +803,8 @@
       ctx.moveTo(roadR(), sy2); ctx.lineTo(roadR() + SIDEWALK, sy2);
       ctx.stroke();
     }
-    // 도로
     ctx.fillStyle = '#585c63';
     ctx.fillRect(roadL(), -20, roadW(), H + 40);
-    // 중앙선
     ctx.strokeStyle = '#f2d05e';
     ctx.lineWidth = 4;
     ctx.setLineDash([26, 22]);
@@ -764,21 +813,6 @@
     ctx.moveTo(W / 2, -20); ctx.lineTo(W / 2, H + 20);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    // 던지기 라인 — 우편함이 이 띠 안에 있을 때 탭해야 명중
-    if (state === STATE_PLAY || state === STATE_TITLE) {
-      var py = playerY();
-      ctx.fillStyle = 'rgba(255,255,255,0.10)';
-      ctx.fillRect(0, py - HIT_TOL, W, HIT_TOL * 2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6, 8]);
-      ctx.beginPath();
-      ctx.moveTo(0, py - HIT_TOL); ctx.lineTo(W, py - HIT_TOL);
-      ctx.moveTo(0, py + HIT_TOL); ctx.lineTo(W, py + HIT_TOL);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
   }
 
   function drawTree(t) {
@@ -794,19 +828,14 @@
 
   function drawHouse(h) {
     var col = HOUSE_COLORS[h.ci];
-    var lawnMidL = (roadL() - SIDEWALK) / 2;
-    var lawnMidR = roadR() + SIDEWALK + (W - roadR() - SIDEWALK) / 2;
-    var cx = h.side < 0 ? lawnMidL : lawnMidR;
+    var cx = houseCx(h);
     var x = cx - h.w / 2, y = h.y;
     var bodyY = y + 26;
 
-    // 그림자
     ctx.fillStyle = 'rgba(0,0,0,0.13)';
     ctx.fillRect(x + 5, bodyY + 6, h.w, HOUSE_H - 26);
-    // 몸체
     ctx.fillStyle = col.body;
     ctx.fillRect(x, bodyY, h.w, HOUSE_H - 26);
-    // 지붕
     ctx.fillStyle = col.roof;
     ctx.beginPath();
     ctx.moveTo(x - 7, bodyY);
@@ -814,80 +843,22 @@
     ctx.lineTo(x + h.w + 7, bodyY);
     ctx.closePath();
     ctx.fill();
-    // 문 (도로 쪽)
-    var doorW = 14, doorH = 24;
-    var doorX = h.side < 0 ? x + h.w - doorW - 8 : x + 8;
+    var doorW = 13, doorH = 22;
+    var doorX = h.side < 0 ? x + h.w - doorW - 7 : x + 7;
     ctx.fillStyle = col.door;
     ctx.fillRect(doorX, bodyY + HOUSE_H - 26 - doorH, doorW, doorH);
-    // 창문
-    var winX = h.side < 0 ? x + 10 : x + h.w - 26;
-    ctx.fillStyle = h.broken ? '#4a4a55' : '#fdf6cf';
-    ctx.fillRect(winX, bodyY + 12, 16, 14);
+    var winX = h.side < 0 ? x + 9 : x + h.w - 24;
+    ctx.fillStyle = '#fdf6cf';
+    ctx.fillRect(winX, bodyY + 11, 15, 13);
     ctx.strokeStyle = 'rgba(0,0,0,0.25)';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(winX, bodyY + 12, 16, 14);
-    ctx.beginPath();
-    ctx.moveTo(winX + 8, bodyY + 12); ctx.lineTo(winX + 8, bodyY + 26);
-    ctx.stroke();
-    if (h.broken) {
-      // 깨진 유리 금
-      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(winX + 3, bodyY + 15); ctx.lineTo(winX + 13, bodyY + 24);
-      ctx.moveTo(winX + 12, bodyY + 14); ctx.lineTo(winX + 5, bodyY + 25);
-      ctx.moveTo(winX + 8, bodyY + 13); ctx.lineTo(winX + 8, bodyY + 25);
-      ctx.stroke();
-    }
-    if (h.smashT > 0) {
-      // 성난 집주인이 문에서 튀어나온다
-      var pop2 = Math.min(1, (1.4 - h.smashT) / 0.15);   // 스케일 인
-      var ha = Math.min(1, h.smashT / 0.4);
-      var hx = doorX + doorW / 2;
-      var hy = bodyY + HOUSE_H - 26 - doorH + 6 - pop2 * 6;
-      ctx.save();
-      ctx.globalAlpha = ha;
-      // 머리
-      ctx.fillStyle = '#e8b88a';
-      ctx.beginPath(); ctx.arc(hx, hy, 7 * pop2, 0, Math.PI * 2); ctx.fill();
-      // 성난 눈썹
-      ctx.strokeStyle = '#5a2c18';
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.moveTo(hx - 4, hy - 3); ctx.lineTo(hx - 1, hy - 1);
-      ctx.moveTo(hx + 4, hy - 3); ctx.lineTo(hx + 1, hy - 1);
-      ctx.stroke();
-      // 흔드는 주먹
-      ctx.fillStyle = '#e8b88a';
-      var fistY = hy - 10 - Math.abs(Math.sin(performance.now() / 90)) * 4;
-      ctx.beginPath(); ctx.arc(hx + 9, fistY, 3.5 * pop2, 0, Math.PI * 2); ctx.fill();
-      // 말풍선 "HEY!!"
-      var bx = hx + (h.side < 0 ? 30 : -30), by = hy - 22;
-      ctx.fillStyle = '#fff';
-      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-      ctx.lineWidth = 1.5;
-      roundRect(bx - 26, by - 12, 52, 22, 8);
-      ctx.fill(); ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(bx + (h.side < 0 ? -18 : 18), by + 10);
-      ctx.lineTo(hx + (h.side < 0 ? 4 : -4), hy - 8);
-      ctx.lineTo(bx + (h.side < 0 ? -8 : 8), by + 10);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#d1342a';
-      ctx.font = 'bold 13px -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('HEY!!', bx, by + 4);
-      ctx.restore();
-    }
+    ctx.strokeRect(winX, bodyY + 11, 15, 13);
 
-    // 우편함 — 배달 목표. 아직 배달 전이면 깃발이 접혀 있고 테두리가 깜빡인다
+    // 우편함 — 배달 목표
     var m = mailboxPos(h);
     var pending = !h.delivered && !h.missed;
-    // 기둥
     ctx.fillStyle = '#7a5a3a';
     ctx.fillRect(m.x - 2, m.y - 6, 4, 16);
-    // 함
     ctx.fillStyle = h.missed ? '#8a8a8a' : '#e8e8ee';
     roundRect(m.x - 10, m.y - 18, 20, 13, 5);
     ctx.fill();
@@ -895,21 +866,16 @@
     ctx.lineWidth = 1.5;
     ctx.stroke();
     if (pending) {
-      var dLine = Math.abs(m.y - playerY());
-      if (dLine <= HIT_TOL) {
-        // 지금이 던질 순간! — 골드로 확 켜진다
-        var hot = 1 - dLine / HIT_TOL;
-        ctx.strokeStyle = 'rgba(255,196,40,' + (0.75 + 0.25 * hot) + ')';
-        ctx.lineWidth = 3.5;
+      var dLine = bikeY() - m.y;   // 아직 위에 있으면 양수
+      if (dLine > 0 && dLine < H * 0.42) {
+        // 다가오는 목표 — 가까워질수록 골드로 켜진다
+        var hot = 1 - dLine / (H * 0.42);
+        ctx.strokeStyle = 'rgba(255,196,40,' + (0.35 + 0.6 * hot) + ')';
+        ctx.lineWidth = 2.5 + hot * 1.5;
         ctx.beginPath();
-        ctx.arc(m.x, m.y - 11, 17 + hot * 4, 0, Math.PI * 2);
+        ctx.arc(m.x, m.y - 11, 15 + hot * 5, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.fillStyle = 'rgba(255,196,40,' + (0.18 + 0.2 * hot) + ')';
-        ctx.beginPath();
-        ctx.arc(m.x, m.y - 11, 17 + hot * 4, 0, Math.PI * 2);
-        ctx.fill();
       } else {
-        // 은은한 예고 링
         var pulse = 0.5 + 0.5 * Math.sin(performance.now() / 240 + h.y);
         ctx.strokeStyle = 'rgba(29,110,216,' + (0.25 + 0.3 * pulse) + ')';
         ctx.lineWidth = 2;
@@ -919,7 +885,6 @@
       }
     }
     if (h.delivered) {
-      // 빨간 깃발이 올라간다
       var up = h.flagT > 0 ? 1 - Math.max(0, h.flagT / 0.8) : 1;
       ctx.strokeStyle = '#d1342a';
       ctx.lineWidth = 3;
@@ -931,7 +896,6 @@
       ctx.beginPath();
       ctx.arc(m.x + 8 + 8 * (1 - up), m.y - 14 - 9 * up, 3, 0, Math.PI * 2);
       ctx.fill();
-      // 놓인 신문
       ctx.save();
       ctx.translate(m.x - (h.side < 0 ? -16 : 16), m.y + 2);
       ctx.rotate(0.5);
@@ -944,7 +908,7 @@
     }
     if (h.missed && h.cancelT > 0) {
       var ca = Math.min(1, h.cancelT / 0.4);
-      var cs = 1 + Math.max(0, h.cancelT - 1.1) * 3;   // 처음에 크게 쾅
+      var cs = 1 + Math.max(0, h.cancelT - 1.1) * 3;
       ctx.save();
       ctx.globalAlpha = ca;
       ctx.strokeStyle = '#d1342a';
@@ -960,45 +924,83 @@
     }
   }
 
+  function drawObstacle(ob) {
+    if (ob.kind === 'trash') {
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.beginPath(); ctx.ellipse(ob.x + 3, ob.y + 5, 13, 9, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#9aa0a8';
+      ctx.beginPath(); ctx.arc(ob.x, ob.y, 13, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#6e747c';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ob.x - 8, ob.y - 3); ctx.lineTo(ob.x + 8, ob.y - 3);
+      ctx.moveTo(ob.x - 8, ob.y + 3); ctx.lineTo(ob.x + 8, ob.y + 3);
+      ctx.stroke();
+      ctx.fillStyle = '#b8bec6';
+      ctx.beginPath(); ctx.arc(ob.x, ob.y, 4.5, 0, Math.PI * 2); ctx.fill();
+    } else {
+      // 후진하는 차 (가로 방향)
+      var c = CAR_COLORS[ob.ci];
+      ctx.save();
+      ctx.translate(ob.x, ob.y);
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      roundRect(-30 + 3, -16 + 5, 60, 32, 10); ctx.fill();
+      ctx.fillStyle = c;
+      roundRect(-30, -16, 60, 32, 10); ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // 유리
+      ctx.fillStyle = '#cfe4f2';
+      roundRect(-12, -11, 24, 22, 5); ctx.fill();
+      // 진행 방향 표시등 (빨간 후진등 깜빡)
+      var blink = Math.sin(performance.now() / 130) > 0;
+      if (blink) {
+        ctx.fillStyle = '#ffdd55';
+        var tipX = ob.vx > 0 ? 30 : -30;
+        ctx.beginPath(); ctx.arc(tipX, -10, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(tipX, 10, 3.5, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
   function drawBike() {
-    var px = W / 2 + bikeSway * 6, py = playerY();
+    var px = bikeX, py = bikeY();
     var pedal = Math.sin(performance.now() / 110);
+    var tilt = Math.max(-0.35, Math.min(0.35, bikeVX / 900));
     ctx.save();
     ctx.translate(px, py);
-    ctx.rotate(bikeSway * 0.12);
-    // 그림자
+    ctx.rotate(tilt);
+    if (state === STATE_OVER && overReason === 'crash') {
+      ctx.rotate(Math.min(1, deathAnim * 3) * 2.4);   // 나뒹구는 연출
+    }
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
     ctx.beginPath(); ctx.ellipse(3, 6, 15, 26, 0, 0, Math.PI * 2); ctx.fill();
-    // 바퀴 (위/아래)
     ctx.fillStyle = '#2b2b2b';
     roundRect(-4, -30, 8, 16, 4); ctx.fill();
     roundRect(-4, 14, 8, 16, 4); ctx.fill();
-    // 프레임
     ctx.strokeStyle = '#d1342a';
     ctx.lineWidth = 5;
     ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(0, 18); ctx.stroke();
-    // 핸들바
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 4;
     ctx.beginPath(); ctx.moveTo(-13, -16); ctx.lineTo(13, -16); ctx.stroke();
-    // 몸통 (어깨) + 팔
     ctx.fillStyle = '#2f6fd6';
     roundRect(-11, -8, 22, 20, 8); ctx.fill();
     ctx.strokeStyle = '#2f6fd6';
     ctx.lineWidth = 5;
     ctx.beginPath(); ctx.moveTo(-9, -2); ctx.lineTo(-12, -14); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(9, -2); ctx.lineTo(12, -14); ctx.stroke();
-    // 다리 페달질
     ctx.strokeStyle = '#39496b';
     ctx.beginPath(); ctx.moveTo(-5, 10); ctx.lineTo(-7, 18 + pedal * 4); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(5, 10); ctx.lineTo(7, 18 - pedal * 4); ctx.stroke();
-    // 머리 + 챙모자
     ctx.fillStyle = '#e8b88a';
     ctx.beginPath(); ctx.arc(0, -6, 8, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#d1342a';
     ctx.beginPath(); ctx.arc(0, -7, 8, Math.PI, 0); ctx.fill();
     ctx.fillRect(-8, -8, 16, 3);
-    // 신문 가방 (어깨 옆 흰 뭉치)
     ctx.fillStyle = '#f7f3e8';
     roundRect(-16, 0, 9, 12, 3); ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.2)';
@@ -1008,15 +1010,14 @@
   }
 
   function drawDog() {
-    var gy = playerY() + CATCH_GAP + dogGap;
+    var gy = bikeY() + CATCH_GAP + dogGap;
     if (state === STATE_OVER) {
-      // 물었다 — 개가 자전거 위로 덮친다
-      gy = playerY() + 18 - Math.min(1, deathAnim * 3) * 8;
+      gy = bikeY() + 18 - Math.min(1, deathAnim * 3) * 8;
     }
     var run = Math.sin(dogLegT * 2.4);
     var x = W / 2 + Math.sin(dogLegT * 0.7) * 10;
+    if (state === STATE_OVER && overReason === 'crash') x = bikeX;
 
-    // 벌점으로 달려오는 중 — 흙먼지 + 스피드선 + !! 로 전력질주를 보여 준다
     if (state === STATE_PLAY && dogSprint > 0) {
       var sa = Math.min(1, dogSprint / 0.25);
       ctx.save();
@@ -1047,10 +1048,8 @@
 
     ctx.save();
     ctx.translate(x, gy);
-    // 그림자
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
     ctx.beginPath(); ctx.ellipse(2, 6, 14, 20, 0, 0, Math.PI * 2); ctx.fill();
-    // 꼬리
     ctx.strokeStyle = '#6b4a2e';
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
@@ -1058,34 +1057,27 @@
     ctx.moveTo(0, 16);
     ctx.quadraticCurveTo(6 + run * 4, 24, run * 6, 30);
     ctx.stroke();
-    // 몸통
     ctx.fillStyle = '#7d572f';
     roundRect(-11, -14, 22, 32, 10); ctx.fill();
-    // 다리 (달리기)
     ctx.strokeStyle = '#6b4a2e';
     ctx.lineWidth = 5;
     ctx.beginPath(); ctx.moveTo(-8, -8); ctx.lineTo(-13, -14 + run * 6); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(8, -8); ctx.lineTo(13, -14 - run * 6); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-8, 12); ctx.lineTo(-13, 18 - run * 6); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(8, 12); ctx.lineTo(13, 18 + run * 6); ctx.stroke();
-    // 머리 (위쪽 = 달려드는 방향)
     ctx.fillStyle = '#8a6134';
     ctx.beginPath(); ctx.arc(0, -18, 11, 0, Math.PI * 2); ctx.fill();
-    // 귀
     ctx.fillStyle = '#5f4023';
     ctx.beginPath(); ctx.ellipse(-9, -22, 4, 7, -0.5, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(9, -22, 4, 7, 0.5, 0, Math.PI * 2); ctx.fill();
-    // 눈 (성난)
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(-4, -20, 2.6, 0, Math.PI * 2); ctx.arc(4, -20, 2.6, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#000';
     ctx.beginPath(); ctx.arc(-4, -21, 1.3, 0, Math.PI * 2); ctx.arc(4, -21, 1.3, 0, Math.PI * 2); ctx.fill();
-    // 코
     ctx.fillStyle = '#2b1d10';
     ctx.beginPath(); ctx.arc(0, -26, 3, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
 
-    // 가까울 때 경고
     if (state === STATE_PLAY && dogGap < 90) {
       var danger = 1 - dogGap / 90;
       var blink = 0.5 + 0.5 * Math.sin(performance.now() / 110);
@@ -1096,7 +1088,6 @@
       ctx.textAlign = 'center';
       ctx.fillText('🐕 WOOF!!', x, gy - 44);
       ctx.restore();
-      // 붉은 비네트
       ctx.save();
       ctx.globalAlpha = danger * 0.28;
       var g = ctx.createLinearGradient(0, H, 0, H * 0.55);
@@ -1111,13 +1102,14 @@
   function drawFlights() {
     for (var i = 0; i < flights.length; i++) {
       var f = flights[i];
+      var m = mailboxPos(f.house);
       var k = Math.min(1, f.t / f.dur);
-      var x = f.x0 + (f.tx - f.x0) * k;
-      var y = f.y0 + (f.ty - f.y0) * k - Math.sin(Math.PI * k) * 26;
+      var x = f.x0 + (m.x - f.x0) * k;
+      var y = f.y0 + (m.y - f.y0) * k - Math.sin(Math.PI * k) * 30;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(k * 7);
-      var s = 1 + Math.sin(Math.PI * k) * 0.35;  // 포물선 높이감
+      var s = 1 + Math.sin(Math.PI * k) * 0.35;
       ctx.scale(s, s);
       ctx.fillStyle = '#f7f3e8';
       ctx.fillRect(-7, -4, 14, 8);
@@ -1138,34 +1130,38 @@
     drawGround();
     for (var t = 0; t < trees.length; t++) drawTree(trees[t]);
     for (var h = 0; h < houses.length; h++) drawHouse(houses[h]);
+    for (var o = 0; o < obstacles.length; o++) drawObstacle(obstacles[o]);
     drawBike();
     drawDog();
     drawFlights();
 
-    // 유리 파편
+    // 파편 (신문/흙먼지)
     for (var pg = 0; pg < parts.length; pg++) {
       var gq = parts[pg];
       ctx.save();
       ctx.globalAlpha = Math.min(1, gq.t / 0.3);
       ctx.translate(gq.x, gq.y);
       ctx.rotate(gq.rot);
-      ctx.fillStyle = '#cfe8ff';
-      ctx.strokeStyle = 'rgba(90,120,160,0.8)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, -4); ctx.lineTo(3.5, 3); ctx.lineTo(-3.5, 3);
-      ctx.closePath();
-      ctx.fill(); ctx.stroke();
+      if (gq.kind === 'paper') {
+        ctx.fillStyle = '#f7f3e8';
+        ctx.fillRect(-6, -3.5, 12, 7);
+        ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-6, -3.5, 12, 7);
+      } else {
+        ctx.fillStyle = '#c9bfa8';
+        ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.restore();
     }
 
-    // 배달 성공 팝
+    // 팝 (+1 / PERFECT / CRASH)
     for (var p = 0; p < pops.length; p++) {
       var pp = pops[p];
       ctx.save();
       ctx.globalAlpha = Math.min(1, pp.t / 0.3);
       var psize = pp.big ? 32 : (pp.gold ? 22 : 20);
-      if (pp.big) psize = Math.round(psize * (1 + Math.max(0, pp.t - 1.0) * 2.5));  // 처음에 쾅 커졌다 안착
+      if (pp.big) psize = Math.round(psize * (1 + Math.max(0, pp.t - 1.0) * 2.5));
       ctx.fillStyle = pp.big ? '#d1342a' : (pp.gold ? '#e8960c' : '#1d6ed8');
       ctx.font = 'bold ' + psize + 'px -apple-system, sans-serif';
       ctx.textAlign = 'center';
@@ -1200,21 +1196,18 @@
         var ia = Math.min(1, introT / 0.35);
         var blink2 = 0.55 + 0.45 * Math.sin(performance.now() / 90);
         ctx.save();
-        ctx.globalAlpha = ia;
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.font = 'bold 30px -apple-system, sans-serif';
-        ctx.fillText('◀', W * 0.14, playerY() + 6);
-        ctx.fillText('▶', W * 0.86, playerY() + 6);
         ctx.globalAlpha = ia * blink2;
         ctx.fillStyle = '#fff';
         ctx.strokeStyle = 'rgba(0,0,0,0.5)';
         ctx.lineWidth = 5;
         ctx.font = 'bold 22px -apple-system, sans-serif';
-        ctx.strokeText('TAP when a mailbox glows gold!', W / 2, H * 0.32);
-        ctx.fillText('TAP when a mailbox glows gold!', W / 2, H * 0.32);
+        ctx.strokeText('DRAG to steer! ◀▶', W / 2, H * 0.3);
+        ctx.fillText('DRAG to steer! ◀▶', W / 2, H * 0.3);
         ctx.font = 'bold 15px -apple-system, sans-serif';
-        ctx.strokeText('Miss a house and the dog gains on you 🐕', W / 2, H * 0.32 + 28);
-        ctx.fillText('Miss a house and the dog gains on you 🐕', W / 2, H * 0.32 + 28);
+        ctx.strokeText('Hug the mailbox side to deliver 🗞️', W / 2, H * 0.3 + 28);
+        ctx.fillText('Hug the mailbox side to deliver 🗞️', W / 2, H * 0.3 + 28);
+        ctx.strokeText("Don't hit anything!", W / 2, H * 0.3 + 50);
+        ctx.fillText("Don't hit anything!", W / 2, H * 0.3 + 50);
         ctx.restore();
       }
       for (var fl2 = 0; fl2 < flashes.length; fl2++) {
@@ -1242,12 +1235,12 @@
       ctx.fillText('🗞️ PAPER ROUTE', W / 2, H * 0.22);
       ctx.font = '16px -apple-system, sans-serif';
       ctx.fillStyle = 'rgba(43,53,80,0.8)';
-      ctx.fillText('Tap LEFT or RIGHT the moment a mailbox', W / 2, H * 0.22 + 44);
-      ctx.fillText('crosses your line 📪 Dead center = PERFECT', W / 2, H * 0.22 + 68);
+      ctx.fillText('Drag to steer your bike 🚲', W / 2, H * 0.22 + 44);
+      ctx.fillText('Ride close to mailboxes — papers throw themselves', W / 2, H * 0.22 + 68);
       ctx.fillStyle = '#d1342a';
       ctx.font = 'bold 16px -apple-system, sans-serif';
-      ctx.fillText('💥 Bad timing smashes a window.', W / 2, H * 0.22 + 100);
-      ctx.fillText('🐕 Miss a house and the dog gains on you!', W / 2, H * 0.22 + 124);
+      ctx.fillText('💥 Dodge cars and trash cans!', W / 2, H * 0.22 + 100);
+      ctx.fillText('🐕 Skip a house and the dog gains on you!', W / 2, H * 0.22 + 124);
       if (best > 0) {
         ctx.fillStyle = 'rgba(43,53,80,0.8)';
         ctx.font = '16px -apple-system, sans-serif';
@@ -1309,15 +1302,16 @@
       get gapMax() { return gapMax(); },
       get elapsed() { return elapsed; },
       get houses() { return houses; },
+      get obstacles() { return obstacles; },
+      get bikeX() { return bikeX; },
+      get py() { return bikeY(); },
+      get roadL() { return roadL(); },
+      get roadR() { return roadR(); },
+      get overReason() { return overReason; },
+      get streak() { return streak; },
       get chScore() { return chScore; },
       get chName() { return chName; },
-      get py() { return playerY(); },
-      get flightsN() { return flights.length; },
-      get streak() { return streak; },
-      get hitTol() { return HIT_TOL; },
-      candidate: candidate,
-      wallOnLine: wallOnLine,
-      throwSide: throwSide,
+      steer: function (x) { bikeTargetX = Math.max(roadL() + BIKE_R + 2, Math.min(roadR() - BIKE_R - 2, x)); },
       tryStart: tryStart
     };
   }
