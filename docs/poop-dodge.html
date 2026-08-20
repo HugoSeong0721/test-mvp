@@ -150,8 +150,8 @@
   var state = STATE_TITLE;
 
   var GROUND_H;                // 바닥 높이 (resize에서 화면 비율로 계산)
-  var PLAYER_H = 74;           // 졸라맨 키
-  var PLAYER_HIT_R = 14;       // 충돌 반경(관대하게)
+  var PLAYER_H = 58;           // 졸라맨 키 (작아야 사이사이로 피한다)
+  var PLAYER_HIT_R = 10;       // 충돌 반경(관대하게)
 
   var player = { x: 0, vx: 0, targetX: 0, face: 1, walk: 0 };
   var poops = [];              // 떨어지는 똥
@@ -697,7 +697,7 @@
 
   function drawStickman(x, groundY, dead) {
     var h = PLAYER_H;
-    var headR = 13;
+    var headR = 10;
     var hipY = groundY - h * 0.42;
     var neckY = groundY - h + headR * 2 + 4;
     var headCY = groundY - h + headR;
@@ -719,9 +719,9 @@
     // 다리
     ctx.beginPath();
     ctx.moveTo(0, hipY);
-    ctx.lineTo(-8 - swing * 6, groundY);
+    ctx.lineTo(-6.5 - swing * 5, groundY);
     ctx.moveTo(0, hipY);
-    ctx.lineTo(8 + swing * 6, groundY);
+    ctx.lineTo(6.5 + swing * 5, groundY);
     ctx.stroke();
     // 몸통
     ctx.beginPath();
@@ -731,11 +731,11 @@
     // 팔 (달릴 때 흔들, 죽으면 만세)
     ctx.beginPath();
     if (dead) {
-      ctx.moveTo(0, neckY + 6); ctx.lineTo(-14, neckY - 12);
-      ctx.moveTo(0, neckY + 6); ctx.lineTo(14, neckY - 12);
+      ctx.moveTo(0, neckY + 5); ctx.lineTo(-11, neckY - 10);
+      ctx.moveTo(0, neckY + 5); ctx.lineTo(11, neckY - 10);
     } else {
-      ctx.moveTo(0, neckY + 6); ctx.lineTo(-12 + swing * 5, neckY + 22);
-      ctx.moveTo(0, neckY + 6); ctx.lineTo(12 - swing * 5, neckY + 22);
+      ctx.moveTo(0, neckY + 5); ctx.lineTo(-10 + swing * 4, neckY + 18);
+      ctx.moveTo(0, neckY + 5); ctx.lineTo(10 - swing * 4, neckY + 18);
     }
     ctx.stroke();
     // 머리
