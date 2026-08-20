@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Catdoku</title>
+<title>Cats vs Dogs</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
@@ -19,7 +19,7 @@
     height: calc(100% + 240px);
     overflow: hidden;
     overscroll-behavior: none;
-    background: #f6efe4;
+    background: #f3f0e8;
     -webkit-user-select: none; user-select: none;
     -webkit-touch-callout: none;
     font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
@@ -34,26 +34,21 @@
     touch-action: pan-y;
     padding: max(10px, env(safe-area-inset-top)) 10px 10px;
   }
-  #hud {
-    width: min(94vw, 480px);
-    margin-top: 2px;
-  }
+  #hud { width: min(94vw, 460px); margin-top: 2px; }
   #hud-top {
     display: flex; align-items: center; justify-content: space-between;
     gap: 8px;
   }
-  #logo { font-size: 19px; font-weight: 800; color: #4a3b28; letter-spacing: 0.5px; }
+  #logo { font-size: 17px; font-weight: 800; color: #3d3a2e; letter-spacing: 0.3px; }
   #timer {
-    font-size: 22px; font-weight: 800; color: #4a3b28;
+    font-size: 22px; font-weight: 800; color: #3d3a2e;
     font-variant-numeric: tabular-nums;
     background: #fff; border-radius: 10px; padding: 2px 10px;
-    box-shadow: 0 1px 4px rgba(120,90,40,0.15);
+    box-shadow: 0 1px 4px rgba(90,90,40,0.15);
   }
-  #timer.practice { color: #8a7a5f; }
+  #timer.practice { color: #8a8468; }
   #hearts { font-size: 18px; letter-spacing: 1px; }
-  #rules {
-    display: flex; gap: 6px; margin-top: 8px;
-  }
+  #rules { display: flex; gap: 6px; margin-top: 8px; }
   .chip {
     flex: 1;
     background: #fff;
@@ -61,21 +56,22 @@
     padding: 6px 4px;
     font-size: 11px;
     font-weight: 700;
-    color: #6b5a41;
+    color: #5f5a44;
     text-align: center;
-    box-shadow: 0 1px 4px rgba(120,90,40,0.12);
+    box-shadow: 0 1px 4px rgba(90,90,40,0.12);
     line-height: 1.25;
   }
   #status-row {
     display: flex; align-items: center; justify-content: space-between;
-    width: min(94vw, 480px);
+    width: min(94vw, 460px);
     margin-top: 8px;
     min-height: 24px;
   }
   #progress {
-    font-size: 16px; font-weight: 800; color: #4a3b28;
+    font-size: 15px; font-weight: 800; color: #3d3a2e;
     background: #fff; border-radius: 10px; padding: 2px 10px;
-    box-shadow: 0 1px 4px rgba(120,90,40,0.12);
+    box-shadow: 0 1px 4px rgba(90,90,40,0.12);
+    font-variant-numeric: tabular-nums;
   }
   #ch-chip {
     font-size: 12px; font-weight: 700; color: #2f6fd6;
@@ -85,67 +81,85 @@
     font-variant-numeric: tabular-nums;
   }
   #ch-chip.hidden { display: none; }
-  #board-wrap {
-    position: relative;
-    margin-top: 10px;
-  }
+  #board-wrap { position: relative; margin-top: 12px; }
   #board {
     display: grid;
-    gap: 4px;
-    width: min(94vw, 54vh, 480px);
+    gap: 5px;
+    width: min(92vw, 52vh, 440px);
     aspect-ratio: 1;
-    padding: 6px;
+    padding: 10px;
     background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 3px 14px rgba(120,90,40,0.18);
+    border-radius: 16px;
+    box-shadow: 0 3px 14px rgba(90,90,40,0.18);
   }
   .cell {
-    border-radius: 15%;
+    border-radius: 16%;
+    background: #ece3d0;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s;
   }
-  .cell span { pointer-events: none; line-height: 1; }
-  .cell .cat { font-size: min(5.6vw, 3.1vh, 27px); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3)); }
-  .cell .xm  { font-size: min(4.6vw, 2.6vh, 22px); font-weight: 900; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
-  .cell .ax  { font-size: min(4.2vw, 2.4vh, 20px); font-weight: 800; color: rgba(255,255,255,0.5); }
+  .cell.cat { background: #ffc46b; }
+  .cell.dog { background: #8ec2ee; }
+  .cell.locked { box-shadow: inset 0 0 0 2.5px rgba(61,58,46,0.22); cursor: default; }
+  .cell > .sym { pointer-events: none; line-height: 1; font-size: min(7.4vw, 4.2vh, 34px); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25)); }
+  .cell.pop > .sym { animation: pop 0.22s ease-out; }
+  @keyframes pop {
+    0% { transform: scale(0.4); } 70% { transform: scale(1.22); } 100% { transform: scale(1); }
+  }
+  .cell.wiggle { animation: wiggle 0.3s; }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); }
+  }
   .cell.bad::after {
     content: '';
     position: absolute; inset: 0;
-    border-radius: 15%;
+    border-radius: 16%;
     background: rgba(230,40,40,0.55);
     animation: badflash 0.7s ease-out forwards;
+    z-index: 3;
   }
-  @keyframes badflash {
-    0% { opacity: 1; } 100% { opacity: 0; }
-  }
+  @keyframes badflash { 0% { opacity: 1; } 100% { opacity: 0; } }
   #board.shake { animation: shake 0.35s; }
   @keyframes shake {
     0%,100% { transform: translateX(0); }
     20% { transform: translateX(-7px); } 40% { transform: translateX(6px); }
     60% { transform: translateX(-4px); } 80% { transform: translateX(3px); }
   }
-  .cell.pop span.cat { animation: pop 0.25s ease-out; }
-  @keyframes pop {
-    0% { transform: scale(0.4); } 70% { transform: scale(1.25); } 100% { transform: scale(1); }
-  }
-  #board.won .cat { animation: winbounce 0.7s ease-in-out infinite alternate; }
+  #board.won .cell > .sym { animation: winbounce 0.7s ease-in-out infinite alternate; }
   @keyframes winbounce {
-    0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-4px) scale(1.12); }
+    0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-4px) scale(1.1); }
   }
+  /* =/✕ 관계 배지 — 두 칸 사이 틈 위에 얹힌다 */
+  .pairb {
+    position: absolute;
+    z-index: 4;
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    color: #4a4636;
+    font-size: 11px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .pairb.h { right: -11px; top: 50%; transform: translateY(-50%); }
+  .pairb.v { bottom: -11px; left: 50%; transform: translateX(-50%); }
   #msg {
     position: absolute;
     left: 50%; top: 42%;
     transform: translate(-50%, -50%);
-    font-size: 22px; font-weight: 900;
+    font-size: 21px; font-weight: 900;
     color: #d1342a;
     text-shadow: 0 1px 0 #fff, 0 2px 8px rgba(255,255,255,0.8);
     pointer-events: none;
     opacity: 0;
     white-space: nowrap;
+    z-index: 5;
   }
   #msg.show { animation: msgfly 1.1s ease-out forwards; }
   @keyframes msgfly {
@@ -154,16 +168,11 @@
     75% { opacity: 1; transform: translate(-50%,-60%) scale(1); }
     100% { opacity: 0; transform: translate(-50%,-75%) scale(1); }
   }
-  #hint {
-    margin-top: 10px;
-    font-size: 13px;
-    color: #8a7a5f;
-    font-weight: 600;
-  }
+  #hint { margin-top: 10px; font-size: 13px; color: #8a8468; font-weight: 600; }
   /* ── 시작 패널 ── */
   #title-panel {
     position: fixed; inset: 0;
-    background: rgba(246,239,228,0.96);
+    background: rgba(243,240,232,0.96);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     text-align: center;
@@ -172,17 +181,17 @@
     touch-action: pan-y;
   }
   #title-panel.hidden { display: none; }
-  #title-panel h1 { font-size: 44px; color: #4a3b28; letter-spacing: 1px; }
+  #title-panel h1 { font-size: 38px; color: #3d3a2e; letter-spacing: 0.5px; }
   #title-sub { margin-top: 8px; font-size: 15px; font-weight: 700; color: #b3543a; }
   #title-rules { display: flex; gap: 8px; margin-top: 18px; width: min(88vw, 420px); }
   #title-rules .chip { font-size: 12px; padding: 9px 6px; }
-  #title-desc { margin-top: 14px; font-size: 14px; color: #6b5a41; line-height: 1.55; }
+  #title-desc { margin-top: 14px; font-size: 14px; color: #5f5a44; line-height: 1.55; }
   #title-ch { margin-top: 12px; font-size: 15px; font-weight: 800; color: #2f6fd6; min-height: 20px; }
-  #title-best { margin-top: 6px; font-size: 13px; color: #8a7a5f; }
+  #title-best { margin-top: 6px; font-size: 13px; color: #8a8468; }
   #start-btn {
     margin-top: 22px;
     border: none;
-    background: #4a3b28; color: #ffd98a;
+    background: #3d3a2e; color: #ffd98a;
     font-size: 19px; font-weight: 800;
     border-radius: 14px;
     padding: 14px 44px;
@@ -191,7 +200,7 @@
     animation: startpulse 1.2s ease-in-out infinite alternate;
   }
   @keyframes startpulse { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
-  #title-next { margin-top: 12px; font-size: 12px; color: #a3937a; font-variant-numeric: tabular-nums; }
+  #title-next { margin-top: 12px; font-size: 12px; color: #a39d84; font-variant-numeric: tabular-nums; }
   /* ── 게임오버 패널 (랭킹 / 도전장) ── */
   #over-panel {
     position: fixed;
@@ -277,36 +286,36 @@
 <div id="app">
   <div id="hud">
     <div id="hud-top">
-      <span id="logo">🐱 CATDOKU</span>
+      <span id="logo">🐱 CATS vs DOGS 🐶</span>
       <span id="timer">0:00</span>
       <span id="hearts">❤️❤️❤️</span>
     </div>
     <div id="rules">
-      <div class="chip">1 cat<br>per color</div>
-      <div class="chip">1 cat per<br>row &amp; column</div>
-      <div class="chip">Cats<br>cannot touch</div>
+      <div class="chip">3 cats &amp; 3 dogs<br>per row &amp; column</div>
+      <div class="chip">No 3 in a row<br>of the same</div>
+      <div class="chip">= same<br>✕ different</div>
     </div>
   </div>
   <div id="status-row">
-    <span id="progress">🐱 0/7</span>
+    <span id="progress">🧩 0/36</span>
     <span id="ch-chip" class="hidden"></span>
   </div>
   <div id="board-wrap">
     <div id="board"></div>
     <div id="msg"></div>
   </div>
-  <div id="hint">Tap a cell: ✕ mark → 🐱 cat → clear</div>
+  <div id="hint">Tap a cell: 🐱 → 🐶 → clear · framed cells are fixed</div>
 </div>
 
 <div id="title-panel">
-  <h1>🐱 CATDOKU</h1>
+  <h1>🐱 CATS vs DOGS 🐶</h1>
   <div id="title-sub"></div>
   <div id="title-rules">
-    <div class="chip">1 cat<br>per color</div>
-    <div class="chip">1 cat per<br>row &amp; column</div>
-    <div class="chip">Cats<br>cannot touch</div>
+    <div class="chip">3 cats &amp; 3 dogs<br>per row &amp; column</div>
+    <div class="chip">No 3 in a row<br>of the same</div>
+    <div class="chip">= same<br>✕ different</div>
   </div>
-  <div id="title-desc">Place 7 cats on the board.<br>Wrong cat = 💔 lose a heart. The clock is your score!</div>
+  <div id="title-desc">Fill every cell with a cat or a dog.<br>Wrong move = 💔 lose a heart. The clock is your score!</div>
   <div id="title-ch"></div>
   <div id="title-best"></div>
   <button id="start-btn">TAP TO START</button>
@@ -333,8 +342,10 @@
 (function () {
   'use strict';
 
-  var N = 7;
-  var PALETTE = ['#3ec3af', '#63aee6', '#c4608c', '#8fd977', '#e6b93f', '#f2a0bf', '#a48ae0'];
+  var N = 6, HALF = 3;
+  var CAT = 0, DOG = 1;
+  var SYM = ['🐱', '🐶'];
+  var SYMNAME = ['CATS', 'DOGS'];
 
   // ---------- 오늘 날짜 (KST) ----------
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
@@ -379,100 +390,138 @@
   }
 
   // ---------- 퍼즐 생성 (날짜 시드 → 모두 같은 판, 유일해 보장) ----------
-  // 해답: 행마다 고양이 1마리, 열 중복 없음, 이웃 행의 고양이는 대각선으로도 안 붙음
-  function genSolution(rand) {
-    var cols = [], used = [];
-    function bt(r) {
-      if (r === N) return true;
-      var cand = [];
-      for (var c = 0; c < N; c++) {
-        if (used[c]) continue;
-        if (r > 0 && Math.abs(c - cols[r - 1]) < 2) continue;
-        cand.push(c);
-      }
-      shuffle(cand, rand);
-      for (var i = 0; i < cand.length; i++) {
-        cols[r] = cand[i]; used[cand[i]] = true;
-        if (bt(r + 1)) return true;
-        used[cand[i]] = false;
+  // pairs: {r, c, dir:'h'|'v', t:'='|'x'} — (r,c)와 오른쪽/아래 칸의 관계
+  var puzzleDay = '', solution = null, pairs = [], givens = null;
+
+  // g에 (r,c)=v를 놓아도 규칙에 어긋나지 않는가 (부분 채움 기준)
+  function fits(g, r, c, v) {
+    // 3연속 금지
+    for (var c0 = c - 2; c0 <= c; c0++) {
+      if (c0 < 0 || c0 + 2 >= N) continue;
+      var a = c0 === c ? v : g[r][c0];
+      var b = c0 + 1 === c ? v : g[r][c0 + 1];
+      var d = c0 + 2 === c ? v : g[r][c0 + 2];
+      if (a === v && b === v && d === v && a >= 0 && b >= 0 && d >= 0) return false;
+    }
+    for (var r0 = r - 2; r0 <= r; r0++) {
+      if (r0 < 0 || r0 + 2 >= N) continue;
+      var a2 = r0 === r ? v : g[r0][c];
+      var b2 = r0 + 1 === r ? v : g[r0 + 1][c];
+      var d2 = r0 + 2 === r ? v : g[r0 + 2][c];
+      if (a2 === v && b2 === v && d2 === v && a2 >= 0 && b2 >= 0 && d2 >= 0) return false;
+    }
+    // 행/열마다 각 3마리 초과 금지
+    var cnt = 1;
+    for (var i = 0; i < N; i++) if (i !== c && g[r][i] === v) cnt++;
+    if (cnt > HALF) return false;
+    cnt = 1;
+    for (var j = 0; j < N; j++) if (j !== r && g[j][c] === v) cnt++;
+    if (cnt > HALF) return false;
+    // =/✕ 관계
+    for (var p = 0; p < pairs.length; p++) {
+      var pr = pairs[p];
+      var r2 = pr.dir === 'h' ? pr.r : pr.r + 1;
+      var c2 = pr.dir === 'h' ? pr.c + 1 : pr.c;
+      var va = -1, vb = -1;
+      if (pr.r === r && pr.c === c) { va = v; vb = g[r2][c2]; }
+      else if (r2 === r && c2 === c) { va = g[pr.r][pr.c]; vb = v; }
+      else continue;
+      if (va < 0 || vb < 0) continue;
+      if (pr.t === '=' && va !== vb) return false;
+      if (pr.t === 'x' && va === vb) return false;
+    }
+    return true;
+  }
+  function emptyGrid() {
+    var g = [];
+    for (var r = 0; r < N; r++) { g.push([]); for (var c = 0; c < N; c++) g[r].push(-1); }
+    return g;
+  }
+  function genFull(rand) {
+    var g = emptyGrid();
+    function bt(i) {
+      if (i === N * N) return true;
+      var r = Math.floor(i / N), c = i % N;
+      var order = rand() < 0.5 ? [CAT, DOG] : [DOG, CAT];
+      for (var k = 0; k < 2; k++) {
+        var v = order[k];
+        if (!fits(g, r, c, v)) continue;
+        g[r][c] = v;
+        if (bt(i + 1)) return true;
+        g[r][c] = -1;
       }
       return false;
     }
-    return bt(0) ? cols.slice(0, N) : null;
+    return bt(0) ? g : null;
   }
-  // 색 구역: 각 고양이 자리에서 씨앗을 심고 무작위로 자라나는 연결 구역 N개
-  function growRegions(rand, sol) {
-    var reg = [];
-    for (var r = 0; r < N; r++) { reg.push([]); for (var c = 0; c < N; c++) reg[r].push(-1); }
-    for (var k = 0; k < N; k++) reg[k][sol[k]] = k;
-    var left = N * N - N;
-    while (left > 0) {
-      var cand = [];
-      for (var r2 = 0; r2 < N; r2++) {
-        for (var c2 = 0; c2 < N; c2++) {
-          var g = reg[r2][c2];
-          if (g < 0) continue;
-          if (r2 > 0 && reg[r2 - 1][c2] < 0) cand.push([r2 - 1, c2, g]);
-          if (r2 < N - 1 && reg[r2 + 1][c2] < 0) cand.push([r2 + 1, c2, g]);
-          if (c2 > 0 && reg[r2][c2 - 1] < 0) cand.push([r2, c2 - 1, g]);
-          if (c2 < N - 1 && reg[r2][c2 + 1] < 0) cand.push([r2, c2 + 1, g]);
-        }
-      }
-      var p = cand[Math.floor(rand() * cand.length)];
-      reg[p[0]][p[1]] = p[2];
-      left--;
-    }
-    return reg;
-  }
-  function countSolutions(reg, cap) {
-    var count = 0, colU = [], regU = [];
-    function bt(r, prevC) {
+  function countSolutions(g0, cap) {
+    var g = g0.map(function (row) { return row.slice(); });
+    var count = 0;
+    var empties = [];
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) if (g[r][c] < 0) empties.push([r, c]);
+    function bt(i) {
       if (count >= cap) return;
-      if (r === N) { count++; return; }
-      for (var c = 0; c < N; c++) {
-        if (colU[c] || regU[reg[r][c]]) continue;
-        if (r > 0 && Math.abs(c - prevC) < 2) continue;
-        colU[c] = true; regU[reg[r][c]] = true;
-        bt(r + 1, c);
-        colU[c] = false; regU[reg[r][c]] = false;
+      if (i === empties.length) { count++; return; }
+      var r = empties[i][0], c = empties[i][1];
+      for (var v = 0; v < 2; v++) {
+        if (!fits(g, r, c, v)) continue;
+        g[r][c] = v;
+        bt(i + 1);
+        g[r][c] = -1;
       }
     }
-    bt(0, -9);
+    bt(0);
     return count;
   }
-  var puzzleDay = '', solution = null, region = null;
   function setupPuzzle() {
     puzzleDay = dayKey();
-    var rand = mulberry32(seedFrom('catdoku-' + puzzleDay));
-    for (var attempt = 0; attempt < 500; attempt++) {
-      var sol = genSolution(rand);
-      if (!sol) continue;
-      var reg = growRegions(rand, sol);
-      if (countSolutions(reg, 2) === 1) {
-        solution = sol; region = reg;
-        return;
+    var rand = mulberry32(seedFrom('catsvsdogs-' + puzzleDay));
+    solution = genFull(rand);
+    // =/✕ 관계 8개를 무작위 이웃 쌍에서 뽑아 해답에서 유형을 읽는다
+    var edges = [];
+    for (var r = 0; r < N; r++) {
+      for (var c = 0; c < N; c++) {
+        if (c + 1 < N) edges.push({ r: r, c: c, dir: 'h' });
+        if (r + 1 < N) edges.push({ r: r, c: c, dir: 'v' });
       }
     }
-    // 500번 안에 유일해가 안 나올 확률은 사실상 0이지만, 마지막 판이라도 쓴다
-    solution = sol; region = reg;
+    shuffle(edges, rand);
+    pairs = edges.slice(0, 8).map(function (e) {
+      var v1 = solution[e.r][e.c];
+      var v2 = e.dir === 'h' ? solution[e.r][e.c + 1] : solution[e.r + 1][e.c];
+      return { r: e.r, c: e.c, dir: e.dir, t: v1 === v2 ? '=' : 'x' };
+    });
+    // 유일해가 유지되는 한 칸씩 비운다 (주어진 칸 8개 안팎에서 멈춤)
+    givens = solution.map(function (row) { return row.slice(); });
+    var order = [];
+    for (var i = 0; i < N * N; i++) order.push(i);
+    shuffle(order, rand);
+    var remain = N * N;
+    for (var k = 0; k < order.length && remain > 8; k++) {
+      var rr = Math.floor(order[k] / N), cc = order[k] % N;
+      var keep = givens[rr][cc];
+      givens[rr][cc] = -1;
+      if (countSolutions(givens, 2) === 1) remain--;
+      else givens[rr][cc] = keep;
+    }
   }
 
   // ---------- 상태 ----------
   var STATE_TITLE = 0, STATE_PLAY = 1, STATE_OVER = 2;
   var state = STATE_TITLE;
-  var cell = [];       // 0 빈칸, 1 내 ✕, 2 고양이
-  var autoM = [];      // 자동 ✕ 힌트 카운트 (고양이가 지우면 함께 걷힌다)
-  var catMarks = {};   // 'r,c' → 그 고양이가 깔아 둔 자동 ✕ 목록
-  var hearts = 3, catCount = 0;
-  var runStart = 0;    // 이번 판 시작 시각 (performance.now)
+  var cellV = [];      // -1 빈칸, 0 🐱, 1 🐶
+  var locked = [];     // 처음부터 주어진 칸
+  var nextSym = [];    // 빈칸에서 다음 탭이 시도할 동물 (거절돼도 순환이 이어진다)
+  var hearts = 3, filled = 0;
+  var runStart = 0;
   var accumBase = 0;   // 오늘 누적 시간(초) — 실패해도 시계는 계속 간다
   var practice = false;
-  var lastTotal = 0;   // 게임오버 시점의 총 시간
+  var lastTotal = 0;
   var won = false;
   var overAt = 0;
 
-  function timeStoreKey() { return 'catdokuTime_' + puzzleDay; }
-  function solvedKey() { return 'catdokuSolved_' + puzzleDay; }
+  function timeStoreKey() { return 'cvdTime_' + puzzleDay; }
+  function solvedKey() { return 'cvdSolved_' + puzzleDay; }
   function loadAccum() {
     try { return parseFloat(localStorage.getItem(timeStoreKey()) || '0') || 0; } catch (e) { return 0; }
   }
@@ -510,9 +559,9 @@
     o.connect(g); g.connect(a.destination);
     o.start(t0); o.stop(t0 + dur + 0.02);
   }
-  function sndTick() { beep(950, 0.05, 'square', 0.03); }
-  function sndClear() { beep(500, 0.05, 'square', 0.025); }
-  function sndCat() { beep(620, 0.09, 'triangle', 0.07); beep(930, 0.12, 'triangle', 0.06, 0.05); }
+  function sndCatPlace() { beep(760, 0.08, 'triangle', 0.06); }
+  function sndDogPlace() { beep(420, 0.09, 'triangle', 0.06); }
+  function sndClear() { beep(520, 0.05, 'square', 0.025); }
   function sndErr() { beep(150, 0.22, 'sawtooth', 0.09); beep(110, 0.25, 'sawtooth', 0.07, 0.06); }
   function sndWin() {
     [523, 659, 784, 1047, 1319].forEach(function (f, i) { beep(f, 0.24, 'triangle', 0.07, i * 0.1); });
@@ -522,7 +571,7 @@
   // ---------- 랭킹 (시간이 낮을수록 위) ----------
   var RANK_MAX = 12;
   var ranks = [], myRankRow = null;
-  function rankStoreKey(day) { return 'catdokuRanks_' + day; }
+  function rankStoreKey(day) { return 'cvdRanks_' + day; }
   function loadRanks(day) {
     try {
       var raw = JSON.parse(localStorage.getItem(rankStoreKey(day)) || '[]');
@@ -543,7 +592,7 @@
       var kill = [];
       for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
-        if (k && (k.indexOf('catdokuRanks_') === 0 || k.indexOf('catdokuTime_') === 0 || k.indexOf('catdokuSolved_') === 0)) {
+        if (k && (k.indexOf('cvdRanks_') === 0 || k.indexOf('cvdTime_') === 0 || k.indexOf('cvdSolved_') === 0)) {
           var d = parseInt(k.slice(k.lastIndexOf('_') + 1), 10);
           if (d && today - d > 100) kill.push(k);
         }
@@ -553,9 +602,9 @@
   }
   pruneOldRanks();
   function loadName() {
-    try { return (localStorage.getItem('catdokuName') || '').slice(0, 8); } catch (e) { return ''; }
+    try { return (localStorage.getItem('cvdName') || '').slice(0, 8); } catch (e) { return ''; }
   }
-  function saveName(v) { try { localStorage.setItem('catdokuName', v); } catch (e) {} }
+  function saveName(v) { try { localStorage.setItem('cvdName', v); } catch (e) {} }
 
   function renderRanks() {
     var board = document.getElementById('rank-board');
@@ -662,11 +711,11 @@
   function shareResult() {
     var s = Math.round(lastTotal);
     var url = challengeUrl(s);
-    var text = '🐱 Catdoku ' + dayLabel(puzzleDay) + ' — solved in ' + fmtTime(s) + '!\nOne cat per color, and no two cats can touch. Same puzzle for everyone today — beat my time!';
+    var text = '🐱🐶 Cats vs Dogs ' + dayLabel(puzzleDay) + ' — solved in ' + fmtTime(s) + '!\nBalance the cats and dogs, no 3 in a row. Same puzzle for everyone today — beat my time!';
     var full = url ? text + '\n' + url : text;
     var done = function () { note('Challenge sent!'); };
     if (navigator.share) {
-      navigator.share(url ? { title: 'Catdoku', text: text, url: url } : { title: 'Catdoku', text: text })
+      navigator.share(url ? { title: 'Cats vs Dogs', text: text, url: url } : { title: 'Cats vs Dogs', text: text })
         .then(done)
         .catch(function (e) {
           if (e && e.name === 'AbortError') return;
@@ -707,125 +756,152 @@
         d.className = 'cell';
         d.dataset.r = r;
         d.dataset.c = c;
-        d.style.background = PALETTE[region[r][c] % PALETTE.length];
         var s = document.createElement('span');
+        s.className = 'sym';
         d.appendChild(s);
         boardEl.appendChild(d);
         cellEls[r].push(d);
       }
     }
+    // =/✕ 배지
+    pairs.forEach(function (p) {
+      var b = document.createElement('span');
+      b.className = 'pairb ' + p.dir;
+      b.textContent = p.t === '=' ? '=' : '✕';
+      cellEls[p.r][p.c].appendChild(b);
+    });
   }
   function updateCell(r, c) {
-    var s = cellEls[r][c].firstChild;
-    if (cell[r][c] === 2) { s.className = 'cat'; s.textContent = '🐱'; }
-    else if (cell[r][c] === 1) { s.className = 'xm'; s.textContent = '✕'; }
-    else if (autoM[r][c] > 0) { s.className = 'ax'; s.textContent = '✕'; }
-    else { s.className = ''; s.textContent = ''; }
+    var el = cellEls[r][c];
+    var s = el.firstChild;
+    el.classList.remove('cat', 'dog');
+    if (cellV[r][c] === CAT) { el.classList.add('cat'); s.textContent = '🐱'; }
+    else if (cellV[r][c] === DOG) { el.classList.add('dog'); s.textContent = '🐶'; }
+    else s.textContent = '';
   }
   function updateHud() {
     var h = '';
     for (var i = 0; i < 3; i++) h += i < hearts ? '❤️' : '🤍';
     document.getElementById('hearts').textContent = h;
-    document.getElementById('progress').textContent = '🐱 ' + catCount + '/' + N;
+    document.getElementById('progress').textContent = '🧩 ' + filled + '/' + (N * N);
   }
   function flashMsg(text) {
     var m = document.getElementById('msg');
     m.textContent = text;
     m.classList.remove('show');
-    void m.offsetWidth; // 애니메이션 재시작
+    void m.offsetWidth;
     m.classList.add('show');
   }
 
-  // ---------- 규칙 판정 ----------
-  function conflictsWith(r, c) {
-    var out = [];
-    for (var r2 = 0; r2 < N; r2++) {
-      for (var c2 = 0; c2 < N; c2++) {
-        if (cell[r2][c2] !== 2) continue;
-        var why = '';
-        if (Math.abs(r2 - r) <= 1 && Math.abs(c2 - c) <= 1) why = 'CATS CAN’T TOUCH!';
-        else if (r2 === r) why = 'ONE PER ROW!';
-        else if (c2 === c) why = 'ONE PER COLUMN!';
-        else if (region[r2][c2] === region[r][c]) why = 'ONE PER COLOR!';
-        if (why) out.push({ r: r2, c: c2, why: why });
+  // ---------- 규칙 판정 (게임 중 — 위반 칸 목록과 사유를 돌려준다) ----------
+  function violationOf(r, c, v) {
+    // 3연속
+    for (var c0 = c - 2; c0 <= c; c0++) {
+      if (c0 < 0 || c0 + 2 >= N) continue;
+      var ok = true, cells = [];
+      for (var i = 0; i < 3; i++) {
+        var cc = c0 + i;
+        var vv = cc === c ? v : cellV[r][cc];
+        if (vv !== v) { ok = false; break; }
+        cells.push([r, cc]);
       }
+      if (ok) return { cells: cells, why: 'NO 3 IN A ROW!' };
     }
-    return out;
+    for (var r0 = r - 2; r0 <= r; r0++) {
+      if (r0 < 0 || r0 + 2 >= N) continue;
+      var ok2 = true, cells2 = [];
+      for (var j = 0; j < 3; j++) {
+        var rr = r0 + j;
+        var vv2 = rr === r ? v : cellV[rr][c];
+        if (vv2 !== v) { ok2 = false; break; }
+        cells2.push([rr, c]);
+      }
+      if (ok2) return { cells: cells2, why: 'NO 3 IN A ROW!' };
+    }
+    // 행/열 3마리 초과
+    var rowCells = [[r, c]];
+    for (var i2 = 0; i2 < N; i2++) if (i2 !== c && cellV[r][i2] === v) rowCells.push([r, i2]);
+    if (rowCells.length > HALF) return { cells: rowCells, why: 'ONLY 3 ' + SYMNAME[v] + ' PER ROW!' };
+    var colCells = [[r, c]];
+    for (var j2 = 0; j2 < N; j2++) if (j2 !== r && cellV[j2][c] === v) colCells.push([j2, c]);
+    if (colCells.length > HALF) return { cells: colCells, why: 'ONLY 3 ' + SYMNAME[v] + ' PER COLUMN!' };
+    // =/✕ 관계
+    for (var p = 0; p < pairs.length; p++) {
+      var pr = pairs[p];
+      var r2 = pr.dir === 'h' ? pr.r : pr.r + 1;
+      var c2 = pr.dir === 'h' ? pr.c + 1 : pr.c;
+      var va, vb;
+      if (pr.r === r && pr.c === c) { va = v; vb = cellV[r2][c2]; }
+      else if (r2 === r && c2 === c) { va = cellV[pr.r][pr.c]; vb = v; }
+      else continue;
+      if (va < 0 || vb < 0) continue;
+      if (pr.t === '=' && va !== vb) return { cells: [[pr.r, pr.c], [r2, c2]], why: '= MUST MATCH!' };
+      if (pr.t === 'x' && va === vb) return { cells: [[pr.r, pr.c], [r2, c2]], why: '✕ MUST DIFFER!' };
+    }
+    return null;
   }
-  function autoCellsFor(r, c) {
-    var seen = {}, out = [];
-    function add(r2, c2) {
-      if (r2 < 0 || r2 >= N || c2 < 0 || c2 >= N) return;
-      if (r2 === r && c2 === c) return;
-      var k = r2 + ',' + c2;
-      if (seen[k]) return;
-      seen[k] = 1;
-      out.push([r2, c2]);
-    }
-    for (var i = 0; i < N; i++) { add(r, i); add(i, c); }
-    for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) add(r + dr, c + dc);
-    for (var r2 = 0; r2 < N; r2++) for (var c2 = 0; c2 < N; c2++) {
-      if (region[r2][c2] === region[r][c]) add(r2, c2);
-    }
-    return out;
+
+  function rejectMove(r, c, viol) {
+    hearts--;
+    viol.cells.forEach(function (p) {
+      var el = cellEls[p[0]][p[1]];
+      el.classList.remove('bad'); void el.offsetWidth; el.classList.add('bad');
+    });
+    boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
+    flashMsg('💔 ' + viol.why);
+    sndErr();
+    buzz(80);
+    updateHud();
+    if (hearts <= 0) gameOver(false);
   }
-  function placeCat(r, c) {
-    cell[r][c] = 2;
-    catCount++;
-    var list = autoCellsFor(r, c);
-    catMarks[r + ',' + c] = list;
-    list.forEach(function (p) { autoM[p[0]][p[1]]++; updateCell(p[0], p[1]); });
+
+  function tryPlace(r, c, v) {
+    var viol = violationOf(r, c, v);
+    if (viol) {
+      if (cellV[r][c] >= 0) {
+        // 놓인 동물을 바꾸다 거절됨 → 칸을 비운다 (같은 시도가 반복돼 하트가 연속으로 빠지는 것 방지)
+        cellV[r][c] = -1;
+        filled--;
+        nextSym[r][c] = CAT;
+        updateCell(r, c);
+      } else {
+        nextSym[r][c] = v === CAT ? DOG : CAT;   // 거절돼도 순환은 이어진다
+      }
+      rejectMove(r, c, viol);
+      return;
+    }
+    var wasEmpty = cellV[r][c] < 0;
+    cellV[r][c] = v;
+    if (wasEmpty) filled++;
     updateCell(r, c);
     var el = cellEls[r][c];
     el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-  }
-  function removeCat(r, c) {
-    cell[r][c] = 0;
-    catCount--;
-    var list = catMarks[r + ',' + c] || [];
-    delete catMarks[r + ',' + c];
-    list.forEach(function (p) { autoM[p[0]][p[1]]--; updateCell(p[0], p[1]); });
-    updateCell(r, c);
+    if (v === CAT) sndCatPlace(); else sndDogPlace();
+    buzz(12);
+    updateHud();
+    if (filled === N * N) gameOver(true);
   }
 
   // ---------- 탭 ----------
   function tap(r, c) {
     if (state !== STATE_PLAY) return;
-    var cur = cell[r][c];
-    if (cur === 0) {
-      cell[r][c] = 1;
+    if (locked[r][c]) {
+      var el = cellEls[r][c];
+      el.classList.remove('wiggle'); void el.offsetWidth; el.classList.add('wiggle');
+      return;
+    }
+    var cur = cellV[r][c];
+    if (cur === CAT) {
+      tryPlace(r, c, DOG);
+    } else if (cur === DOG) {
+      cellV[r][c] = -1;
+      filled--;
+      nextSym[r][c] = CAT;
       updateCell(r, c);
-      sndTick();
-    } else if (cur === 1) {
-      var conf = conflictsWith(r, c);
-      if (conf.length) {
-        // 규칙 위반 — 하트를 잃고 표시는 걷힌다
-        hearts--;
-        cell[r][c] = 0;
-        updateCell(r, c);
-        conf.forEach(function (f) {
-          var el = cellEls[f.r][f.c];
-          el.classList.remove('bad'); void el.offsetWidth; el.classList.add('bad');
-        });
-        var me = cellEls[r][c];
-        me.classList.remove('bad'); void me.offsetWidth; me.classList.add('bad');
-        boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
-        flashMsg('💔 ' + conf[0].why);
-        sndErr();
-        buzz(80);
-        updateHud();
-        if (hearts <= 0) { gameOver(false); return; }
-      } else {
-        placeCat(r, c);
-        sndCat();
-        buzz(15);
-        updateHud();
-        if (catCount === N) { gameOver(true); return; }
-      }
-    } else if (cur === 2) {
-      removeCat(r, c);
       sndClear();
       updateHud();
+    } else {
+      tryPlace(r, c, nextSym[r][c]);
     }
   }
 
@@ -835,7 +911,8 @@
     lastTouchAt = performance.now();
     var t = e.changedTouches[0];
     var el = document.elementFromPoint(t.clientX, t.clientY);
-    if (el && el.classList && el.classList.contains('cell')) {
+    while (el && el !== boardEl && !(el.classList && el.classList.contains('cell'))) el = el.parentElement;
+    if (el && el !== boardEl && el.classList.contains('cell')) {
       tap(parseInt(el.dataset.r, 10), parseInt(el.dataset.c, 10));
     }
   }, { passive: true });
@@ -847,12 +924,21 @@
 
   // ---------- 판 시작/리셋 ----------
   function resetBoard() {
-    cell = []; autoM = []; catMarks = {};
+    cellV = []; locked = []; nextSym = [];
+    filled = 0;
     for (var r = 0; r < N; r++) {
-      cell.push([]); autoM.push([]);
-      for (var c = 0; c < N; c++) { cell[r].push(0); autoM[r].push(0); updateCell(r, c); }
+      cellV.push([]); locked.push([]); nextSym.push([]);
+      for (var c = 0; c < N; c++) {
+        var g = givens[r][c];
+        cellV[r].push(g);
+        locked[r].push(g >= 0);
+        nextSym[r].push(CAT);
+        if (g >= 0) filled++;
+        cellEls[r][c].classList.toggle('locked', g >= 0);
+        updateCell(r, c);
+      }
     }
-    hearts = 3; catCount = 0;
+    hearts = 3;
     boardEl.classList.remove('won');
     updateHud();
   }
@@ -896,7 +982,7 @@
     var sub = document.getElementById('over-sub');
     sub.className = '';
     if (won) {
-      document.getElementById('over-title').textContent = practice ? '🐱 SOLVED! (practice)' : '🎉 SOLVED!';
+      document.getElementById('over-title').textContent = practice ? '🐾 SOLVED! (practice)' : '🎉 SOLVED!';
       document.getElementById('over-score').textContent = fmtTime(lastTotal);
       if (practice) {
         sub.textContent = 'Practice run — today’s time is ' + fmtTime(loadSolved());
@@ -906,7 +992,7 @@
         else if (mine === chTime) { sub.textContent = 'Tied with ' + chName + ' at ' + fmtTime(chTime) + '!'; sub.className = 'lose'; }
         else { sub.textContent = fmtTime(mine - chTime) + ' behind ' + chName + '…'; sub.className = 'lose'; }
       } else {
-        sub.textContent = 'All 7 cats are home. Purr-fect!';
+        sub.textContent = 'Every cat and dog in its place!';
       }
       document.getElementById('share-btn').classList.remove('hidden');
       document.getElementById('retry-btn').textContent = 'Play Again';
@@ -988,15 +1074,18 @@
     window.__game = {
       get state() { return state; },
       get hearts() { return hearts; },
-      get catCount() { return catCount; },
+      get filled() { return filled; },
       get solution() { return solution; },
-      get region() { return region; },
-      get cell() { return cell; },
+      get givens() { return givens; },
+      get pairs() { return pairs; },
+      get cellV() { return cellV; },
+      get locked() { return locked; },
       get won() { return won; },
       get lastTotal() { return lastTotal; },
       get puzzleDay() { return puzzleDay; },
       get chTime() { return chTime; },
       get chName() { return chName; },
+      setHearts: function (n) { hearts = n; updateHud(); },
       tap: tap,
       startRun: startRun
     };
