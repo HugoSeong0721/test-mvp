@@ -183,8 +183,12 @@
   var flights = [];        // 날아가는 신문 {x0,y0,tx,ty,t,dur,house,waste}
   var trees = [];          // {side, y, r, tone}
   var flashes = [];        // {text, t, color}
-  var pops = [];           // 배달 성공 팝 {x, y, t, text}
+  var pops = [];           // 배달 성공/실패 팝 {x, y, t, text, gold, big}
+  var parts = [];          // 유리 파편/흙먼지 입자 {x, y, vx, vy, rot, vr, t, kind}
+  var hitstop = 0;         // 창문 깨진 순간 잠깐 슬로모
   var dogGap = 0;          // 개와의 거리(px). 0에 가까울수록 위험
+  var dogPend = 0;         // 아직 적용 안 된 벌점 — 개가 '달려와서' 좁히는 연출용
+  var dogSprint = 0;       // 개 전력질주 연출 타이머
   var dogLegT = 0, dogLunge = 0;
   var spawnDist = 0, nextGap = 260, lastSide = 1;
   var treeDist = 0;
@@ -364,6 +368,10 @@
     trees = [];
     flashes = [];
     pops = [];
+    parts = [];
+    hitstop = 0;
+    dogPend = 0;
+    dogSprint = 0;
     dogGap = gapMax() * 0.82;
     dogLegT = 0;
     dogLunge = 0;
@@ -408,6 +416,17 @@
   function mailboxPos(h) {
     var x = h.side < 0 ? roadL() - SIDEWALK - 10 : roadR() + SIDEWALK + 10;
     return { x: x, y: h.y + HOUSE_H - 4 };
+  }
+  function houseCx(h) {
+    return h.side < 0
+      ? (roadL() - SIDEWALK) / 2
+      : roadR() + SIDEWALK + (W - roadR() - SIDEWALK) / 2;
+  }
+  // 창문 위치 — 빗나간 신문이 실제로 여길 때려야 뭘 깼는지 보인다
+  function windowPos(h) {
+    var x = houseCx(h) - h.w / 2;
+    var winX = h.side < 0 ? x + 10 : x + h.w - 26;
+    return { x: winX + 8, y: h.y + 26 + 19 };
   }
 
   // ---------- 조작: 좌/우 탭 = 그쪽으로 수평 투척 (타이밍 게임) ----------
@@ -462,17 +481,16 @@
     }
     var wall = wallOnLine(side);
     if (wall) {
-      // 창문 깨먹음 — 집주인이 개를 부추긴다
-      dogGap = Math.max(0, dogGap - 45);
+      // 창문 깨먹음 — 집주인이 개를 부추긴다 (벌점은 개가 달려와서 좁히는 걸로 보여 준다)
+      dogPend += 45;
       if (!wall.delivered && !wall.missed) { wall.missed = true; wall.cancelT = 1.4; }
       streak = 0;
-      shake = 6;
-      var wx = side < 0 ? roadL() - SIDEWALK - 34 : roadR() + SIDEWALK + 34;
-      flights.push({ x0: px, y0: py, tx: wx, ty: py, t: 0, dur: 0.12, smash: wall });
+      var wp = windowPos(wall);
+      flights.push({ x0: px, y0: py, tx: wp.x, ty: wp.y, t: 0, dur: 0.12, smash: wall });
       return;
     }
     // 허공 — 신문이 잔디밭에 처박힌다 (낭비. 개도 살짝 가까워짐)
-    dogGap = Math.max(0, dogGap - 12);
+    dogPend += 12;
     var lx = side < 0 ? roadL() - SIDEWALK - 30 : roadR() + SIDEWALK + 30;
     flights.push({ x0: px, y0: py, tx: lx, ty: py, t: 0, dur: 0.14, waste: true });
   }
@@ -571,7 +589,20 @@
 
   // ---------- 업데이트 ----------
   function update(dt) {
+    // 창문 깨진 직후 잠깐 슬로모 — 뭘 깼는지 눈에 들어오게
+    if (hitstop > 0) { hitstop -= dt; dt *= 0.15; }
     if (shake > 0) shake = Math.max(0, shake - dt * 26);
+    if (dogSprint > 0) dogSprint -= dt;
+    // 입자 (유리 파편)
+    for (var pa = parts.length - 1; pa >= 0; pa--) {
+      var q = parts[pa];
+      q.t -= dt;
+      q.vy += 620 * dt;
+      q.x += q.vx * dt;
+      q.y += q.vy * dt;
+      q.rot += q.vr * dt;
+      if (q.t <= 0) parts.splice(pa, 1);
+    }
     if (bikeSway !== 0) bikeSway *= Math.max(0, 1 - dt * 9);
     for (var i = flashes.length - 1; i >= 0; i--) {
       flashes[i].t -= dt;
@@ -591,17 +622,25 @@
       fl.t += dt;
       // 목표(우편함/집)는 화면과 같이 흘러내리므로 좌표를 따라간다
       if (fl.house) { var fm = mailboxPos(fl.house); fl.tx = fm.x; fl.ty = fm.y; }
-      if (fl.smash) fl.ty = fl.smash.y + HOUSE_H * 0.5;
+      if (fl.smash) { var fw = windowPos(fl.smash); fl.tx = fw.x; fl.ty = fw.y; }
       if (fl.t >= fl.dur) {
         if (fl.house) {
           fl.house.flagT = 0.8;
           var m = mailboxPos(fl.house);
           pops.push({ x: m.x, y: m.y - 16, t: 0.8, text: fl.perfect ? 'PERFECT!' : '+1', gold: fl.perfect });
         } else if (fl.smash) {
-          fl.smash.smashT = 1.2;
+          // 쨍그랑 — 잠깐 슬로모 걸고, 유리가 사방으로 튀고, CRASH가 크게 뜬다
+          fl.smash.smashT = 1.4;
           fl.smash.broken = true;
-          pops.push({ x: fl.tx, y: fl.ty - 10, t: 0.9, text: '💥', gold: false });
-          flashes.push({ text: 'WINDOW! 💥🐕', t: 0.9, color: '#d1342a' });
+          hitstop = 0.22;
+          shake = 11;
+          for (var g = 0; g < 12; g++) {
+            var ga = Math.random() * Math.PI * 2, gs = 90 + Math.random() * 190;
+            parts.push({ x: fl.tx, y: fl.ty, vx: Math.cos(ga) * gs, vy: Math.sin(ga) * gs - 60,
+                         rot: Math.random() * 6, vr: (Math.random() - 0.5) * 14, t: 0.9, kind: 'glass' });
+          }
+          pops.push({ x: Math.max(74, Math.min(W - 74, fl.tx)), y: fl.ty - 26, t: 1.3, text: 'CRASH!', big: true });
+          flashes.push({ text: '💥 You smashed a window!', t: 1.3, color: '#d1342a' });
         }
         flights.splice(f, 1);
       }
@@ -651,7 +690,7 @@
         streak = 0;
         // 첫 배달에 성공하기 전까지는 배우는 시간 — 놓쳐도 개가 점프하지 않는다
         // (개의 기본 추격만으로도 방치하면 10초쯤에 잡힌다)
-        if (papers > 0) dogGap = Math.max(0, dogGap - 95);
+        if (papers > 0) dogPend += 95;
         flashes.push({ text: 'MISSED! 🐕💨', t: 0.9, color: '#d1342a' });
         shake = 5;
       }
@@ -660,6 +699,14 @@
     for (var tI = trees.length - 1; tI >= 0; tI--) {
       trees[tI].y += dy;
       if (trees[tI].y > H + 60) trees.splice(tI, 1);
+    }
+
+    // 벌점은 즉시가 아니라 개가 전력질주로 달려와서 좁힌다 — 원인과 결과가 눈에 보이게
+    if (dogPend > 0) {
+      var sprintStep = Math.min(dogPend, 300 * dt);
+      dogPend -= sprintStep;
+      dogGap = Math.max(0, dogGap - sprintStep);
+      dogSprint = 0.5;
     }
 
     // 개가 좁혀 온다
@@ -793,12 +840,44 @@
       ctx.stroke();
     }
     if (h.smashT > 0) {
+      // 성난 집주인이 문에서 튀어나온다
+      var pop2 = Math.min(1, (1.4 - h.smashT) / 0.15);   // 스케일 인
+      var ha = Math.min(1, h.smashT / 0.4);
+      var hx = doorX + doorW / 2;
+      var hy = bodyY + HOUSE_H - 26 - doorH + 6 - pop2 * 6;
       ctx.save();
-      ctx.globalAlpha = Math.min(1, h.smashT / 0.5);
+      ctx.globalAlpha = ha;
+      // 머리
+      ctx.fillStyle = '#e8b88a';
+      ctx.beginPath(); ctx.arc(hx, hy, 7 * pop2, 0, Math.PI * 2); ctx.fill();
+      // 성난 눈썹
+      ctx.strokeStyle = '#5a2c18';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(hx - 4, hy - 3); ctx.lineTo(hx - 1, hy - 1);
+      ctx.moveTo(hx + 4, hy - 3); ctx.lineTo(hx + 1, hy - 1);
+      ctx.stroke();
+      // 흔드는 주먹
+      ctx.fillStyle = '#e8b88a';
+      var fistY = hy - 10 - Math.abs(Math.sin(performance.now() / 90)) * 4;
+      ctx.beginPath(); ctx.arc(hx + 9, fistY, 3.5 * pop2, 0, Math.PI * 2); ctx.fill();
+      // 말풍선 "HEY!!"
+      var bx = hx + (h.side < 0 ? 30 : -30), by = hy - 22;
+      ctx.fillStyle = '#fff';
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = 1.5;
+      roundRect(bx - 26, by - 12, 52, 22, 8);
+      ctx.fill(); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(bx + (h.side < 0 ? -18 : 18), by + 10);
+      ctx.lineTo(hx + (h.side < 0 ? 4 : -4), hy - 8);
+      ctx.lineTo(bx + (h.side < 0 ? -8 : 8), by + 10);
+      ctx.closePath();
+      ctx.fill();
       ctx.fillStyle = '#d1342a';
-      ctx.font = 'bold 15px -apple-system, sans-serif';
+      ctx.font = 'bold 13px -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('HEY!!', winX + 8, bodyY + 6);
+      ctx.fillText('HEY!!', bx, by + 4);
       ctx.restore();
     }
 
@@ -864,12 +943,19 @@
       ctx.restore();
     }
     if (h.missed && h.cancelT > 0) {
+      var ca = Math.min(1, h.cancelT / 0.4);
+      var cs = 1 + Math.max(0, h.cancelT - 1.1) * 3;   // 처음에 크게 쾅
       ctx.save();
-      ctx.globalAlpha = Math.min(1, h.cancelT / 0.4);
+      ctx.globalAlpha = ca;
+      ctx.strokeStyle = '#d1342a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(m.x, m.y - 11, 18 * cs, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.fillStyle = '#d1342a';
-      ctx.font = 'bold 20px -apple-system, sans-serif';
+      ctx.font = 'bold ' + Math.round(28 * cs) + 'px -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('✗', m.x, m.y - 24);
+      ctx.fillText('✗', m.x, m.y - 26);
       ctx.restore();
     }
   }
@@ -929,6 +1015,36 @@
     }
     var run = Math.sin(dogLegT * 2.4);
     var x = W / 2 + Math.sin(dogLegT * 0.7) * 10;
+
+    // 벌점으로 달려오는 중 — 흙먼지 + 스피드선 + !! 로 전력질주를 보여 준다
+    if (state === STATE_PLAY && dogSprint > 0) {
+      var sa = Math.min(1, dogSprint / 0.25);
+      ctx.save();
+      ctx.globalAlpha = sa * 0.7;
+      ctx.fillStyle = '#c9bfa8';
+      for (var du = 0; du < 4; du++) {
+        var dux = x + Math.sin(dogLegT * 3 + du * 2.1) * 14;
+        var duy = gy + 30 + du * 13 + Math.sin(dogLegT * 5 + du) * 4;
+        ctx.beginPath();
+        ctx.arc(dux, duy, 7 - du, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 2.5;
+      for (var sl = -1; sl <= 1; sl += 2) {
+        ctx.beginPath();
+        ctx.moveTo(x + sl * 20, gy + 18);
+        ctx.lineTo(x + sl * 24, gy + 44);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = sa;
+      ctx.fillStyle = '#d1342a';
+      ctx.font = 'bold 24px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('!!', x + 20, gy - 34);
+      ctx.restore();
+    }
+
     ctx.save();
     ctx.translate(x, gy);
     // 그림자
@@ -1026,14 +1142,38 @@
     drawDog();
     drawFlights();
 
+    // 유리 파편
+    for (var pg = 0; pg < parts.length; pg++) {
+      var gq = parts[pg];
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, gq.t / 0.3);
+      ctx.translate(gq.x, gq.y);
+      ctx.rotate(gq.rot);
+      ctx.fillStyle = '#cfe8ff';
+      ctx.strokeStyle = 'rgba(90,120,160,0.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, -4); ctx.lineTo(3.5, 3); ctx.lineTo(-3.5, 3);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+
     // 배달 성공 팝
     for (var p = 0; p < pops.length; p++) {
       var pp = pops[p];
       ctx.save();
       ctx.globalAlpha = Math.min(1, pp.t / 0.3);
-      ctx.fillStyle = pp.gold ? '#e8960c' : '#1d6ed8';
-      ctx.font = 'bold ' + (pp.gold ? 22 : 20) + 'px -apple-system, sans-serif';
+      var psize = pp.big ? 32 : (pp.gold ? 22 : 20);
+      if (pp.big) psize = Math.round(psize * (1 + Math.max(0, pp.t - 1.0) * 2.5));  // 처음에 쾅 커졌다 안착
+      ctx.fillStyle = pp.big ? '#d1342a' : (pp.gold ? '#e8960c' : '#1d6ed8');
+      ctx.font = 'bold ' + psize + 'px -apple-system, sans-serif';
       ctx.textAlign = 'center';
+      if (pp.big) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 5;
+        ctx.strokeText(pp.text, pp.x, pp.y);
+      }
       ctx.fillText(pp.text, pp.x, pp.y);
       ctx.restore();
     }
