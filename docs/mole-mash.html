@@ -184,10 +184,18 @@
   var floats = [];       // {x, y, text, color, t, size}
   var mallets = [];      // {x, y, t} 탭 지점의 망치 스윙 연출
   var puffs = [];        // {x, y, t, color} 흙먼지 / 스컹크 구름
+  var particles = [];    // 타격 파편 {x, y, vx, vy, r, color, t, life}
   var shake = 0;
   var overAt = 0;
   var lastScore = 0;
   var heartFlash = 0;    // 목숨 잃었을 때 하트 깜빡임
+  var hitStop = 0;       // 명중 순간 잠깐 멈추는 히트스톱(타격감)
+  var flashA = 0;        // 황금 두더지 화면 플래시
+  var timeLeft = 0;      // 남은 시간(초) — 0이 되면 종료
+  var lastTick = -1;     // 마지막 5초 카운트다운 삑 소리용
+  var overReason = 'time';
+
+  var TIME_LIMIT = 45;   // 한 판 제한시간(초)
 
   var best = 0;
   try { best = parseInt(localStorage.getItem('moleMashBest') || '0', 10) || 0; } catch (e) {}
@@ -224,7 +232,25 @@
       o.start(); o.stop(ac.currentTime + dur);
     } catch (e) {}
   }
-  function sndBonk()  { beep(220, 0.1, 'square', 0.15, -140); beep(90, 0.14, 'triangle', 0.2, -40); }
+  function thwack(vol) {
+    // 짧은 노이즈 버스트 — '퍽' 하는 질감 담당
+    var ac = audio();
+    if (!ac) return;
+    try {
+      var len = Math.floor(ac.sampleRate * 0.08);
+      var buf = ac.createBuffer(1, len, ac.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      var src = ac.createBufferSource(); src.buffer = buf;
+      var f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900;
+      var g = ac.createGain(); g.gain.value = vol || 0.25;
+      src.connect(f); f.connect(g); g.connect(ac.destination);
+      src.start();
+    } catch (e) {}
+  }
+  function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+  function sndBonk()  { thwack(0.3); beep(75, 0.13, 'sine', 0.28, -25); beep(190, 0.07, 'square', 0.1, -100); }
+  function sndTick()  { beep(1050, 0.05, 'square', 0.09); }
   function sndGold()  { beep(660, 0.09, 'square', 0.1); setTimeout(function(){ beep(880, 0.09, 'square', 0.1); }, 70); setTimeout(function(){ beep(1100, 0.14, 'square', 0.1); }, 140); }
   function sndMiss()  { beep(300, 0.25, 'sawtooth', 0.1, -220); }
   function sndSkunk() { beep(140, 0.35, 'sawtooth', 0.14, -90); }
@@ -389,10 +415,31 @@
     floats = [];
     mallets = [];
     puffs = [];
+    particles = [];
     shake = 0;
     heartFlash = 0;
+    hitStop = 0;
+    flashA = 0;
+    timeLeft = TIME_LIMIT;
+    lastTick = -1;
     isNewBest = false;
     chBeaten = false;
+  }
+
+  // 타격 파편 — 명중 지점에서 사방으로 튄다
+  function spawnBurst(x, y, colors, n, speed) {
+    for (var i = 0; i < n; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var v = speed * (0.4 + Math.random() * 0.8);
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(a) * v,
+        vy: Math.sin(a) * v - speed * 0.5,
+        r: 2.5 + Math.random() * 3.5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        t: 0, life: 0.45 + Math.random() * 0.25
+      });
+    }
   }
 
   // ---------- 등장 ----------
@@ -449,20 +496,29 @@
         mo.phase = 'whacked'; mo.t = 0;
         loseLife('P.U.!', hx, hy - moleH * 0.6, '#3aa02c');
         puffs.push({ x: hx, y: hy - moleH * 0.5, t: 0, color: 'rgba(120,190,60,0.85)' });
+        spawnBurst(hx, hy - moleH * 0.5, ['#7fbf3c', '#a8d95e', '#4c7a22'], 10, 200);
+        buzz(60);
         sndSkunk();
       } else if (mo.kind === 'gold') {
         mo.phase = 'whacked'; mo.t = 0;
         score += 3;
         if (lives < 3) { lives++; floats.push({ x: hx, y: hy - moleH - 26, text: '+❤️', color: '#ff5f6e', t: 0, size: 20 }); }
-        floats.push({ x: hx, y: hy - moleH, text: '+3', color: '#e8a800', t: 0, size: 26 });
-        shake = 4;
+        floats.push({ x: hx, y: hy - moleH, text: '+3', color: '#e8a800', t: 0, size: 30 });
+        spawnBurst(hx, hy - moleH * 0.5, ['#ffd94d', '#ffef9e', '#f4b820', '#fff'], 16, 260);
+        hitStop = 0.09;
+        flashA = 0.28;
+        shake = 9;
+        buzz(35);
         sndGold();
         checkChallenge();
       } else {
         mo.phase = 'whacked'; mo.t = 0;
         score += 1;
-        floats.push({ x: hx, y: hy - moleH, text: 'BONK!', color: '#d1342a', t: 0, size: 22 });
-        shake = 3;
+        floats.push({ x: hx, y: hy - moleH, text: 'BONK!', color: '#d1342a', t: 0, size: 24 });
+        spawnBurst(hx, hy - moleH * 0.5, ['#8a5a34', '#a97544', '#5b3a1e', '#ffd94d'], 12, 220);
+        hitStop = 0.055;
+        shake = 6;
+        buzz(20);
         sndBonk();
         checkChallenge();
       }
@@ -485,7 +541,7 @@
     heartFlash = 1;
     shake = 6;
     floats.push({ x: x, y: y, text: text, color: color, t: 0, size: 24 });
-    if (lives <= 0) gameOver();
+    if (lives <= 0) gameOver('hearts');
   }
 
   function tryStart() {
@@ -539,8 +595,9 @@
   });
 
   // ---------- 게임오버 ----------
-  function gameOver() {
+  function gameOver(reason) {
     state = STATE_OVER;
+    overReason = reason || 'hearts';
     overAt = performance.now();
     shake = 10;
     lastScore = score;
@@ -555,7 +612,8 @@
   }
 
   function showOverPanel() {
-    document.getElementById('over-title').textContent = '🔨 GAME OVER';
+    document.getElementById('over-title').textContent =
+      overReason === 'time' ? '⏰ TIME\'S UP!' : '💔 OUT OF HEARTS!';
     document.getElementById('over-score').textContent = lastScore + ' moles';
     var sub = document.getElementById('over-sub');
     sub.className = '';
@@ -587,6 +645,7 @@
   function update(dt) {
     if (shake > 0) shake = Math.max(0, shake - dt * 26);
     if (heartFlash > 0) heartFlash = Math.max(0, heartFlash - dt * 2.5);
+    if (flashA > 0) flashA = Math.max(0, flashA - dt * 1.6);
     for (var i = floats.length - 1; i >= 0; i--) {
       floats[i].t += dt;
       if (floats[i].t > 1.1) floats.splice(i, 1);
@@ -599,10 +658,30 @@
       puffs[k].t += dt;
       if (puffs[k].t > 0.5) puffs.splice(k, 1);
     }
+    for (var q = particles.length - 1; q >= 0; q--) {
+      var pa = particles[q];
+      pa.t += dt;
+      pa.vy += 900 * dt;
+      pa.x += pa.vx * dt;
+      pa.y += pa.vy * dt;
+      if (pa.t > pa.life) particles.splice(q, 1);
+    }
 
     if (state !== STATE_PLAY) return;
+    // 히트스톱: 명중 순간 게임만 잠깐 멈춘다 (연출은 위에서 계속 돈다)
+    if (hitStop > 0) { hitStop -= dt; return; }
     playT += dt;
     if (introT > 0) introT -= dt;
+
+    // 제한시간 카운트다운 — 마지막 5초는 삑 소리
+    timeLeft -= dt;
+    var sec = Math.ceil(timeLeft);
+    if (sec <= 5 && sec >= 1 && sec !== lastTick) { lastTick = sec; sndTick(); }
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      gameOver('time');
+      return;
+    }
 
     // 두더지 상태기계: 쑥 올라온 뒤 stayT 동안 눈에 보이게 가라앉는다 — 타이밍 창이 화면에 그대로 보인다
     for (var m = moles.length - 1; m >= 0; m--) {
@@ -887,6 +966,29 @@
     ctx.fillStyle = 'rgba(61,40,18,0.65)';
     ctx.fillText('BEST ' + best, W / 2, H * 0.135 + 20);
 
+    // 제한시간 바 — 줄어드는 것이 항상 눈에 보이게
+    var low = timeLeft <= 8, crit = timeLeft <= 5;
+    var bw = Math.min(W * 0.56, 230), bh = 14;
+    var bx = W / 2 - bw / 2, by = H * 0.135 + 30;
+    var pulse = crit ? 1 + 0.06 * Math.sin(performance.now() / 80) : 1;
+    ctx.save();
+    ctx.translate(W / 2, by + bh / 2);
+    ctx.scale(pulse, pulse);
+    ctx.translate(-W / 2, -(by + bh / 2));
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    roundRect(bx - 2, by - 2, bw + 4, bh + 4, 8);
+    ctx.fill();
+    var frac = Math.max(0, timeLeft / TIME_LIMIT);
+    ctx.fillStyle = crit ? '#e4342c' : (low ? '#f08c1e' : '#3f9e3f');
+    if (frac > 0) {
+      roundRect(bx, by, Math.max(bh, bw * frac), bh, 7);
+      ctx.fill();
+    }
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 11px -apple-system, sans-serif';
+    ctx.fillText('⏱ ' + Math.ceil(timeLeft) + 's', W / 2, by + bh - 3);
+    ctx.restore();
+
     // 목숨 하트
     var hx = W / 2 - 44;
     for (var i = 0; i < 3; i++) {
@@ -895,7 +997,7 @@
       if (heartFlash > 0 && i === lives) ctx.globalAlpha = 0.4 + 0.6 * Math.abs(Math.sin(performance.now() / 90));
       ctx.font = '22px -apple-system, sans-serif';
       ctx.globalAlpha *= on ? 1 : 0.25;
-      ctx.fillText(on ? '❤️' : '🖤', hx + i * 34, H * 0.135 + 48);
+      ctx.fillText(on ? '❤️' : '🖤', hx + i * 34, H * 0.135 + 74);
       ctx.restore();
     }
 
@@ -903,7 +1005,7 @@
     if (chScore > 0 && !chBeaten) {
       ctx.fillStyle = 'rgba(47,111,214,0.95)';
       ctx.font = 'bold 14px -apple-system, sans-serif';
-      ctx.fillText('⚔️ Beat ' + chName + ': ' + chScore, W / 2, H * 0.135 + 76);
+      ctx.fillText('⚔️ Beat ' + chName + ': ' + chScore, W / 2, H * 0.135 + 100);
     }
   }
 
@@ -951,18 +1053,38 @@
     for (var j = 0; j < holes.length; j++) drawHoleFront(holes[j]);
 
     for (var p = 0; p < puffs.length; p++) drawPuff(puffs[p]);
+
+    // 타격 파편
+    for (var pt = 0; pt < particles.length; pt++) {
+      var pa = particles[pt];
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - pa.t / pa.life);
+      ctx.fillStyle = pa.color;
+      ctx.beginPath();
+      ctx.arc(pa.x, pa.y, pa.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     for (var mk = 0; mk < mallets.length; mk++) drawMallet(mallets[mk]);
 
-    // 떠오르는 텍스트
+    // 떠오르는 텍스트 — 처음에 크게 튀었다가 가라앉는 팝
     for (var f = 0; f < floats.length; f++) {
       var fl = floats[f];
+      var pop = 1 + 0.55 * Math.max(0, 1 - fl.t / 0.18);
       ctx.save();
       ctx.globalAlpha = Math.min(1, (1.1 - fl.t) / 0.4);
       ctx.fillStyle = fl.color;
-      ctx.font = 'bold ' + fl.size + 'px -apple-system, sans-serif';
+      ctx.font = 'bold ' + Math.round(fl.size * pop) + 'px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(fl.text, fl.x, fl.y - fl.t * 46);
       ctx.restore();
+    }
+
+    // 황금 두더지 화면 플래시
+    if (flashA > 0) {
+      ctx.fillStyle = 'rgba(255,244,200,' + flashA.toFixed(3) + ')';
+      ctx.fillRect(-20, -20, W + 40, H + 40);
     }
 
     if (state === STATE_PLAY) {
@@ -983,7 +1105,7 @@
       drawSign();
       // 설명 카드 — 구멍 위에 글씨가 겹치지 않게 판을 깔아 준다
       var iy = H * 0.16 + 152;
-      var cardH = 122 + (best > 0 ? 28 : 0) + (chScore > 0 ? 30 : 0);
+      var cardH = 148 + (best > 0 ? 28 : 0) + (chScore > 0 ? 30 : 0);
       var cardW = Math.min(W * 0.88, 330);
       ctx.fillStyle = 'rgba(255,246,234,0.94)';
       roundRect(W / 2 - cardW / 2, iy - 26, cardW, cardH, 14);
@@ -1001,15 +1123,17 @@
       ctx.fillText('🦨 DON\'T tap the skunk!', W / 2, iy + 52);
       ctx.fillStyle = '#b8860b';
       ctx.fillText('✦ Gold mole = +3 & a heart back', W / 2, iy + 78);
+      ctx.fillStyle = '#c0392b';
+      ctx.fillText('⏱ ' + TIME_LIMIT + ' seconds on the clock!', W / 2, iy + 104);
       if (best > 0) {
         ctx.fillStyle = 'rgba(61,40,18,0.75)';
         ctx.font = '15px -apple-system, sans-serif';
-        ctx.fillText('Best: ' + best + ' moles', W / 2, iy + 106);
+        ctx.fillText('Best: ' + best + ' moles', W / 2, iy + 132);
       }
       if (chScore > 0) {
         ctx.fillStyle = '#2f6fd6';
         ctx.font = 'bold 16px -apple-system, sans-serif';
-        ctx.fillText('⚔️ ' + chName + ' challenges you: beat ' + chScore + '!', W / 2, iy + (best > 0 ? 134 : 106));
+        ctx.fillText('⚔️ ' + chName + ' challenges you: beat ' + chScore + '!', W / 2, iy + (best > 0 ? 160 : 132));
       }
       var a = 0.55 + 0.45 * Math.sin(performance.now() / 350);
       ctx.save();
@@ -1056,6 +1180,8 @@
       get state() { return state; },
       get score() { return score; },
       get lives() { return lives; },
+      get timeLeft() { return timeLeft; },
+      set timeLeft(v) { timeLeft = v; },
       get moles() { return moles; },
       get chScore() { return chScore; },
       get chName() { return chName; },
