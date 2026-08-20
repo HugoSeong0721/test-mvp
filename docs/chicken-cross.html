@@ -682,10 +682,13 @@
       }
       if (wingT > 0) wingT -= dt;
 
-      // 콤바인 전진 + 고무줄 (너무 뒤처지면 끌어온다 → 항상 화면 안)
+      // 콤바인 전진 + 고무줄 (너무 뒤처지면 서서히 따라붙는다 → 항상 화면 안)
+      // 스냅으로 끌어오면 닭이 한 칸 오를 때 콤바인도 그 프레임에 확 튀어서
+      // 순간이동처럼 보인다 — 초과분을 속도에 얹어 부드럽게 좁힌다
       if (introT <= 0) {
         combineRow += combineSpeed() * dt;
-        if (cr - combineRow > COMBINE_MAX_LAG) combineRow = cr - COMBINE_MAX_LAG;
+        var lag = cr - combineRow;
+        if (lag > COMBINE_MAX_LAG) combineRow += (lag - COMBINE_MAX_LAG) * Math.min(1, dt * 3);
       }
 
       var vr = visRow();
