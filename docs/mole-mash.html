@@ -201,10 +201,12 @@
   try { best = parseInt(localStorage.getItem('moleMashBest') || '0', 10) || 0; } catch (e) {}
   var isNewBest = false;
 
-  // ---------- 난이도: 점수가 오를수록 창이 좁아지고 마릿수가 는다 ----------
-  function stayTime()  { return Math.max(0.62, 1.55 - score * 0.022); }   // 올라와 있는 시간(초) — 이 동안 눈에 보이게 가라앉는다
-  function spawnGap()  { return Math.max(0.4, 1.0 - score * 0.013); }     // 다음 등장까지 간격
-  function maxActive() { return score < 10 ? 1 : (score < 24 ? 2 : 3); }  // 동시 등장 수
+  // ---------- 난이도: 시간이 흐르기만 해도, 잘 잡아도 계속 조여든다 ----------
+  // heat 0 → 1: 경과 시간(잡든 못 잡든 오른다) + 점수(잘 잡는 사람은 더 빨리 오른다)
+  function heat()      { return Math.min(1, (playT / TIME_LIMIT) * 0.62 + (score / 40) * 0.55); }
+  function stayTime()  { return 1.5 - 1.02 * heat(); }                    // 올라와 있는 시간: 1.5초 → 0.48초
+  function spawnGap()  { return 0.95 - 0.62 * heat(); }                   // 다음 등장까지 간격: 0.95초 → 0.33초
+  function maxActive() { var h = heat(); return h < 0.24 ? 1 : (h < 0.58 ? 2 : 3); }  // 동시 등장 수
 
   // ---------- 사운드 (WebAudio — 첫 터치에서 초기화) ----------
   var AC = null;
@@ -1182,6 +1184,9 @@
       get lives() { return lives; },
       get timeLeft() { return timeLeft; },
       set timeLeft(v) { timeLeft = v; },
+      get heat() { return heat(); },
+      get stayTime() { return stayTime(); },
+      get maxActive() { return maxActive(); },
       get moles() { return moles; },
       get chScore() { return chScore; },
       get chName() { return chName; },
