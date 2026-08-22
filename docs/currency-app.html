@@ -124,6 +124,10 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   padding:6px 10px;border-radius:999px;
 }
 .stamp .dot{width:6px;height:6px;border-radius:50%;background:var(--pos)}
+.stamp.loading .dot{background:var(--accent);animation:pulse 1.1s ease-in-out infinite}
+.stamp.cache .dot{background:var(--accent)}
+.stamp.offline .dot{background:var(--muted)}
+@keyframes pulse{50%{opacity:.25}}
 
 /* ---- 뷰 공통 ---- */
 .views{flex:1;min-height:0;position:relative}
@@ -380,7 +384,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   <header class="hd">
     <div class="brand">환율<small>Currency</small></div>
     <button class="stamp num" id="stamp" title="환율 기준 시각">
-      <span class="dot"></span>08.07 22:00 KST 기준
+      <span class="dot"></span><span id="stamp-txt">환율 불러오는 중…</span>
     </button>
   </header>
 
@@ -496,8 +500,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 
 <script>
 'use strict';
-/* ================= 데이터 (예시 스냅샷: 2026-08-07 22:00 KST) =================
-   r = 1 USD당 해당 통화 수량, d = 전일 대비 USD→통화 환율 변동(%) */
+/* ================= 통화 목록 & 오프라인 기준 스냅샷 =================
+   r = 1 USD당 해당 통화 수량, d = 전일 대비 USD→통화 환율 변동(%)
+   여기 적힌 숫자는 인터넷이 없을 때 쓰는 마지막 수단이다. 앱이 열리면 아래
+   loadRates() 가 무료 환율 API에서 최신 환율을 받아 이 값들을 덮어쓴다.
+   (스냅샷 기준: 2026-08-07) */
 const CURRENCIES = [
   {c:'USD', n:'미국 달러',        f:'🇺🇸', r:1,        d:0,     g:'fiat'},
   {c:'KRW', n:'대한민국 원',      f:'🇰🇷', r:1385.20,  d:+0.32, g:'fiat'},
@@ -859,7 +866,91 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{
   $('view-' + t.dataset.view).classList.add('on');
   if(t.dataset.view === 'chart') renderChart();
 }));
-$('stamp').addEventListener('click', ()=>toast('예시 환율 데이터입니다 (실서비스는 API 연동)'));
+/* ================= 실시간 환율 =================
+   위 CURRENCIES 값은 오프라인용 기준 스냅샷이고, 앱이 열릴 때 무료 환율 API에서
+   최신 환율을 받아 덮어쓴다. 어제 값도 같이 받아 전일 대비 ▲▼ 를 실제로 계산한다.
+   못 받아오면 마지막으로 받은 값(캐시) → 내장 스냅샷 순으로 물러난다. */
+const SNAPSHOT_DATE = '2026-08-07';
+const RATE_CACHE_KEY = 'fx-rates-v1';
+const RATE_SOURCES = [
+  d => `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${d}/v1/currencies/usd.min.json`,
+  d => `https://${d}.currency-api.pages.dev/v1/currencies/usd.min.json`,
+];
+
+function setStamp(dateStr, kind){
+  const el = $('stamp');
+  el.classList.remove('loading','cache','offline');
+  if(kind !== 'live') el.classList.add(kind);
+  const label = {live:'실시간', cache:'최근 저장', offline:'오프라인 기준값', loading:''}[kind];
+  const md = (dateStr || '').slice(5).replace('-', '.');
+  $('stamp-txt').textContent = kind === 'loading' ? '환율 불러오는 중…' : `${md} · ${label}`;
+}
+function applyRates(rates, prev){
+  let n = 0;
+  for(const c of CURRENCIES){
+    const v = rates[c.c.toLowerCase()];
+    if(typeof v !== 'number' || !(v > 0)) continue;   // 없는 통화는 스냅샷 값 유지
+    c.r = v; n++;
+    const p = prev && prev[c.c.toLowerCase()];
+    c.d = (typeof p === 'number' && p > 0) ? (v / p - 1) * 100 : 0;
+  }
+  return n;
+}
+function redraw(){ renderConvert(); renderChart(); }
+
+async function fetchDay(day){
+  for(const url of RATE_SOURCES){
+    const ac = new AbortController();
+    const timer = setTimeout(()=>ac.abort(), 7000);
+    try{
+      const res = await fetch(url(day), {signal:ac.signal, cache:'no-store'});
+      if(!res.ok) continue;
+      const json = await res.json();
+      if(json && json.usd) return {date: json.date || day, rates: json.usd};
+    }catch(e){ /* 다음 소스로 */ }
+    finally{ clearTimeout(timer); }
+  }
+  throw new Error('rate source unavailable');
+}
+function prevDay(dateStr){
+  const t = new Date(dateStr + 'T00:00:00Z');
+  t.setUTCDate(t.getUTCDate() - 1);
+  return t.toISOString().slice(0,10);
+}
+
+let rateState = 'offline';
+async function loadRates(){
+  /* 1) 지난번에 받아둔 값이 있으면 먼저 그려서 빈 화면을 안 보여준다 */
+  let cache = null;
+  try{ cache = JSON.parse(localStorage.getItem(RATE_CACHE_KEY) || 'null'); }catch(e){}
+  if(cache && cache.rates){
+    applyRates(cache.rates, cache.prev);
+    rateState = 'cache'; setStamp(cache.date, 'cache'); redraw();
+  }else{
+    setStamp(SNAPSHOT_DATE, 'loading');
+  }
+  /* 2) 최신 환율 + 어제 환율 */
+  try{
+    const today = await fetchDay('latest');
+    let prev = null;
+    try{ prev = (await fetchDay(prevDay(today.date))).rates; }catch(e){}
+    applyRates(today.rates, prev);
+    rateState = 'live'; setStamp(today.date, 'live'); redraw();
+    try{
+      localStorage.setItem(RATE_CACHE_KEY,
+        JSON.stringify({date: today.date, rates: today.rates, prev}));
+    }catch(e){}
+  }catch(e){
+    if(rateState !== 'cache'){ rateState = 'offline'; setStamp(SNAPSHOT_DATE, 'offline'); redraw(); }
+  }
+}
+
+$('stamp').addEventListener('click', ()=>{
+  toast(rateState === 'live'  ? '방금 받아온 실시간 환율이에요'
+      : rateState === 'cache' ? '마지막으로 받아둔 환율 — 인터넷 연결 후 자동 갱신'
+      :                         '오프라인 기준값 — 인터넷에 연결되면 자동으로 최신 환율로 바뀝니다');
+});
+loadRates();
 
 renderConvert(); renderChart();
 </script>
