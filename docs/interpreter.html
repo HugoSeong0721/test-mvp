@@ -7,7 +7,7 @@
 <style>
   :root{
     --bg:#0e1117; --panel:#151a23; --line:#2a3242;
-    --me:#2dd4bf; --you:#fbbf24; --text:#e8edf5; --dim:#8b95a7; --bad:#f87171;
+    --me:#2dd4bf; --you:#fbbf24; --text:#e8edf5; --dim:#8b95a7; --sec:#b7c2d4; --bad:#f87171;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
@@ -40,8 +40,11 @@
   .msg.old1{font-size:15px; color:var(--dim); opacity:.75;}
   .msg.old2{font-size:13px; color:var(--dim); opacity:.45;}
   .msg.big{font-weight:800;}
-  .msg .orig{display:block; font-size:12px; font-weight:400; color:var(--dim); margin-top:4px;}
+  .msg .second{display:block; font-size:58%; font-weight:600; color:var(--sec); margin-top:7px;}
+  .msg .orig{display:block; font-size:12px; font-weight:400; color:var(--dim); margin-top:5px;}
   .msg .warn{color:var(--bad);}
+  .msg.livemsg{animation:livepulse 1.4s ease-in-out infinite;}
+  @keyframes livepulse{0%,100%{opacity:1;} 50%{opacity:.55;}}
   .mine{font-size:12px; color:var(--dim); text-align:right; font-weight:400;}
   .placeholder{color:var(--dim); font-size:14px; text-align:center; margin:auto 0; opacity:.8;}
 
@@ -83,13 +86,13 @@
   var LANGS = {
     ko:{label:'한국어', sr:'ko-KR',
         tap:'마이크를 탭하고 말하세요', listen:'듣는 중… 탭하면 정지', read:'상대방의 말이 여기에 크게 표시됩니다',
-        fail:'번역 실패 · 원문 표시', type:'메시지 입력…', send:'전송', reads:'내가 읽을 언어', nosr:'이 브라우저는 음성 인식을 지원하지 않아요. 키보드로 입력하세요.'},
+        fail:'번역 실패 · 원문 표시', type:'메시지 입력…', send:'전송', reads:'내가 읽을 언어(2개까지)', nosr:'이 브라우저는 음성 인식을 지원하지 않아요. 키보드로 입력하세요.'},
     en:{label:'English', sr:'en-US',
         tap:'Tap the mic & speak', listen:'Listening… tap to stop', read:'What the other person says appears here',
-        fail:'Translation failed · original shown', type:'Type a message…', send:'Send', reads:'I read in', nosr:'Speech recognition not supported here. Use the keyboard.'},
+        fail:'Translation failed · original shown', type:'Type a message…', send:'Send', reads:'I read in (up to 2)', nosr:'Speech recognition not supported here. Use the keyboard.'},
     ru:{label:'Русский', sr:'ru-RU',
         tap:'Нажмите на микрофон и говорите', listen:'Слушаю… нажмите, чтобы остановить', read:'Слова собеседника появятся здесь',
-        fail:'Ошибка перевода · показан оригинал', type:'Введите сообщение…', send:'Отпр.', reads:'Я читаю на', nosr:'Распознавание речи не поддерживается. Используйте клавиатуру.'}
+        fail:'Ошибка перевода · показан оригинал', type:'Введите сообщение…', send:'Отпр.', reads:'Я читаю на (до 2)', nosr:'Распознавание речи не поддерживается. Используйте клавиатуру.'}
   };
   var ORDER = ['ko','en','ru'];
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -127,15 +130,23 @@
     });
   }
 
-  function bigSize(t){
-    var n = t.length;
-    if(n <= 14) return 'clamp(30px, 9vw, 46px)';
-    if(n <= 40) return 'clamp(24px, 7vw, 36px)';
-    if(n <= 90) return 'clamp(19px, 5.5vw, 28px)';
-    return 'clamp(16px, 4.5vw, 22px)';
+  // translate into every language the listener reads; per-language fallback to original
+  function translateAll(text, langs){
+    return Promise.all(langs.map(function(tl){
+      return translate(text, tl).then(function(r){ return {lang:tl, text:r.text, ok:true}; })
+        .catch(function(){ return {lang:tl, text:text, ok:false}; });
+    }));
   }
 
-  function makeSide(id, defLang, flip){
+  function bigSize(t){
+    var n = t.length;
+    if(n <= 14) return 'clamp(28px, 8.5vw, 44px)';
+    if(n <= 40) return 'clamp(22px, 6.5vw, 34px)';
+    if(n <= 90) return 'clamp(18px, 5vw, 26px)';
+    return 'clamp(15px, 4.2vw, 21px)';
+  }
+
+  function makeSide(id, defRead, flip){
     var p = el('div','panel'+(flip?' flip':''), app);
     p.dataset.side = id;
 
@@ -145,7 +156,7 @@
     ORDER.forEach(function(code){
       var b = el('button','chip',langrow);
       b.type='button'; b.textContent = LANGS[code].label;
-      b.addEventListener('click', function(){ setLang(s, code); });
+      b.addEventListener('click', function(){ toggleLang(s, code); });
       chips[code] = b;
     });
 
@@ -163,9 +174,11 @@
     var send = el('button','',typerow); send.type='button';
 
     var s = {
-      id:id, lang:defLang, panel:p, chips:chips, hint:hint, feed:feed, interim:interim,
+      id:id, read:defRead.slice(), panel:p, chips:chips, hint:hint, feed:feed, interim:interim,
       mic:mic, status:status, typerow:typerow, input:input, send:send,
-      active:false, rec:null, msgs:[], seq:0
+      active:false, rec:null, msgs:[],
+      live:null, liveSeq:0,          // incoming live (pre-final) translation shown on this side
+      pendingLive:null, liveTimer:null // outgoing interim awaiting translation
     };
 
     mic.addEventListener('click', function(){ toggleMic(s); });
@@ -182,34 +195,66 @@
     send.addEventListener('click', submitTyped);
     input.addEventListener('keydown', function(e){ if(e.key==='Enter') submitTyped(); });
 
-    setLang(s, defLang);
+    syncLangUI(s);
     return s;
   }
 
   function other(s){ return s.id==='me' ? sides.you : sides.me; }
-  function L(s){ return LANGS[s.lang]; }
+  function L(s){ return LANGS[s.read[0]]; }
 
-  function setLang(s, code){
-    s.lang = code;
-    ORDER.forEach(function(c){ s.chips[c].classList.toggle('on', c===code); });
+  function toggleLang(s, code){
+    var i = s.read.indexOf(code);
+    if(i >= 0){
+      if(s.read.length > 1) s.read.splice(i,1);   // keep at least one
+    }else{
+      s.read.push(code);
+      if(s.read.length > 2) s.read.shift();        // at most two
+    }
+    syncLangUI(s);
+    if(s.active){ stopMic(s); startMic(s); }        // re-listen with new primary language
+    renderFeed(s);
+  }
+
+  function syncLangUI(s){
+    ORDER.forEach(function(c){ s.chips[c].classList.toggle('on', s.read.indexOf(c)>=0); });
     s.hint.textContent = L(s).reads + ':';
     s.input.placeholder = L(s).type;
     s.send.textContent = L(s).send;
     s.status.textContent = s.active ? L(s).listen : (SR ? L(s).tap : L(s).nosr);
-    if(s.active){ stopMic(s); startMic(s); }   // re-listen in new language
-    renderFeed(s);
+  }
+
+  function renderBig(d, m, isLive){
+    d.style.fontSize = bigSize(m.parts[0].text);
+    d.textContent = m.parts[0].text + (isLive ? ' ▏' : '');
+    for(var j=1; j<m.parts.length; j++){
+      var sec = el('span','second',d);
+      sec.textContent = m.parts[j].text;
+    }
+    if(!isLive){
+      if(m.warn){
+        var w = el('span','orig warn',d); w.textContent = '⚠ ' + L(sidesOf(d)).fail;
+      }else if(m.orig && m.orig !== m.parts[0].text){
+        var o = el('span','orig',d); o.textContent = m.orig;
+      }
+    }
+  }
+  function sidesOf(node){
+    return node.closest('.panel').dataset.side === 'me' ? sides.me : sides.you;
   }
 
   function renderFeed(s){
     s.feed.innerHTML = '';
-    if(!s.msgs.length){
+    var hasLive = !!s.live;
+    if(!s.msgs.length && !hasLive){
       var ph = el('div','placeholder',s.feed);
       ph.textContent = L(s).read;
       return;
     }
-    var last = s.msgs.slice(-4);
+    var last = s.msgs.slice(hasLive ? -3 : -4);
     var bigIdx = -1;
-    for(var k=last.length-1; k>=0; k--){ if(!last[k].self){ bigIdx=k; break; } }
+    if(!hasLive){
+      for(var k=last.length-1; k>=0; k--){ if(!last[k].self){ bigIdx=k; break; } }
+    }
     last.forEach(function(m, i){
       var d = el('div','msg',s.feed);
       if(m.self){
@@ -219,18 +264,16 @@
       }
       if(i === bigIdx){
         d.classList.add('big');
-        d.style.fontSize = bigSize(m.text);
-        d.textContent = m.text;
-        if(m.warn){
-          var w = el('span','orig warn',d); w.textContent = '⚠ ' + L(s).fail;
-        } else if(m.orig && m.orig !== m.text){
-          var o = el('span','orig',d); o.textContent = m.orig;
-        }
+        renderBig(d, m, false);
       }else{
-        d.classList.add(i >= bigIdx-1 ? 'old1' : 'old2');
-        d.textContent = m.text;
+        d.classList.add(i >= (bigIdx>=0?bigIdx:last.length)-1 ? 'old1' : 'old2');
+        d.textContent = m.parts[0].text;
       }
     });
+    if(hasLive){
+      var ld = el('div','msg big livemsg',s.feed);
+      renderBig(ld, s.live, true);
+    }
   }
 
   function pushMsg(s, msg){
@@ -239,17 +282,40 @@
     renderFeed(s);
   }
 
-  // speaker s said `text` → translate into the other side's language and show it there
+  // ---- live (pre-final) translation while the speaker is still talking ----
+  function scheduleLive(s, text){
+    var t = other(s);
+    s.pendingLive = text;
+    if(s.liveTimer) return;                 // debounce: one in-flight window at a time
+    s.liveTimer = setTimeout(function(){
+      s.liveTimer = null;
+      var txt = s.pendingLive;
+      if(!txt) return;
+      var id = ++t.liveSeq;
+      translateAll(txt, t.read).then(function(parts){
+        if(id !== t.liveSeq) return;        // superseded by newer interim or a final
+        t.live = {parts:parts};
+        renderFeed(t);
+      });
+    }, 450);
+  }
+
+  function cancelLive(s){
+    s.pendingLive = null;
+    if(s.liveTimer){ clearTimeout(s.liveTimer); s.liveTimer = null; }
+    var t = other(s);
+    t.liveSeq++;
+    if(t.live){ t.live = null; renderFeed(t); }
+  }
+
+  // speaker s said `text` (final) → translate into the listener's language(s)
   function handleUtterance(s, text){
+    cancelLive(s);
     var target = other(s);
-    var tl = target.lang;
     pushMsg(s, {self:true, text:text});
-    var id = ++target.seq;
-    translate(text, tl).then(function(res){
-      if(id !== target.seq){ /* older result, still show */ }
-      pushMsg(target, {text:res.text, orig:text});
-    }).catch(function(){
-      pushMsg(target, {text:text, warn:true});
+    translateAll(text, target.read).then(function(parts){
+      var allFail = parts.every(function(p){ return !p.ok; });
+      pushMsg(target, {parts:parts, orig:text, warn:allFail});
     });
   }
 
@@ -268,7 +334,10 @@
         if(r.isFinal) finals.push(r[0].transcript.trim());
         else interim += r[0].transcript;
       }
-      if(interim){ s.interim.textContent = interim; s.interim.classList.add('live'); }
+      if(interim){
+        s.interim.textContent = interim; s.interim.classList.add('live');
+        scheduleLive(s, interim);       // translate while still speaking
+      }
       finals.forEach(function(t){
         if(!t) return;
         s.interim.textContent=''; s.interim.classList.remove('live');
@@ -297,6 +366,7 @@
     s.active = false;
     if(s.rec){ var r=s.rec; s.rec=null; try{ r.onend=null; r.stop(); }catch(e){} }
     s.interim.textContent=''; s.interim.classList.remove('live');
+    cancelLive(s);
     syncMicUI(s);
   }
 
@@ -312,10 +382,11 @@
   }
 
   // ---- build UI: top = the other person (flipped), bottom = me ----
-  sides.you = makeSide('you', 'ru', true);
+  sides.you = makeSide('you', ['ru'], true);
   var div = el('div','divider',app);
   el('span','',div).textContent = '↕ FACE-TO-FACE INTERPRETER ↕';
-  sides.me  = makeSide('me', 'ko', false);
+  sides.me  = makeSide('me', ['ko','en'], false);
+  renderFeed(sides.you); renderFeed(sides.me);
 
   if(!SR){
     sides.me.typerow.classList.add('show');
