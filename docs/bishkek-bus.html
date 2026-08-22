@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>비쉬켁 버스 지도</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; background:#0f172a; }
+  /* 인앱 브라우저 시트 닫힘 방지: 앱은 fixed, 문서에 스크롤 완충지대 */
+  body { overscroll-behavior:none; }
+  #scrollbuffer { height:calc(100vh + 240px); }
+  #app {
+    position:fixed; inset:0; display:flex; flex-direction:column;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    color:#e2e8f0; background:#0f172a; touch-action:pan-y; overflow:hidden;
+  }
+  header {
+    padding:10px 14px 8px; background:#1e293b; border-bottom:1px solid #334155;
+    display:flex; align-items:center; justify-content:space-between; flex:0 0 auto;
+  }
+  header h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; }
+  header h1 span { color:#38bdf8; }
+  #clock { font-size:12px; color:#94a3b8; text-align:right; line-height:1.4; }
+  #clock b { color:#e2e8f0; font-variant-numeric:tabular-nums; }
+  #guide {
+    flex:0 0 auto; padding:8px 14px; font-size:13px; background:#0f172a;
+    display:flex; align-items:center; gap:8px; border-bottom:1px solid #1e293b;
+  }
+  .chip {
+    display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:999px;
+    font-size:12px; font-weight:700; background:#1e293b; border:1px solid #334155; color:#94a3b8;
+    max-width:42%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .chip.set { color:#fff; }
+  .chip.from.set { background:#065f46; border-color:#10b981; }
+  .chip.to.set { background:#7f1d1d; border-color:#ef4444; }
+  #arrow { color:#475569; font-weight:800; }
+  #resetBtn {
+    margin-left:auto; padding:6px 12px; border-radius:8px; border:1px solid #334155;
+    background:#1e293b; color:#cbd5e1; font-size:12px; font-weight:700;
+  }
+  #mapwrap { flex:1 1 auto; position:relative; overflow:hidden; background:#0b1220; }
+  #map { width:100%; height:100%; display:block; }
+  .street { stroke:#243447; stroke-width:5; fill:none; stroke-linecap:round; }
+  .street.major { stroke:#2c405a; stroke-width:9; }
+  .stname { fill:#3e5878; font-size:19px; font-weight:600; }
+  .routeline { fill:none; stroke-linecap:round; stroke-linejoin:round; opacity:0.34; }
+  .routeline.hl { opacity:1; }
+  .routeline.dim { opacity:0.07; }
+  .pin { cursor:pointer; }
+  .pin circle.dot { fill:#f8fafc; stroke:#475569; stroke-width:3; }
+  .pin.from circle.dot { fill:#10b981; stroke:#d1fae5; }
+  .pin.to circle.dot { fill:#ef4444; stroke:#fee2e2; }
+  .pin text.emoji { font-size:30px; text-anchor:middle; pointer-events:none; }
+  .pin text.lbl { fill:#cbd5e1; font-size:21px; font-weight:700; text-anchor:middle; pointer-events:none;
+    paint-order:stroke; stroke:#0b1220; stroke-width:6; }
+  .pin.from text.lbl { fill:#6ee7b7; }
+  .pin.to text.lbl { fill:#fca5a5; }
+  #sheet {
+    flex:0 0 auto; max-height:46%; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    background:#1e293b; border-top:2px solid #334155; border-radius:16px 16px 0 0;
+    padding:12px 14px calc(14px + env(safe-area-inset-bottom)); touch-action:pan-y;
+  }
+  #sheet.empty { max-height:none; }
+  .hint { color:#94a3b8; font-size:13px; line-height:1.6; }
+  .hint b { color:#e2e8f0; }
+  .fareinfo { margin-top:8px; font-size:12px; color:#64748b; line-height:1.55; }
+  .opt {
+    border:1px solid #334155; border-radius:12px; padding:10px 12px; margin-bottom:10px;
+    background:#0f172a; cursor:pointer;
+  }
+  .opt.active { border-color:#38bdf8; box-shadow:0 0 0 1px #38bdf8; }
+  .opt-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .busno {
+    display:inline-block; padding:3px 9px; border-radius:7px; font-weight:800; font-size:14px; color:#fff;
+  }
+  .opt-time { margin-left:auto; font-weight:800; font-size:16px; color:#38bdf8; white-space:nowrap; }
+  .opt-sub { margin-top:4px; font-size:12px; color:#94a3b8; }
+  .steps { margin-top:10px; display:none; }
+  .opt.active .steps { display:block; }
+  .step { display:flex; gap:10px; padding:7px 0; border-top:1px dashed #29384d; font-size:13px; line-height:1.55; }
+  .step .ico { flex:0 0 22px; text-align:center; font-size:16px; }
+  .step .ru { color:#7dd3fc; font-size:14px; font-weight:700; }
+  .step small { color:#64748b; }
+  .warn { margin-top:2px; color:#fbbf24; font-size:12px; }
+  .sec-title { font-size:13px; font-weight:800; color:#94a3b8; margin:2px 0 8px; }
+  .sec-title b { color:#e2e8f0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🚌 비쉬켁 <span>버스 지도</span></h1>
+    <div id="clock">비쉬켁 현재 <b>--:--</b><br>UTC+6</div>
+  </header>
+  <div id="guide">
+    <span class="chip from" id="chipFrom">① 출발지 탭</span>
+    <span id="arrow">→</span>
+    <span class="chip to" id="chipTo">② 도착지 탭</span>
+    <button id="resetBtn">다시</button>
+  </div>
+  <div id="mapwrap">
+    <svg id="map" viewBox="0 0 1000 1260" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+  <div id="sheet" class="empty">
+    <div class="hint" id="hintBox">
+      지도에서 <b>출발지</b>와 <b>도착지</b>를 차례로 탭하면 타야 할 버스, 타는 곳, 배차·소요시간을 알려드려요.
+      <div class="fareinfo">
+        💳 시내버스 <b>17솜</b> — Тулпар(툴파르) 카드/QR 전용, <b>2026년 7월부터 현금 불가</b> ·
+        380번 공항 마르슈르트카는 현금 <b>50솜</b><br>
+        ⚠️ 실시간 정보가 아닌 대표 노선·배차 기준 추정치입니다. 탑승 전 2GIS / Yandex Maps 앱으로 확인하세요.
+      </div>
+    </div>
+    <div id="results" style="display:none"></div>
+  </div>
+</div>
+<div id="scrollbuffer"></div>
+<script>
+'use strict';
+/* ---------- 데이터 ---------- */
+const STOPS = {
+  airport:  {ko:'마나스 공항',      ru:'Аэропорт «Манас»',        emoji:'✈️', x:80,  y:90},
+  dordoi:   {ko:'도르도이 바자르',  ru:'Рынок «Дордой»',          emoji:'🛍️', x:900, y:80},
+  east:     {ko:'동부 터미널',      ru:'Восточный автовокзал',    emoji:'🚏', x:960, y:250, dy:76, lx:990, anchor:'end'},
+  alamedin: {ko:'알라메딘 바자르',  ru:'Аламединский рынок',      emoji:'🍎', x:850, y:250, short:'알라메딘', lx:800},
+  victory:  {ko:'승리 광장',        ru:'Площадь Победы',          emoji:'🔥', x:790, y:330},
+  west:     {ko:'서부 터미널',      ru:'Западный автовокзал',     emoji:'🚏', x:80,  y:400},
+  osh:      {ko:'오쉬 바자르',      ru:'Ошский рынок',            emoji:'🧺', x:200, y:400, dy:76},
+  molgvard: {ko:'몰로다야 그바르디야', ru:'бул. Молодой Гвардии', emoji:'🌳', x:290, y:400, short:'그바르디야'},
+  phil:     {ko:'필하모니',         ru:'Филармония',              emoji:'🎻', x:380, y:400, dy:76},
+  alatoo:   {ko:'알라투 광장',      ru:'Площадь Ала-Тоо',         emoji:'🏛️', x:560, y:400},
+  tsum:     {ko:'춤(ЦУМ) 백화점',   ru:'ЦУМ «Айчүрөк»',           emoji:'🏬', x:680, y:400, short:'춤 백화점', dy:76},
+  bpark:    {ko:'비쉬켁 파크몰',    ru:'ТРЦ Bishkek Park',        emoji:'🛒', x:460, y:455, dy:76, lx:500},
+  rail:     {ko:'기차역',           ru:'Ж/д вокзал Бишкек-2',     emoji:'🚉', x:600, y:700},
+  vefa:     {ko:'베파 센터',        ru:'ТЦ «Vefa»',               emoji:'🎪', x:680, y:850},
+  asia:     {ko:'아시아몰',         ru:'Asia Mall',               emoji:'🏔️', x:620, y:1150},
+};
+/* seg: [정류장id, 다음 구간 소요분] — 마지막 원소는 소요분 0 */
+const ROUTES = [
+  { no:'380', kind:'마르슈르트카', color:'#f59e0b', headway:15, first:'06:30', last:'20:30',
+    fare:'50솜 현금', note:'공항선 · 흰색 미니버스, 기사에게 현금 지불',
+    seg:[['airport',35],['west',5],['osh',4],['molgvard',0]],
+    path:[[80,90],[80,400],[290,400]] },
+  { no:'38', kind:'시내버스', color:'#3b82f6', headway:8, first:'06:00', last:'22:00',
+    fare:'17솜 카드', note:'추이 대로 동서 관통',
+    seg:[['west',4],['osh',3],['molgvard',4],['phil',5],['alatoo',4],['tsum',6],['victory',0]],
+    path:[[80,400],[790,400],[790,330]] },
+  { no:'42', kind:'시내버스', color:'#10b981', headway:10, first:'06:00', last:'21:30',
+    fare:'17솜 카드', note:'동부 터미널 ↔ 추이 대로',
+    seg:[['east',4],['alamedin',6],['victory',6],['tsum',6],['alatoo',4],['phil',5],['osh',0]],
+    path:[[960,250],[790,250],[790,400],[200,400]] },
+  { no:'7', kind:'시내버스', color:'#ec4899', headway:7, first:'06:00', last:'22:00',
+    fare:'17솜 카드', note:'소베츠카야(바이틱 바아티르) 남북 관통',
+    seg:[['victory',6],['tsum',12],['vefa',10],['asia',0]],
+    path:[[790,330],[680,330],[680,1150],[620,1150]] },
+  { no:'5', kind:'시내버스', color:'#8b5cf6', headway:9, first:'06:30', last:'21:00',
+    fare:'17솜 카드', note:'기차역 ↔ 키예프 거리 ↔ 오쉬 바자르',
+    seg:[['rail',8],['bpark',7],['osh',0]],
+    path:[[600,700],[600,455],[250,455],[250,400],[200,400]] },
+  { no:'4', kind:'시내버스', color:'#ef4444', headway:12, first:'06:00', last:'21:00',
+    fare:'17솜 카드', note:'시내 중심 ↔ 도르도이(피혁공장 정류장)',
+    seg:[['tsum',6],['victory',18],['dordoi',0]],
+    path:[[680,400],[680,330],[790,330],[790,250],[900,250],[900,80]] },
+  { no:'17', kind:'시내버스', color:'#06b6d4', headway:10, first:'06:30', last:'21:00',
+    fare:'17솜 카드', note:'지벡 졸루 경유 도르도이행',
+    seg:[['osh',15],['alamedin',14],['dordoi',0]],
+    path:[[200,400],[200,250],[900,250],[900,80]] },
+];
+const STREETS = [
+  {p:[[60,250],[960,250]],  n:'Жибек Жолу',    lx:400, ly:238, major:0},
+  {p:[[250,330],[960,330]], n:'Фрунзе',         lx:470, ly:318, major:0},
+  {p:[[40,400],[960,400]],  n:'пр. Чуй',        lx:455, ly:388, major:1},
+  {p:[[250,455],[700,455]], n:'Киевская',       lx:0,   ly:0,   major:0},
+  {p:[[150,520],[900,520]], n:'Московская',     lx:430, ly:508, major:0},
+  {p:[[150,600],[900,600]], n:'Токтогула',      lx:430, ly:588, major:0},
+  {p:[[250,680],[900,680]], n:'Боконбаева',     lx:430, ly:668, major:0},
+  {p:[[250,850],[900,850]], n:'Горького',       lx:430, ly:838, major:0},
+  {p:[[250,950],[900,950]], n:'Ахунбаева',      lx:430, ly:938, major:0},
+  {p:[[300,1150],[800,1150]],n:'Токомбаева',    lx:390, ly:1138,major:0},
+  {p:[[290,250],[290,950]], n:'',               lx:0,   ly:0,   major:0},
+  {p:[[380,250],[380,1150]],n:'пр. Манаса',     lx:0,   ly:0,   major:0},
+  {p:[[460,250],[460,600]], n:'',               lx:0,   ly:0,   major:0},
+  {p:[[600,330],[600,700]], n:'Эркиндик',       lx:0,   ly:0,   major:0},
+  {p:[[680,250],[680,1150]],n:'Байтик Баатыра', lx:0,   ly:0,   major:1},
+  {p:[[790,250],[790,850]], n:'Ибраимова',      lx:0,   ly:0,   major:0},
+  {p:[[900,80],[900,950]],  n:'Алма-Атинская',  lx:0,   ly:0,   major:0},
+];
+/* 도보 속도: 지도 1단위 ≈ 6.8m, 80m/분 */
+const UNIT_M = 6.8, WALK_M_PER_MIN = 80, TRANSFER_MIN = 3;
+
+/* ---------- 시간 유틸 (비쉬켁 UTC+6) ---------- */
+function bishkekNow(){
+  const n = new Date();
+  return new Date(n.getTime() + (n.getTimezoneOffset() + 360) * 60000);
+}
+const hm2min = s => { const [h,m] = s.split(':').map(Number); return h*60+m; };
+const fmtMin = m => m < 60 ? m + '분' : Math.floor(m/60) + '시간 ' + (m%60 ? m%60+'분' : '');
+/* 배차 기준 다음 차 추정: {wait, msg} */
+function nextBus(r){
+  const now = bishkekNow(), cur = now.getHours()*60 + now.getMinutes();
+  const a = hm2min(r.first), b = hm2min(r.last);
+  if (cur < a) return {wait:a-cur, msg:'첫차 ' + r.first + ' (약 ' + fmtMin(a-cur) + ' 후)'};
+  if (cur > b) return {wait:null, msg:'오늘 운행 종료 · 첫차 ' + r.first};
+  const w = (r.headway - ((cur - a) % r.headway)) % r.headway || r.headway;
+  return {wait:w, msg:'다음 차 약 ' + w + '분 후 (배차 ' + r.headway + '분)'};
+}
+
+/* ---------- 경로 탐색: 직행 + 1~2회 환승 열거 ---------- */
+function ridesOf(route){
+  const ids = route.seg.map(s => s[0]);
+  const out = [];
+  for (let i = 0; i < ids.length; i++)
+    for (let j = 0; j < ids.length; j++){
+      if (i === j) continue;
+      let t = 0;
+      const lo = Math.min(i,j), hi = Math.max(i,j);
+      for (let k = lo; k < hi; k++) t += route.seg[k][1];
+      out.push({from:ids[i], to:ids[j], min:t, stops:hi-lo, route});
+    }
+  return out;
+}
+const ALL_RIDES = ROUTES.flatMap(ridesOf);
+function findPlans(from, to){
+  const plans = [];
+  const add = (legs) => {
+    let total = 0, ok = true;
+    for (const l of legs){
+      const nb = nextBus(l.route);
+      total += (nb.wait == null ? l.route.headway : Math.min(nb.wait, l.route.headway)) + l.min;
+      if (nb.wait == null) ok = false;
+    }
+    total += (legs.length - 1) * TRANSFER_MIN;
+    plans.push({legs, total, running: ok});
+  };
+  for (const r of ALL_RIDES) if (r.from === from && r.to === to) add([r]);
+  for (const a of ALL_RIDES) if (a.from === from)
+    for (const b of ALL_RIDES)
+      if (b.route !== a.route && b.from === a.to && b.to === to) add([a,b]);
+  if (!plans.length)
+    for (const a of ALL_RIDES) if (a.from === from)
+      for (const b of ALL_RIDES) if (b.route !== a.route && b.from === a.to)
+        for (const c of ALL_RIDES)
+          if (c.route !== b.route && c.from === b.to && c.to === to) add([a,b,c]);
+  plans.sort((p,q) => (q.running - p.running) || (p.total - q.total));
+  /* 같은 노선 조합 중복 제거 */
+  const seen = new Set(), out = [];
+  for (const p of plans){
+    const key = p.legs.map(l => l.route.no + l.from).join('>');
+    const rkey = p.legs.map(l => l.route.no).join('>');
+    if (seen.has(rkey)) continue;
+    seen.add(rkey); out.push(p);
+    if (out.length >= 3) break;
+  }
+  return out;
+}
+function walkMin(a, b){
+  const A = STOPS[a], B = STOPS[b];
+  const d = Math.hypot(A.x-B.x, A.y-B.y) * UNIT_M;
+  return Math.round(d / WALK_M_PER_MIN);
+}
+
+/* ---------- 지도 그리기 ---------- */
+const SVG = document.getElementById('map');
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent || SVG).appendChild(e); return e;
+}
+const pts = p => p.map(q => q.join(',')).join(' ');
+for (const s of STREETS){
+  el('polyline', {points:pts(s.p), class:'street' + (s.major ? ' major' : '')});
+  if (s.n && s.lx){ const t = el('text', {x:s.lx, y:s.ly, class:'stname'}); t.textContent = s.n; }
+}
+/* 공항 연결선(점선) */
+el('polyline', {points:pts([[80,90],[80,400]]), class:'street', 'stroke-dasharray':'14 12'});
+const routeEls = {};
+for (const r of ROUTES)
+  routeEls[r.no] = el('polyline', {points:pts(r.path), class:'routeline', stroke:r.color, 'stroke-width':10});
+const pinEls = {};
+for (const id in STOPS){
+  const s = STOPS[id];
+  const g = el('g', {class:'pin', 'data-id':id});
+  el('circle', {cx:s.x, cy:s.y, r:34, fill:'transparent'}, g);   /* 터치 판정 확대 */
+  el('circle', {cx:s.x, cy:s.y, r:13, class:'dot'}, g);
+  const em = el('text', {x:s.x, y:s.y-24, class:'emoji'}, g); em.textContent = s.emoji;
+  const lb = el('text', {x:s.lx || s.x, y:s.y + (s.dy || 42), class:'lbl'}, g);
+  if (s.anchor) lb.style.textAnchor = s.anchor;
+  lb.textContent = s.short || s.ko;
+  pinEls[id] = g;
+}
+
+/* ---------- 상호작용 ---------- */
+let selFrom = null, selTo = null, activeOpt = 0, curPlans = [];
+const $ = id => document.getElementById(id);
+function setChip(chip, id, prefix){
+  if (id){ chip.classList.add('set'); chip.textContent = prefix + ' ' + STOPS[id].ko; }
+  else { chip.classList.remove('set'); chip.textContent = prefix === '출발' ? '① 출발지 탭' : '② 도착지 탭'; }
+}
+function refreshPins(){
+  for (const id in pinEls){
+    pinEls[id].classList.toggle('from', id === selFrom);
+    pinEls[id].classList.toggle('to', id === selTo);
+  }
+}
+function highlight(plan){
+  const used = plan ? new Set(plan.legs.map(l => l.route.no)) : null;
+  for (const r of ROUTES){
+    routeEls[r.no].classList.toggle('hl', !!used && used.has(r.no));
+    routeEls[r.no].classList.toggle('dim', !!used && !used.has(r.no));
+  }
+}
+SVG.addEventListener('click', ev => {
+  const g = ev.target.closest('.pin');
+  if (!g) return;
+  const id = g.dataset.id;
+  if (!selFrom || (selFrom && selTo)){ selFrom = id; selTo = null; }
+  else if (id === selFrom){ selFrom = null; }
+  else { selTo = id; }
+  setChip($('chipFrom'), selFrom, '출발');
+  setChip($('chipTo'), selTo, '도착');
+  refreshPins();
+  if (selFrom && selTo) showResults(); else clearResults();
+});
+$('resetBtn').addEventListener('click', () => {
+  selFrom = selTo = null;
+  setChip($('chipFrom'), null, '출발'); setChip($('chipTo'), null, '도착');
+  refreshPins(); clearResults();
+});
+function clearResults(){
+  $('results').style.display = 'none'; $('hintBox').style.display = 'block';
+  $('sheet').classList.add('empty'); highlight(null);
+}
+function legHtml(l, idx, n){
+  const nb = nextBus(l.route);
+  const board = STOPS[l.from], off = STOPS[l.to];
+  const ids = l.route.seg.map(s => s[0]);
+  const term = ids.indexOf(l.to) > ids.indexOf(l.from) ? ids[ids.length-1] : ids[0];
+  return '<div class="step"><div class="ico">🚏</div><div>' +
+      (idx === 0 ? '' : '환승 · ') + '<b>' + board.ko + '</b> 정류장에서 탑승<br>' +
+      '<span class="ru">' + board.ru + '</span></div></div>' +
+    '<div class="step"><div class="ico">🚌</div><div>' +
+      '<span class="busno" style="background:' + l.route.color + '">' + l.route.no + '</span> ' +
+      l.route.kind + ' · <b>' + STOPS[term].ko + '(' + STOPS[term].ru + ') 방면</b><br>' +
+      '⏱️ ' + nb.msg + ' · 이동 약 ' + fmtMin(l.min) + ' (' + l.stops + '개 구간)<br>' +
+      '💳 ' + l.route.fare + ' · 운행 ' + l.route.first + '~' + l.route.last +
+      '<br><small>' + l.route.note + '</small>' +
+      (nb.wait == null ? '<div class="warn">⚠️ 지금은 운행 시간이 아닙니다</div>' : '') +
+    '</div></div>' +
+    (idx === n-1 ? '<div class="step"><div class="ico">📍</div><div><b>' + off.ko + '</b> 정류장 하차<br>' +
+      '<span class="ru">' + off.ru + '</span></div></div>' : '');
+}
+function showResults(){
+  curPlans = findPlans(selFrom, selTo);
+  const res = $('results');
+  const wm = walkMin(selFrom, selTo);
+  let html = '<div class="sec-title"><b>' + STOPS[selFrom].ko + '</b> → <b>' + STOPS[selTo].ko + '</b></div>';
+  if (!curPlans.length && wm > 18){
+    html += '<div class="hint">직결 노선을 찾지 못했어요. 택시(Yandex Go) 이용을 추천합니다.</div>';
+  }
+  curPlans.forEach((p, i) => {
+    const nos = p.legs.map(l =>
+      '<span class="busno" style="background:' + l.route.color + '">' + l.route.no + '</span>').join('<span style="color:#64748b"> ▸ </span>');
+    html += '<div class="opt' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
+      '<div class="opt-head">' + nos +
+      '<span class="opt-sub">' + (p.legs.length === 1 ? '직행' : (p.legs.length-1) + '회 환승') + '</span>' +
+      '<span class="opt-time">약 ' + fmtMin(Math.round(p.total)) + '</span></div>' +
+      '<div class="opt-sub">대기 포함 총 예상 · 탭하면 상세 단계</div>' +
+      '<div class="steps">' + p.legs.map((l,j) => legHtml(l, j, p.legs.length)).join('') + '</div></div>';
+  });
+  if (wm <= 18)
+    html += '<div class="opt"><div class="opt-head">🚶 <b>걸어가기</b><span class="opt-time">약 ' + fmtMin(wm) + '</span></div>' +
+      '<div class="opt-sub">가까운 거리예요 — 도보 추천</div></div>';
+  html += '<div class="fareinfo">⚠️ 배차·소요시간은 대표 노선 기준 추정치입니다. 실시간 위치는 2GIS·Yandex Maps 앱에서 확인하세요.</div>';
+  res.innerHTML = html;
+  res.style.display = 'block'; $('hintBox').style.display = 'none';
+  $('sheet').classList.remove('empty');
+  activeOpt = 0;
+  highlight(curPlans[0] || null);
+  res.querySelectorAll('.opt[data-i]').forEach(o => o.addEventListener('click', () => {
+    activeOpt = +o.dataset.i;
+    res.querySelectorAll('.opt').forEach(x => x.classList.remove('active'));
+    o.classList.add('active');
+    highlight(curPlans[activeOpt]);
+  }));
+  $('sheet').scrollTop = 0;
+}
+
+/* ---------- 시계 ---------- */
+function tickClock(){
+  const n = bishkekNow();
+  $('clock').innerHTML = '비쉬켁 현재 <b>' +
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0') + '</b><br>UTC+6';
+}
+tickClock(); setInterval(tickClock, 15000);
+
+/* 인앱 브라우저 완충 스크롤 고정 */
+window.scrollTo(0, 120);
+window.addEventListener('scroll', () => {
+  if (window.scrollY < 20 || window.scrollY > 220) window.scrollTo(0, 120);
+}, {passive:true});
+</script>
+</body>
+</html>

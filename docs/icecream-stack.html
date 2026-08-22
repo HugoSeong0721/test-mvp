@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>아이스크림 탑</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
+     아래로 쓸리는 손가락을 시트 닫기 대신 스크롤로 소비시킨다 */
+  html {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    height: calc(100% + 240px);
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #ffe3b3;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  }
+  #game {
+    display: block;
+    position: fixed;
+    inset: 0;
+    /* 세로 팬은 완충지대 스크롤로 흘려보낸다 — none으로 막으면 iOS가 시트 닫기로 가져간다 */
+    touch-action: pan-y;
+  }
+  /* ── 게임오버 패널 (랭킹 / 도전장) ── */
+  #over-panel {
+    position: fixed;
+    left: 50%; top: 46%;
+    transform: translate(-50%, -50%);
+    width: min(330px, 88vw);
+    background: rgba(40, 22, 30, 0.95);
+    color: #fff;
+    border-radius: 16px;
+    padding: 18px 16px 14px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+  }
+  #over-panel.hidden { display: none; }
+  #over-title { font-size: 24px; font-weight: 800; }
+  #over-score { font-size: 36px; font-weight: 800; margin-top: 2px; color: #ffb3c8; }
+  #over-sub { font-size: 15px; margin-top: 4px; min-height: 18px; color: rgba(255,255,255,0.75); }
+  #over-sub.newbest { color: #ffb3c8; font-weight: 700; }
+  #over-sub.win { color: #7ee787; font-weight: 700; }
+  #over-sub.lose { color: #ff8f7a; font-weight: 700; }
+  #board-title { margin-top: 12px; font-size: 13px; color: rgba(255,255,255,0.6); text-align: left; padding-left: 4px; }
+  #rank-board {
+    margin: 6px 0 8px;
+    max-height: 158px; overflow-y: auto;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .rank-row {
+    display: flex; gap: 8px; align-items: baseline;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row.me { background: rgba(255, 179, 200, 0.18); }
+  .rank-pos { width: 30px; text-align: left; color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums; }
+  .rank-row.me .rank-pos { color: #ffb3c8; }
+  .rank-name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-friend { font-size: 11px; color: #8ecbff; margin-left: 4px; }
+  .rank-s { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rank-empty { padding: 14px; font-size: 13px; color: rgba(255,255,255,0.5); }
+  #name-row {
+    display: flex; gap: 8px; align-items: center; justify-content: center;
+    font-size: 13px; color: rgba(255,255,255,0.65);
+    margin-bottom: 10px;
+  }
+  #name-input {
+    width: 92px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 5px 8px;
+    text-align: center;
+  }
+  #over-btns { display: flex; gap: 8px; }
+  #over-btns button {
+    flex: 1;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700;
+    padding: 12px 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #retry-btn { background: #ffb3c8; color: #4a1626; }
+  #share-btn { background: rgba(255,255,255,0.14); color: #fff; }
+  #share-note { font-size: 12px; color: #7ee787; min-height: 15px; margin-top: 7px; }
+  #share-fallback {
+    width: 100%; margin-top: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; color: #fff;
+    font-size: 12px; padding: 6px 8px;
+  }
+  #share-fallback.hidden { display: none; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="over-panel" class="hidden">
+  <div id="over-title">🍦 무너짐!</div>
+  <div id="over-score"></div>
+  <div id="over-sub"></div>
+  <div id="board-title"></div>
+  <div id="rank-board"></div>
+  <div id="name-row"><span>이름</span><input id="name-input" maxlength="8" placeholder="나"></div>
+  <div id="over-btns">
+    <button id="share-btn">⚔️ 도전장 보내기</button>
+    <button id="retry-btn">다시 쌓기</button>
+  </div>
+  <div id="share-note"></div>
+  <input id="share-fallback" class="hidden" readonly>
+</div>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('game');
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ---------- 상수 ----------
+  var BLOCK_H = 34;                 // 스쿱 한 층의 높이
+  var MIN_W = 16;                   // 이보다 좁아지면 다 녹은 것
+  var PERFECT_TOL = 7;              // 퍼펙트 판정 폭(px)
+  function baseW() { return Math.min(Math.round(W * 0.6), 230); }
+
+  var FLAVORS = [
+    { c: '#ff8fb2', d: '#e26a92', name: '딸기' },
+    { c: '#fff3d6', d: '#e8d7ae', name: '바닐라' },
+    { c: '#9be3c3', d: '#6fc39e', name: '민트' },
+    { c: '#a8794f', d: '#845c39', name: '초코' },
+    { c: '#9fb2ff', d: '#7a8fe0', name: '블루베리' },
+    { c: '#ffe37a', d: '#e3c353', name: '레몬' }
+  ];
+
+  // ---------- 상태 ----------
+  var STATE_TITLE = 0, STATE_PLAY = 1, STATE_OVER = 2;
+  var state = STATE_TITLE;
+
+  var tower = [];        // {x: 중심(센터 기준 오프셋 px), w, ci: 맛 인덱스}
+  var floors = 0;        // 쌓은 층수 = 점수
+  var cur = null;        // 지금 움직이는 스쿱 {x, w, ci, dir}
+  var camH = 0;          // 카메라 높이(월드 px, 위로 +)
+  var playT = 0, introT = 0;
+  var combo = 0;         // 연속 퍼펙트
+  var falls = [];        // 잘려나간 / 놓친 조각 {x, w, h(월드), vx, vh, rot, vr, ci}
+  var drips = [];        // 녹아 떨어지는 방울 {x, h, vh, r, ci}
+  var flashes = [];      // {text, t, color}
+  var shake = 0;
+  var overAt = 0, deathAnim = 0;
+  var overReason = '';   // 'miss' | 'melt'
+  var lastScore = 0;
+  var placeFx = 0;       // 놓였을 때 눌리는 연출
+
+  var best = 0;
+  try { best = parseInt(localStorage.getItem('icecreamStackBest') || '0', 10) || 0; } catch (e) {}
+  var isNewBest = false;
+
+  // ---------- 난이도 ----------
+  function slideSpeed() { return Math.min(330, 95 + floors * 6.5); }       // 좌우 왕복 속도
+  function meltRate()  { return Math.min(24, 7 + floors * 0.45); }         // 초당 녹는 폭(px)
+
+  // ---------- 랭킹 (이 기기 기록 + 친구 도전장 기록) ----------
+  var RANK_MAX = 12;
+  var RANK_KEY = 'icecreamStackRanks';
+  var ranks = [], myRankRow = null;
+  function loadRanks() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(RANK_KEY) || '[]');
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter(function (r) { return r && typeof r.s === 'number' && isFinite(r.s); })
+        .map(function (r) { return { n: String(r.n || '나').slice(0, 8), s: Math.max(0, Math.round(r.s)), f: r.f ? 1 : 0, t: r.t || 0 }; })
+        .sort(function (a, b) { return b.s - a.s; })
+        .slice(0, RANK_MAX);
+    } catch (e) { return []; }
+  }
+  function saveRanks(list) {
+    try { localStorage.setItem(RANK_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function loadName() {
+    try { return (localStorage.getItem('icecreamStackName') || '').slice(0, 8); } catch (e) { return ''; }
+  }
+  function saveName(v) { try { localStorage.setItem('icecreamStackName', v); } catch (e) {} }
+
+  function renderRanks() {
+    var board = document.getElementById('rank-board');
+    board.textContent = '';
+    if (!ranks.length) {
+      var empty = document.createElement('div');
+      empty.className = 'rank-empty';
+      empty.textContent = '아직 기록이 없어요.';
+      board.appendChild(empty);
+      return;
+    }
+    ranks.forEach(function (r, i) {
+      var row = document.createElement('div');
+      row.className = 'rank-row' + (r === myRankRow ? ' me' : '');
+      var pos = document.createElement('span');
+      pos.className = 'rank-pos';
+      pos.textContent = '#' + (i + 1);
+      var name = document.createElement('span');
+      name.className = 'rank-name';
+      name.textContent = r.n;               // 이름은 항상 텍스트로만 — 주입 방지
+      if (r.f) {
+        var tag = document.createElement('span');
+        tag.className = 'rank-friend';
+        tag.textContent = '👥친구';
+        name.appendChild(tag);
+      }
+      var s = document.createElement('span');
+      s.className = 'rank-s';
+      s.textContent = r.s + '층';
+      row.append(pos, name, s);
+      board.appendChild(row);
+    });
+    var me = board.querySelector('.rank-row.me');
+    if (me) me.scrollIntoView({ block: 'nearest' });
+  }
+
+  function recordRank(s) {
+    ranks = loadRanks();
+    var entry = { n: loadName() || '나', s: Math.round(s), f: 0, t: Date.now() };
+    ranks.push(entry);
+    ranks.sort(function (a, b) { return b.s - a.s; });
+    ranks = ranks.slice(0, RANK_MAX);
+    myRankRow = ranks.indexOf(entry) >= 0 ? entry : null;
+    saveRanks(ranks);
+    renderRanks();
+  }
+
+  // ---------- 도전장 (공유 링크에 실려 오는 친구 기록) ----------
+  var chSteps = 0, chName = '', chBeaten = false;
+  function readHashChallenge() {
+    var hash = location.hash || '';
+    var mc = /(?:^|[#&])c=(\d{1,5})/.exec(hash);
+    if (!mc) return false;
+    var mn = /(?:^|[#&])n=([^&]{1,64})/.exec(hash);
+    chSteps = Math.min(99999, parseInt(mc[1], 10) || 0);
+    chName = '친구';
+    if (mn) {
+      try { chName = decodeURIComponent(mn[1]).slice(0, 8) || '친구'; } catch (e) {}
+    }
+    return chSteps > 0;
+  }
+  function absorbChallenge() {
+    // 친구 기록을 랭킹판에 넣어 준다 (중복은 한 번만)
+    if (chSteps <= 0) return;
+    var list = loadRanks();
+    var dup = list.some(function (r) { return r.f && r.n === chName && r.s === chSteps; });
+    if (!dup) {
+      list.push({ n: chName, s: chSteps, f: 1, t: Date.now() });
+      list.sort(function (a, b) { return b.s - a.s; });
+      saveRanks(list.slice(0, RANK_MAX));
+    }
+  }
+  if (readHashChallenge()) absorbChallenge();
+  window.addEventListener('hashchange', function () {
+    if (readHashChallenge()) { absorbChallenge(); chBeaten = false; }
+  });
+
+  // ---------- 공유 ----------
+  function challengeUrl(s) {
+    try {
+      var u = new URL(location.href);
+      var n = loadName() || '나';
+      u.hash = 'c=' + Math.round(s) + '&n=' + encodeURIComponent(n);
+      return u.href;
+    } catch (e) { return ''; }
+  }
+  function note(msg) {
+    var el = document.getElementById('share-note');
+    el.textContent = msg;
+    clearTimeout(note._t);
+    note._t = setTimeout(function () { el.textContent = ''; }, 3200);
+  }
+  function shareResult() {
+    var s = Math.round(lastScore);
+    var url = challengeUrl(s);
+    var text = '🍦 아이스크림 탑 ' + s + '층 쌓았다!\n녹기 전에 나보다 높이 쌓아 볼래?';
+    var full = url ? text + '\n' + url : text;
+    var done = function () { note('도전장 전송!'); };
+    if (navigator.share) {
+      navigator.share(url ? { title: '아이스크림 탑', text: text, url: url } : { title: '아이스크림 탑', text: text })
+        .then(done)
+        .catch(function (e) {
+          if (e && e.name === 'AbortError') return;   // 사용자가 취소한 것은 실패가 아니다
+          copyFallback(full);
+        });
+      return;
+    }
+    copyFallback(full);
+  }
+  function copyFallback(full) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(full)
+        .then(function () { note('도전장 링크 복사됨!'); })
+        .catch(function () { manualCopy(full); });
+      return;
+    }
+    manualCopy(full);
+  }
+  function manualCopy(full) {
+    var fb = document.getElementById('share-fallback');
+    fb.value = full;
+    fb.classList.remove('hidden');
+    fb.focus(); fb.select();
+    note('아래 링크를 복사해서 보내세요');
+  }
+
+  // ---------- 판 리셋 ----------
+  function newScoop() {
+    var prev = topBlock();
+    var ci;
+    do { ci = Math.floor(Math.random() * FLAVORS.length); } while (tower.length && ci === tower[tower.length - 1].ci);
+    var w = Math.min(prev.w + 6, baseW());   // 새 스쿱은 아래층보다 살짝 넉넉하게 시작
+    var fromLeft = Math.random() < 0.5;
+    cur = {
+      x: fromLeft ? -travelHalf(w) : travelHalf(w),
+      w: w,
+      ci: ci,
+      dir: fromLeft ? 1 : -1
+    };
+  }
+  function topBlock() {
+    return tower.length ? tower[tower.length - 1] : { x: 0, w: baseW(), ci: -1 };
+  }
+  function travelHalf(w) {
+    // 왕복 범위: 탑 폭을 넉넉히 벗어나되 화면 밖으로는 안 나가게
+    return Math.min(W / 2 - w / 2 - 8, baseW() * 0.5 + 74);
+  }
+
+  function reset() {
+    tower = [];
+    floors = 0;
+    camH = 0;
+    playT = 0;
+    introT = 2.2;
+    combo = 0;
+    falls = [];
+    drips = [];
+    flashes = [];
+    shake = 0;
+    deathAnim = 0;
+    placeFx = 0;
+    isNewBest = false;
+    chBeaten = false;
+    overReason = '';
+    newScoop();
+  }
+
+  // ---------- 조작: 탭 = 스쿱 떨어뜨리기 ----------
+  function drop() {
+    if (state !== STATE_PLAY || !cur) return;
+    var prev = topBlock();
+    var lo = Math.max(cur.x - cur.w / 2, prev.x - prev.w / 2);
+    var hi = Math.min(cur.x + cur.w / 2, prev.x + prev.w / 2);
+    var overlap = hi - lo;
+
+    if (overlap < 6) {
+      // 완전히 빗나감 → 스쿱이 통째로 떨어진다
+      falls.push({ x: cur.x, w: cur.w, h: (floors + 1) * BLOCK_H, vx: cur.dir * 60, vh: 40, rot: 0, vr: cur.dir * 4, ci: cur.ci });
+      cur = null;
+      gameOver('miss');
+      return;
+    }
+
+    var isPerfect = Math.abs(cur.x - prev.x) <= PERFECT_TOL && prev.ci >= 0;
+    var nx, nw;
+    if (isPerfect) {
+      combo++;
+      nx = prev.x;
+      nw = Math.min(cur.w + 8, baseW());   // 퍼펙트 보상: 살짝 되살아난다
+      flashes.push({ text: combo >= 2 ? '퍼펙트 x' + combo + '!' : '퍼펙트!', t: 0.9, color: '#ff5f8f' });
+      shake = 3;
+    } else {
+      combo = 0;
+      nx = (lo + hi) / 2;
+      nw = overlap;
+      // 잘려나간 조각 낙하 연출
+      if (cur.x < prev.x) {
+        falls.push({ x: (cur.x - cur.w / 2 + lo) / 2, w: lo - (cur.x - cur.w / 2), h: (floors + 1) * BLOCK_H, vx: -80, vh: 60, rot: 0, vr: -3, ci: cur.ci });
+      } else {
+        falls.push({ x: (hi + cur.x + cur.w / 2) / 2, w: (cur.x + cur.w / 2) - hi, h: (floors + 1) * BLOCK_H, vx: 80, vh: 60, rot: 0, vr: 3, ci: cur.ci });
+      }
+    }
+
+    tower.push({ x: nx, w: nw, ci: cur.ci });
+    floors++;
+    placeFx = 1;
+
+    if (chSteps > 0 && !chBeaten && floors > chSteps) {
+      chBeaten = true;
+      flashes.push({ text: '🏆 ' + chName + ' 넘어섬!', t: 1.6, color: '#1d8a3c' });
+      shake = 6;
+    }
+
+    if (nw < MIN_W) {
+      cur = null;
+      gameOver('melt');
+      return;
+    }
+    newScoop();
+  }
+
+  function tryStart() {
+    if (state === STATE_OVER && performance.now() - overAt < 600) return; // 오터치 방지
+    document.getElementById('over-panel').classList.add('hidden');
+    reset();
+    state = STATE_PLAY;
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return;
+    if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown') {
+      if (state === STATE_PLAY) drop(); else tryStart();
+    }
+  });
+
+  // 터치: 화면 아무 데나 탭 (탭 전용 — 홀드/드래그 없음)
+  // preventDefault를 걸지 않는다 — 세로 팬이 완충지대 스크롤로 소비되어야
+  // 인앱 브라우저 시트가 끌기를 가로채지 않는다
+  var lastTouchAt = 0; // 터치 뒤에 따라오는 호환용 mousedown 무시 (한 탭 = 한 번)
+  canvas.addEventListener('touchstart', function () {
+    lastTouchAt = performance.now();
+    if (state !== STATE_PLAY) { tryStart(); return; }
+    drop();
+  }, { passive: true });
+
+  canvas.addEventListener('mousedown', function () {
+    if (performance.now() - lastTouchAt < 800) return;
+    if (state !== STATE_PLAY) { tryStart(); return; }
+    drop();
+  });
+
+  // ---------- 패널 버튼 ----------
+  document.getElementById('retry-btn').addEventListener('click', function () { tryStart(); });
+  document.getElementById('share-btn').addEventListener('click', function () { shareResult(); });
+  var nameInput = document.getElementById('name-input');
+  nameInput.value = loadName();
+  nameInput.addEventListener('input', function () {
+    var v = nameInput.value.slice(0, 8);
+    saveName(v);
+    if (myRankRow) { myRankRow.n = v || '나'; saveRanks(ranks); renderRanks(); }
+  });
+
+  // ---------- 게임오버 ----------
+  function gameOver(reason) {
+    state = STATE_OVER;
+    overReason = reason;
+    overAt = performance.now();
+    deathAnim = 0;
+    shake = 10;
+    lastScore = floors;
+    if (floors > best) {
+      best = floors;
+      isNewBest = true;
+      try { localStorage.setItem('icecreamStackBest', String(best)); } catch (e) {}
+    }
+    recordRank(floors);
+    showOverPanel();
+  }
+
+  function showOverPanel() {
+    document.getElementById('over-title').textContent = overReason === 'melt' ? '🫠 다 녹았다!' : '🍦 떨어뜨렸다!';
+    document.getElementById('over-score').textContent = lastScore + '층';
+    var sub = document.getElementById('over-sub');
+    sub.className = '';
+    if (chSteps > 0) {
+      if (lastScore > chSteps) {
+        sub.textContent = '🏆 ' + chName + '(' + chSteps + '층) 꺾음!';
+        sub.className = 'win';
+      } else if (lastScore === chSteps) {
+        sub.textContent = '동점! ' + chName + ' ' + chSteps + '층';
+        sub.className = 'lose';
+      } else {
+        sub.textContent = chName + '까지 ' + (chSteps - lastScore) + '층 남았다…';
+        sub.className = 'lose';
+      }
+    } else if (isNewBest) {
+      sub.textContent = '🎉 신기록!';
+      sub.className = 'newbest';
+    } else {
+      sub.textContent = '최고 기록 ' + best + '층';
+    }
+    document.getElementById('board-title').textContent = '🏅 랭킹 — 제일 높이 쌓은 사람';
+    ranks = loadRanks();
+    renderRanks();
+    document.getElementById('share-fallback').classList.add('hidden');
+    document.getElementById('over-panel').classList.remove('hidden');
+  }
+
+  // ---------- 업데이트 ----------
+  function update(dt) {
+    if (shake > 0) shake = Math.max(0, shake - dt * 26);
+    for (var i = flashes.length - 1; i >= 0; i--) {
+      flashes[i].t -= dt;
+      if (flashes[i].t <= 0) flashes.splice(i, 1);
+    }
+    // 낙하 조각
+    for (var f = falls.length - 1; f >= 0; f--) {
+      var p = falls[f];
+      p.vh -= 1400 * dt;
+      p.h += p.vh * dt;
+      p.x += p.vx * dt;
+      p.rot += p.vr * dt;
+      if (p.h < camH - H) falls.splice(f, 1);
+    }
+    // 녹은 방울
+    for (var d = drips.length - 1; d >= 0; d--) {
+      var q = drips[d];
+      q.vh -= 900 * dt;
+      q.h += q.vh * dt;
+      if (q.h < camH - H) drips.splice(d, 1);
+    }
+
+    if (state === STATE_OVER) { deathAnim += dt; return; }
+    if (state !== STATE_PLAY) return;
+
+    playT += dt;
+    if (introT > 0) introT -= dt;
+    if (placeFx > 0) placeFx = Math.max(0, placeFx - dt * 6);
+
+    if (cur) {
+      // 좌우 왕복
+      var half = travelHalf(cur.w);
+      cur.x += cur.dir * slideSpeed() * dt;
+      if (cur.x > half) { cur.x = half; cur.dir = -1; }
+      if (cur.x < -half) { cur.x = -half; cur.dir = 1; }
+
+      // 녹는다 — 망설일수록 좁아진다 (위협은 항상 화면 안에)
+      cur.w -= meltRate() * dt;
+      if (Math.random() < dt * (3 + floors * 0.15)) {
+        var side = Math.random() < 0.5 ? -1 : 1;
+        drips.push({ x: cur.x + side * cur.w * (0.2 + Math.random() * 0.28), h: (floors + 1) * BLOCK_H - 6, vh: -20, r: 2.5 + Math.random() * 2, ci: cur.ci });
+      }
+      if (cur.w < MIN_W) {
+        // 손도 못 쓰고 다 녹아 버림
+        cur = null;
+        gameOver('melt');
+        return;
+      }
+    }
+
+    // 카메라: 탑 꼭대기가 화면 55% 지점 근처에 오도록
+    var want = Math.max(0, (floors + 1) * BLOCK_H - H * 0.42);
+    camH += (want - camH) * Math.min(1, dt * 6);
+  }
+
+  // ---------- 좌표 변환 ----------
+  function sx(x) { return W / 2 + x; }
+  function sy(h) { return H * 0.86 - (h - camH); }
+
+  // ---------- 그리기 ----------
+  function roundRect(x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawScoop(cx, topY, w, ci, squash) {
+    var f = FLAVORS[ci];
+    var h = BLOCK_H * (1 - squash * 0.18);
+    var y = topY + BLOCK_H - h;
+    // 몸통
+    ctx.fillStyle = f.c;
+    roundRect(cx - w / 2, y, w, h, 12);
+    ctx.fill();
+    ctx.strokeStyle = f.d;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // 아래로 흘러내리는 물결 (아이스크림답게)
+    ctx.fillStyle = f.c;
+    var n = Math.max(2, Math.round(w / 26));
+    for (var i = 0; i < n; i++) {
+      var bx = cx - w / 2 + (i + 0.5) * (w / n);
+      ctx.beginPath();
+      ctx.arc(bx, y + h - 2, Math.min(7, w / n * 0.42), 0, Math.PI);
+      ctx.fill();
+    }
+    // 하이라이트
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    roundRect(cx - w / 2 + 5, y + 4, Math.max(4, w * 0.3), 5, 3);
+    ctx.fill();
+  }
+
+  function drawCone() {
+    var topY = sy(0);
+    var w = baseW() + 18;
+    var cx = sx(0);
+    // 콘
+    ctx.fillStyle = '#e0a45f';
+    ctx.beginPath();
+    ctx.moveTo(cx - w / 2, topY);
+    ctx.lineTo(cx + w / 2, topY);
+    ctx.lineTo(cx, topY + Math.min(120, H * 0.14));
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#b57e3c';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // 와플 무늬
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = 'rgba(140,90,40,0.5)';
+    ctx.lineWidth = 1.5;
+    for (var i = -4; i <= 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(cx + i * 22 - 40, topY);
+      ctx.lineTo(cx + i * 22 + 40, topY + 130);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + i * 22 + 40, topY);
+      ctx.lineTo(cx + i * 22 - 40, topY + 130);
+      ctx.stroke();
+    }
+    ctx.restore();
+    // 콘 테두리 립
+    ctx.fillStyle = '#c98f3e';
+    roundRect(cx - w / 2 - 4, topY - 7, w + 8, 10, 5);
+    ctx.fill();
+  }
+
+  function drawSun() {
+    var x = W - 58, y = 64;
+    var t = performance.now() / 1000;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(t * 0.25);
+    ctx.strokeStyle = 'rgba(255,150,40,0.75)';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    for (var i = 0; i < 8; i++) {
+      var a = (i / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * 30, Math.sin(a) * 30);
+      ctx.lineTo(Math.cos(a) * 40, Math.sin(a) * 40);
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.fillStyle = '#ffb52e';
+    ctx.beginPath();
+    ctx.arc(x, y, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.beginPath();
+    ctx.arc(x - 7, y - 7, 7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 친구/도전 기록선
+  function drawChallengeLine() {
+    if (chSteps <= 0 || chBeaten) return;
+    var y = sy(chSteps * BLOCK_H);
+    if (y < -30 || y > H + 30) return;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(70,140,255,0.85)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 7]);
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(W, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(70,140,255,0.95)';
+    ctx.font = 'bold 13px -apple-system, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('⚔️ ' + chName + ' ' + chSteps + '층', 8, y - 6);
+    ctx.restore();
+  }
+
+  function skyColor() {
+    // 높이 올라갈수록 노을빛으로
+    var k = Math.min(1, floors / 100);
+    var r = Math.round(255);
+    var g = Math.round(227 + (170 - 227) * k);
+    var b = Math.round(179 + (140 - 179) * k);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function draw() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (shake > 0) ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+
+    ctx.fillStyle = skyColor();
+    ctx.fillRect(-20, -20, W + 40, H + 40);
+    drawSun();
+
+    // 배경 구름 (장식, 패럴랙스)
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    for (var b = 0; b < 4; b++) {
+      var by = ((b * 240 + 120 - camH * 0.3) % (H + 200) + H + 200) % (H + 200) - 100;
+      var bx = (b * 173 + 60) % Math.max(1, W);
+      ctx.beginPath();
+      ctx.ellipse(bx, by, 46, 15, 0, 0, Math.PI * 2);
+      ctx.ellipse(bx + 30, by - 8, 30, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    drawChallengeLine();
+    drawCone();
+
+    // 쌓인 스쿱들 (화면 범위만)
+    for (var i = 0; i < tower.length; i++) {
+      var t = tower[i];
+      var y = sy((i + 1) * BLOCK_H);
+      if (y < -60 || y > H + 60) continue;
+      var squash = (i === tower.length - 1) ? placeFx : 0;
+      drawScoop(sx(t.x), y, t.w, t.ci, squash);
+    }
+
+    // 잘려나간 / 놓친 조각
+    for (var f = 0; f < falls.length; f++) {
+      var p = falls[f];
+      if (p.w < 2) continue;
+      ctx.save();
+      ctx.translate(sx(p.x), sy(p.h) + BLOCK_H / 2);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = 0.95;
+      drawScoop(0, -BLOCK_H / 2, p.w, p.ci, 0);
+      ctx.restore();
+    }
+
+    // 녹은 방울
+    for (var d = 0; d < drips.length; d++) {
+      var q = drips[d];
+      ctx.fillStyle = FLAVORS[q.ci].c;
+      ctx.beginPath();
+      ctx.arc(sx(q.x), sy(q.h), q.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 지금 움직이는 스쿱 (탑 위 한 층)
+    if (cur) {
+      drawScoop(sx(cur.x), sy((floors + 1) * BLOCK_H), cur.w, cur.ci, 0);
+      // 녹는 중 표시: 폭 게이지 느낌의 반짝임
+      if (cur.w < baseW() * 0.45) {
+        var blink = 0.4 + 0.6 * Math.abs(Math.sin(performance.now() / 140));
+        ctx.save();
+        ctx.globalAlpha = blink;
+        ctx.fillStyle = '#d1342a';
+        ctx.font = 'bold 15px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🫠 녹는 중!', sx(cur.x), sy((floors + 1) * BLOCK_H) - 10);
+        ctx.restore();
+      }
+    }
+
+    // UI
+    ctx.textAlign = 'center';
+    if (state === STATE_PLAY) {
+      ctx.fillStyle = '#5a2c18';
+      ctx.font = 'bold 46px -apple-system, sans-serif';
+      ctx.fillText(floors + '층', W / 2, 62);
+      ctx.font = '14px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(90,44,24,0.6)';
+      ctx.fillText('최고 ' + best + '층', W / 2, 86);
+
+      if (introT > 0) {
+        var ia = Math.min(1, introT / 0.35);
+        var blink2 = 0.55 + 0.45 * Math.sin(performance.now() / 90);
+        ctx.save();
+        ctx.globalAlpha = ia * blink2;
+        ctx.fillStyle = '#d1342a';
+        ctx.font = 'bold 26px -apple-system, sans-serif';
+        ctx.fillText('탭해서 쌓기!', W / 2, H * 0.3);
+        ctx.font = 'bold 17px -apple-system, sans-serif';
+        ctx.fillText('망설이면 녹아서 줄어들어요', W / 2, H * 0.3 + 32);
+        ctx.restore();
+      }
+
+      // 플래시 메시지 (퍼펙트, 친구 기록 돌파 등)
+      for (var fl2 = 0; fl2 < flashes.length; fl2++) {
+        var fl = flashes[fl2];
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, fl.t / 0.4);
+        ctx.fillStyle = fl.color;
+        ctx.font = 'bold 26px -apple-system, sans-serif';
+        ctx.fillText(fl.text, W / 2, H * 0.24 - fl2 * 30);
+        ctx.restore();
+      }
+    } else if (state === STATE_TITLE) {
+      ctx.fillStyle = 'rgba(255,255,255,0.72)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#5a2c18';
+      var ts = 50;
+      ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
+      while (ts > 24 && ctx.measureText('🍦 아이스크림 탑').width > W * 0.9) {
+        ts -= 2;
+        ctx.font = 'bold ' + ts + 'px -apple-system, sans-serif';
+      }
+      ctx.fillText('🍦 아이스크림 탑', W / 2, H * 0.24);
+      ctx.font = '16px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(90,44,24,0.75)';
+      ctx.fillText('탭하면 아이스크림이 떨어져요', W / 2, H * 0.24 + 42);
+      ctx.fillText('겹친 만큼만 남아요 — 딱 맞추면 퍼펙트!', W / 2, H * 0.24 + 66);
+      ctx.fillStyle = '#d1342a';
+      ctx.font = 'bold 16px -apple-system, sans-serif';
+      ctx.fillText('☀️ 망설이면 녹아서 점점 줄어들어요', W / 2, H * 0.24 + 94);
+      if (best > 0) {
+        ctx.fillStyle = 'rgba(90,44,24,0.75)';
+        ctx.font = '16px -apple-system, sans-serif';
+        ctx.fillText('최고 기록 ' + best + '층', W / 2, H * 0.24 + 124);
+      }
+      if (chSteps > 0) {
+        ctx.fillStyle = '#2f6fd6';
+        ctx.font = 'bold 17px -apple-system, sans-serif';
+        ctx.fillText('⚔️ ' + chName + '의 도전장: ' + chSteps + '층을 넘어라!', W / 2, H * 0.24 + 154);
+      }
+      blinkText('탭해서 시작!', H * 0.72);
+    } else if (state === STATE_OVER) {
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(-20, -20, W + 40, H + 40);
+    }
+  }
+
+  function blinkText(text, y) {
+    var a = 0.55 + 0.45 * Math.sin(performance.now() / 350);
+    ctx.save();
+    ctx.fillStyle = '#5a2c18';
+    ctx.globalAlpha = a;
+    ctx.font = 'bold 22px -apple-system, sans-serif';
+    ctx.fillText(text, W / 2, y);
+    ctx.restore();
+  }
+
+  // ---------- 루프 ----------
+  var last = performance.now();
+  function loop(now) {
+    var dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // 인앱 브라우저 시트 닫힘 방지: 문서 스크롤을 완충지대 중간(120px)에 걸어 둔다.
+  var SE = document.scrollingElement || document.documentElement;
+  var PIN = 120, pinT = null;
+  function pinScroll() {
+    var max = SE.scrollHeight - SE.clientHeight;
+    if (max <= 0) return;
+    SE.scrollTop = Math.min(PIN, Math.max(1, max - 1));
+  }
+  document.addEventListener('touchstart', pinScroll, { passive: true });
+  window.addEventListener('scroll', function () {
+    clearTimeout(pinT); pinT = setTimeout(pinScroll, 250);
+  }, { passive: true });
+  pinScroll();
+
+  requestAnimationFrame(loop);
+
+  // 헤드리스 테스트용 훅 (해시에 debug가 있을 때만)
+  if ((location.hash || '').indexOf('debug') >= 0) {
+    window.__game = {
+      get state() { return state; },
+      get floors() { return floors; },
+      get cur() { return cur; },
+      get towerTop() { return topBlock(); },
+      get chSteps() { return chSteps; },
+      get chName() { return chName; },
+      get combo() { return combo; },
+      drop: drop,
+      tryStart: tryStart
+    };
+  }
+})();
+</script>
+</body>
+</html>
