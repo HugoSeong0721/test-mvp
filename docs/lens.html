@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>카메라 번역 렌즈</title>
+<style>
+  html,body{margin:0;padding:0;background:#000;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+  /* in-app browser sheet-close guard: fixed app + scroll buffer */
+  html{height:100%;}
+  body{height:calc(100% + 240px);}
+  #app{position:fixed;inset:0;overflow:hidden;touch-action:pan-y;background:#000;}
+
+  /* ---------- start screen ---------- */
+  #start{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    gap:18px;padding:24px;box-sizing:border-box;background:radial-gradient(120% 100% at 50% 0%,#12233b 0%,#050a12 70%);z-index:30;}
+  #start h1{font-size:26px;margin:0;letter-spacing:-0.5px;}
+  #start p.sub{margin:0;color:#8fa8c7;font-size:14px;text-align:center;line-height:1.5;}
+  .langRow{display:flex;align-items:center;gap:10px;}
+  .langBtn{background:#182a44;border:1px solid #2c4a74;color:#fff;border-radius:14px;
+    padding:14px 18px;font-size:17px;min-width:118px;text-align:center;}
+  .langBtn small{display:block;color:#7d97ba;font-size:11px;margin-bottom:3px;}
+  #swapBtn{background:none;border:none;color:#5f7ea8;font-size:22px;padding:6px;}
+  #goBtn{margin-top:8px;background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;border:none;
+    border-radius:16px;padding:16px 46px;font-size:19px;font-weight:700;box-shadow:0 6px 24px rgba(37,99,235,.45);}
+  #camErr{display:none;color:#fca5a5;font-size:13px;text-align:center;line-height:1.5;max-width:300px;}
+
+  /* ---------- camera view ---------- */
+  #view{position:absolute;inset:0;display:none;}
+  #video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}
+  #freezeImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+  #overlay{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .ovl{position:absolute;display:flex;align-items:center;justify-content:center;
+    border-radius:4px;white-space:nowrap;overflow:hidden;line-height:1.05;
+    font-weight:600;box-shadow:0 0 0 2px rgba(0,0,0,.06);}
+
+  /* top bar */
+  #topbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:8px;
+    padding:calc(env(safe-area-inset-top, 0px) + 10px) 12px 10px;z-index:5;
+    background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,0));}
+  .pill{background:rgba(15,23,42,.78);border:1px solid rgba(148,163,184,.35);color:#fff;
+    border-radius:999px;padding:9px 16px;font-size:15px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  #swap2{background:rgba(15,23,42,.78);border:1px solid rgba(148,163,184,.35);color:#93c5fd;
+    border-radius:999px;width:38px;height:38px;font-size:17px;}
+
+  /* status + bottom */
+  #status{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom, 0px) + 86px);
+    text-align:center;z-index:5;pointer-events:none;}
+  #status span{display:inline-block;background:rgba(15,23,42,.75);border-radius:999px;padding:7px 14px;
+    font-size:13px;color:#cbd5e1;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  #status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ade80;margin-right:7px;
+    animation:pulse 1.2s infinite;vertical-align:1px;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  #bottombar{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom, 0px) + 18px);
+    display:flex;justify-content:center;gap:14px;z-index:5;}
+  #freezeBtn{width:64px;height:64px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.18);
+    color:#fff;font-size:24px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  #freezeBtn.frozen{background:#f59e0b;border-color:#fcd34d;}
+
+  /* progress bar for lang download */
+  #prog{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:230px;z-index:6;
+    text-align:center;display:none;}
+  #prog .txt{font-size:14px;color:#e2e8f0;margin-bottom:10px;text-shadow:0 1px 4px #000;}
+  #prog .bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;}
+  #prog .fill{height:100%;width:0%;background:#3b82f6;border-radius:3px;transition:width .2s;}
+
+  /* language sheet */
+  #sheet{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none;}
+  #sheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:62%;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:#0f1a2c;border-radius:18px 18px 0 0;padding:10px 0 calc(env(safe-area-inset-bottom, 0px) + 14px);}
+  #sheet h3{margin:6px 18px 8px;font-size:14px;color:#7d97ba;font-weight:600;}
+  #sheet .opt{padding:14px 20px;font-size:17px;border-bottom:1px solid rgba(148,163,184,.08);}
+  #sheet .opt.sel{color:#60a5fa;font-weight:700;}
+  #sheet .opt small{color:#64748b;font-size:12px;margin-left:8px;}
+  button{cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- start screen -->
+  <div id="start">
+    <h1>📷 카메라 번역 렌즈</h1>
+    <p class="sub">메뉴판·간판에 카메라를 비추면<br>글자 위에 번역이 실시간으로 덮여 보여요.<br>사진 안 찍어도 됩니다.</p>
+    <div class="langRow">
+      <button class="langBtn" id="srcBtn"><small>비추는 글자</small><span id="srcLabel">러시아어</span></button>
+      <button id="swapBtn">⇄</button>
+      <button class="langBtn" id="tgtBtn"><small>보이는 번역</small><span id="tgtLabel">영어</span></button>
+    </div>
+    <button id="goBtn">카메라 시작</button>
+    <p id="camErr"></p>
+  </div>
+
+  <!-- camera view -->
+  <div id="view">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="freezeImg"></canvas>
+    <div id="overlay"></div>
+    <div id="topbar">
+      <button class="pill" id="srcPill">러시아어</button>
+      <button id="swap2">⇄</button>
+      <button class="pill" id="tgtPill">영어</button>
+    </div>
+    <div id="prog"><div class="txt">글자 인식 준비 중…</div><div class="bar"><div class="fill"></div></div></div>
+    <div id="status"><span style="display:none"><i class="dot"></i><b id="stTxt"></b></span></div>
+    <div id="bottombar"><button id="freezeBtn" title="화면 고정">⏸</button></div>
+  </div>
+
+  <!-- language picker sheet -->
+  <div id="sheet"><div class="panel"><h3 id="sheetTitle"></h3><div id="sheetList"></div></div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  // in-app browser guard: keep a scroll buffer so downward drags don't close the sheet
+  window.scrollTo(0,120);
+  window.addEventListener('touchend', function(){ setTimeout(function(){ window.scrollTo(0,120); }, 50); });
+
+  var CDN = 'https://cdn.jsdelivr.net/npm/';
+  var TESS_OPTS = {
+    workerPath: CDN + 'tesseract.js@5.1.1/dist/worker.min.js',
+    corePath:   CDN + 'tesseract.js-core@5.1.1'
+  };
+
+  // tess: tesseract traineddata code / gt: google translate code
+  var LANGS = [
+    {tess:'rus',     gt:'ru',    name:'러시아어',      nat:'Русский'},
+    {tess:'eng',     gt:'en',    name:'영어',          nat:'English'},
+    {tess:'kor',     gt:'ko',    name:'한국어',        nat:'한국어'},
+    {tess:'kir',     gt:'ky',    name:'키르기스어',    nat:'Кыргызча'},
+    {tess:'jpn',     gt:'ja',    name:'일본어',        nat:'日本語'},
+    {tess:'chi_sim', gt:'zh-CN', name:'중국어(간체)',  nat:'中文'},
+    {tess:'spa',     gt:'es',    name:'스페인어',      nat:'Español'},
+    {tess:'fra',     gt:'fr',    name:'프랑스어',      nat:'Français'},
+    {tess:'deu',     gt:'de',    name:'독일어',        nat:'Deutsch'},
+    {tess:'ita',     gt:'it',    name:'이탈리아어',    nat:'Italiano'},
+    {tess:'tur',     gt:'tr',    name:'튀르키예어',    nat:'Türkçe'},
+    {tess:'vie',     gt:'vi',    name:'베트남어',      nat:'Tiếng Việt'},
+    {tess:'tha',     gt:'th',    name:'태국어',        nat:'ไทย'}
+  ];
+  // targets don't need OCR data — any translate code works
+  var TARGETS = [
+    {gt:'en',    name:'영어'},   {gt:'ko',    name:'한국어'}, {gt:'ru', name:'러시아어'},
+    {gt:'ja',    name:'일본어'}, {gt:'zh-CN', name:'중국어(간체)'}, {gt:'es', name:'스페인어'},
+    {gt:'fr',    name:'프랑스어'}, {gt:'de',  name:'독일어'}, {gt:'ky', name:'키르기스어'}
+  ];
+
+  var src = LANGS[0];     // 러시아어
+  var tgt = TARGETS[0];   // 영어
+  try{
+    var saved = JSON.parse(localStorage.getItem('lens.langs') || 'null');
+    if(saved){
+      src = LANGS.filter(function(l){return l.tess===saved.s;})[0] || src;
+      tgt = TARGETS.filter(function(l){return l.gt===saved.t;})[0] || tgt;
+    }
+  }catch(e){}
+
+  var $ = function(id){ return document.getElementById(id); };
+  var video = $('video'), overlay = $('overlay'), freezeImg = $('freezeImg');
+  var worker = null, workerLang = '', workerLoading = false;
+  var running = false, frozen = false, scanning = false;
+  var ocrCanvas = document.createElement('canvas');
+  var ocrCtx = ocrCanvas.getContext('2d', {willReadFrequently:true});
+  var measure = document.createElement('canvas').getContext('2d');
+
+  function saveLangs(){ try{ localStorage.setItem('lens.langs', JSON.stringify({s:src.tess, t:tgt.gt})); }catch(e){} }
+  function labels(){
+    $('srcLabel').textContent = src.name; $('tgtLabel').textContent = tgt.name;
+    $('srcPill').textContent = src.name;  $('tgtPill').textContent = tgt.name;
+  }
+  labels();
+
+  function setStatus(txt){
+    var s = $('status').firstElementChild;
+    if(!txt){ s.style.display = 'none'; return; }
+    $('stTxt').textContent = txt; s.style.display = '';
+  }
+
+  /* ---------------- translation (gtx + MyMemory fallback, cached) ---------------- */
+  function fetchTimeout(url, ms){
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    if(ctrl) setTimeout(function(){ ctrl.abort(); }, ms);
+    return fetch(url, ctrl ? {signal:ctrl.signal} : {});
+  }
+  var gtxBlockedUntil = 0;
+  function viaGtx(text, sl, tl){
+    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + sl
+            + '&tl=' + tl + '&dt=t&q=' + encodeURIComponent(text);
+    return fetchTimeout(url, 8000).then(function(r){
+      if(r.status === 429){ gtxBlockedUntil = Date.now() + 60000; throw new Error('429'); }
+      if(!r.ok) throw new Error('http '+r.status);
+      return r.json();
+    }).then(function(j){
+      var out = (j && j[0]) ? j[0].map(function(s){return s[0]||'';}).join('') : '';
+      if(!out) throw new Error('empty');
+      return out;
+    });
+  }
+  function viaMyMemory(text, sl, tl){
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text)
+            + '&langpair=' + sl + '%7C' + tl;
+    return fetchTimeout(url, 8000).then(function(r){
+      if(!r.ok) throw new Error('http '+r.status);
+      return r.json();
+    }).then(function(j){
+      var out = j && j.responseData && j.responseData.translatedText;
+      if(!out || j.responseStatus != 200 || /MYMEMORY WARNING/i.test(out)) throw new Error('mm');
+      return out;
+    });
+  }
+  var cache = {}, cacheKeys = [];
+  function putCache(key, val){
+    cache[key] = val; cacheKeys.push(key);
+    if(cacheKeys.length > 800) delete cache[cacheKeys.shift()];
+  }
+  // translate a batch of lines in as few requests as possible (newline-joined gtx)
+  function translateLines(lines, sl, tl){
+    if(sl === tl) return Promise.resolve(lines.slice());
+    var out = new Array(lines.length), need = [], needIdx = [];
+    lines.forEach(function(t, i){
+      var k = sl + '|' + tl + '|' + t;
+      if(cache[k] !== undefined) out[i] = cache[k];
+      else { need.push(t); needIdx.push(i); }
+    });
+    if(!need.length) return Promise.resolve(out);
+
+    function fallbackPerLine(items, idxs){
+      // MyMemory can't batch — translate a few per pass, rest keeps original for now
+      var jobs = items.slice(0, 8).map(function(t, j){
+        return viaMyMemory(t, sl, tl).then(function(tr){
+          putCache(sl+'|'+tl+'|'+t, tr); out[idxs[j]] = tr;
+        }).catch(function(){ out[idxs[j]] = null; });
+      });
+      items.slice(8).forEach(function(_, j){ out[idxs[8+j]] = null; });
+      return Promise.all(jobs).then(function(){ return out; });
+    }
+
+    if(Date.now() < gtxBlockedUntil) return fallbackPerLine(need, needIdx);
+
+    // chunk so the URL stays a sane length
+    var chunks = [], cur = [], curLen = 0;
+    need.forEach(function(t, j){
+      if(curLen + t.length > 2600 && cur.length){ chunks.push(cur); cur = []; curLen = 0; }
+      cur.push(j); curLen += t.length + 1;
+    });
+    if(cur.length) chunks.push(cur);
+
+    return Promise.all(chunks.map(function(idxList){
+      var joined = idxList.map(function(j){ return need[j]; }).join('\n');
+      return viaGtx(joined, sl, tl).then(function(tr){
+        var parts = tr.split('\n');
+        if(parts.length !== idxList.length) throw new Error('mismatch');
+        idxList.forEach(function(j, p){
+          var v = parts[p].trim() || need[j];
+          putCache(sl+'|'+tl+'|'+need[j], v); out[needIdx[j]] = v;
+        });
+      }).catch(function(){
+        // per-line gtx as a second chance, then give up quietly this pass
+        return Promise.all(idxList.slice(0, 10).map(function(j){
+          return viaGtx(need[j], sl, tl).then(function(tr){
+            putCache(sl+'|'+tl+'|'+need[j], tr); out[needIdx[j]] = tr;
+          }).catch(function(){ out[needIdx[j]] = null; });
+        }));
+      });
+    })).then(function(){ return out; })
+      .catch(function(){ return fallbackPerLine(need, needIdx); });
+  }
+
+  /* ---------------- OCR worker ---------------- */
+  function loadWorker(lang){
+    if(worker && workerLang === lang) return Promise.resolve(worker);
+    workerLoading = true;
+    var prog = $('prog'); prog.style.display = 'block';
+    prog.querySelector('.txt').textContent = src.name + ' 글자 인식 준비 중…';
+    prog.querySelector('.fill').style.width = '0%';
+    var old = worker; worker = null; workerLang = '';
+    var p = old ? old.terminate().catch(function(){}) : Promise.resolve();
+    return p.then(function(){
+      return Tesseract.createWorker(lang, 1, {
+        workerPath: TESS_OPTS.workerPath,
+        corePath:   TESS_OPTS.corePath,
+        langPath:   CDN + '@tesseract.js-data/' + lang + '/4.0.0_best_int',
+        logger: function(m){
+          if(m.progress !== undefined){
+            var pct = Math.round(m.progress * 100);
+            prog.querySelector('.fill').style.width = pct + '%';
+          }
+        }
+      });
+    }).then(function(w){
+      worker = w; workerLang = lang; workerLoading = false;
+      prog.style.display = 'none';
+      return w;
+    }).catch(function(e){
+      workerLoading = false;
+      prog.querySelector('.txt').textContent = '인식 모델 로딩 실패 — 네트워크 확인 후 새로고침';
+      throw e;
+    });
+  }
+
+  /* ---------------- camera ---------------- */
+  function startCamera(){
+    var constraints = {audio:false, video:{
+      facingMode:{ideal:'environment'},
+      width:{ideal:1920}, height:{ideal:1080}
+    }};
+    return navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
+      video.srcObject = stream;
+      return video.play().catch(function(){});
+    });
+  }
+
+  /* ---------------- scan loop ---------------- */
+  var lastResults = [];   // [{bbox, text, tr}]
+  function grabFrame(){
+    var vw = video.videoWidth, vh = video.videoHeight;
+    if(!vw || !vh) return null;
+    var maxDim = 1100, k = Math.min(1, maxDim / Math.max(vw, vh));
+    ocrCanvas.width = Math.round(vw * k); ocrCanvas.height = Math.round(vh * k);
+    ocrCtx.drawImage(video, 0, 0, ocrCanvas.width, ocrCanvas.height);
+    return {k:k, vw:vw, vh:vh};
+  }
+  function avgColor(b){
+    // sample the line's box from the ocr canvas for a Lens-style patch color
+    try{
+      var w = Math.max(1, Math.min(60, b.x1 - b.x0)), h = Math.max(1, Math.min(24, b.y1 - b.y0));
+      var d = ocrCtx.getImageData(b.x0, b.y0, w, h).data;
+      var r=0,g=0,bl=0,n=0;
+      for(var i=0;i<d.length;i+=16){ r+=d[i]; g+=d[i+1]; bl+=d[i+2]; n++; }
+      r=Math.round(r/n); g=Math.round(g/n); bl=Math.round(bl/n);
+      var lum = 0.2126*r + 0.7152*g + 0.0722*bl;
+      return {bg:'rgba('+r+','+g+','+bl+',0.93)', fg: lum > 140 ? '#111' : '#fff'};
+    }catch(e){ return {bg:'rgba(17,24,39,0.9)', fg:'#fff'}; }
+  }
+  function hasLetters(t){
+    if(/[A-Za-zÀ-ɏЀ-ӿ぀-ヿ㐀-鿿가-힣฀-๿]/.test(t)) return true;
+    return false;
+  }
+
+  function scanOnce(frame){
+    return worker.recognize(ocrCanvas).then(function(res){
+      var lines = (res.data.lines || []).filter(function(l){
+        var t = l.text.replace(/\s+/g,' ').trim();
+        return t.length >= 2 && l.confidence >= 45 && hasLetters(t);
+      }).map(function(l){
+        return {bbox:l.bbox, text:l.text.replace(/\s+/g,' ').trim(), color:avgColor(l.bbox)};
+      });
+      if(!lines.length){ lastResults = []; render(frame); return; }
+      return translateLines(lines.map(function(l){return l.text;}), src.gt, tgt.gt)
+        .then(function(trs){
+          var failed = 0;
+          lines.forEach(function(l, i){ l.tr = trs[i]; if(trs[i] === null) failed++; });
+          lastResults = lines;
+          render(frame);
+          setStatus(failed === lines.length ? '번역 서버 연결 안 됨 — 원문 표시 중' : '');
+          if(failed !== lines.length && failed === 0) setStatus('');
+        });
+    });
+  }
+
+  function render(frame){
+    var dispW = overlay.clientWidth, dispH = overlay.clientHeight;
+    var vw = frame.vw, vh = frame.vh, k = frame.k;
+    var scale = Math.max(dispW / vw, dispH / vh);
+    var offX = (dispW - vw * scale) / 2, offY = (dispH - vh * scale) / 2;
+    var html = '';
+    lastResults.forEach(function(l){
+      var b = l.bbox;
+      var x = (b.x0 / k) * scale + offX, y = (b.y0 / k) * scale + offY;
+      var w = ((b.x1 - b.x0) / k) * scale, h = ((b.y1 - b.y0) / k) * scale;
+      if(w < 8 || h < 6) return;
+      var text = l.tr || l.text;
+      var fs = Math.max(9, Math.min(40, h * 0.72));
+      measure.font = '600 ' + fs + 'px -apple-system,sans-serif';
+      var tw = measure.measureText(text).width;
+      if(tw > w - 4) fs = Math.max(8, fs * (w - 4) / tw);
+      var pending = (l.tr === null || l.tr === undefined);
+      html += '<div class="ovl" style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1)
+           + 'px;width:' + w.toFixed(1) + 'px;height:' + h.toFixed(1)
+           + 'px;background:' + l.color.bg + ';color:' + l.color.fg
+           + ';font-size:' + fs.toFixed(1) + 'px'
+           + (pending ? ';opacity:.65;font-style:italic' : '') + '">'
+           + text.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</div>';
+    });
+    overlay.innerHTML = html;
+  }
+
+  function loop(){
+    if(!running) return;
+    if(frozen || document.hidden || workerLoading || !worker){ setTimeout(loop, 250); return; }
+    var frame = grabFrame();
+    if(!frame){ setTimeout(loop, 250); return; }
+    scanning = true;
+    scanOnce(frame).catch(function(){}).then(function(){
+      scanning = false;
+      setTimeout(loop, 150);
+    });
+  }
+
+  /* ---------------- freeze ---------------- */
+  function setFrozen(f){
+    frozen = f;
+    $('freezeBtn').textContent = f ? '▶' : '⏸';
+    $('freezeBtn').className = f ? 'frozen' : '';
+    if(f){
+      freezeImg.width = ocrCanvas.width; freezeImg.height = ocrCanvas.height;
+      var c = freezeImg.getContext('2d');
+      var vw = video.videoWidth, vh = video.videoHeight;
+      if(vw && vh){
+        freezeImg.width = vw; freezeImg.height = vh;
+        c.drawImage(video, 0, 0, vw, vh);
+      }
+      freezeImg.style.display = 'block';
+      setStatus('화면 고정 — ▶ 를 누르면 다시 스캔');
+    }else{
+      freezeImg.style.display = 'none';
+      setStatus('');
+    }
+  }
+  $('freezeBtn').addEventListener('click', function(){ setFrozen(!frozen); });
+
+  /* ---------------- language sheet ---------------- */
+  var sheetMode = 's';
+  function openSheet(mode){
+    sheetMode = mode;
+    $('sheetTitle').textContent = mode === 's' ? '비추는 글자 (인식할 언어)' : '번역해서 보여줄 언어';
+    var list = mode === 's' ? LANGS : TARGETS;
+    var curCode = mode === 's' ? src.tess : tgt.gt;
+    $('sheetList').innerHTML = list.map(function(l, i){
+      var sel = (mode === 's' ? l.tess : l.gt) === curCode;
+      return '<div class="opt' + (sel ? ' sel' : '') + '" data-i="' + i + '">' + l.name
+           + (l.nat ? '<small>' + l.nat + '</small>' : '') + '</div>';
+    }).join('');
+    $('sheet').style.display = 'block';
+  }
+  $('sheet').addEventListener('click', function(e){
+    var opt = e.target.closest ? e.target.closest('.opt') : null;
+    if(opt){
+      var i = +opt.getAttribute('data-i');
+      if(sheetMode === 's'){
+        src = LANGS[i];
+        if(running) loadWorker(src.tess).catch(function(){});
+      }else{
+        tgt = TARGETS[i];
+      }
+      saveLangs(); labels();
+      overlay.innerHTML = ''; lastResults = [];
+    }
+    $('sheet').style.display = 'none';
+  });
+  $('srcBtn').addEventListener('click', function(){ openSheet('s'); });
+  $('tgtBtn').addEventListener('click', function(){ openSheet('t'); });
+  $('srcPill').addEventListener('click', function(){ openSheet('s'); });
+  $('tgtPill').addEventListener('click', function(){ openSheet('t'); });
+
+  function doSwap(){
+    // swap only if the current target is also OCR-capable
+    var newSrc = LANGS.filter(function(l){ return l.gt === tgt.gt; })[0];
+    var newTgt = TARGETS.filter(function(l){ return l.gt === src.gt; })[0];
+    if(!newSrc || !newTgt) return;
+    src = newSrc; tgt = newTgt;
+    saveLangs(); labels();
+    overlay.innerHTML = ''; lastResults = [];
+    if(running) loadWorker(src.tess).catch(function(){});
+  }
+  $('swapBtn').addEventListener('click', doSwap);
+  $('swap2').addEventListener('click', doSwap);
+
+  /* ---------------- start ---------------- */
+  $('goBtn').addEventListener('click', function(){
+    $('goBtn').disabled = true;
+    $('camErr').style.display = 'none';
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      $('camErr').textContent = '이 브라우저에서는 카메라를 쓸 수 없어요. 링크를 사파리(Safari)에서 직접 열어 주세요.';
+      $('camErr').style.display = 'block'; $('goBtn').disabled = false;
+      return;
+    }
+    startCamera().then(function(){
+      $('start').style.display = 'none';
+      $('view').style.display = 'block';
+      running = true;
+      loadWorker(src.tess).then(function(){ loop(); })
+        .catch(function(){});
+    }).catch(function(e){
+      var msg = '카메라를 열 수 없어요';
+      if(e && (e.name === 'NotAllowedError' || e.name === 'SecurityError'))
+        msg = '카메라 권한이 거부됐어요. 카카오톡·인스타 등 인앱 브라우저라면 링크를 사파리에서 직접 열어 주세요.';
+      else if(e && e.name === 'NotFoundError') msg = '사용할 수 있는 카메라가 없어요.';
+      $('camErr').textContent = msg;
+      $('camErr').style.display = 'block';
+      $('goBtn').disabled = false;
+    });
+  });
+
+  window.addEventListener('resize', function(){
+    if(lastResults.length && video.videoWidth){
+      render({k: ocrCanvas.width / video.videoWidth, vw: video.videoWidth, vh: video.videoHeight});
+    }
+  });
+})();
+</script>
+</body>
+</html>
