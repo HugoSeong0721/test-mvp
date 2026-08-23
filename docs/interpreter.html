@@ -115,25 +115,62 @@
     }catch(e){}
   }
 
-  function translate(text, tl){
-    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl='
-            + tl + '&dt=t&q=' + encodeURIComponent(text);
+  function fetchTimeout(url, ms){
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
-    if(ctrl) setTimeout(function(){ ctrl.abort(); }, 8000);
-    return fetch(url, ctrl ? {signal:ctrl.signal} : {}).then(function(r){
+    if(ctrl) setTimeout(function(){ ctrl.abort(); }, ms);
+    return fetch(url, ctrl ? {signal:ctrl.signal} : {});
+  }
+
+  // provider 1: Google gtx — fast but rate-limits (429) under bursty use
+  var gtxBlockedUntil = 0;
+  function viaGtx(text, sl, tl){
+    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + sl
+            + '&tl=' + tl + '&dt=t&q=' + encodeURIComponent(text);
+    return fetchTimeout(url, 7000).then(function(r){
+      if(r.status === 429){ gtxBlockedUntil = Date.now() + 60000; throw new Error('429'); }
       if(!r.ok) throw new Error('http '+r.status);
       return r.json();
     }).then(function(j){
       var out = (j && j[0]) ? j[0].map(function(s){return s[0]||'';}).join('') : '';
       if(!out) throw new Error('empty');
-      return {text:out, src:j[2]||''};
+      return out;
     });
   }
 
-  // translate into every language the listener reads; per-language fallback to original
-  function translateAll(text, langs){
+  // provider 2: MyMemory — fallback while gtx is cooling down
+  function viaMyMemory(text, sl, tl){
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text)
+            + '&langpair=' + sl + '%7C' + tl;
+    return fetchTimeout(url, 7000).then(function(r){
+      if(!r.ok) throw new Error('http '+r.status);
+      return r.json();
+    }).then(function(j){
+      var out = j && j.responseData && j.responseData.translatedText;
+      if(!out || j.responseStatus != 200 || /MYMEMORY WARNING/i.test(out)) throw new Error('mm');
+      return out;
+    });
+  }
+
+  var cache = {}; var cacheKeys = [];
+  function translate(text, sl, tl){
+    if(sl === tl) return Promise.resolve(text);
+    var key = sl + '|' + tl + '|' + text;
+    if(cache[key] !== undefined) return Promise.resolve(cache[key]);
+    var first = (Date.now() > gtxBlockedUntil) ? viaGtx : viaMyMemory;
+    var second = (first === viaGtx) ? viaMyMemory : viaGtx;
+    return first(text, sl, tl)
+      .catch(function(){ return second(text, sl, tl); })
+      .then(function(out){
+        cache[key] = out; cacheKeys.push(key);
+        if(cacheKeys.length > 300) delete cache[cacheKeys.shift()];
+        return out;
+      });
+  }
+
+  // translate into every listener language; per-language fallback to original
+  function translateAll(text, sl, langs){
     return Promise.all(langs.map(function(tl){
-      return translate(text, tl).then(function(r){ return {lang:tl, text:r.text, ok:true}; })
+      return translate(text, sl, tl).then(function(out){ return {lang:tl, text:out, ok:true}; })
         .catch(function(){ return {lang:tl, text:text, ok:false}; });
     }));
   }
@@ -283,6 +320,7 @@
   }
 
   // ---- live (pre-final) translation while the speaker is still talking ----
+  // throttled to ~1 req/900ms, primary listener language only, to stay under rate limits
   function scheduleLive(s, text){
     var t = other(s);
     s.pendingLive = text;
@@ -290,18 +328,19 @@
     s.liveTimer = setTimeout(function(){
       s.liveTimer = null;
       var txt = s.pendingLive;
-      if(!txt) return;
+      if(!txt || txt === s.liveSent) return; // unchanged since last live request
+      s.liveSent = txt;
       var id = ++t.liveSeq;
-      translateAll(txt, t.read).then(function(parts){
+      translateAll(txt, s.read[0], [t.read[0]]).then(function(parts){
         if(id !== t.liveSeq) return;        // superseded by newer interim or a final
         t.live = {parts:parts};
         renderFeed(t);
       });
-    }, 450);
+    }, 900);
   }
 
   function cancelLive(s){
-    s.pendingLive = null;
+    s.pendingLive = null; s.liveSent = null;
     if(s.liveTimer){ clearTimeout(s.liveTimer); s.liveTimer = null; }
     var t = other(s);
     t.liveSeq++;
@@ -313,7 +352,7 @@
     cancelLive(s);
     var target = other(s);
     pushMsg(s, {self:true, text:text});
-    translateAll(text, target.read).then(function(parts){
+    translateAll(text, s.read[0], target.read).then(function(parts){
       var allFail = parts.every(function(p){ return !p.ok; });
       pushMsg(target, {parts:parts, orig:text, warn:allFail});
     });
