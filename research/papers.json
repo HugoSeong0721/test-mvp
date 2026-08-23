@@ -2545,5 +2545,120 @@
       "TCM body constitution classification machine learning"
     ],
     "first_seen": "2026-08-17"
+  },
+  {
+    "id": "doi:10.1111/wrr.70184",
+    "title": "Ischial Pressure Ulcer Reconstruction: A Critical Review of the Paradigm Shift From Wound Coverage to Functional Restoration.",
+    "authors": [
+      "Huang C",
+      "Wang S",
+      "Lin J",
+      "Wang S",
+      "Xu Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/wrr.70184",
+    "abstract": "Ischial pressure ulcers (IPUs), severe complications in patients with prolonged immobility, are challenging due to high recurrence. Moving beyond anatomical closure, the field now prioritises functional-integrated reconstruction. This paradigm emphasises radical debridement and the transfer of well-vascularized perforator flaps to obliterate dead space, cover wounds, and restore protective sensation, aiming to break the recurrence cycle and restore patient autonomy. This review critically synthesises contemporary advances driving this shift. It details the development of precision and minimally invasive perforator flap techniques, including sensory nerve coaptation and chimeric designs. The integration of multimodal perioperative strategies, such as antibiotic-loaded bone cement and fluorescence angiography, is discussed. The adjunctive role of traditional Chinese medicine and the exploratory potential of regenerative approaches (stem cells, 3D-bioprinting) are considered. Finally, practical recommendations for implementing this holistic approach are provided, along with a clinical flowchart to guide staged management. By consolidating these advances, this review provides a framework to transition IPU management from simple wound healing towards comprehensive functional and social rehabilitation.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-08-23"
+  },
+  {
+    "id": "doi:10.1016/j.jpha.2025.101455",
+    "title": "Principles and strategies in cold/hot property studies of traditional Chinese medicine: an evolution from traditional theory to modern elucidation.",
+    "authors": [
+      "Zhang M",
+      "Zhang X",
+      "Wei R",
+      "Li YN",
+      "Hu Y",
+      "Zou YD",
+      "Li X",
+      "Wang YF",
+      "Yang WZ",
+      "Guo DA."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1016/j.jpha.2025.101455",
+    "abstract": "Property of traditional Chinese medicine (TCM) is the core of the basic theories of TCM. Especially, the cold and hot properties are considered as closely related to the clinical medication and have the guiding significance. Driven by the ongoing advances of modern analytical technology, studies on the ancient theory of TCM cold and hot properties are flourishing recently; however, the review focusing on the applied research methods is insufficient. This review, by the bibliometric analysis of 996 associated publications, discloses the methodological evolution in researching the cold and hot properties of TCM from the traditional temperature-based methods (e.g., cold/hot plate differentiating and infrared thermography technologies) to modern elucidation that relies on the material basis-oriented strategies (multi-omics and gut microbiomics). The analytical techniques that are appliable to the <i>in vitro</i>/<i>in vivo</i> characterization of TCM decoction, analysis of effects on endogenous substances, and use of machine learning models for predicting properties, are systematically summarized. In addition, a review on the principles, characteristics, and applications of these analytical methods is conducted, to highlight the important research ideas and key results. It is thus expected to provide valuable reference for the in-depth analysis and better understanding of the theory of TCM properties.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-08-23"
+  },
+  {
+    "id": "doi:10.1097/md.0000000000049452",
+    "title": "Efficacy and safety of traditional Chinese medicine decoctions as an adjuvant treatment for rheumatoid arthritis: A systematic review and meta-analysis.",
+    "authors": [
+      "Xu Y",
+      "Luo L",
+      "Chen Y",
+      "Liu X."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1097/md.0000000000049452",
+    "abstract": "<h4>Background</h4>To assess the effectiveness and safety of traditional Chinese medicine (TCM) decoctions as an additional therapy for rheumatoid arthritis (RA) via a systematic review and meta-analysis.<h4>Methods</h4>Databases including PubMed, Web of Science, Cochrane Library, Embase, China National Knowledge Infrastructure, and Wanfang were searched up to June 2024. Randomized controlled trials (RCTs) on TCM decoctions as adjunctive RA treatment were included. Primary outcomes were efficacy and safety. Effect sizes were measured using standardized mean difference, risk ratio, and 95% confidence intervals. Sensitivity and subgroup analyses were conducted to test result robustness and identify heterogeneity sources. Data were analyzed using RevMan 5.4 and Stata 15. In addition, the quality of evidence was assessed using grading of recommendations assessment, development and evaluation grading.<h4>Results</h4>Thirty-six RCTs with 6934 participants showed that TCM decoctions significantly improved overall efficacy versus control (risk ratio = 1.25, 95% confidence interval [1.21-1.29], P < .00001). They also reduced erythrocyte sedimentation rate, C-reactive protein, rheumatoid factor, swollen joint count, Disease Activity Score, and morning stiffness duration compared to placebo. Subgroup analysis suggested treatment duration, disease duration, and age may affect efficacy. Among them, the quality of evidence was high for Visual Analog Scale, and moderate for overall efficacy, C-reactive protein, Disease Activity Score, Traditional Chinese Medicine Symptom Score, and interleukin-1.<h4>Conclusion</h4>TCM decoctions as adjunctive RA treatment significantly enhance efficacy. However, due to study limitations, further large-scale, multicenter RCTs are needed to confirm these findings.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-08-23"
+  },
+  {
+    "id": "doi:10.1016/j.pccm.2026.05.005",
+    "title": "Artificial intelligence in respiratory medicine: From diagnosis to treatment and future directions.",
+    "authors": [
+      "Chen Z",
+      "Tang Z",
+      "Ewing RM",
+      "Belkhatir Z",
+      "Wang Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1016/j.pccm.2026.05.005",
+    "abstract": "Lung diseases-including lung cancer, chronic obstructive pulmonary disease (COPD), asthma, interstitial lung diseases (ILDs), and rare conditions like cystic fibrosis-remain major drivers of global morbidity and mortality. Timely diagnosis and individualized treatment are frequently challenged by heterogeneous clinical phenotypes and the complexity of multimodal data. This review provides a critical synthesis of the transformative role of artificial intelligence (AI) in respiratory care, tracing the paradigm shift from classical machine learning to emerging large language models (LLMs) and multimodal foundation models. We evaluate the performance of AI across the patient care continuum: beginning with radiologist-level nodule detection and automated diagnostics, advancing into AI-powered clinical decision support systems (CDSS) and surgical/radiotherapeutic interventions, and culminating in prognostic modeling and \"digital twin\" simulations for longitudinal patient management. Furthermore, we explore the translational frontier of precision medicine, examining how AI leverages multi-omics and liquid biopsies to drive novel biomarker discovery and accelerate drug repurposing. Finally, we address persistent sociotechnical barriers-including data sovereignty, legal liability, and the critical need for prospective clinical validation-proposing a translational roadmap for the safe integration of generalist medical AI into clinical workflows.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-08-23"
+  },
+  {
+    "id": "doi:10.1186/s13010-026-00223-4",
+    "title": "Humanistic thought in medical dao: a cross-cultural perspective of global medical humanities.",
+    "authors": [
+      "Li Y",
+      "Cheng Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13010-026-00223-4",
+    "abstract": "Rooted in \"the real human being and their practice\", the humanistic thought of Traditional Chinese Medicine (TCM) encompasses four core dimensions: the Theory of Valuing Life and Attaining Sagehood, the Theory of Temperament and Human Nature, the Theory of Subject Mutual Benefit, and the Theory of Body-State Synchronism. It provides crucial support for the mutual learning of Chinese and Western medical humanities. The Theory of Valuing Life and Attaining Sagehood resonates with Western bioethics while adding a unique dimension of spiritual self-cultivation; the Theory of Temperament and Human Nature aligns with the precision medicine paradigm and complements the perspective of cultural ethical examination; the Theory of Subject Mutual Benefit firmly opposes the objectification of patients and theoretically expands the Western concept of \"patient-centered care\"; the Theory of Body-State Synchronism integrates individual physical and mental health with collective public well-being, aligning with the core values of contemporary global health governance. As an ideological system deeply embedded in Chinese civilization, it takes the Qi ontology and Yin-Yang balance as its profound metaphysical foundation, constructing a holistic medical humanistic paradigm independent of the Western biomedical model. In the contemporary academic context where medical humanities are moving toward pluralistic coexistence, the value of non-Western medical traditions has attracted increasing scholarly attention. It can not only enrich the Western medical humanistic tradition through cross-cultural dialogue but also provide solid ethical support for the global dissemination and clinical practice of TCM, ultimately realizing two-way mutual learning, complementarity and symbiosis between Eastern and Western medical humanities across cultures.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-08-23"
+  },
+  {
+    "id": "doi:10.1111/jebm.70156",
+    "title": "Development and Preliminary Validation of the Chinese Medicine Interventional Clinical Trials Research Question Importance Tool (CMICT-RQIT).",
+    "authors": [
+      "Cheng T",
+      "Yu D",
+      "Qiu X",
+      "Li G",
+      "Wen Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jebm.70156",
+    "abstract": "<h4>Objective</h4>Evidence-based medicine emphasizes clinical research driven by important questions, yet Chinese medicine lacks practical quantitative tools to identify such questions. We developed the Chinese Medicine Interventional Clinical Trials Research Question Importance Tool (CMICT-RQIT) to support topic selection and provide transparent criteria for proposal review, promoting high-quality clinical research in Chinese medicine.<h4>Methods</h4>This study followed internationally accepted procedures of conceptualization and operationalization. Using a mixed-methods approach-including a literature review, qualitative interviews, Delphi surveys, expert consensus meetings, and the analytic hierarchy process-we developed the CMICT-RQIT. CMICT-RQIT was prespecified and interpreted as a formative/composite multicriteria decision-support tool.<h4>Results</h4>Following a standardized development process comprising three stages-framework construction, tool development, and tool evaluation-the CMICT-RQIT V1.0 was established. It consists of four domains, 10 facets, and 24 items, each with corresponding composite weights, item explanations, scoring criteria, and an operations manual. Exploratory traditional psychometric analyses showed limited internal consistency and poor structural fit, consistent with the formative/composite nature of the tool and should not be interpreted as evidence that all items measure a single latent trait.<h4>Conclusions</h4>CMICT-RQIT V1.0 can assist researchers in selecting research topics, with its greatest value lying in providing a concise summary of the importance of research question along with a comprehensive 24-item checklist for clinical investigators. At the same time, it offers reviewers transparent criteria for assessing the importance of research questions, thereby promoting the objectivity and fairness of evaluations. CMICT-RQIT V1.0 should be used primarily as a structured checklist and decision-support index.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-08-23"
   }
 ]
