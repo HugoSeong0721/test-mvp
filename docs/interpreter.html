@@ -19,8 +19,25 @@
   #app{position:fixed; inset:0; display:flex; flex-direction:column; touch-action:pan-y;
        padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
 
-  .panel{flex:1 1 0; min-height:0; display:flex; flex-direction:column; background:var(--panel); overflow:hidden;}
+  .panel{flex:1 1 0; min-height:0; display:flex; flex-direction:column; background:var(--panel); overflow:hidden; position:relative;}
   .panel.flip{transform:rotate(180deg);}
+
+  .report{position:absolute; left:10px; right:10px; bottom:10px; z-index:5; display:none;
+          background:#1b2230; border:1px solid var(--line); border-radius:16px; padding:14px;
+          box-shadow:0 8px 30px rgba(0,0,0,.5);}
+  .report.show{display:block;}
+  .report h3{margin:0 0 8px; font-size:14px;}
+  .report .ctx{font-size:12px; color:var(--dim); background:var(--bg); border-radius:8px;
+               padding:8px 10px; margin-bottom:8px; max-height:72px; overflow:hidden; line-height:1.4;}
+  .report textarea{width:100%; background:var(--bg); border:1px solid var(--line); border-radius:8px;
+                   color:var(--text); font-size:15px; padding:8px 10px; resize:none; height:60px;}
+  .rbtns{display:flex; gap:8px; margin-top:10px;}
+  .rbtns button{flex:1; border:none; border-radius:10px; padding:10px 4px; font-size:13px; font-weight:700;}
+  .rsend{background:#3b82f6; color:#fff;}
+  .rshare{background:#334155; color:var(--text);}
+  .rclose{background:transparent; color:var(--dim); border:1px solid var(--line) !important; flex:0 0 auto !important; padding:10px 14px !important;}
+  .rfoot{margin-top:8px; font-size:11px; color:var(--dim); text-align:center;}
+  .rfoot button{background:none; border:none; color:#7fb3ff; font-size:11px; text-decoration:underline; padding:0;}
 
   .divider{height:2px; background:var(--line); position:relative; flex:none;}
   .divider span{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
@@ -86,19 +103,28 @@
   var LANGS = {
     ko:{label:'한국어', sr:'ko-KR',
         tap:'마이크를 탭하고 말하세요', listen:'듣는 중… 탭하면 정지', read:'상대방의 말이 여기에 크게 표시됩니다',
-        fail:'번역 실패 · 원문 표시', type:'메시지 입력…', send:'전송', reads:'내가 읽을 언어(2개까지)', nosr:'이 브라우저는 음성 인식을 지원하지 않아요. 키보드로 입력하세요.'},
+        fail:'번역 실패 · 원문 표시', type:'메시지 입력…', send:'전송', reads:'내가 읽을 언어(2개까지)', nosr:'이 브라우저는 음성 인식을 지원하지 않아요. 키보드로 입력하세요.',
+        rTitle:'🚩 오류 신고 (인식/번역)', rNote:'뭐가 잘못됐는지 적어주세요 (안 써도 돼요)', rSend:'GitHub로 보내기', rShare:'공유/복사', rClose:'닫기',
+        rCopied:'복사됐어요! 붙여넣어 보내주세요', rNoMsg:'아직 대화가 없어요 — 대화 기록 없이 보내집니다', rSaved:'기기에 저장된 리포트', rShareAll:'전체 공유', rHint:'최근 대화·번역 데이터가 자동으로 함께 담깁니다'},
     en:{label:'English', sr:'en-US',
         tap:'Tap the mic & speak', listen:'Listening… tap to stop', read:'What the other person says appears here',
-        fail:'Translation failed · original shown', type:'Type a message…', send:'Send', reads:'I read in (up to 2)', nosr:'Speech recognition not supported here. Use the keyboard.'},
+        fail:'Translation failed · original shown', type:'Type a message…', send:'Send', reads:'I read in (up to 2)', nosr:'Speech recognition not supported here. Use the keyboard.',
+        rTitle:'🚩 Report an error (speech/translation)', rNote:'What went wrong? (optional)', rSend:'Send to GitHub', rShare:'Share/Copy', rClose:'Close',
+        rCopied:'Copied! Paste it to send', rNoMsg:'No conversation yet — sent without chat data', rSaved:'reports saved on device', rShareAll:'Share all', rHint:'Recent conversation & translation data is attached automatically'},
     ru:{label:'Русский', sr:'ru-RU',
         tap:'Нажмите на микрофон и говорите', listen:'Слушаю… нажмите, чтобы остановить', read:'Слова собеседника появятся здесь',
-        fail:'Ошибка перевода · показан оригинал', type:'Введите сообщение…', send:'Отпр.', reads:'Я читаю на (до 2)', nosr:'Распознавание речи не поддерживается. Используйте клавиатуру.'}
+        fail:'Ошибка перевода · показан оригинал', type:'Введите сообщение…', send:'Отпр.', reads:'Я читаю на (до 2)', nosr:'Распознавание речи не поддерживается. Используйте клавиатуру.',
+        rTitle:'🚩 Сообщить об ошибке', rNote:'Что не так? (необязательно)', rSend:'Отправить в GitHub', rShare:'Поделиться', rClose:'Закрыть',
+        rCopied:'Скопировано! Вставьте и отправьте', rNoMsg:'Разговора ещё нет — отправится без данных чата', rSaved:'отчётов на устройстве', rShareAll:'Поделиться всеми', rHint:'Данные разговора и перевода прилагаются автоматически'}
   };
   var ORDER = ['ko','en','ru'];
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 
   var app = document.getElementById('app');
   var sides = {};
+  var log = [];                                  // recent utterances with full translation data
+  var REPORT_KEY = 'interpreter_reports';
+  var REPO_ISSUES = 'https://github.com/HugoSeong0721/test-mvp/issues/new';
 
   function el(tag, cls, parent){ var e=document.createElement(tag); if(cls) e.className=cls; if(parent) parent.appendChild(e); return e; }
 
@@ -133,7 +159,7 @@
     }).then(function(j){
       var out = (j && j[0]) ? j[0].map(function(s){return s[0]||'';}).join('') : '';
       if(!out) throw new Error('empty');
-      return out;
+      return {text:out, via:'google'};
     });
   }
 
@@ -147,13 +173,13 @@
     }).then(function(j){
       var out = j && j.responseData && j.responseData.translatedText;
       if(!out || j.responseStatus != 200 || /MYMEMORY WARNING/i.test(out)) throw new Error('mm');
-      return out;
+      return {text:out, via:'mymemory'};
     });
   }
 
   var cache = {}; var cacheKeys = [];
   function translate(text, sl, tl){
-    if(sl === tl) return Promise.resolve(text);
+    if(sl === tl) return Promise.resolve({text:text, via:'same'});
     var key = sl + '|' + tl + '|' + text;
     if(cache[key] !== undefined) return Promise.resolve(cache[key]);
     var first = (Date.now() > gtxBlockedUntil) ? viaGtx : viaMyMemory;
@@ -170,7 +196,7 @@
   // translate into every listener language; per-language fallback to original
   function translateAll(text, sl, langs){
     return Promise.all(langs.map(function(tl){
-      return translate(text, sl, tl).then(function(out){ return {lang:tl, text:out, ok:true}; })
+      return translate(text, sl, tl).then(function(r){ return {lang:tl, text:r.text, via:r.via, ok:true}; })
         .catch(function(){ return {lang:tl, text:text, ok:false}; });
     }));
   }
@@ -203,8 +229,20 @@
     var ctrl = el('div','ctrl',p);
     var spacer = el('div','spacer',ctrl);
     var kbd = el('button','kbd',spacer); kbd.type='button'; kbd.textContent='⌨';
+    var flag = el('button','kbd',spacer); flag.type='button'; flag.textContent='🚩'; flag.style.marginLeft='8px';
     var mic = el('button','mic',ctrl); mic.type='button'; mic.textContent='🎤';
     var status = el('div','status',ctrl);
+
+    // report sheet
+    var rep = el('div','report',p);
+    var rTitle = el('h3','',rep);
+    var rCtx = el('div','ctx',rep);
+    var rNote = el('textarea','',rep);
+    var rBtns = el('div','rbtns',rep);
+    var rSend = el('button','rsend',rBtns); rSend.type='button';
+    var rShare = el('button','rshare',rBtns); rShare.type='button';
+    var rClose = el('button','rclose',rBtns); rClose.type='button'; rClose.textContent='✕';
+    var rFoot = el('div','rfoot',rep);
 
     var typerow = el('div','typerow',p);
     var input = el('input','',typerow); input.type='text'; input.autocomplete='off';
@@ -213,10 +251,28 @@
     var s = {
       id:id, read:defRead.slice(), panel:p, chips:chips, hint:hint, feed:feed, interim:interim,
       mic:mic, status:status, typerow:typerow, input:input, send:send,
+      rep:rep, rTitle:rTitle, rCtx:rCtx, rNote:rNote, rSend:rSend, rShare:rShare, rFoot:rFoot,
       active:false, rec:null, msgs:[],
       live:null, liveSeq:0,          // incoming live (pre-final) translation shown on this side
       pendingLive:null, liveTimer:null // outgoing interim awaiting translation
     };
+
+    flag.addEventListener('click', function(){ openReport(s); });
+    rClose.addEventListener('click', function(){ rep.classList.remove('show'); });
+    rSend.addEventListener('click', function(){
+      var r = buildReport(s, rNote.value.trim());
+      saveReport(r);
+      window.open(ghIssueUrl(r), '_blank');
+      rNote.value=''; rep.classList.remove('show');
+    });
+    rShare.addEventListener('click', function(){
+      var r = buildReport(s, rNote.value.trim());
+      saveReport(r);
+      shareText(JSON.stringify(r, null, 1), 'Interpreter report').then(function(how){
+        if(how === 'copied'){ rFoot.textContent = L(s).rCopied; }
+        else { rNote.value=''; rep.classList.remove('show'); }
+      });
+    });
 
     mic.addEventListener('click', function(){ toggleMic(s); });
     kbd.addEventListener('click', function(){
@@ -258,6 +314,35 @@
     s.input.placeholder = L(s).type;
     s.send.textContent = L(s).send;
     s.status.textContent = s.active ? L(s).listen : (SR ? L(s).tap : L(s).nosr);
+    s.rTitle.textContent = L(s).rTitle;
+    s.rNote.placeholder = L(s).rNote;
+    s.rSend.textContent = L(s).rSend;
+    s.rShare.textContent = L(s).rShare;
+  }
+
+  function openReport(s){
+    var last = null;
+    for(var i=log.length-1; i>=0; i--){ if(log[i]){ last = log[i]; break; } }
+    if(last){
+      s.rCtx.textContent = '🗣 ' + last.heard + '  →  '
+        + last.translated.map(function(p){ return p.text + (p.ok ? '' : ' ⚠'); }).join(' / ');
+    }else{
+      s.rCtx.textContent = L(s).rNoMsg;
+    }
+    s.rFoot.innerHTML = '';
+    s.rFoot.appendChild(document.createTextNode(L(s).rHint));
+    var n = storedReports().length;
+    if(n > 0){
+      s.rFoot.appendChild(document.createTextNode(' · ' + L(s).rSaved + ' ' + n + ' — '));
+      var all = el('button','',s.rFoot);
+      all.type='button'; all.textContent = L(s).rShareAll;
+      all.addEventListener('click', function(){
+        shareText(JSON.stringify(storedReports(), null, 1), 'Interpreter reports').then(function(how){
+          if(how === 'copied') s.rFoot.textContent = L(s).rCopied;
+        });
+      });
+    }
+    s.rep.classList.add('show');
   }
 
   function renderBig(d, m, isLive){
@@ -355,7 +440,61 @@
     translateAll(text, s.read[0], target.read).then(function(parts){
       var allFail = parts.every(function(p){ return !p.ok; });
       pushMsg(target, {parts:parts, orig:text, warn:allFail});
+      log.push({ts:new Date().toISOString(), speaker:s.id, recognizedAs:s.read[0], heard:text, translated:parts});
+      if(log.length > 40) log.shift();
     });
+  }
+
+  // ---- error reports: data snapshot saved on device, sent as a GitHub issue or shared ----
+  function storedReports(){
+    try{ return JSON.parse(localStorage.getItem(REPORT_KEY)) || []; }catch(e){ return []; }
+  }
+  function buildReport(s, note){
+    return {
+      app:'face-to-face-interpreter', when:new Date().toISOString(),
+      reporterSide:s.id, note:note || '',
+      settings:{me:sides.me.read.join('+'), you:sides.you.read.join('+')},
+      recentConversation:log.slice(-10),
+      ua:navigator.userAgent
+    };
+  }
+  function saveReport(rep){
+    try{
+      var all = storedReports();
+      all.push(rep);
+      if(all.length > 50) all.splice(0, all.length-50);
+      localStorage.setItem(REPORT_KEY, JSON.stringify(all));
+    }catch(e){}
+  }
+  function ghIssueUrl(rep){
+    var r = JSON.parse(JSON.stringify(rep)), body;
+    for(;;){
+      body = (r.note ? r.note + '\n\n' : '') + '```json\n' + JSON.stringify(r, null, 1) + '\n```';
+      if(body.length <= 6000 || !r.recentConversation.length) break;
+      r.recentConversation.shift();               // trim oldest until it fits in the URL
+    }
+    var last = rep.recentConversation[rep.recentConversation.length-1];
+    var title = '[통역 리포트] ' + (rep.note || (last ? last.heard : '피드백')).slice(0, 60);
+    return REPO_ISSUES + '?title=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(body);
+  }
+  function copyText(text){
+    return new Promise(function(res, rej){
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(res, function(){ legacy(); });
+      } else legacy();
+      function legacy(){
+        try{
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta); res();
+        }catch(e){ rej(e); }
+      }
+    });
+  }
+  function shareText(text, title){
+    if(navigator.share) return navigator.share({title:title, text:text}).then(function(){return 'shared';}).catch(function(){return 'cancel';});
+    return copyText(text).then(function(){ return 'copied'; });
   }
 
   function startMic(s){
