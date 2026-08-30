@@ -133,7 +133,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 .views{flex:1;min-height:0;position:relative}
 .view{position:absolute;inset:0;display:none;flex-direction:column;min-height:0}
 .view.on{display:flex}
-.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px;scroll-behavior:smooth}
 .scroll.nopad{padding:0 0 12px}
 
 /* ---- 변환 화면: 기준 통화 ---- */
@@ -189,6 +189,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
   display:flex;align-items:center;gap:12px;
   background:var(--surface);border:1px solid var(--line);
   border-radius:18px;padding:11px 14px;
+  scroll-margin:8px 0 10px;   /* 키패드 위로 끌어올릴 때 딱 붙지 않게 */
 }
 .trow .pick{display:flex;align-items:center;gap:10px;padding:2px 4px 2px 2px;border-radius:12px;flex-shrink:0;text-align:left}
 .trow .who{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
@@ -380,6 +381,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-r
 
 @media (prefers-reduced-motion: reduce){
   *{transition:none!important;animation:none!important}
+  .scroll{scroll-behavior:auto}
 }
 </style>
 
@@ -657,6 +659,15 @@ function setKbd(open){
   kbdOpen = open;
   $('kbdwrap').hidden = !open;
   renderConvert();
+  /* 키패드가 덮어버린 자리에 입력 중인 행이 숨지 않도록 위로 끌어올린다.
+     키패드가 자리를 차지한 뒤의 높이로 계산해야 해서 다음 프레임에 실행. */
+  if(open) requestAnimationFrame(revealActiveRow);
+}
+function revealActiveRow(){
+  const i = S.targets.indexOf(S.active);
+  if(i < 0) return;                  // 기준 행은 스크롤 영역 밖이라 항상 보인다
+  const row = $('tlist').children[i];
+  if(row) row.scrollIntoView({block:'nearest'});   // 필요한 만큼만 움직인다
 }
 
 /* ================= 변환 화면 =================
