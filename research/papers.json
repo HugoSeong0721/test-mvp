@@ -2695,5 +2695,206 @@
       "adaptive symptom questionnaire traditional chinese medicine"
     ],
     "first_seen": "2026-08-24"
+  },
+  {
+    "id": "doi:10.1136/bmjresp-2025-003781",
+    "title": "Development and validation of a disease-syndrome integrated assessment model for AECOPD severity: protocol for a nationwide multicentre cross-sectional study.",
+    "authors": [
+      "Zhang HL",
+      "Liu JM",
+      "Li Y",
+      "Wang LY",
+      "Jia PL",
+      "Yao ZX."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1136/bmjresp-2025-003781",
+    "abstract": "<h4>Introduction</h4>Acute exacerbations of chronic obstructive pulmonary disease (AECOPD) accelerate disease progression and increase mortality. Accurate severity assessment is essential for standardised clinical management. Traditional Chinese Medicine (TCM) shows efficacy in treating AECOPD, but no practical TCM-specific severity assessment tool exists. This study integrates multidimensional Western and TCM variables to develop an AECOPD severity assessment model, aiming to support clinical evaluation, improve treatment efficacy and prognosis and offer methodological insights for related research.<h4>Methods and analysis</h4>The overall study design comprises four sequential steps. First, factors influencing AECOPD severity will be preliminarily screened through literature review and the first round of expert questionnaire surveys. Second, a multicentre cross-sectional study will be performed to establish a clinical information database; multiple statistical methods, combined with a second expert questionnaire survey, will be employed to identify the relevant variables associated with disease severity. Third, based on the established clinical database and identified variables, a disease-syndrome integrated AECOPD severity assessment model will be developed using both Classification and Regression Trees and Backpropagation Neural Networks. Fourth, the models will undergo comprehensive evaluation and validation to determine an accurate, practical, reproducible and externally valid disease severity assessment tool.<h4>Ethics and dissemination</h4>The study protocol and all required documents have been submitted for review and approval to the Independent Ethics Committees of all the participating sites. All participants will provide their written informed consent on study entry, and all the recorded data will be treated as confidential. Ethical approval for this study was granted by the Institutional Review Board of the First Affiliated Hospital of Henan University of Chinese Medicine (Approval No. 2025HL-342) TRIAL REGISTRATION NUMBER: NCT06918353.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.1016/j.apsb.2026.05.027",
+    "title": "Dual-driven by regulatory science and policy reconstruction: Traditional Chinese medicine (TCM) new drugs accelerate development-A critical review of highlights in registration and regulation of TCM and natural medicine new drugs in China (2021-2025).",
+    "authors": [
+      "Zhao J",
+      "Zhang Q",
+      "Chen S",
+      "Chen C",
+      "Yang C",
+      "Hua H",
+      "Wang T",
+      "Tang J",
+      "Zhang J",
+      "Yang Z",
+      "Yu J",
+      "Wei F",
+      "Song H",
+      "Cai S",
+      "Sun Q",
+      "Cao M",
+      "Li D."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1016/j.apsb.2026.05.027",
+    "abstract": "In recent years, China's new round of institution reform has further optimized the drug regulatory system. Relevant departments and institutions involved in traditional Chinese medicine (TCM) regulation have been strengthened. TCM regulatory science, as an emerging interdisciplinary field, has received high regard and experienced rapid development, significantly enhancing TCM regulatory capabilities. Simultaneously, accelerated progress in emerging technologies and production innovation for TCM drug discovery, coupled with the implementation of the National Major Scientific and Technological Special Project for \"Significant New Drugs Development\" and its translational achievements, have led to a historic turning point in the development of innovative natural TCM drugs over the past five years. Driven by the dual engines of \"regulatory science\" and \"policy restructuring\", the development of new TCM drugs has entered a fast lane. Both the quantity and quality of investigational new drug (IND) and new drug application (NDA) registrations and approvals for new natural TCM drugs have shown rapid growth, effectively meeting the public's health demands for TCM products and unmet clinical needs of patients. This study focuses on the development of new TCM drugs during the significant historical phase from 2021 to 2025. It provides a comprehensive overview of new TCM and natural drug applications and regulatory reviews over the past five years, delves into the implementation of the National Drug Regulatory Science Action Plan, and highlights the importance of TCM regulatory science as an emerging interdisciplinary field in accelerating the creation of new TCM drugs. It systematically summarizes the effects of regulatory policies and regulations, the reform of TCM registration classification, specialized TCM registration provisions, and incentive measures such as the National Major Scientific and Technological Special Project for \"Significant New Drugs Development\". Based on an international perspective, it provides a focused review of recent highlights in TCM new drug development and regulation. This holds significant importance for promoting breakthroughs in TCM new drugs across more disease areas and advancing the international coordination of TCM regulation. The challenge faced in managing the registration of new TCM drugs lies in resolving the conflict between TCM theory and modern drug attributes, while balancing the rapid advancement of traditional medical theory and emerging technologies with the robustness of the drug regulatory framework. In the future, actively advancing research and translation in TCM regulatory science, innovatively establishing benefit-risk assessment systems and standards for new TCM drugs, and accelerating the development of a globally leading regulatory system with Chinese characteristics that aligns with the unique nature of TCM will be particularly crucial for global coordination of TCM regulatory policies, and the modernization and internationalization of TCM.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.3389/fnut.2026.1825606",
+    "title": "Medicine-food homology substances in cardiovascular disease prevention and management: from mechanisms to clinical evidence and future translation.",
+    "authors": [
+      "Fei S",
+      "Rao Y",
+      "Lai J",
+      "Zhang B",
+      "Ma H",
+      "Ma X",
+      "Liu Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3389/fnut.2026.1825606",
+    "abstract": "Cardiovascular disease (CVD) is the leading global cause of death. \"Medicine-food homology\" (MFH), a fundamental principle of traditional Chinese medicine (TCM), emphasizes dual nutritional and therapeutic roles of natural substances, thereby attracting increasing attention in disease management. These substances exhibit synergistic effects through multiple targets and signaling pathways, demonstrating significant potential in the prevention, adjuvant therapy, and rehabilitation of CVD. This review presents the mechanisms underlying MFH substances (such as astragalus, codonopsis, and hawthorn) in targeting key pathways related to CVD, and summarizes findings from clinical randomized controlled trials (RCT). This review summarizes MFH substances' role in CVD management, focusing on four core mechanisms (vascular defense, myocardial protection, gut-heart axis regulation, risk factor control) that mediate their multi-targeted, multi-pathway effects (e.g., anti-inflammation via Astragalus, myocardial repair via Ginseng). Clinical evidence confirms MFH substances enhance CVD therapeutic efficacy as adjuvant therapies, with mild adverse reactions, while highlighting the need for further research to advance translational application. Future research should prioritize large-scale multi-center trials, multi-omics integration, and standardized quality control to advance MFH from empirical use to precision medicine, providing new natural product-based strategies for comprehensive CVD prevention and treatment.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.2196/92315",
+    "title": "Performance of DeepSeek V3.2 and ChatGPT 5.1 in Musculoskeletal Triage and Differential Diagnosis of Outpatients With Low Back Pain: Multidimensional Comparative Study.",
+    "authors": [
+      "Ma Z",
+      "Chen R",
+      "Wang A",
+      "Xi Y",
+      "Liang M",
+      "Yuan S",
+      "Fan N",
+      "Zang J",
+      "Wang T",
+      "Zang L."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/92315",
+    "abstract": "<h4>Background</h4>Outpatients presenting with low back pain (LBP) often require efficient preconsultation triage and early differential diagnostic support. Large language models may assist these text-based tasks, but their performance under different clinical information conditions remains unclear.<h4>Objective</h4>This study aimed to compare the performance of ChatGPT (5.1; OpenAI) and DeepSeek (V3.2; DeepSeek AI) in musculoskeletal disorders (MSDs) triage and the differential diagnosis of outpatients with LBP using real-world outpatient records under 2 simulated information conditions.<h4>Methods</h4>This retrospective comparative study was conducted at a tertiary academic teaching hospital in Beijing. A total of 160 cases were included using a balanced design across 8 diagnostic categories (20 per category); 6 MSDs and 2 non-MSDs. Evaluation was performed in 2 phases: Phase 1 (chief complaint) and Phase 2 (structured questionnaire with 7 domains or 33 items), both executed in a zero-shot setting using standardized prompts. Outcomes included (1) triage accuracy, (2) preliminary diagnosis accuracy, and (3) differential diagnosis agreement. In Phase 2, 3 senior orthopedic evaluators additionally rated model rationales across 5 domains using a 5-point Likert scale.<h4>Results</h4>For triage accuracy across all 160 cases, DeepSeek V3.2 improved from 84.4% to 90.6% (risk difference [RD] 6.2%, 95% CI -0.7% to 13.3%), and ChatGPT 5.1 improved from 75.6% to 93.1% (RD 17.5%, 95% CI 10.2%-24.9%). For preliminary diagnosis accuracy across the 120 musculoskeletal cases, DeepSeek V3.2 improved from 48.3% to 76.7% (RD 28.3%, 95% CI 16.8%-38.8%), whereas ChatGPT 5.1 improved from 35.0% to 87.5% (RD 52.5%, 95% CI 42.8%-60.6%). The mean number of correct differential diagnoses increased from 1.27 (SD 0.71) to 2.02 (SD 0.74) for DeepSeek V3.2 and from 1.34 (SD 0.70) to 2.03 (SD 0.77) for ChatGPT 5.1. In Phase 2, rationale ratings were generally good for both models, with ChatGPT 5.1 scoring higher in understanding and reasoning. Recognition of multiple myeloma (MM) remained limited, improving only from 45% to 55% (DeepSeek V3.2) and 55% to 60% (ChatGPT 5.1). Structured input reduced safety-risk errors in both models, but residual errors remained, especially for MM and metastatic spinal tumor.<h4>Conclusions</h4>Both ChatGPT 5.1 and DeepSeek V3.2 demonstrated potential in text-based triage and differential diagnosis of MSDs for LBP, with structured clinical information generally improving performance, particularly for preliminary diagnosis accuracy and differential diagnosis agreement. However, their suboptimal sensitivity for red-flag conditions such as MM highlights significant safety concerns, indicating that they should not be used as stand-alone triage tools without clinician oversight. ChatGPT 5.1 showed stronger reasoning with structured inputs based on rationale ratings, whereas DeepSeek V3.2 showed better performance under chief-complaint-only input, with significantly higher Phase 1 preliminary diagnostic accuracy and numerically higher Phase 1 triage accuracy. These findings underscore the need for further model refinement, rigorous prospective validation, and integration with clinician oversight before clinical implementation.",
+    "matched_queries": [
+      "traditional chinese medicine dynamic questioning diagnosis"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.2196/97802",
+    "title": "Performance of Large Language Models for Oncology Nursing Decision Support: Cross-Sectional Study.",
+    "authors": [
+      "Zhou Q",
+      "Jia Y",
+      "Hu H",
+      "Huang D",
+      "Chen X",
+      "Xia Y",
+      "Wu W."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/97802",
+    "abstract": "<h4>Background</h4>Large language models (LLMs) are increasingly used in health care, with emerging applications in clinical decision support and nursing education. However, evidence on their performance in nursing contexts, particularly in oncology nursing, remains limited. Given the complexity and high-risk nature of oncology care, it is important to evaluate the performance and clinical relevance of LLM-generated responses in oncology nursing contexts.<h4>Objective</h4>This study aimed to compare the performance of LLMs in oncology nursing decision support tasks using standardized examination questions and case-based clinical scenarios and explore LLMs' potential applicability and current limitations in oncology nursing practice.<h4>Methods</h4>A total of 33 case-based questions derived from 10 oncology nursing clinical scenarios in a nationally used training manual, along with standardized examination-oriented questions from a commercially published preparation book for the Chinese Nursing (Intermediate) Qualification Examination, were used to evaluate the performance of 5 LLMs (DeepSeek, Qwen, Spark-Desk, WiseDiag, and ChatGPT). All models generated responses using a standardized prompt. Two oncology nurses with more than 5 years of clinical experience independently rated the case-based responses using 3 evaluation dimensions: correctness, clarity, and conciseness. Interrater reliability was assessed using the quadratic weighted Cohen κ, intraclass correlation coefficient, and Spearman rank correlation coefficient. Differences among models were analyzed using the Kruskal-Wallis test with the Dunn post hoc test. In addition, examination performance was evaluated based on total score, accuracy rate, and completion efficiency.<h4>Results</h4>Interrater reliability analyses indicated moderate agreement between evaluators. The median correctness, clarity, and conciseness scores were as follows: 11.50 (IQR 10.50-12.00) for DeepSeek, 11.00 (IQR 10.50-12.00) for Qwen, 10.50 (IQR 9.50-11.50) for Spark-Desk, 10.00 (IQR 9.50-11.50) for WiseDiag, and 10.00 (IQR 9.00-11.50) for ChatGPT. The Kruskal-Wallis test indicated statistically significant differences among models (H=11.416; P<.05), with post hoc analysis showing a significant difference only between DeepSeek and ChatGPT (P<.05). In examination-based tasks, all models achieved passing performance, with accuracy rates ranging from 77% (77/100) to 93% (93/100). In terms of response completion, DeepSeek and ChatGPT completed all tasks in a single interaction, whereas other models required multiple interactions due to output interruptions.<h4>Conclusions</h4>LLMs showed relatively strong performance on structured knowledge and examination-based tasks but remained limited in complex oncology nursing scenarios requiring individualized assessment and dynamic clinical judgment. Their potential use may be most relevant to information retrieval, knowledge organization, and patient education. Because the correctness, clarity, and conciseness rubric showed only moderate interrater reliability, the case-based comparisons should be interpreted as preliminary signals rather than definitive evidence of between-model differences. LLM outputs should therefore be used as supportive information and interpreted alongside professional clinical judgment.",
+    "matched_queries": [
+      "large language model traditional chinese medicine diagnosis dialogue"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.1097/md.0000000000049572",
+    "title": "Visual analysis of research status and hotspots of Pinellia ternata from 2004 to 2025: A bibliometric review.",
+    "authors": [
+      "Lian K",
+      "Meng L",
+      "Lei J",
+      "Kuang H",
+      "Tie S",
+      "Li L",
+      "Hu Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1097/md.0000000000049572",
+    "abstract": "Pinellia ternata has been widely recognized as a traditional Chinese medicine for its use in digestive system diseases and cancers. Furthermore, its good clinical efficacy, excellent safety, and limited side effects have attracted growing interest from research institutions in China, South Korea, the United States, and Japan, resulting in a surge of associated studies. However, the information remains scattered, lacking systematic summaries. This makes it challenging to consolidate the extent of the research progress. Thus, in this study, data from published literature were obtained and assessed to assist researchers in comprehending the current research landscape in the field and to investigate research hotspots and emerging frontiers. Two English databases were employed to search and download the literature on P ternata research published from 2004 to 2025. We used VOSviewer, Microsoft Excel, and CiteSpace to visually analyze annual publishing trends, publishing countries, institutions, authors, journals, keywords, and references in the field. We retrieved 488 papers. Publications have increased annually, particularly in 2024. China, South Korea, the United States, and Japan take the lead in this field of research. Nanjing University of Chinese Medicine produced the largest number of papers. The Journal of Ethnopharmacology contained the most publications. The most prolific authors are Xue Jianping and Xue Tao. Keywords with the highest frequency were P. ternata, expression, banxia xiexin decoction, and network pharmacology. Twelve clusters and twenty-five burst keywords were generated. To date, 3 areas have been the primary subject of this field's research: research on related classic prescriptions and their applications, research on pharmacological components and mechanisms of action, and research on cultivation and quality control. Furthermore, research on microscopization, normalization, standardization, and objectification of traditional Chinese medicine has also been developing.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.3390/brainsci16070765",
+    "title": "Cognitive Impairment Associated with Chemotherapy: Neuroimmunological Interactions, Gut-Brain Axis, and Therapeutic Approaches.",
+    "authors": [
+      "Llanes-Cervantes BA",
+      "Cruz-Ramos JA",
+      "Barón-Cárdenas ME",
+      "Zepeda-Olmos PM",
+      "López-Verdín S",
+      "Vargas-López JM",
+      "de la Mora-Jiménez E."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/brainsci16070765",
+    "abstract": "Chemotherapy is a treatment designed to contain or eradicate neoplastic cells; however, patients may experience various treatment-related adverse effects. Chemotherapy-related cognitive impairment (CRCI), clinically referred to as \"chemobrain,\" is a frequent complication with a duration ranging from months to years, affecting between 17% and 70% of cancer patients. These cognitive deficits not only impair social, educational, and occupational functioning but may also impact survival outcomes, possibly by interfering with medication adherence and health-related behaviors. Emerging evidence has converged on an integrative cascade in which chemotherapy-induced systemic inflammation, intestinal dysbiosis, blood-brain barrier disruption, microglial/astroglial activation, and impaired hippocampal neurogenesis act in sequence rather than as independent pathways. Underlying pathophysiological mechanisms include neuroinflammation, reduced neurogenesis, loss of dendritic spines, oxidative stress, hormonal changes, epigenetic modifications, and mitochondrial dysfunction. In contrast, repair mechanisms involve complex glial responses, particularly those of astrocytes and microglia. Emerging studies suggest a link between changes in the microbiome and cognitive decline, demonstrating the importance of bidirectional communication in the gut-brain axis. Current research seeks to determine appropriate tests to identify chemobrain. Therefore, several biomarkers, such as GFAP, S100β, and isoprostanes, have been proposed to assess chemobrain, alongside screening tools such as MoCA, MMSE, and CAB-CF, to evaluate cognitive impairment and enable early detection. Pharmacological candidates-including lithium, fluoxetine, methylphenidate, modafinil, metformin, agomelatine, and melatonin-as well as nutritional and lifestyle interventions such as physical exercise, omega-3 fatty acids, curcumin, probiotics, and traditional Chinese medicine formulations-have been investigated, predominantly in animal models. These remain candidate, not validated, therapies; clinical evidence in CRCI populations is limited, heterogeneous, or absent, and well-powered randomized controlled trials are required before any recommendation can be issued. However, optimal strategies for symptom improvement remain unclear, as various approaches have yielded mixed outcomes. This review provides a comprehensive overview of chemobrain, focusing on its molecular mechanisms, interactions with the gut-brain axis, and potential therapeutic targets to improve the quality of life for cancer survivors.",
+    "matched_queries": [
+      "chain of thought reasoning traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.2196/91051",
+    "title": "Yiqi Fumai Lyophilized Injection for Improving Exercise Tolerance in Chronic Heart Failure: Protocol for a Prospective Cohort Study.",
+    "authors": [
+      "Zuo Y",
+      "Jia Y",
+      "Fan L",
+      "Liu Y",
+      "Cao Y",
+      "Wei M",
+      "Wei L",
+      "Wang X",
+      "Liu X",
+      "Lv S."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/91051",
+    "abstract": "<h4>Background</h4>High mortality and prevalence rates are hallmarks of chronic heart failure (CHF). Patients frequently have a much lower quality of life as a result of diminished exercise tolerance. Chinese guidelines have recommended Yiqi Fumai lyophilized injection (YQFM) for the treatment of heart failure, although there is currently inadequate evidence to support its effectiveness in increasing exercise tolerance in these patients.<h4>Objective</h4>The purpose of this cohort study is to examine the relationship between the improvement of exercise tolerance in patients with CHF and the addition of YQFM to guideline-directed medical therapy.<h4>Methods</h4>In total, 216 hospitalized patients with CHF with New York Heart Association (NYHA) functional classes II-IV were to be enrolled in the prospective, observational cohort trial design. The participants were divided into a YQFM group (exposed group: n=144) and a non-YQFM group (nonexposed group: n=72) at a 2:1 ratio based on real clinical medication and patient preference. Standard guideline-directed medical therapy was administered to both groups; however, the YQFM group also got a 10-day YQFM exposure. The change in metabolic equivalents measured by the Veterans Specific Activity Questionnaire was the main outcome. The 6-minute walk distance, Kansas City Cardiomyopathy Questionnaire score, NYHA functional class, N-terminal pro-B-type natriuretic peptide levels, and echocardiographic parameters were among the secondary objectives. Traditional Chinese medicine syndrome scores and the frequency of hard clinical occurrences were the exploratory objectives. A linear mixed-effects model was used to examine repeated measurement data, and propensity score weighting was used to account for baseline confounding variables.<h4>Results</h4>The first patient was registered in June 2024, and all 216 patients had been recruited and followed up with by December 2025. Data cleaning and statistical analysis began in January 2026, with final results scheduled to be published in the autumn of 2026.<h4>Conclusions</h4>This study, using a prospective cohort design, intends to offer high-quality, real-world evidence for the use of YQFM in cardiac rehabilitation for heart failure. This will aid in the optimization of preventative and treatment strategies for CHF that combine traditional Chinese and Western medicine, giving an objective basis for enhancing patients' long-term quality of life.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.1186/s12913-026-15077-x",
+    "title": "Development and validation of a clinical prediction model for acupuncture response in community-dwelling patients with chronic low back pain: a retrospective cohort study.",
+    "authors": [
+      "Wang J",
+      "Hu T",
+      "Zhao M",
+      "Wu C."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s12913-026-15077-x",
+    "abstract": "<h4>Objectives</h4>To identify independent risk and protective factors for acupuncture response in community-dwelling patients with chronic low back pain, and to develop and validate a clinical prediction model incorporating traditional Chinese medicine (TCM) diagnostic components, thereby providing a tool for individualized clinical decision-making and risk stratification in community acupuncture practice.<h4>Methods</h4>A total of 500 patients with chronic non-specific low back pain who received acupuncture treatment at the Ningbo Jiangbei Zhuangqiao Community Health Service Center between January 2023 and November 2025 were retrospectively enrolled. Patients were randomly split into a training cohort (n = 350) for model development and a test cohort (n = 150) for internal validation using a 7:3 ratio. Predictors were selected via LASSO regression, and a multivariable logistic regression model was constructed and presented as a clinical nomogram. SHapley Additive exPlanations (SHAP) analysis was employed to quantify the global importance of features and their directional association with the outcome. Model performance was comprehensively evaluated by assessing discrimination (receiver operating characteristic curve), calibration (calibration curve), clinical utility (decision curve analysis), and generalizability (performance in the internal/external validation sets).<h4>Results</h4>Multivariable analysis identified longer disease duration (OR = 1.170), radiating leg pain (OR = 1.998), and the Qi-Stagnation-Blood-Stasis syndrome pattern (OR = 3.701) as independent risk factors for poor acupuncture response (all p < 0.05), while acupoint Weizhong (BL40) selection (OR = 0.267) and combined therapy (OR = 0.214) were independent protective factors. SHAP analysis confirmed disease duration and the Qi-Stagnation-Blood-Stasis pattern as the top contributors to the prediction. The developed nomogram demonstrated excellent discrimination in the training (AUC = 0.819), test (AUC = 0.828), and external validation (AUC = 0.788) cohorts. The model showed good calibration (Hosmer-Lemeshow test p > 0.05) and provided a clear clinical net benefit across a wide threshold probability range (25%-90%).<h4>Conclusions</h4>This study identifies a TCM syndrome pattern (Qi-Stagnation-Blood-Stasis) and acupoint selection as independent predictors for acupuncture response in community-based low back pain management. The developed nomogram, integrating TCM and clinical features, demonstrates good predictive performance and clinical utility upon internal and preliminary external validation. Its broader implementation requires further confirmation through larger, multicenter prospective studies and could be enhanced by the future integration of objective biomarkers.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-04"
   }
 ]
