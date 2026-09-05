@@ -2896,5 +2896,276 @@
       "TCM clinical decision support syndrome differentiation"
     ],
     "first_seen": "2026-09-04"
+  },
+  {
+    "id": "doi:10.1111/cpr.70265",
+    "title": "Immune Repertoire Profiling Reveals Distinct Adaptive Immune Signatures of Dampness ZHENG Across Psoriasis, Rheumatoid Arthritis and Ulcerative Colitis.",
+    "authors": [
+      "Tang L",
+      "Wang M",
+      "Yan Y",
+      "Qin S",
+      "Liang Y",
+      "Yao D",
+      "Mei L",
+      "Deng H",
+      "Ye S",
+      "Chen X",
+      "Gao K",
+      "Zheng X",
+      "Liu T",
+      "Qiu X",
+      "Li S",
+      "Yu X",
+      "Pan W",
+      "Huang S",
+      "Wang Z",
+      "Huang R",
+      "Zheng G",
+      "Lu C."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/cpr.70265",
+    "abstract": "Autoimmune diseases, including psoriasis (Ps), rheumatoid arthritis (RA) and ulcerative colitis (UC), pose significant health burdens worldwide. A more refined classification of these diseases is essential for enabling targeted therapeutic strategies. Traditional Chinese Medicine (TCM) is gaining increasing recognition globally, offering potential insights into disease heterogeneity. In this study, we performed comprehensive T cell receptor (TCR) and B cell receptor (BCR) repertoire sequencing in 59 participants, including patients with Ps, RA, UC and healthy controls. Patients were further stratified into Dampness and non-Dampness groups based on standardized TCM diagnostic criteria. Repertoire composition, clonotype richness, diversity metrics, V gene usage and shared CDR3 patterns were analysed. Machine learning approaches (LASSO, GLM and OPLS-DA) were applied to identify diagnostic biomarkers, followed by validation in an independent cohort. Compared with healthy controls, Ps, RA and UC patients exhibited reduced clonotype richness and diminished TCR/BCR diversity, indicating adaptive immune contraction. Dampness ZHENG-specific alterations were observed, including selective IgK and IgL clonotype richness reduction in Ps with dampness, increased TRA/TRB diversity in RA with dampness, and elevated TRG clonotype counts/read proportions in UC with dampness. Stratification by Dampness ZHENG revealed distinct immune repertoire architectures characterized by increased D50 index, reduced proportions of large clones and preferential V gene usage, including TRAV20, TRAV38-2DV8 and TRAV8-3. Unsupervised dimensionality reduction demonstrated significant separation between Dampness and non-Dampness groups across diseases. A three-gene V-segment model achieved an AUC of 0.804 and 74.7% accuracy in an independent validation cohort, supporting its potential utility as an objective biomarker for Dampness ZHENG. Our findings suggest that TCM-based phenotyping may offer a meaningful approach for subgrouping autoimmune diseases, thereby providing a foundation for more syndrome differentiation-based treatment strategies.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.1016/j.apsb.2025.12.030",
+    "title": "Revolutionizing drug discovery from natural products: The roles of artificial intelligence and multi-omics in accelerating innovation.",
+    "authors": [
+      "Wang B",
+      "Liu Q",
+      "Zhao W",
+      "Zhang T",
+      "Zhang D",
+      "Sutcharitchan C",
+      "Li S."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1016/j.apsb.2025.12.030",
+    "abstract": "Natural products and their derivatives have long been crucial in drug therapy, especially in traditional medicine. However, challenges in screening, isolation, characterization, and optimization have slowed their development in the pharmaceutical industry. Recent advancements in artificial intelligence (AI) and multi-omics technologies are revitalizing this field. AI offers powerful tools for understanding natural compounds, enhancing molecular representations, and supporting tasks such as binding prediction, drug repurposing, and retrosynthesis. Moreover, generative models are aiding in natural product optimization and the creation of pseudo-natural compounds. At the same time, multi-omics technologies, including genomics, transcriptomics, proteomics, and metabolomics, have enabled high-throughput studies of plant traits, synthesis, regulatory mechanisms, and quality control, providing valuable data for AI model development. These advancements help accelerate the discovery of new compounds with medicinal potential. Furthermore, in the field of traditional Chinese medicine research, which is largely based on natural plant sources, AI systems exemplified by UNIQ system, combining AI and multi-omics, have been instrumental in mechanistic studies and new drug development. This study comprehensively discusses the algorithms and applications of AI and multi-omics technologies in the drug development of natural compounds and plants, as well as summarizing relevant databases which might provide high-quality data for the future development of AI algorithms targeting natural products.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.3390/s26144498",
+    "title": "A Two-Stage Cascaded Regression Framework for Automatic Facial Acupoint Localization in Infrared Thermal Images.",
+    "authors": [
+      "Li J",
+      "Ming X",
+      "Zeng Y",
+      "Yang R",
+      "Tian J",
+      "Niu F."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/s26144498",
+    "abstract": "Infrared thermal imaging offers objective physiological insights for Traditional Chinese Medicine (TCM), yet automated acupoint localization struggles with low texture and extreme pose variations. To address this, we constructed a multi-pose thermal facial dataset using digitized bone-proportional measurements and TCM anatomical rules. We propose T2FAL, a two-stage cascaded regression framework explicitly decoupling macroscopic face detection from fine-grained acupoint localization. Stage 1 utilizes an improved YOLOv12m-based Thermal-Aware Face Detector-integrating ICAN_C2f, MixNeck, and TAF-IoU-to mitigate domain shifts and thermal noise. Stage 2 deploys pose-specific regressors incorporating Gated Feature-Conditioned Cascade Refinement (FCCR) and a Selective GeoDeriv module, mathematically translating anatomical rules into geometric constraints. Under the stated experimental protocol, Stage 1 processed images at 87.3 frames per second on an NVIDIA RTX 4090. For Stage 2, the final frontal- and profile-view configurations achieved mAP@50-95 values of 73.19% and 86.92%, with mean pixel errors of 1.986 and 3.109 pixels, respectively. These results support the feasibility of automated reference-coordinate localization on the datasets used. However, given the partial reliance of the annotations on image registration and geometric rules, the use of the cross-domain set for model selection, and the lack of clinical or diagnostic evaluation, further validation using independently generated expert annotations, a strictly held-out external test set, and clinically labeled data is required before clinical or diagnostic use.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.14744/anatoljcardiol.2026.5694",
+    "title": "Pharmacological Insights and Clinical Challenges of Wenxin Keli in Arrhythmia Treatment.",
+    "authors": [
+      "Fu J",
+      "Li Y",
+      "Xu G",
+      "Li M",
+      "Chen Y",
+      "Xia L",
+      "Ding Y",
+      "Hu H",
+      "Lai Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.14744/anatoljcardiol.2026.5694",
+    "abstract": "Cardiac arrhythmias remain a leading cause of cardiovascular morbidity and mortality worldwide. Although conventional antiarrhythmic drugs are effective, their use is constrained by proarrhythmic risks and extracardiac toxicity. Wenxin Keli (WXKL), a traditional Chinese medicine (TCM) formula, has demonstrated antiarrhythmic properties in preclinical and clinical studies with a reportedly favorable safety profile. This article provides a critical synthesis of WXKL's pharmacological mechanisms, including ion channel modulation (INa, ICaL, Ito), calcium handling, and calcium/calmodulin-dependent protein kinase II signaling, with explicit appraisal of translational limitations. Clinical trial evidence and meta-analyses for atrial fibrillation (AF), premature ventricular contractions, and other indications were systematically evaluated, with detailed discussion of effect sizes, heterogeneity, and methodological quality. Key challenges unique to WXKL as a TCM-derived product-formulation variability, quality control limitations, and regulatory approval pathways-are analyzed in depth. A prioritized research agenda is proposed to address evidence gaps. *These authors contributed equally to this work and share first authorship.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.1186/s13020-026-01458-1",
+    "title": "Modeling symptom-acupoint interactions via a heterogeneous graph learning framework for intelligent acupoint recommendation.",
+    "authors": [
+      "Lin W",
+      "Chen J",
+      "Chen Z",
+      "Yin T",
+      "Guo J",
+      "Zeng F."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13020-026-01458-1",
+    "abstract": "<h4>Objective</h4>Acupuncture prescriptions involve complex compatibility mechanisms grounded in multi-symptom and multi-acupoint interactions, embodying millennia of clinical experience. Despite growing interest in computational acupoint recommendations, significant challenges persist due to sparse clinical data and the insufficient modelling of symptom-acupoint relationships, posing considerable hurdles to effective prediction.<h4>Methods</h4>We introduced an acupoint compatibility prediction framework with graph neural networks (GNN) and fine-tuned bidirectional encoder representations from transformers (termed GNN-BERT-Attention). The heterogeneous feature interaction learning mechanism was introduced to model symptom-acupoint interactions through heterogeneous graph construction, capturing semantic features and relational patterns in a unified space, which alleviated the sparsity of data. Neural collaborative filtering is utilised via label-aware fusion to iteratively refine the confidence of predictions, while Focal Loss and randomised augmentation strategies enhance robustness against imbalanced label distribution.<h4>Results</h4>Comprehensive experiments demonstrate the superiority of the proposed GNN-BERT-Attention model over State-of-the-Art (SOTA) baselines in precision, recall, ranking-based metrics and robustness. Ablation studies validate the effectiveness of each architectural module, and hyperparameter tuning confirms models' stability. A web-based demonstration system further validates clinical applicability, enabling real-time, interpretable acupoint recommendations.<h4>Conclusion</h4>This study contributes to enhancing the performance of acupoint prediction, ultimately benefiting the efficiency and precision of acupuncture treatment while providing a theoretical foundation for optimising prescriptions and advancing evidence-based traditional Chinese medicine interventions.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.3390/ijms27135871",
+    "title": "Fascia as a Functional System in Health and Disease: From Fundamental Biology to Assessment and Targeted Interventions.",
+    "authors": [
+      "Huang H",
+      "Chen L",
+      "Lai Y",
+      "Li W",
+      "Li J."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/ijms27135871",
+    "abstract": "Fascia is increasingly recognized as a dynamic functional system. It can actively sense, transmit, and regulate mechanical, sensory, and metabolic signals. Why does fascia play such a critical role in chronic pain and movement disorders? Researchers are now rethinking the pathophysiological mechanisms underlying this role. Previous systematic reviews have typically focused primarily on specific mechanisms or interventions. In contrast, this study takes a holistic view of fascial function. It integrates multiple physiological functions of the fascia: mechanical integration, sensory modulation, cellular and matrix remodeling, as well as metabolic and immune regulation. From the perspective of functional imbalance, we further explore the pathological mechanisms associated with the fascia. Building on this, we then focus on how to assess fascial function from multiple dimensions and on specific targeted interventions. For assessment, we have systematically compiled a set of multi-stage quantitative techniques. These include clinical palpation, ultrasound, and elastography, tissue mechanics testing, microdialysis, omics approaches, electrophysiological testing, and digital modeling. For interventions, we have listed a range of modulating approaches, such as manual therapy, exercise rehabilitation, dry needling and acupuncture, fascial injections, targeted drugs, and biotechnological materials derived from tissue engineering. This review summarizes a clinical decision-making framework guided by the assessment of fascial functional status. It emphasizes a systematic approach and links quantitative diagnosis with precise interventions. Additionally, it provides a literature synthesis for understanding fascial mechanisms and related disorders and offers a reference foundation for the field's transition from empirical treatment to measurable, reproducible, and individualized practice.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.2196/98207",
+    "title": "Large Language Model-Based Clinical Decision Support for Antibiotic Selection and Dose Recommendation in Hospitalized Patients With Pneumonia: Multicenter Retrospective Study.",
+    "authors": [
+      "Zhang Y",
+      "Li L",
+      "Tan C",
+      "Ji M",
+      "Tian X",
+      "Mu X",
+      "Li J",
+      "Gu Y",
+      "Liu H."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/98207",
+    "abstract": "<h4>Background</h4>Pneumonia is a common infectious disease, and antibiotic treatment in hospitalized patients must balance efficacy, safety, and resistance risk. However, antibiotic selection and dose adjustment still rely heavily on clinician experience. Although large language models (LLMs) are promising for clinical reasoning, their direct use for antibiotic selection and dose recommendation is limited by hallucinations and weak adherence to clinical constraints.<h4>Objective</h4>This study aimed to develop and externally validate a constrained LLM-based clinical decision support pipeline for antibiotic selection and dose recommendation in hospitalized patients with pneumonia.<h4>Methods</h4>We conducted a multicenter retrospective study using electronic health record narratives, antibiotic orders, and laboratory indicators of hepatic and renal function from 331 hospitalized patients with pneumonia from 2 hospitals in China. The development cohort included 233 patients, and the external validation cohort included 98 patients. The pipeline integrated dual-branch retrieval (similar-case vector retrieval plus guideline-based knowledge graph retrieval), clinician-defined rule constraints, and hybrid-context reasoning. DeepSeek-V3, GLM-4.6, and GPT-4o were evaluated using F1-score and Jaccard accuracy.<h4>Results</h4>On the internal test set, the full pipeline using DeepSeek-V3 achieved the best performance, with an F1-score of 0.8110 (95% CI 0.7371-0.8762) and Jaccard accuracy of 0.7624 (95% CI 0.6810-0.8386) for antibiotic selection and an F1-score of 0.7538 (95% CI 0.6671-0.8329) and Jaccard accuracy of 0.7076 (95% CI 0.6145-0.7938) for joint antibiotic selection plus dosing recommendation. On the external validation set, performance remained high, with an F1-score of 0.8605 (95% CI 0.7891-0.9252) and Jaccard accuracy of 0.8571 (95% CI 0.7857-0.9184) for antibiotic selection, and an F1-score of 0.8503 (95% CI 0.7789-0.9150) and Jaccard accuracy of 0.8469 (95% CI 0.7755-0.9133) for antibiotic selection plus dosing recommendation. The system also provided traceable evidence and rule trigger information to support clinician review.<h4>Conclusions</h4>A constrained, retrieval-augmented LLM pipeline improved the consistency and interpretability of antibiotic selection and dose recommendation for hospitalized patients with pneumonia and provided preliminary evidence of cross-site generalizability.",
+    "matched_queries": [
+      "chain of thought reasoning traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.1111/jep.70539",
+    "title": "Development of an Evaluation Framework for the Integration of Clinical and Preventive Medicine in Traditional Chinese Medicine: Using a DELPHI-AHP Approach.",
+    "authors": [
+      "Lu W",
+      "Thongmuang P",
+      "Soontornchai S",
+      "Zhao Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jep.70539",
+    "abstract": "<h4>Background</h4>China healthcare system has undergone significant reforms in recent years. Promoting the integration of treatment and prevention, strengthening collaboration between medical institutions and preventive services, and consolidating medical and preventive resources have become key priorities in the healthcare sector. Traditional Chinese Medicine (TCM) offers distinct advantages in disease prevention, health maintenance and rehabilitation. Systematically incorporating TCM into the healthcare and prevention system can help extend and enhance the continuum of care, thereby improving overall service effectiveness. However, there remains a lack of a standardized and scientifically rigorous evaluation framework to comprehensively assess the actual impact of TCM within integrated healthcare and prevention practices.<h4>Objective</h4>To establish a scientifically grounded evaluation framework for the integration of clinical and preventive medicine within Traditional Chinese Medicine (TCM), thereby supporting the enhancement of TCM's capacity and quality in healthcare delivery and disease prevention.<h4>Methods</h4>From September 2024 to January 2025, an initial pool of indicators was developed based on policy analysis, literature review, and expert interviews. Between February and April 2025, a two-round Delphi expert consultation was carried out to finalise the indicator system. The Analytic Hierarchy Process (AHP) was then used to determine both individual and combined weights for all indicators.<h4>Results</h4>A total of 19 experts participated in both rounds of the Delphi consultation. After two rounds of correspondence, the evaluation index system includes 6 first-level indicators, 17 s-level indicators and 57 third-level indicators. The expert authority coefficients for these rounds were 0.90 and 0.91, respectively, indicating a high level of expertise among the participating experts. Additionally, the Kendall's W of each index are, respectively, was 0.23 and 0.82 (p < 0.05). The consistency test was conducted using the AHP for all judgement matrices, with a consistency ratio (CR) for all levels of indicators < 0.10, indicating good consistency in the weight settings. The weights assigned to the first-level indicators were as follows: Resource Integration (0.3512), Technological Integration (0.2704), Service Integration (0.2146), Institutional Integration (0.0681), System Integration (0.0541) and Standardization Integration (0.0416). Together, Resource Integration and Technological Integration accounted for over 60% of the total weight. Among the second-level indicators, notable weights included TCM Information Platform (0.1476), Integrated TCM-Western Medicine Clinical Collaboration (0.1803) and Financial Resources for TCM (0.0943).<h4>Conclusion</h4>This study developed a dedicated evaluation index system for Traditional Chinese Medicine (TCM) within the context of medical-preventive integration, filling an important gap in standardized assessment tools. The framework highlights the crucial role of resource allocation and technological collaboration in the integration process. It offers a practical framework for comprehensively assessing the integration of clinical and preventive medicine in Traditional Chinese Medicine and enhancing medical services quality.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.1001/jamanetworkopen.2026.26709",
+    "title": "Design, Conduct, and Analysis of Randomized Clinical Trials of Chinese Herbal Medicine.",
+    "authors": [
+      "Li L",
+      "Luo X",
+      "Liu Y",
+      "Liang Q",
+      "Deng K",
+      "Nie L",
+      "Ma Y",
+      "Aminaei D",
+      "Sayfi S",
+      "Xie D",
+      "Meghdadi A",
+      "Talukder S",
+      "Liu J",
+      "Xiang H",
+      "Huan J",
+      "Yao M",
+      "Fan AY",
+      "Chen Y",
+      "Sun X",
+      "Guyatt GH."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1001/jamanetworkopen.2026.26709",
+    "abstract": "<h4>Importance</h4>Randomized clinical trials (RCTs) provide the optimal design for evaluating the effects of Chinese herbal medicine (CHM) on patient outcomes. However, how trialists have designed, conducted, and analyzed CHM RCTs remains largely unknown.<h4>Objective</h4>To investigate the design, conduct, and analysis of CHM RCTs; to examine whether there are differences between RCTs published in English and Chinese and between higher-impact and lower-impact English journals; and to determine whether CHM RCTs have improved over time.<h4>Design, setting, and participants</h4>In this cross-sectional study, PubMed, EMBASE, Cochrane Central Register of Controlled Trials, and 4 Chinese databases were searched from inception to April 2024. Parallel CHM RCTs published in journals covered in the Journal Citation Reports or Chinese core journals were included.<h4>Main outcomes and measures</h4>The primary outcomes were the general and methodological characteristics of included RCTs published in English vs Chinese, publication year up to vs after 2015, and higher-impact vs lower-impact English journals. To compare characteristics of included RCTs published in different journals, χ2 or Fisher exact test was use for dichotomous variables, and t test was used for continuous variables when the distribution proved normal or Mann-Whitney U test when it did not.<h4>Results</h4>The 400 CHM RCTs (200 from Chinese language journals and 200 from English language journals) enrolled 100 to 4870 patients. Most RCTs (370 RCTs [92.5%]) did not specify the study hypothesis; approximately one-third (102 RCTs [30.6%]) were registered. The protocols were available for 15 RCTs (3.8%), and statistical analysis plans were available for 4 RCTs (1.0%). Approximately two-fifths (159 RCTs [39.8%]) reported inadequate methods of allocation sequence generation, and three-fifths (242 RCTs [60.2%]) described inadequate methods of allocation concealment. More than one-third (138 RCTs [34.5%]) explicitly specified a primary outcome, and 115 RCTs (28.8%) reported sample size estimation. Ony 10 RCTs (2.5%) had an independent data monitoring committee. More than two-thirds (254 RCTs [73.5%]) stated reasons for prescribing CHM, most commonly the limited or no effect of Western medicine (215 RCTs [53.8%]) and adverse effects of Western medicine (80 RCTs [20.0%]). Most RCTs did not mention whether there was prior clinical (279 RCTs [69.8%]), pharmacological (201 RCTs [50.2%]), or toxicological (388 RCTs [97.0%]) evidence to support the trial hypotheses. A minority (146 RCTs [36.5%]) specified the prescription of CHM according to traditional Chinese medicine syndrome diagnosis. Most RCTs with missing data conducted only a complete case analysis (70 RCTs [77.8%] for dichotomous outcomes and 79 RCTs [84.0%] for continuous outcomes). A small proportion of RCTs (62 RCTs [15.5%]) used an intention-to-treat analysis, and trialists rarely performed sensitivity analysis (29 RCTs [7.2%]) and subgroup analysis (30 RCTs [7.5%]). The design, conduct, and analysis of CHM RCTs improved over time, and were superior in English-language journals, especially higher-impact English-language journals.<h4>Conclusions and relevance</h4>These findings suggest that the conduct and analysis of CHM RCTs are generally suboptimal, highlighting areas that urgently need improvement, including statement of study hypothesis and provision of a protocol; registration of the trial; implementation of allocation concealment; specification of primary outcome and sample size estimation; mention of prior clinical, pharmacological, and toxicological support for the trial hypotheses; and satisfactory conduct of sensitivity analysis or subgroup analysis. Although improvements occurred over time, further enhancing the fundamental research capabilities and developing methodological guidelines remains necessary.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.1016/j.neurot.2026.e00953",
+    "title": "Huoling Shengji granule in amyotrophic lateral sclerosis: A multicenter, randomized, double-blind, riluzole-controlled trial.",
+    "authors": [
+      "Liu X",
+      "Fu W",
+      "Cui X",
+      "Feng Y",
+      "Wen B",
+      "Shan L",
+      "Xu X",
+      "Yang J",
+      "Zhang J",
+      "He L",
+      "Zang Y",
+      "Zhao S",
+      "Yao X",
+      "Liu Y",
+      "Ma M",
+      "Du B",
+      "Dang J",
+      "Zou Z",
+      "Feng H",
+      "Lu Z",
+      "Zhang Y",
+      "Wu Z",
+      "Shang H",
+      "Yin P",
+      "Fan D."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1016/j.neurot.2026.e00953",
+    "abstract": "Currently, no curative therapies exist for Amyotrophic Lateral Sclerosis (ALS). This study aimed to evaluate the efficacy and safety of Huoling Shengji granules (HLSJ), a traditional Chinese medicine (TCM), compared to the standard treatment riluzole. A multicenter, randomized, double-blind, double-dummy, active-controlled Phase II clinical trial was conducted across 11 centers in China. A total of 140 ALS patients were randomly assigned (1:1) to receive either HLSJ or riluzole for 48 weeks. The primary endpoint, analyzed in the full analysis set (FAS), was the change in the ALS Functional Rating Scale-Revised (ALSFRS-R) score from baseline to Week 48. Safety profiles were comparable between groups, with no significant difference in adverse events (80.28% vs. 80.56%, P = 0.9671). Analysis using the pre-specified Last Observation Carried Forward (LOCF) method showed a numerical advantage for HLSJ (1.07 points) but lacked statistical superiority. However, a more scientific analysis using the Mixed Model for Repeated Measures (MMRM), recommended for progressive diseases, indicated that HLSJ was significantly superior to riluzole in slowing ALSFRS-R score decline (Least Squares Mean Difference [LSMD]: 2.29 points; 95% confidence interval [CI]: 0.52 to 4.06; P = 0.0114). While the LOCF model showed no statistical difference, the MMRM analysis confirmed that HLSJ demonstrated significant efficacy superior to riluzole with a favorable safety profile. These findings provide a critical basis for conducting pivotal Phase III confirmatory trials of HLSJ for ALS treatment.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.1002/trc2.70293",
+    "title": "Advances in pharmacotherapy for vascular cognitive impairment and vascular dementia: An update of 2025.",
+    "authors": [
+      "Tran DK",
+      "Kuan YC",
+      "Huang LK",
+      "Hu CJ."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1002/trc2.70293",
+    "abstract": "Vascular cognitive impairment (VCI), including vascular dementia (VaD), encompasses a spectrum of cognitive deficits resulting from cerebrovascular pathology, ranging from mild impairment to dementia. As the second leading cause of dementia worldwide, VCI remains a major therapeutic challenge. A comprehensive search of ClinicalTrials.gov and the World Health Organization International Clinical Trials Registry Platform (WHO ICTRP) identified randomized controlled trials (RCTs) conducted or completed between 2012 and 2025. Trials enrolling participants diagnosed with VCI or VaD across all disease stages and all trial phases were included. Forty-one RCTs met the inclusion criteria encompassing diverse therapeutic mechanisms. Investigated agents included neuroprotective and vascular-targeted compounds, neurotransmitter modulators, symptom-focused drugs for behavioral and psychological symptoms of dementia (BPSD), traditional Chinese medicine (TCM) formulations, and agents acting on novel pathways. Recent trials in VCI and VaD show increasing methodological rigor and therapeutic diversity, signaling growing research momentum in the field. Nonetheless, progress is constrained by regional concentration of studies, limited publication of completed results, and inconsistent disease classification across stages. Strengthening global collaboration, ensuring transparent reporting, and standardizing disease staging will be critical to advancing pharmacological development for vascular cognitive disorders.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-05"
   }
 ]
