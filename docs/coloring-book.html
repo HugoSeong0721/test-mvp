@@ -156,6 +156,16 @@
   @keyframes lfl { 0%,100% { transform: scale(1); } 40% { transform: scale(1.9); } }
   .deco { pointer-events: none; }
 
+  /* ── Mode toggle ── */
+  #mode-row { flex: none; display: flex; justify-content: center; padding: 6px 0 0; }
+  #mode-row button {
+    border: 1.5px solid #e3dbc8; background: #fff; color: #8b8fa0;
+    font-size: 12.5px; font-weight: 800; padding: 7px 16px;
+  }
+  #mode-num { border-radius: 10px 0 0 10px; border-right: none; }
+  #mode-free { border-radius: 0 10px 10px 0; }
+  #mode-row button.sel { background: #3d4351; border-color: #3d4351; color: #fff; }
+
   /* ── Palette ── */
   #palette {
     flex: none;
@@ -233,6 +243,9 @@
       <div id="pct">0%</div>
     </div>
     <div id="art-wrap"></div>
+    <div id="mode-row">
+      <button id="mode-num">123 Number</button><button id="mode-free">&#128396; Free</button>
+    </div>
     <div id="palette"></div>
   </div>
 </div>
@@ -704,7 +717,7 @@
       el.setAttribute('data-i', i);
       if (filled.has(i)) {
         el.classList.add('filled');
-        el.style.fill = pic.pal[rg.c - 1];
+        el.style.fill = pic.pal[filled.get(i)]; // Map: 조각 → 실제 칠한 색 (자유 모드는 정답과 다를 수 있음)
       }
       svg.appendChild(el);
       els.push(el);
@@ -817,8 +830,24 @@
   var pctEl = document.getElementById('pct');
   var donePanel = null;
 
-  function getFilledSet(pic) {
-    return new Set((saveData[pic.id] || []).filter(function (i) { return i >= 0 && i < pic.rg.length; }));
+  // 채움 상태: Map(조각 인덱스 → 팔레트 색 인덱스). 모드별로 저장이 분리된다.
+  // 숫자 모드: saveData[picId] = [인덱스…] (색은 조각의 정답 번호에서 유도)
+  // 자유 모드: saveData['f:'+picId] = {인덱스: 색인덱스}
+  function modeOf(pic) { return (saveData._mode || {})[pic.id] === 'free' ? 'free' : 'num'; }
+  function getFills(pic, mode) {
+    var m = new Map();
+    if (mode === 'free') {
+      var o = saveData['f:' + pic.id] || {};
+      Object.keys(o).forEach(function (k) {
+        var i = +k, c = o[k];
+        if (i >= 0 && i < pic.rg.length && c >= 0 && c < pic.pal.length) m.set(i, c);
+      });
+    } else {
+      (saveData[pic.id] || []).forEach(function (i) {
+        if (i >= 0 && i < pic.rg.length) m.set(i, pic.rg[i].c - 1);
+      });
+    }
+    return m;
   }
 
   // ── 홈 갤러리 (Modernist) ───────────────────────────────────
@@ -837,13 +866,13 @@
     // 이어하기 행: 진행 중(0 < 채움 < 전체) 그림 중 최근에 칠한 것
     var cont = null;
     PICS.forEach(function (pic) {
-      var n = getFilledSet(pic).size;
+      var n = getFills(pic, modeOf(pic)).size;
       if (n > 0 && n < pic.rg.length && (!cont || lastOf(pic.id) > lastOf(cont.id))) cont = pic;
     });
     contEl.innerHTML = '';
     contEl.classList.toggle('hidden', !cont);
     if (cont) {
-      var cf = getFilledSet(cont);
+      var cf = getFills(cont, modeOf(cont));
       var pctv = Math.round(cf.size / cont.rg.length * 100);
       var th = document.createElement('div');
       th.className = 'cthumb';
@@ -880,7 +909,7 @@
     gridEl.innerHTML = '';
     var shown = 0;
     PICS.forEach(function (pic) {
-      var filled = getFilledSet(pic);
+      var filled = getFills(pic, modeOf(pic));
       var n = filled.size, total = pic.rg.length;
       var isDone = n === total, inProg = n > 0 && !isDone;
       if (homeFilter === 'prog' && !inProg) return;
@@ -925,14 +954,19 @@
   }
 
   // ── 플레이 ──────────────────────────────────────────────────
-  function openPic(pic) {
-    var filled = getFilledSet(pic);
-    cur = { pic: pic, filled: filled, sel: -1, counts: [] };
-    pic.pal.forEach(function (_, ci) {
-      cur.counts[ci] = pic.rg.filter(function (rg, i) { return rg.c === ci + 1 && !filled.has(i); }).length;
-    });
+  function openPic(pic, mode) {
+    mode = mode || modeOf(pic);
+    var filled = getFills(pic, mode);
+    cur = { pic: pic, mode: mode, filled: filled, sel: -1, counts: [] };
+    if (mode === 'num') {
+      pic.pal.forEach(function (_, ci) {
+        cur.counts[ci] = pic.rg.filter(function (rg, i) { return rg.c === ci + 1 && !filled.has(i); }).length;
+      });
+    }
 
     document.getElementById('pic-name').textContent = pic.name;
+    document.getElementById('mode-num').classList.toggle('sel', mode === 'num');
+    document.getElementById('mode-free').classList.toggle('sel', mode === 'free');
 
     // 먼저 화면을 보이게 한 뒤 크기/라벨을 측정한다 (숨긴 채 getBBox는 0을 돌려줌)
     homeEl.classList.add('hidden');
@@ -940,21 +974,33 @@
     hideDonePanel();
 
     artWrap.innerHTML = '';
-    var view = buildSVG(pic, filled, true);
+    var view = buildSVG(pic, filled, mode === 'num'); // 자유 모드는 숫자 라벨 없음
     cur.view = view;
     artWrap.appendChild(view.svg);
     sizeArt();
-    placeLabels(pic, view);
+    if (mode === 'num') placeLabels(pic, view);
 
     view.svg.addEventListener('pointerdown', onArtDown);
     view.svg.addEventListener('pointerup', onArtUp);
 
     buildPalette();
-    // 첫 미완성 색 자동 선택
-    var first = cur.counts.findIndex(function (n) { return n > 0; });
-    selectColor(first >= 0 ? first : 0);
+    if (mode === 'num') {
+      // 첫 미완성 색 자동 선택
+      var first = cur.counts.findIndex(function (n) { return n > 0; });
+      selectColor(first >= 0 ? first : 0);
+    } else {
+      selectColor(0);
+    }
     updateProgress();
     if (filled.size === pic.rg.length) showDonePanel(false);
+  }
+
+  function setMode(m) {
+    if (!cur || cur.mode === m) return;
+    (saveData._mode = saveData._mode || {})[cur.pic.id] = m;
+    persist();
+    sndTick();
+    openPic(cur.pic, m);
   }
 
   function sizeArt() {
@@ -974,7 +1020,7 @@
       b.className = 'sw';
       b.style.background = hex;
       b.style.color = isLight(hex) ? '#3d4351' : '#fff';
-      b.textContent = ci + 1;
+      b.textContent = cur.mode === 'num' ? ci + 1 : '';
       var cnt = document.createElement('span');
       cnt.className = 'cnt';
       b.appendChild(cnt);
@@ -993,10 +1039,15 @@
     var sws = paletteEl.children;
     cur.pic.pal.forEach(function (_, ci) {
       var b = sws[ci];
-      var left = cur.counts[ci];
       b.classList.toggle('sel', ci === cur.sel);
-      b.classList.toggle('done', left === 0);
       var cnt = b.querySelector('.cnt');
+      if (cur.mode === 'free') { // 자유 모드: 번호·잔여 수 없음, 순수 색 견본
+        b.classList.remove('done');
+        cnt.style.display = 'none';
+        return;
+      }
+      var left = cur.counts[ci];
+      b.classList.toggle('done', left === 0);
       if (left === 0) {
         b.childNodes[0].textContent = '✓';
         cnt.style.display = 'none';
@@ -1012,7 +1063,7 @@
     if (!cur) return;
     cur.sel = ci;
     var hex = cur.pic.pal[ci];
-    cur.pic.rg.forEach(function (rg, i) {
+    if (cur.mode === 'num') cur.pic.rg.forEach(function (rg, i) {
       var el = cur.view.els[i];
       var lbl = cur.view.labels[i];
       var on = rg.c === ci + 1 && !cur.filled.has(i);
@@ -1029,6 +1080,7 @@
   // 탭 판정: 드래그(완충지대 스크롤)와 구분
   var downPt = null;
   function onArtDown(e) {
+    if (donePanel) hideDonePanel(); // 완성 후에도 그림을 탭하면 패널을 치우고 덧칠 가능
     downPt = { x: e.clientX, y: e.clientY, t: Date.now() };
   }
   function onArtUp(e) {
@@ -1043,7 +1095,13 @@
   }
 
   function tapRegion(i, e) {
-    if (!cur || cur.filled.has(i)) return;
+    if (!cur) return;
+    if (cur.mode === 'free') {
+      if (cur.filled.get(i) === cur.sel) return; // 같은 색 재탭은 무시
+      fillRegion(i, e);
+      return;
+    }
+    if (cur.filled.has(i)) return;
     var rg = cur.pic.rg[i];
     if (rg.c !== cur.sel + 1) {
       // 다른 번호: 숫자를 크게 깜빡여 힌트
@@ -1060,15 +1118,23 @@
 
   function fillRegion(i, e) {
     var pic = cur.pic, rg = pic.rg[i];
-    var hex = pic.pal[rg.c - 1];
+    var ci = cur.mode === 'free' ? cur.sel : rg.c - 1;
+    var hex = pic.pal[ci];
     var el = cur.view.els[i];
     var lbl = cur.view.labels[i];
+    var wasFull = cur.filled.size === pic.rg.length;
 
-    cur.filled.add(i);
-    saveData[pic.id] = Array.from(cur.filled);
+    cur.filled.set(i, ci);
+    if (cur.mode === 'free') {
+      var o = {};
+      cur.filled.forEach(function (c, idx) { o[idx] = c; });
+      saveData['f:' + pic.id] = o;
+    } else {
+      saveData[pic.id] = Array.from(cur.filled.keys());
+      cur.counts[cur.sel]--;
+    }
     (saveData._last = saveData._last || {})[pic.id] = Date.now();
     persist();
-    cur.counts[cur.sel]--;
 
     // 리플(물감 퍼짐) 애니메이션
     var bb = el.getBBox();
@@ -1110,10 +1176,14 @@
     })(t0);
 
     el.classList.remove('hl');
-    lbl.style.display = 'none';
+    if (lbl) lbl.style.display = 'none';
     sndPop(); buzz(8);
     updateProgress();
 
+    if (cur.mode === 'free') {
+      if (!wasFull && cur.filled.size === pic.rg.length) setTimeout(showComplete, 420);
+      return;
+    }
     if (cur.counts[cur.sel] === 0) {
       refreshPalette();
       if (cur.filled.size === pic.rg.length) {
@@ -1122,8 +1192,8 @@
         // 다음 미완성 색으로 자동 이동
         var n = pic.pal.length;
         for (var k2 = 1; k2 <= n; k2++) {
-          var ci = (cur.sel + k2) % n;
-          if (cur.counts[ci] > 0) { sndColor(); setTimeout(function () { selectColor(ci); }, 240); break; }
+          var ci2 = (cur.sel + k2) % n;
+          if (cur.counts[ci2] > 0) { sndColor(); setTimeout(function () { selectColor(ci2); }, 240); break; }
         }
       }
     } else {
@@ -1155,12 +1225,12 @@
     document.body.appendChild(donePanel);
     onTap(donePanel.querySelector('#btn-gallery'), goHome);
     onTap(donePanel.querySelector('#btn-again'), function () {
-      delete saveData[cur.pic.id];
-      if (saveData._last) delete saveData._last[cur.pic.id];
+      if (cur.mode === 'free') delete saveData['f:' + cur.pic.id];
+      else delete saveData[cur.pic.id];
       persist();
-      var pic = cur.pic;
+      var pic = cur.pic, md = cur.mode;
       hideDonePanel();
-      openPic(pic);
+      openPic(pic, md);
     });
   }
   function hideDonePanel() {
@@ -1175,6 +1245,8 @@
     renderHome();
   }
   onTap(document.getElementById('btn-back'), goHome);
+  onTap(document.getElementById('mode-num'), function () { setMode('num'); });
+  onTap(document.getElementById('mode-free'), function () { setMode('free'); });
 
   // ── 컨페티 ──────────────────────────────────────────────────
   var cvs = document.getElementById('confetti');
@@ -1238,6 +1310,7 @@
       get cur() { return cur; },
       open: function (id) { openPic(PICS.find(function (p) { return p.id === id; })); },
       select: selectColor,
+      setMode: setMode,
       tap: function (i) { tapRegion(i, null); },
       fillAll: function () {
         var pic = cur.pic;
