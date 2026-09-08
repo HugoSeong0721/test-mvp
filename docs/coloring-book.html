@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Cozy Coloring</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* 인앱 브라우저 시트 대응: 문서에 240px 스크롤 완충지대를 깔아
+     아래로 쓸리는 손가락을 시트 닫기 대신 스크롤로 소비시킨다 */
+  html {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    height: calc(100% + 240px);
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #f6f1e7;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: #3d4351;
+  }
+  #app {
+    position: fixed;
+    inset: 0;
+    /* 세로 팬은 완충지대 스크롤로 흘려보낸다 — none으로 막으면 iOS가 시트 닫기로 가져간다 */
+    touch-action: pan-y;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .hidden { display: none !important; }
+
+  /* ── Home (gallery) ── */
+  #home { background: linear-gradient(180deg, #fdf8ee 0%, #f3ead9 100%); }
+  #home-head { padding: max(14px, env(safe-area-inset-top)) 20px 6px; text-align: center; }
+  #home-head h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+  #home-head p { font-size: 14px; color: #8b8fa0; margin-top: 3px; }
+  #grid {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 12px 16px calc(24px + env(safe-area-inset-bottom));
+    align-content: start;
+  }
+  .card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 10px 10px 12px;
+    box-shadow: 0 3px 14px rgba(90, 70, 40, 0.10);
+    text-align: center;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  .card:active { transform: scale(0.97); }
+  .card.done { border-color: #ffc94d; }
+  .card .thumb { width: 100%; border-radius: 12px; overflow: hidden; background: #fafbfc; }
+  .card .thumb svg { display: block; width: 100%; height: auto; }
+  .card .nm { font-size: 14px; font-weight: 700; margin-top: 8px; }
+  .card .pg { font-size: 12px; color: #9aa0ae; margin-top: 2px; }
+  .card.done .pg { color: #d99b1f; font-weight: 700; }
+
+  /* ── Play screen ── */
+  #play { background: #fdf9f0; }
+  #play-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: max(10px, env(safe-area-inset-top)) 12px 8px;
+  }
+  #btn-back {
+    width: 40px; height: 40px; border: none; border-radius: 12px;
+    background: #fff; box-shadow: 0 2px 8px rgba(90,70,40,0.12);
+    font-size: 20px; color: #3d4351; flex: none;
+  }
+  #btn-back:active { transform: scale(0.94); }
+  #head-mid { flex: 1; min-width: 0; }
+  #pic-name { font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #pbar { height: 7px; background: #ece5d6; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+  #pbar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #7fc46a, #ffc94d); border-radius: 4px; transition: width 0.25s ease; }
+  #pct { font-size: 14px; font-weight: 800; color: #8b8fa0; min-width: 44px; text-align: right; flex: none; }
+
+  #art-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; padding: 4px 10px; }
+  #art-wrap svg { display: block; background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(90,70,40,0.12); }
+
+  .region { stroke: #ccd3da; stroke-width: 1.4; fill: #fff; }
+  .region.filled { stroke: none; }
+  .region.hl { animation: hlp 1.3s ease-in-out infinite; }
+  @keyframes hlp { 0%, 100% { fill: #fff; } 50% { fill: var(--tint); } }
+  .region.shake { animation: shk 0.35s ease; transform-box: fill-box; transform-origin: center; }
+  @keyframes shk { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+  .lbl {
+    fill: #98a2b3; font-weight: 700; text-anchor: middle;
+    pointer-events: none; font-family: -apple-system, Arial, sans-serif;
+  }
+  .lbl.on { fill: #4a5468; }
+  .lbl.flash { animation: lfl 0.5s ease; transform-box: fill-box; transform-origin: center; }
+  @keyframes lfl { 0%,100% { transform: scale(1); } 40% { transform: scale(1.9); } }
+  .deco { pointer-events: none; }
+
+  /* ── Palette ── */
+  #palette {
+    flex: none;
+    display: flex; gap: 10px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 10px 14px calc(14px + env(safe-area-inset-bottom));
+  }
+  #palette::-webkit-scrollbar { display: none; }
+  .sw {
+    flex: none;
+    width: 52px; height: 52px; border-radius: 50%;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(90,70,40,0.18), inset 0 -2px 4px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform 0.15s ease;
+  }
+  .sw.sel { transform: scale(1.16); outline: 3.5px solid #3d4351; outline-offset: 2.5px; }
+  .sw.done { opacity: 0.45; box-shadow: none; }
+  .sw .cnt {
+    position: absolute; right: -3px; top: -3px;
+    min-width: 19px; height: 19px; padding: 0 4px;
+    border-radius: 10px; background: #3d4351; color: #fff;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Completion ── */
+  #done-panel {
+    position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: min(330px, 88vw);
+    background: rgba(46, 38, 24, 0.95); color: #fff;
+    border-radius: 18px; padding: 16px 16px 14px; text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    animation: rise 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+  @keyframes rise { from { transform: translateX(-50%) translateY(60px); opacity: 0; } }
+  #done-panel h2 { font-size: 22px; font-weight: 800; }
+  #done-panel p { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+  #done-panel .row { display: flex; gap: 10px; margin-top: 13px; }
+  #done-panel button {
+    flex: 1; border: none; border-radius: 12px; padding: 12px 0;
+    font-size: 15px; font-weight: 800;
+  }
+  #btn-gallery { background: #ffc94d; color: #3a2c10; }
+  #btn-again { background: rgba(255,255,255,0.14); color: #fff; }
+  #done-panel button:active { transform: scale(0.96); }
+  #confetti { position: fixed; inset: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Home / gallery -->
+  <div class="screen" id="home">
+    <div id="home-head">
+      <h1>🎨 Cozy Coloring</h1>
+      <p>Pick a picture and tap to color</p>
+    </div>
+    <div id="grid"></div>
+  </div>
+
+  <!-- Coloring screen -->
+  <div class="screen hidden" id="play">
+    <div id="play-head">
+      <button id="btn-back">←</button>
+      <div id="head-mid">
+        <div id="pic-name"></div>
+        <div id="pbar"><div id="pbar-fill"></div></div>
+      </div>
+      <div id="pct">0%</div>
+    </div>
+    <div id="art-wrap"></div>
+    <div id="palette"></div>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+
+  // ── 그림 데이터 ─────────────────────────────────────────────
+  // t: c=circle e=ellipse r=rect p=path / c: 팔레트 색 번호(1-base)
+  // lx,ly: 숫자 라벨 위치 강제(겹침 회피용), rot: 회전(중심 기준)
+  function C(cx, cy, r, c, o)      { return Object.assign({ t: 'c', cx: cx, cy: cy, r: r, c: c }, o); }
+  function E(cx, cy, rx, ry, c, o) { return Object.assign({ t: 'e', cx: cx, cy: cy, rx: rx, ry: ry, c: c }, o); }
+  function R(x, y, w, h, c, o)     { return Object.assign({ t: 'r', x: x, y: y, w: w, h: h, c: c }, o); }
+  function P(d, c, o)              { return Object.assign({ t: 'p', d: d, c: c }, o); }
+
+  var PICS = [
+    {
+      id: 'tulip', name: 'Tulip Garden', w: 360, h: 440,
+      pal: ['#A8D8F0', '#FFD35C', '#FBF1DC', '#8FCB6B', '#61A94F', '#F4826D', '#D64545', '#F2A0C4'],
+      rg: [
+        R(0, 0, 360, 312, 1, { lx: 180, ly: 140 }),
+        C(310, 62, 40, 2),
+        P('M52,96 Q50,74 72,70 Q78,52 100,54 Q122,50 128,68 Q148,70 146,86 Q144,98 126,98 L66,98 Q54,98 52,96 Z', 3),
+        P('M202,136 Q200,114 222,110 Q228,92 250,94 Q272,90 278,108 Q298,110 296,126 Q294,138 276,138 L216,138 Q204,138 202,136 Z', 3),
+        P('M0,312 Q90,298 180,310 Q270,320 360,306 L360,376 L0,376 Z', 4, { lx: 40, ly: 348 }),
+        R(0, 376, 360, 64, 5, { lx: 180, ly: 408 }),
+        R(175, 238, 10, 150, 5),
+        R(90, 268, 10, 124, 5),
+        R(260, 268, 10, 124, 5),
+        E(158, 330, 9, 26, 5, { rot: -35 }),
+        E(202, 330, 9, 26, 5, { rot: 35 }),
+        E(77, 332, 8, 22, 5, { rot: -35 }),
+        E(283, 332, 8, 22, 5, { rot: 35 }),
+        E(164, 208, 15, 27, 7, { lx: 155, ly: 208 }),
+        E(196, 208, 15, 27, 7, { lx: 205, ly: 208 }),
+        E(180, 202, 17, 32, 6),
+        E(82, 244, 12, 22, 2, { lx: 75, ly: 246 }),
+        E(108, 244, 12, 22, 2, { lx: 115, ly: 246 }),
+        E(95, 238, 14, 26, 2),
+        E(252, 244, 12, 22, 8, { lx: 245, ly: 246 }),
+        E(278, 244, 12, 22, 8, { lx: 285, ly: 246 }),
+        E(265, 238, 14, 26, 8),
+        C(70, 382, 11, 3), C(70, 418, 11, 3), C(52, 400, 11, 3), C(88, 400, 11, 3),
+        C(70, 400, 11, 2),
+        C(56, 182, 15, 8), C(88, 182, 15, 8),
+        E(72, 190, 7, 17, 7)
+      ],
+      deco: [
+        { d: 'M68,175 Q60,158 52,154', s: '#c76a92', w: 2.5 },
+        { d: 'M76,175 Q84,158 92,154', s: '#c76a92', w: 2.5 },
+        { d: 'M218,168 q8,-8 16,0', s: '#7d8b99', w: 2.5 },
+        { d: 'M244,182 q7,-7 14,0', s: '#7d8b99', w: 2.5 }
+      ]
+    },
+    {
+      id: 'butterfly', name: 'Butterfly Meadow', w: 360, h: 440,
+      pal: ['#E4F3E6', '#F58FB0', '#FFB25E', '#FBF1DC', '#9B7EDE', '#FFD35C', '#7FC46A', '#F0715C'],
+      rg: [
+        R(0, 0, 360, 440, 1, { lx: 180, ly: 34 }),
+        C(48, 56, 34, 6),
+        P('M258,84 Q256,64 276,60 Q282,44 302,46 Q322,42 328,58 Q346,60 344,74 Q342,86 326,86 L268,86 Q258,86 258,84 Z', 4),
+        C(126, 180, 50, 2, { lx: 126, ly: 144 }),
+        C(234, 180, 50, 2, { lx: 234, ly: 144 }),
+        C(138, 268, 38, 3, { lx: 138, ly: 243 }),
+        C(222, 268, 38, 3, { lx: 222, ly: 243 }),
+        C(126, 180, 22, 4),
+        C(234, 180, 22, 4),
+        C(138, 268, 15, 4),
+        C(222, 268, 15, 4),
+        E(180, 222, 13, 55, 5),
+        C(180, 146, 16, 5),
+        P('M0,372 Q90,358 180,370 Q270,380 360,364 L360,440 L0,440 Z', 7),
+        C(75, 380, 11, 8), C(75, 412, 11, 8), C(59, 396, 11, 8), C(91, 396, 11, 8),
+        C(75, 396, 10, 6),
+        C(285, 380, 11, 8), C(285, 412, 11, 8), C(269, 396, 11, 8), C(301, 396, 11, 8),
+        C(285, 396, 10, 6)
+      ],
+      deco: [
+        { d: 'M172,133 Q164,114 154,110', s: '#9B7EDE', w: 3 },
+        { d: 'M188,133 Q196,114 206,110', s: '#9B7EDE', w: 3 }
+      ]
+    },
+    {
+      id: 'sailboat', name: 'Sail Away', w: 360, h: 440,
+      pal: ['#C9E8F7', '#FFD35C', '#FBF1DC', '#74B8E8', '#4E93C7', '#E2574C', '#FFA24D', '#8F6A4F'],
+      rg: [
+        R(0, 0, 360, 272, 1, { lx: 222, ly: 150 }),
+        C(52, 56, 34, 2),
+        P('M78,120 Q76,98 98,94 Q104,76 126,78 Q148,74 154,92 Q174,94 172,110 Q170,122 152,122 L90,122 Q78,122 78,120 Z', 3),
+        P('M248,92 Q246,70 268,66 Q274,48 296,50 Q318,46 324,64 Q344,66 342,82 Q340,94 322,94 L260,94 Q248,94 248,92 Z', 3),
+        R(0, 272, 360, 168, 4, { lx: 320, ly: 358 }),
+        P('M72,240 L72,264 L54,264 Z', 3, { lx: 66, ly: 258 }),
+        P('M52,268 L96,268 L88,282 L60,282 Z', 6),
+        P('M0,316 Q30,306 60,316 Q90,326 120,316 Q150,306 180,316 Q210,326 240,316 Q270,306 300,316 Q330,326 360,316 L360,338 L0,338 Z', 5, { lx: 40, ly: 327 }),
+        R(176, 182, 9, 120, 8),
+        P('M194,196 L194,296 L266,296 Z', 3, { lx: 216, ly: 264 }),
+        P('M166,206 L166,296 L104,296 Z', 7, { lx: 146, ly: 266 }),
+        P('M180,158 L216,170 L180,182 Z', 6, { lx: 192, ly: 170 }),
+        P('M108,302 L252,302 L228,344 L132,344 Z', 6, { lx: 146, ly: 322 }),
+        C(206, 323, 10, 3),
+        P('M0,378 Q30,368 60,378 Q90,388 120,378 Q150,368 180,378 Q210,388 240,378 Q270,368 300,378 Q330,388 360,378 L360,400 L0,400 Z', 5),
+        P('M0,418 Q30,408 60,418 Q90,428 120,418 Q150,408 180,418 Q210,428 240,418 Q270,408 300,418 Q330,428 360,418 L360,440 L0,440 Z', 5)
+      ],
+      deco: [
+        { d: 'M72,240 L72,268', s: '#8F6A4F', w: 2.5 },
+        { d: 'M244,138 q8,-8 16,0', s: '#7d8b99', w: 2.5 },
+        { d: 'M274,120 q8,-8 16,0', s: '#7d8b99', w: 2.5 }
+      ]
+    },
+    {
+      id: 'mushroom', name: 'Mushroom Cottage', w: 360, h: 440,
+      pal: ['#D7EEF9', '#E85D5D', '#FBF1DC', '#A9714B', '#FFD35C', '#85C96B', '#F49AC1'],
+      rg: [
+        R(0, 0, 360, 368, 1, { lx: 180, ly: 44 }),
+        P('M24,86 Q22,64 44,60 Q50,42 72,44 Q94,40 100,58 Q120,60 118,76 Q116,88 98,88 L36,88 Q24,88 24,86 Z', 3),
+        P('M260,78 Q258,56 280,52 Q286,34 308,36 Q330,32 336,50 Q356,52 354,68 Q352,80 334,80 L272,80 Q260,80 260,78 Z', 3),
+        P('M0,368 Q90,354 180,366 Q270,376 360,360 L360,440 L0,440 Z', 6, { lx: 180, ly: 420 }),
+        P('M62,212 Q62,92 180,92 Q298,92 298,212 Q240,198 180,200 Q120,198 62,212 Z', 2, { lx: 264, ly: 178 }),
+        C(122, 142, 16, 3), C(224, 132, 14, 3), C(180, 172, 13, 3),
+        P('M122,206 L238,206 Q244,300 234,380 L126,380 Q116,300 122,206 Z', 3, { lx: 180, ly: 222 }),
+        P('M156,380 L156,300 Q156,274 180,274 Q204,274 204,300 L204,380 Z', 4, { lx: 172, ly: 314 }),
+        C(140, 244, 14, 5), C(220, 244, 14, 5),
+        C(60, 384, 10, 7), C(60, 412, 10, 7), C(46, 398, 10, 7), C(74, 398, 10, 7),
+        C(60, 398, 9, 5),
+        C(300, 384, 10, 7), C(300, 412, 10, 7), C(286, 398, 10, 7), C(314, 398, 10, 7),
+        C(300, 398, 9, 5),
+        C(288, 166, 13, 7), C(314, 166, 13, 7),
+        E(301, 172, 6, 14, 4)
+      ],
+      deco: [
+        { d: 'M192,318 a4,4 0 1 0 0.1,0', s: '#7a4e33', w: 4 },
+        { d: 'M297,160 Q290,146 282,142', s: '#c76a92', w: 2.5 },
+        { d: 'M305,160 Q312,146 320,142', s: '#c76a92', w: 2.5 }
+      ]
+    }
+  ];
+
+  // ── 저장 ────────────────────────────────────────────────────
+  var SAVE_KEY = 'coloringbook-v1';
+  function loadSave() {
+    try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch (e) { return {}; }
+  }
+  function persist() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch (e) {}
+  }
+  var saveData = loadSave();
+
+  // 탭 판정 헬퍼: 완충지대 스크롤 드래그와 구분 (12px 이내 + 600ms 이내)
+  function onTap(el, fn) {
+    var d = null;
+    el.addEventListener('pointerdown', function (e) {
+      d = { x: e.clientX, y: e.clientY, t: Date.now() };
+    });
+    el.addEventListener('pointerup', function (e) {
+      if (!d) return;
+      var dx = e.clientX - d.x, dy = e.clientY - d.y;
+      var ok = Date.now() - d.t < 600 && dx * dx + dy * dy <= 144;
+      d = null;
+      if (ok) fn(e);
+    });
+  }
+
+  // ── 색 유틸 ─────────────────────────────────────────────────
+  function hexRGB(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+  function tint(h, f) { // 흰색과 섞기 (f = 원색 비율)
+    var c = hexRGB(h);
+    return 'rgb(' + c.map(function (v) { return Math.round(255 - (255 - v) * f); }).join(',') + ')';
+  }
+  function isLight(h) {
+    var c = hexRGB(h);
+    return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) > 165;
+  }
+
+  // ── 사운드 ──────────────────────────────────────────────────
+  var AC = null;
+  function ac() {
+    if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+    if (AC && AC.state === 'suspended') AC.resume();
+    return AC;
+  }
+  function beep(freq, dur, type, vol, when) {
+    var a = ac(); if (!a) return;
+    var t = a.currentTime + (when || 0);
+    var o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.12, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function sndPop()   { beep(660, 0.09, 'triangle', 0.14); beep(990, 0.07, 'sine', 0.07, 0.02); }
+  function sndWrong() { beep(190, 0.12, 'sine', 0.10); }
+  function sndColor() { beep(587, 0.1, 'triangle', 0.12); beep(880, 0.14, 'triangle', 0.12, 0.09); }
+  function sndDone()  { [523, 659, 784, 1047].forEach(function (f, i) { beep(f, 0.22, 'triangle', 0.13, i * 0.13); }); }
+  function buzz(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+
+  // ── SVG 빌드 ────────────────────────────────────────────────
+  function makeShape(rg) {
+    var el;
+    if (rg.t === 'c') {
+      el = document.createElementNS(NS, 'circle');
+      el.setAttribute('cx', rg.cx); el.setAttribute('cy', rg.cy); el.setAttribute('r', rg.r);
+    } else if (rg.t === 'e') {
+      el = document.createElementNS(NS, 'ellipse');
+      el.setAttribute('cx', rg.cx); el.setAttribute('cy', rg.cy);
+      el.setAttribute('rx', rg.rx); el.setAttribute('ry', rg.ry);
+      if (rg.rot) el.setAttribute('transform', 'rotate(' + rg.rot + ' ' + rg.cx + ' ' + rg.cy + ')');
+    } else if (rg.t === 'r') {
+      el = document.createElementNS(NS, 'rect');
+      el.setAttribute('x', rg.x); el.setAttribute('y', rg.y);
+      el.setAttribute('width', rg.w); el.setAttribute('height', rg.h);
+    } else {
+      el = document.createElementNS(NS, 'path');
+      el.setAttribute('d', rg.d);
+    }
+    return el;
+  }
+
+  // filled: Set(index) / withLabels: 플레이 화면용 숫자 표시
+  function buildSVG(pic, filled, withLabels) {
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + pic.w + ' ' + pic.h);
+    var defs = document.createElementNS(NS, 'defs');
+    svg.appendChild(defs);
+    var els = [], labels = [];
+    pic.rg.forEach(function (rg, i) {
+      var el = makeShape(rg);
+      el.setAttribute('class', 'region');
+      el.setAttribute('data-i', i);
+      if (filled.has(i)) {
+        el.classList.add('filled');
+        el.style.fill = pic.pal[rg.c - 1];
+      }
+      svg.appendChild(el);
+      els.push(el);
+    });
+    (pic.deco || []).forEach(function (d) {
+      var p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', d.d);
+      p.setAttribute('class', 'deco');
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', d.s);
+      p.setAttribute('stroke-width', d.w);
+      p.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(p);
+    });
+    if (withLabels) {
+      pic.rg.forEach(function (rg, i) {
+        var t = document.createElementNS(NS, 'text');
+        t.setAttribute('class', 'lbl');
+        t.textContent = rg.c;
+        if (filled.has(i)) t.style.display = 'none';
+        svg.appendChild(t);
+        labels.push(t);
+      });
+    }
+    return { svg: svg, defs: defs, els: els, labels: labels };
+  }
+
+  // 라벨 위치/크기: DOM 부착 후 bbox 기준
+  function placeLabels(pic, view) {
+    pic.rg.forEach(function (rg, i) {
+      var lbl = view.labels[i];
+      var bb = view.els[i].getBBox();
+      var fs = Math.max(11, Math.min(19, Math.sqrt(bb.width * bb.height) * 0.2));
+      lbl.setAttribute('font-size', fs);
+      lbl.setAttribute('x', rg.lx != null ? rg.lx : bb.x + bb.width / 2);
+      lbl.setAttribute('y', (rg.ly != null ? rg.ly : bb.y + bb.height / 2) + fs * 0.36);
+    });
+  }
+
+  // ── 상태 ────────────────────────────────────────────────────
+  var cur = null; // { pic, filled:Set, view, sel, counts[] }
+  var homeEl = document.getElementById('home');
+  var playEl = document.getElementById('play');
+  var gridEl = document.getElementById('grid');
+  var artWrap = document.getElementById('art-wrap');
+  var paletteEl = document.getElementById('palette');
+  var pbarFill = document.getElementById('pbar-fill');
+  var pctEl = document.getElementById('pct');
+  var donePanel = null;
+
+  function getFilledSet(pic) {
+    return new Set((saveData[pic.id] || []).filter(function (i) { return i >= 0 && i < pic.rg.length; }));
+  }
+
+  // ── 홈 갤러리 ───────────────────────────────────────────────
+  function renderHome() {
+    gridEl.innerHTML = '';
+    PICS.forEach(function (pic) {
+      var filled = getFilledSet(pic);
+      var card = document.createElement('div');
+      card.className = 'card' + (filled.size === pic.rg.length ? ' done' : '');
+      var th = document.createElement('div');
+      th.className = 'thumb';
+      th.appendChild(buildSVG(pic, filled, false).svg);
+      card.appendChild(th);
+      var nm = document.createElement('div');
+      nm.className = 'nm'; nm.textContent = pic.name;
+      card.appendChild(nm);
+      var pg = document.createElement('div');
+      pg.className = 'pg';
+      pg.textContent = filled.size === pic.rg.length ? '✓ Done — tap to admire'
+        : filled.size ? Math.round(filled.size / pic.rg.length * 100) + '% colored'
+        : pic.rg.length + ' pieces';
+      card.appendChild(pg);
+      onTap(card, function () { openPic(pic); });
+      gridEl.appendChild(card);
+    });
+  }
+
+  // ── 플레이 ──────────────────────────────────────────────────
+  function openPic(pic) {
+    var filled = getFilledSet(pic);
+    cur = { pic: pic, filled: filled, sel: -1, counts: [] };
+    pic.pal.forEach(function (_, ci) {
+      cur.counts[ci] = pic.rg.filter(function (rg, i) { return rg.c === ci + 1 && !filled.has(i); }).length;
+    });
+
+    document.getElementById('pic-name').textContent = pic.name;
+
+    // 먼저 화면을 보이게 한 뒤 크기/라벨을 측정한다 (숨긴 채 getBBox는 0을 돌려줌)
+    homeEl.classList.add('hidden');
+    playEl.classList.remove('hidden');
+    hideDonePanel();
+
+    artWrap.innerHTML = '';
+    var view = buildSVG(pic, filled, true);
+    cur.view = view;
+    artWrap.appendChild(view.svg);
+    sizeArt();
+    placeLabels(pic, view);
+
+    view.svg.addEventListener('pointerdown', onArtDown);
+    view.svg.addEventListener('pointerup', onArtUp);
+
+    buildPalette();
+    // 첫 미완성 색 자동 선택
+    var first = cur.counts.findIndex(function (n) { return n > 0; });
+    selectColor(first >= 0 ? first : 0);
+    updateProgress();
+    if (filled.size === pic.rg.length) showDonePanel(false);
+  }
+
+  function sizeArt() {
+    if (!cur) return;
+    var availW = Math.min(window.innerWidth - 20, 520);
+    var availH = artWrap.clientHeight - 8 || (window.innerHeight - 170);
+    var s = Math.min(availW / cur.pic.w, availH / cur.pic.h);
+    cur.view.svg.setAttribute('width', Math.floor(cur.pic.w * s));
+    cur.view.svg.setAttribute('height', Math.floor(cur.pic.h * s));
+  }
+  window.addEventListener('resize', function () { setTimeout(sizeArt, 60); });
+
+  function buildPalette() {
+    paletteEl.innerHTML = '';
+    cur.pic.pal.forEach(function (hex, ci) {
+      var b = document.createElement('button');
+      b.className = 'sw';
+      b.style.background = hex;
+      b.style.color = isLight(hex) ? '#3d4351' : '#fff';
+      b.textContent = ci + 1;
+      var cnt = document.createElement('span');
+      cnt.className = 'cnt';
+      b.appendChild(cnt);
+      b.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        selectColor(ci);
+        sndTick();
+      });
+      paletteEl.appendChild(b);
+    });
+    refreshPalette();
+  }
+  function sndTick() { beep(520, 0.05, 'sine', 0.06); }
+
+  function refreshPalette() {
+    var sws = paletteEl.children;
+    cur.pic.pal.forEach(function (_, ci) {
+      var b = sws[ci];
+      var left = cur.counts[ci];
+      b.classList.toggle('sel', ci === cur.sel);
+      b.classList.toggle('done', left === 0);
+      var cnt = b.querySelector('.cnt');
+      if (left === 0) {
+        b.childNodes[0].textContent = '✓';
+        cnt.style.display = 'none';
+      } else {
+        b.childNodes[0].textContent = ci + 1;
+        cnt.style.display = '';
+        cnt.textContent = left;
+      }
+    });
+  }
+
+  function selectColor(ci) {
+    if (!cur) return;
+    cur.sel = ci;
+    var hex = cur.pic.pal[ci];
+    cur.pic.rg.forEach(function (rg, i) {
+      var el = cur.view.els[i];
+      var lbl = cur.view.labels[i];
+      var on = rg.c === ci + 1 && !cur.filled.has(i);
+      el.classList.toggle('hl', on);
+      if (on) el.style.setProperty('--tint', tint(hex, 0.38));
+      if (lbl) lbl.classList.toggle('on', on);
+    });
+    refreshPalette();
+    // 선택 스와치 보이게 스크롤
+    var sw = paletteEl.children[ci];
+    if (sw && sw.scrollIntoView) sw.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+
+  // 탭 판정: 드래그(완충지대 스크롤)와 구분
+  var downPt = null;
+  function onArtDown(e) {
+    downPt = { x: e.clientX, y: e.clientY, t: Date.now() };
+  }
+  function onArtUp(e) {
+    if (!downPt) return;
+    var dx = e.clientX - downPt.x, dy = e.clientY - downPt.y;
+    var quick = Date.now() - downPt.t < 600;
+    downPt = null;
+    if (!quick || dx * dx + dy * dy > 144) return; // 12px 이상 움직이면 스크롤로 간주
+    var t = e.target.closest ? e.target.closest('[data-i]') : null;
+    if (!t) return;
+    tapRegion(parseInt(t.getAttribute('data-i'), 10), e);
+  }
+
+  function tapRegion(i, e) {
+    if (!cur || cur.filled.has(i)) return;
+    var rg = cur.pic.rg[i];
+    if (rg.c !== cur.sel + 1) {
+      // 다른 번호: 숫자를 크게 깜빡여 힌트
+      var lbl = cur.view.labels[i];
+      var el = cur.view.els[i];
+      lbl.classList.remove('flash'); void lbl.getBoundingClientRect(); lbl.classList.add('flash');
+      el.classList.remove('shake'); void el.getBoundingClientRect(); el.classList.add('shake');
+      setTimeout(function () { lbl.classList.remove('flash'); el.classList.remove('shake'); }, 520);
+      sndWrong();
+      return;
+    }
+    fillRegion(i, e);
+  }
+
+  function fillRegion(i, e) {
+    var pic = cur.pic, rg = pic.rg[i];
+    var hex = pic.pal[rg.c - 1];
+    var el = cur.view.els[i];
+    var lbl = cur.view.labels[i];
+
+    cur.filled.add(i);
+    saveData[pic.id] = Array.from(cur.filled);
+    persist();
+    cur.counts[cur.sel]--;
+
+    // 리플(물감 퍼짐) 애니메이션
+    var bb = el.getBBox();
+    var pt = { x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 };
+    if (e) {
+      var svgPt = cur.view.svg.createSVGPoint();
+      svgPt.x = e.clientX; svgPt.y = e.clientY;
+      var m = cur.view.svg.getScreenCTM();
+      if (m) { var p2 = svgPt.matrixTransform(m.inverse()); pt = { x: p2.x, y: p2.y }; }
+    }
+    var clipId = 'cb-clip-' + i + '-' + Date.now();
+    var clip = document.createElementNS(NS, 'clipPath');
+    clip.setAttribute('id', clipId);
+    var shape = makeShape(rg);
+    clip.appendChild(shape);
+    cur.view.defs.appendChild(clip);
+    var rip = document.createElementNS(NS, 'circle');
+    rip.setAttribute('cx', pt.x); rip.setAttribute('cy', pt.y); rip.setAttribute('r', 0);
+    rip.setAttribute('fill', hex);
+    rip.setAttribute('clip-path', 'url(#' + clipId + ')');
+    rip.setAttribute('pointer-events', 'none');
+    el.parentNode.insertBefore(rip, el.nextSibling);
+    var corners = [
+      [bb.x, bb.y], [bb.x + bb.width, bb.y], [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]
+    ];
+    var maxR = 0;
+    corners.forEach(function (c) {
+      maxR = Math.max(maxR, Math.hypot(c[0] - pt.x, c[1] - pt.y));
+    });
+    var t0 = performance.now(), dur = 260;
+    (function step(now) {
+      var k = Math.min(1, Math.max(0, (now - t0) / dur));
+      rip.setAttribute('r', maxR * (1 - Math.pow(1 - k, 2)));
+      if (k < 1) { requestAnimationFrame(step); return; }
+      el.classList.add('filled');
+      el.classList.remove('hl');
+      el.style.fill = hex;
+      rip.remove(); clip.remove();
+    })(t0);
+
+    el.classList.remove('hl');
+    lbl.style.display = 'none';
+    sndPop(); buzz(8);
+    updateProgress();
+
+    if (cur.counts[cur.sel] === 0) {
+      refreshPalette();
+      if (cur.filled.size === pic.rg.length) {
+        setTimeout(showComplete, 420);
+      } else {
+        // 다음 미완성 색으로 자동 이동
+        var n = pic.pal.length;
+        for (var k2 = 1; k2 <= n; k2++) {
+          var ci = (cur.sel + k2) % n;
+          if (cur.counts[ci] > 0) { sndColor(); setTimeout(function () { selectColor(ci); }, 240); break; }
+        }
+      }
+    } else {
+      refreshPalette();
+    }
+  }
+
+  function updateProgress() {
+    var p = Math.round(cur.filled.size / cur.pic.rg.length * 100);
+    pbarFill.style.width = p + '%';
+    pctEl.textContent = p + '%';
+  }
+
+  // ── 완성 ────────────────────────────────────────────────────
+  function showComplete() {
+    sndDone(); buzz([30, 40, 30]);
+    confettiBurst();
+    showDonePanel(true);
+  }
+
+  function showDonePanel(fresh) {
+    hideDonePanel();
+    donePanel = document.createElement('div');
+    donePanel.id = 'done-panel';
+    donePanel.innerHTML =
+      '<h2>' + (fresh ? '🎉 Beautiful!' : '⭐ All done!') + '</h2>' +
+      '<p>' + cur.pic.name + ' is complete</p>' +
+      '<div class="row"><button id="btn-again">Color again</button><button id="btn-gallery">Gallery</button></div>';
+    document.body.appendChild(donePanel);
+    onTap(donePanel.querySelector('#btn-gallery'), goHome);
+    onTap(donePanel.querySelector('#btn-again'), function () {
+      delete saveData[cur.pic.id];
+      persist();
+      var pic = cur.pic;
+      hideDonePanel();
+      openPic(pic);
+    });
+  }
+  function hideDonePanel() {
+    if (donePanel) { donePanel.remove(); donePanel = null; }
+  }
+
+  function goHome() {
+    hideDonePanel();
+    cur = null;
+    playEl.classList.add('hidden');
+    homeEl.classList.remove('hidden');
+    renderHome();
+  }
+  onTap(document.getElementById('btn-back'), goHome);
+
+  // ── 컨페티 ──────────────────────────────────────────────────
+  var cvs = document.getElementById('confetti');
+  var ctx = cvs.getContext('2d');
+  var parts = [], confOn = false;
+  function confettiBurst() {
+    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+    var colors = ['#ffc94d', '#f58fb0', '#7fc46a', '#74b8e8', '#f0715c', '#9b7ede'];
+    for (var i = 0; i < 120; i++) {
+      parts.push({
+        x: Math.random() * cvs.width,
+        y: -20 - Math.random() * cvs.height * 0.5,
+        vy: 130 + Math.random() * 180,
+        vx: (Math.random() - 0.5) * 60,
+        s: 5 + Math.random() * 6,
+        r: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 6,
+        c: colors[(Math.random() * colors.length) | 0]
+      });
+    }
+    if (!confOn) { confOn = true; requestAnimationFrame(confStep); }
+  }
+  var confLast = 0;
+  function confStep(now) {
+    var dt = confLast ? Math.min((now - confLast) / 1000, 0.05) : 0.016;
+    confLast = now;
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    parts = parts.filter(function (p) { return p.y < cvs.height + 30; });
+    parts.forEach(function (p) {
+      p.y += p.vy * dt; p.x += p.vx * dt; p.r += p.vr * dt;
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c;
+      ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6);
+      ctx.restore();
+    });
+    if (parts.length) { requestAnimationFrame(confStep); }
+    else { confOn = false; confLast = 0; ctx.clearRect(0, 0, cvs.width, cvs.height); }
+  }
+
+  // ── 인앱 브라우저 시트 닫힘 방지: 스크롤을 완충지대 중간에 걸어 둔다 ──
+  var SE = document.scrollingElement || document.documentElement;
+  var PIN = 120, pinT = null;
+  function pinScroll() {
+    var max = SE.scrollHeight - SE.clientHeight;
+    if (max <= 0) return;
+    SE.scrollTop = Math.min(PIN, Math.max(1, max - 1));
+  }
+  document.addEventListener('touchstart', pinScroll, { passive: true });
+  window.addEventListener('scroll', function () {
+    clearTimeout(pinT); pinT = setTimeout(pinScroll, 250);
+  }, { passive: true });
+  pinScroll();
+
+  renderHome();
+
+  // 헤드리스 테스트용 훅 (해시에 debug가 있을 때만)
+  if ((location.hash || '').indexOf('debug') >= 0) {
+    window.__app = {
+      PICS: PICS,
+      get cur() { return cur; },
+      open: function (id) { openPic(PICS.find(function (p) { return p.id === id; })); },
+      select: selectColor,
+      tap: function (i) { tapRegion(i, null); },
+      fillAll: function () {
+        var pic = cur.pic;
+        pic.rg.forEach(function (rg, i) {
+          if (cur.filled.has(i)) return;
+          selectColor(rg.c - 1);
+          tapRegion(i, null);
+        });
+      },
+      home: goHome
+    };
+  }
+})();
+</script>
+</body>
+</html>
