@@ -37,37 +37,88 @@
   .screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
   .hidden { display: none !important; }
 
-  /* ── Home (gallery) ── */
-  #home { background: linear-gradient(180deg, #fdf8ee 0%, #f3ead9 100%); }
-  #home-head { padding: max(14px, env(safe-area-inset-top)) 20px 6px; text-align: center; }
-  #home-head h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
-  #home-head p { font-size: 14px; color: #8b8fa0; margin-top: 3px; }
+  /* ── Home (gallery) — Modernist: 헤어라인 그리드, 빨간 포인트, 종이 배경 ── */
+  #home { background: #f4f1e9; color: #1c1a16; }
+  #home-head { padding: max(16px, env(safe-area-inset-top)) 18px 12px; }
+  #kicker {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+    color: #d6391b; text-transform: uppercase;
+  }
+  #home-head h1 { font-size: 34px; font-weight: 900; letter-spacing: -1px; margin-top: 2px; }
+
+  #cont-row {
+    display: flex; align-items: center; gap: 12px;
+    margin: 0 18px; padding: 12px 0;
+    border-top: 1px solid #1c1a16; border-bottom: 1px solid #ddd7c9;
+  }
+  #cont-row .cthumb {
+    width: 56px; height: 62px; flex: none;
+    border: 1px solid #ddd7c9; background: #fdfcf9; padding: 2px;
+  }
+  #cont-row .cthumb svg { display: block; width: 100%; height: 100%; }
+  #cont-row .cmid { flex: 1; min-width: 0; }
+  #cont-row .clabel { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; color: #d6391b; }
+  #cont-row .cname { font-size: 16px; font-weight: 800; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #cont-row .ctrack { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+  #cont-row .cbar { flex: 1; height: 2px; background: #ddd7c9; position: relative; }
+  #cont-row .cbar i { position: absolute; left: 0; top: -0.5px; height: 3px; background: #d6391b; }
+  #cont-row .cpct { font-size: 12px; font-weight: 700; color: #7d7568; }
+  #btn-resume {
+    flex: none; border: none; border-radius: 0;
+    background: #d6391b; color: #fff;
+    font-size: 14px; font-weight: 800;
+    padding: 12px 18px;
+  }
+  #btn-resume:active { background: #b32d12; }
+
+  #filter {
+    display: flex; align-items: center;
+    margin: 12px 18px 0; gap: 0;
+  }
+  #filter button {
+    border: 1px solid #ddd7c9; border-left: none; border-radius: 0;
+    background: #fdfcf9; color: #1c1a16;
+    font-size: 13px; font-weight: 700;
+    padding: 8px 14px;
+  }
+  #filter button:first-child { border-left: 1px solid #ddd7c9; }
+  #filter button.sel { background: #d6391b; border-color: #d6391b; color: #fff; }
+
   #grid {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding: 12px 16px calc(24px + env(safe-area-inset-bottom));
+    gap: 1px;
     align-content: start;
+    background: #ddd7c9;
+    border-top: 1px solid #ddd7c9; border-bottom: 1px solid #ddd7c9;
+    margin: 12px 18px calc(20px + env(safe-area-inset-bottom));
   }
   .card {
-    background: #fff;
-    border-radius: 18px;
+    background: #fdfcf9;
     padding: 10px 10px 12px;
-    box-shadow: 0 3px 14px rgba(90, 70, 40, 0.10);
-    text-align: center;
-    border: 2px solid transparent;
+    position: relative;
     cursor: pointer;
   }
-  .card:active { transform: scale(0.97); }
-  .card.done { border-color: #ffc94d; }
-  .card .thumb { width: 100%; border-radius: 12px; overflow: hidden; background: #fafbfc; }
+  .card:active { background: #f6f2e8; }
+  .card .thumb { border: 1px solid #e4dfd2; background: #fff; padding: 3px; }
   .card .thumb svg { display: block; width: 100%; height: auto; }
-  .card .nm { font-size: 14px; font-weight: 700; margin-top: 8px; }
-  .card .pg { font-size: 12px; color: #9aa0ae; margin-top: 2px; }
-  .card.done .pg { color: #d99b1f; font-weight: 700; }
+  .card .crow { display: flex; align-items: center; gap: 6px; margin-top: 9px; }
+  .card .nm { font-size: 14px; font-weight: 800; flex: 1; min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .chip {
+    flex: none; font-size: 10px; font-weight: 800; color: #d6391b;
+    background: #fbeae4; border: 1px solid #f0cec2;
+    padding: 2px 7px 3px;
+  }
+  .card .meta { font-size: 11.5px; color: #8a8172; margin-top: 3px; text-align: left; }
+  .card .pgline { position: absolute; left: 0; bottom: 0; height: 3px; background: #d6391b; }
+  .empty {
+    grid-column: 1 / -1; background: #fdfcf9;
+    padding: 36px 0; text-align: center;
+    font-size: 13px; color: #8a8172;
+  }
 
   /* ── Play screen ── */
   #play { background: #fdf9f0; }
@@ -163,9 +214,11 @@
   <!-- Home / gallery -->
   <div class="screen" id="home">
     <div id="home-head">
-      <h1>🎨 Cozy Coloring</h1>
-      <p>Pick a picture and tap to color</p>
+      <div id="kicker"></div>
+      <h1>Cozy Coloring</h1>
     </div>
+    <div id="cont-row" class="hidden"></div>
+    <div id="filter"></div>
     <div id="grid"></div>
   </div>
 
@@ -768,29 +821,107 @@
     return new Set((saveData[pic.id] || []).filter(function (i) { return i >= 0 && i < pic.rg.length; }));
   }
 
-  // ── 홈 갤러리 ───────────────────────────────────────────────
+  // ── 홈 갤러리 (Modernist) ───────────────────────────────────
+  var contEl = document.getElementById('cont-row');
+  var filterEl = document.getElementById('filter');
+  var homeFilter = 'all'; // all | prog | done
+  document.getElementById('kicker').textContent = 'Gallery \u00b7 ' + PICS.length + ' Pictures';
+
+  function diffOf(pic) {
+    var n = pic.rg.length;
+    return n >= 120 ? 'Hard' : n >= 60 ? 'Medium' : 'Easy';
+  }
+  function lastOf(id) { return (saveData._last || {})[id] || 0; }
+
   function renderHome() {
+    // 이어하기 행: 진행 중(0 < 채움 < 전체) 그림 중 최근에 칠한 것
+    var cont = null;
+    PICS.forEach(function (pic) {
+      var n = getFilledSet(pic).size;
+      if (n > 0 && n < pic.rg.length && (!cont || lastOf(pic.id) > lastOf(cont.id))) cont = pic;
+    });
+    contEl.innerHTML = '';
+    contEl.classList.toggle('hidden', !cont);
+    if (cont) {
+      var cf = getFilledSet(cont);
+      var pctv = Math.round(cf.size / cont.rg.length * 100);
+      var th = document.createElement('div');
+      th.className = 'cthumb';
+      th.appendChild(buildSVG(cont, cf, false).svg);
+      contEl.appendChild(th);
+      var mid = document.createElement('div');
+      mid.className = 'cmid';
+      mid.innerHTML = '<div class="clabel">CONTINUE</div><div class="cname"></div>' +
+        '<div class="ctrack"><div class="cbar"><i style="width:' + pctv + '%"></i></div>' +
+        '<span class="cpct">' + pctv + '%</span></div>';
+      mid.querySelector('.cname').textContent = cont.name;
+      contEl.appendChild(mid);
+      var rb = document.createElement('button');
+      rb.id = 'btn-resume';
+      rb.textContent = 'Resume';
+      contEl.appendChild(rb);
+      var openCont = function () { openPic(cont); };
+      onTap(rb, openCont);
+      onTap(th, openCont);
+      onTap(mid, openCont);
+    }
+
+    // 필터 세그먼트
+    filterEl.innerHTML = '';
+    [['all', 'All'], ['prog', 'In progress'], ['done', 'Done']].forEach(function (f) {
+      var b = document.createElement('button');
+      b.textContent = f[1];
+      b.classList.toggle('sel', homeFilter === f[0]);
+      onTap(b, function () { homeFilter = f[0]; renderHome(); });
+      filterEl.appendChild(b);
+    });
+
+    // 카드 그리드
     gridEl.innerHTML = '';
+    var shown = 0;
     PICS.forEach(function (pic) {
       var filled = getFilledSet(pic);
+      var n = filled.size, total = pic.rg.length;
+      var isDone = n === total, inProg = n > 0 && !isDone;
+      if (homeFilter === 'prog' && !inProg) return;
+      if (homeFilter === 'done' && !isDone) return;
+      shown++;
       var card = document.createElement('div');
-      card.className = 'card' + (filled.size === pic.rg.length ? ' done' : '');
+      card.className = 'card' + (isDone ? ' done' : '');
       var th = document.createElement('div');
       th.className = 'thumb';
       th.appendChild(buildSVG(pic, filled, false).svg);
       card.appendChild(th);
+      var crow = document.createElement('div');
+      crow.className = 'crow';
       var nm = document.createElement('div');
       nm.className = 'nm'; nm.textContent = pic.name;
-      card.appendChild(nm);
-      var pg = document.createElement('div');
-      pg.className = 'pg';
-      pg.textContent = filled.size === pic.rg.length ? '✓ Done — tap to admire'
-        : filled.size ? Math.round(filled.size / pic.rg.length * 100) + '% colored'
-        : pic.rg.length + ' pieces';
-      card.appendChild(pg);
+      crow.appendChild(nm);
+      if (isDone) {
+        var chip = document.createElement('span');
+        chip.className = 'chip'; chip.textContent = 'Done';
+        crow.appendChild(chip);
+      }
+      card.appendChild(crow);
+      var meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = total + ' pieces \u00b7 ' + diffOf(pic);
+      card.appendChild(meta);
+      if (inProg) {
+        var pl = document.createElement('div');
+        pl.className = 'pgline';
+        pl.style.width = Math.round(n / total * 100) + '%';
+        card.appendChild(pl);
+      }
       onTap(card, function () { openPic(pic); });
       gridEl.appendChild(card);
     });
+    if (!shown) {
+      var em = document.createElement('div');
+      em.className = 'empty';
+      em.textContent = homeFilter === 'done' ? 'No finished pictures yet.' : 'Nothing in progress yet.';
+      gridEl.appendChild(em);
+    }
   }
 
   // ── 플레이 ──────────────────────────────────────────────────
@@ -935,6 +1066,7 @@
 
     cur.filled.add(i);
     saveData[pic.id] = Array.from(cur.filled);
+    (saveData._last = saveData._last || {})[pic.id] = Date.now();
     persist();
     cur.counts[cur.sel]--;
 
@@ -1024,6 +1156,7 @@
     onTap(donePanel.querySelector('#btn-gallery'), goHome);
     onTap(donePanel.querySelector('#btn-again'), function () {
       delete saveData[cur.pic.id];
+      if (saveData._last) delete saveData._last[cur.pic.id];
       persist();
       var pic = cur.pic;
       hideDonePanel();
