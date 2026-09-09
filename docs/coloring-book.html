@@ -139,7 +139,27 @@
   #pct { font-size: 14px; font-weight: 800; color: #8b8fa0; min-width: 44px; text-align: right; flex: none; }
 
   #art-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; padding: 4px 10px; }
-  #art-wrap svg { display: block; background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(90,70,40,0.12); }
+  #art-vp {
+    position: relative; overflow: hidden;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(90,70,40,0.12);
+    /* 세로 팬은 완충지대로 — 핀치(멀티터치)만 JS가 가로챈다 */
+    touch-action: pan-y;
+  }
+  #art-tf { transform-origin: 0 0; }
+  #art-vp svg { display: block; }
+  #zoom-ctrl {
+    position: absolute; right: 8px; bottom: 8px; z-index: 5;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  #zoom-ctrl button {
+    width: 42px; height: 42px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.94); color: #3d4351;
+    font-size: 22px; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(90,70,40,0.3);
+  }
+  #zoom-ctrl button:active { transform: scale(0.92); }
+  #zoom-reset { font-size: 14px !important; }
 
   .region { stroke: #ccd3da; stroke-width: 1.4; fill: #fff; }
   .region.filled { stroke: none; }
@@ -242,7 +262,16 @@
       </div>
       <div id="pct">0%</div>
     </div>
-    <div id="art-wrap"></div>
+    <div id="art-wrap">
+      <div id="art-vp">
+        <div id="art-tf"></div>
+        <div id="zoom-ctrl">
+          <button id="zoom-in">&#65291;</button>
+          <button id="zoom-out">&#65293;</button>
+          <button id="zoom-reset">1&#215;</button>
+        </div>
+      </div>
+    </div>
     <div id="mode-row">
       <button id="mode-num">123 Number</button><button id="mode-free">&#128396; Free</button>
     </div>
@@ -829,6 +858,79 @@
   var pbarFill = document.getElementById('pbar-fill');
   var pctEl = document.getElementById('pct');
   var donePanel = null;
+  var vpEl = document.getElementById('art-vp');
+  var artTf = document.getElementById('art-tf');
+
+  // ── 줌: 핀치 + 버튼. 한 손가락 세로 끌기는 계속 완충지대 스크롤이 가져간다 ──
+  var Z = { z: 1, tx: 0, ty: 0, w: 0, h: 0 };
+  var ZMAX = 5;
+  function applyZoom() {
+    var minTx = Math.min(0, Z.w - Z.w * Z.z), minTy = Math.min(0, Z.h - Z.h * Z.z);
+    Z.tx = Math.max(minTx, Math.min(0, Z.tx));
+    Z.ty = Math.max(minTy, Math.min(0, Z.ty));
+    artTf.style.transform = 'translate(' + Z.tx + 'px,' + Z.ty + 'px) scale(' + Z.z + ')';
+    var zoomed = Z.z > 1.01;
+    document.getElementById('zoom-out').style.display = zoomed ? '' : 'none';
+    document.getElementById('zoom-reset').style.display = zoomed ? '' : 'none';
+    document.getElementById('zoom-in').style.opacity = Z.z >= ZMAX - 0.01 ? 0.35 : 1;
+  }
+  function resetZoom() { Z.z = 1; Z.tx = 0; Z.ty = 0; applyZoom(); }
+  function zoomAt(f, cx, cy) { // (cx,cy)=뷰포트 좌표 고정점
+    var nz = Math.max(1, Math.min(ZMAX, Z.z * f));
+    var k = nz / Z.z;
+    Z.tx = cx - (cx - Z.tx) * k;
+    Z.ty = cy - (cy - Z.ty) * k;
+    Z.z = nz;
+    applyZoom();
+  }
+
+  // 핀치(두 손가락): 확대·이동 동시. 진행 중이거나 직후에는 탭을 무시한다.
+  var ptrs = new Map(), pinch = null, lastPinchT = 0;
+  function ptrList() { var a = []; ptrs.forEach(function (v) { a.push(v); }); return a; }
+  vpEl.addEventListener('pointerdown', function (e) {
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 2) {
+      var pp = ptrList(), r = vpEl.getBoundingClientRect();
+      pinch = {
+        d0: Math.hypot(pp[0].x - pp[1].x, pp[0].y - pp[1].y) || 1,
+        mx0: (pp[0].x + pp[1].x) / 2 - r.left,
+        my0: (pp[0].y + pp[1].y) / 2 - r.top,
+        z0: Z.z, tx0: Z.tx, ty0: Z.ty, rect: r
+      };
+    }
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (!pinch || ptrs.size < 2) return;
+    var pp = ptrList();
+    var d = Math.hypot(pp[0].x - pp[1].x, pp[0].y - pp[1].y) || 1;
+    var mx = (pp[0].x + pp[1].x) / 2 - pinch.rect.left;
+    var my = (pp[0].y + pp[1].y) / 2 - pinch.rect.top;
+    var nz = Math.max(1, Math.min(ZMAX, pinch.z0 * d / pinch.d0));
+    var k = nz / pinch.z0;
+    Z.z = nz;
+    Z.tx = mx - (pinch.mx0 - pinch.tx0) * k; // 시작 미드 밑 지점이 현재 미드를 따라온다
+    Z.ty = my - (pinch.my0 - pinch.ty0) * k;
+    applyZoom();
+  });
+  function ptrEnd(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (pinch && ptrs.size < 2) { pinch = null; lastPinchT = Date.now(); }
+  }
+  window.addEventListener('pointerup', ptrEnd);
+  window.addEventListener('pointercancel', ptrEnd);
+  // 멀티터치일 때만 브라우저 기본 동작(고무줄/페이지 줌)을 막는다 — 한 손가락은 완충지대로
+  vpEl.addEventListener('touchmove', function (e) {
+    if (e.touches.length >= 2) e.preventDefault();
+  }, { passive: false });
+  // 데스크톱: 휠 줌
+  vpEl.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var r = vpEl.getBoundingClientRect();
+    zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
 
   // 채움 상태: Map(조각 인덱스 → 팔레트 색 인덱스). 모드별로 저장이 분리된다.
   // 숫자 모드: saveData[picId] = [인덱스…] (색은 조각의 정답 번호에서 유도)
@@ -973,10 +1075,10 @@
     playEl.classList.remove('hidden');
     hideDonePanel();
 
-    artWrap.innerHTML = '';
+    artTf.innerHTML = '';
     var view = buildSVG(pic, filled, mode === 'num'); // 자유 모드는 숫자 라벨 없음
     cur.view = view;
-    artWrap.appendChild(view.svg);
+    artTf.appendChild(view.svg);
     sizeArt();
     if (mode === 'num') placeLabels(pic, view);
 
@@ -1008,8 +1110,13 @@
     var availW = Math.min(window.innerWidth - 20, 520);
     var availH = artWrap.clientHeight - 8 || (window.innerHeight - 170);
     var s = Math.min(availW / cur.pic.w, availH / cur.pic.h);
-    cur.view.svg.setAttribute('width', Math.floor(cur.pic.w * s));
-    cur.view.svg.setAttribute('height', Math.floor(cur.pic.h * s));
+    var w = Math.floor(cur.pic.w * s), h = Math.floor(cur.pic.h * s);
+    cur.view.svg.setAttribute('width', w);
+    cur.view.svg.setAttribute('height', h);
+    vpEl.style.width = w + 'px';
+    vpEl.style.height = h + 'px';
+    Z.w = w; Z.h = h;
+    resetZoom();
   }
   window.addEventListener('resize', function () { setTimeout(sizeArt, 60); });
 
@@ -1088,6 +1195,7 @@
     var dx = e.clientX - downPt.x, dy = e.clientY - downPt.y;
     var quick = Date.now() - downPt.t < 600;
     downPt = null;
+    if (pinch || ptrs.size > 1 || Date.now() - lastPinchT < 350) return; // 핀치 중/직후는 탭 아님
     if (!quick || dx * dx + dy * dy > 144) return; // 12px 이상 움직이면 스크롤로 간주
     var t = e.target.closest ? e.target.closest('[data-i]') : null;
     if (!t) return;
@@ -1246,6 +1354,9 @@
   }
   onTap(document.getElementById('btn-back'), goHome);
   onTap(document.getElementById('mode-num'), function () { setMode('num'); });
+  onTap(document.getElementById('zoom-in'), function () { sndTick(); zoomAt(1.6, Z.w / 2, Z.h / 2); });
+  onTap(document.getElementById('zoom-out'), function () { sndTick(); zoomAt(1 / 1.6, Z.w / 2, Z.h / 2); });
+  onTap(document.getElementById('zoom-reset'), function () { sndTick(); resetZoom(); });
   onTap(document.getElementById('mode-free'), function () { setMode('free'); });
 
   // ── 컨페티 ──────────────────────────────────────────────────
@@ -1311,6 +1422,9 @@
       open: function (id) { openPic(PICS.find(function (p) { return p.id === id; })); },
       select: selectColor,
       setMode: setMode,
+      get Z() { return Z; },
+      zoomAt: zoomAt,
+      resetZoom: resetZoom,
       tap: function (i) { tapRegion(i, null); },
       fillAll: function () {
         var pic = cur.pic;
