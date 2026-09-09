@@ -3167,5 +3167,92 @@
       "multi-label symptom syndrome classification traditional chinese medicine"
     ],
     "first_seen": "2026-09-05"
+  },
+  {
+    "id": "doi:10.3389/fphar.2026.1856615",
+    "title": "Traditional Chinese medicine-induced cardiac adverse reactions: a critical review of current evidence, knowledge gaps, and pharmacovigilance strategies.",
+    "authors": [
+      "Cai X",
+      "Yasien K",
+      "Gan R",
+      "Zhou Q",
+      "Zhang B",
+      "Wang Y",
+      "Zhang X",
+      "Lin Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3389/fphar.2026.1856615",
+    "abstract": "Traditional Chinese Medicine (TCM) holds considerable promise for managing cardiovascular conditions, but its cardiac safety continues to raise legitimate clinical concerns. In this critical review, we synthesize what is currently known about TCM related cardiac adverse reactions, including epidemiological patterns, offending botanical drug metabolites, toxicological pathways, and pharmacovigilance practices. What emerges from our systematic evaluation is a body of evidence that is surprisingly thin in key areas, with knowledge gaps that seriously undermine both risk assessment and clinical decision making. We argue that the field relies too heavily on descriptive case reports and spontaneous notifications, lacks validated causality tools suited to complex botanical drug matrices, and has yet to translate mechanistic discoveries into actionable predictive models. Methodological weaknesses are pervasive: pharmacokinetic and pharmacodynamic interaction data are scarce, real world evidence remains underused in regulatory contexts, and no specific biomarkers exist for early detection of cardiac injury. Preclinical findings, moreover, are difficult to extrapolate to human physiology, and post marketing surveillance systems lag far behind what is needed. In response, we outline a practical agenda that prioritises TCM tailored pharmacovigilance protocols, leverages advanced analytical and computational platforms, and calls for stronger international data sharing frameworks. Our ultimate aim is not merely to catalogue problems, but to offer a critical yet constructive foundation for advancing the cardiac safety science of TCM, so that its integration into global healthcare can proceed on firmer, more evidence based ground.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-09"
+  },
+  {
+    "id": "doi:10.4103/nrr.nrr-d-25-00410",
+    "title": "Dysfunction of hippocampal cells and its role in cognitive impairment.",
+    "authors": [
+      "Ye J",
+      "Zhou L",
+      "Li Q",
+      "Huang Y",
+      "Wu X",
+      "Zhu L",
+      "Zhu J",
+      "Liu J",
+      "Gao D",
+      "Chen X",
+      "Chen G",
+      "Chen Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.4103/nrr.nrr-d-25-00410",
+    "abstract": "Ischemic stroke has a higher survival rate and is more likely to result in cognitive impairment than hemorrhagic stroke. The primary pathological mechanism underlying cognitive impairment involves dysfunction of neural circuits and damage to specific brain regions. This review aims to investigate the role of the hippocampus in cognitive impairment following a stroke. A review of the literature suggests that the hippocampus is a metabolically active structure that is easily involved in various metabolic states, such as hypoxia and hypoglycaemia. The functional changes in hippocampal cells associated with poststroke cognitive impairment mainly manifest as neuronal apoptosis, impaired synaptic plasticity, and decreased neurogenesis. The primary pathological mechanism of poststroke cognitive impairment involves a complex cascade of reactions, including neuroinflammatory activation, bursts of oxidative stress, and neuronal apoptosis induced by mitochondrial dysfunction. Interventional drugs for cognitive impairment after cerebral ischemia include neuroprotective drugs, traditional Chinese medicines and their extracts, and stem cell therapies. Many of these drugs have unique advantages, including the inhibition of neuroinflammation, the prevention of apoptosis, and the promotion of neurogenesis. They hold great potential for the prevention and treatment of cognitive impairment following cerebral ischemia. However, most current studies are animal experiments, and relatively few clinical studies exist. In future research, emphasis should be placed on interventions for cognitive impairment following cerebral ischemia. These findings offer novel perspectives for the treatment of cognitive impairment after cerebral ischemia. Finally, the role of hippocampal cell dysfunction in other diseases associated with cognitive decline is briefly discussed. The aim of this review is to provide researchers with a comprehensive overview of the role of the hippocampus in cognitive impairment and its intervention strategies.",
+    "matched_queries": [
+      "large language model traditional chinese medicine diagnosis dialogue"
+    ],
+    "first_seen": "2026-09-09"
+  },
+  {
+    "id": "doi:10.3389/fmed.2026.1893231",
+    "title": "Are AI tutors ready for the TCM classroom? A multimodal evaluation of large language models across cognitive levels in Chinese medicine education.",
+    "authors": [
+      "Yang J",
+      "Wang R",
+      "Guo F",
+      "Chen Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3389/fmed.2026.1893231",
+    "abstract": "<h4>Background</h4>Large language models (LLMs) have shown promise in medical education, but most are trained primarily on Western medical data and lack sufficient exposure to Traditional Chinese Medicine (TCM). Despite growing interest in LLMs for TCM education, systematic evaluations of their performance remain limited. However, it remains unclear at which cognitive levels-from basic recall to clinical reasoning-these models can reliably support learners, and whether their multimodal capabilities meet the demands of authentic TCM pedagogical tasks.<h4>Objective</h4>This study aimed to evaluate LLMs' performance on authentic Chinese medicine knowledge tasks, including both text-based and image-based assessments, to provide evidence for their potential application in TCM education.<h4>Methods</h4>Seven LLMs were evaluated across four task types: textual objective questions, textual subjective syndrome differentiation tasks, image-based objective herb identification, and image-based subjective tongue diagnosis. For objective tasks, performance was measured by accuracy. For subjective tasks, performance was evaluated using natural language processing metrics and blinded expert ratings. Statistical analyses included Cochran's <i>Q</i> test, Friedman rank-sum test, and Bonferroni-corrected <i>post-hoc</i> comparisons. Inter-rater reliability was verified using the intraclass correlation coefficient.<h4>Results</h4>Significant tiered performance differences emerged across 7 models. For textual objective questions, Doubao-1.5-Pro achieved the highest accuracy (91.23%), with performance declining markedly from lower-order memorization to higher-order clinical reasoning tasks. For textual subjective tasks, SparkDesk-v3.5 (94.11%), Doubao-1.5-Pro (93.03%), and Gemini-3-Preview (92.99%) formed the top tier. A notable subjective-objective performance inversion was identified: SparkDesk-v3.5 ranked lowest in objective accuracy but highest in subjective scoring. Our exploratory image-based results suggest that no model exceeded 60% accuracy in herbal identification (<i>N</i> = 55), while tongue diagnosis performance was comparatively higher but should also be interpreted cautiously (<i>N</i> = 223). Qualitative analysis using a four-category error typology revealed visual misidentification, cross-modal association failures, terminological-level errors, and reasoning-level inconsistencies.<h4>Conclusion</h4>Top-tier large language models demonstrate potential as virtual teaching assistants for foundational Traditional Chinese Medicine knowledge navigation. However, their deployment in complex syndrome differentiation and multimodal teaching poses substantial risks due to model errors and insufficient clinical reasoning. Image-based findings should be considered preliminary and require validation in larger, more balanced multimodal datasets. Clearly defined applicability boundaries, rigorous manual review procedures, and continuous enhancement of domain-specific multimodal datasets are essential before integration into educational practice.",
+    "matched_queries": [
+      "tongue image constitution reasoning language model"
+    ],
+    "first_seen": "2026-09-09"
+  },
+  {
+    "id": "doi:10.2196/96547",
+    "title": "Efficacy and Safety of Integrated Traditional Chinese Medicine and Biologic Treatment in Moderate to Severe Atopic Dermatitis: Protocol for a Prospective Observational Real-World Study.",
+    "authors": [
+      "Shen F",
+      "Cai R",
+      "Lu J",
+      "Gao X",
+      "Jiang W",
+      "Li B",
+      "Wang R."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/96547",
+    "abstract": "<h4>Background</h4>Atopic dermatitis (AD) is a chronic and relapsing skin disorder that significantly impairs patients' quality of life. Long-term biologic therapy provides durable efficacy for AD, but raises concerns related to costs, safety, and withdrawal-associated relapse. Traditional Chinese medicine (TCM) has a long history in AD treatment and is usually integrated with biologic treatment to achieve complementary benefits and provide comprehensive care for patients with AD. However, high-quality evidence supporting its real-world efficacy remains limited.<h4>Objective</h4>This study aims to collect real-world data to evaluate the efficacy and safety of TCM integrated with biologics (TCMIB) in moderate to severe AD, thereby providing methodological insights to obtain high-quality evidence and inform future in-depth research on AD treatment.<h4>Methods</h4>A total of 3500 patients with moderate to severe AD will be classified into 7 groups based on clinical manifestations and receive 16 weeks of treatment followed by 36 weeks of observation. A reduction of 75% or more in eczema area and severity index score from baseline to week 16 is set as the primary outcome. The secondary outcomes include the eczema area and severity index, body surface area, Investigator's Global Assessment scale, Dermatology Life Quality Index, numerical rating scale for pruritus, Patient-Oriented Eczema Measure, Atopic Dermatitis Control Tool, and TCM syndrome scale. Assessments will be performed at baseline, every 2 weeks until week 16, and then every 4 weeks until week 52. Safety assessments include vital signs, concomitant medications, and adverse events. The SAS software (version 9.4) will be used for data analysis, and a P value of less than .05 will be considered statistically significant.<h4>Results</h4>This study has been approved by the institutional review boards of Shanghai Skin Disease Hospital and registered on the International Traditional Medicine Clinical Trial Registry (ITMCTR2025000984). Patient recruitment began in June 2025 and is expected to be completed in January 2028. Data analysis will begin in June 2028. The main results of the study are expected to be submitted for publication in peer-reviewed journals in December 2028.<h4>Conclusions</h4>The anticipated findings of this protocol are projected to furnish strong evidence on the efficacy and safety of TCMIB for moderate to severe AD, potentially contributing to the standardization of TCMIB and optimization of clinical practice.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-09"
   }
 ]
