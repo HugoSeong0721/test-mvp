@@ -13,6 +13,13 @@
 - 출시용 온보딩을 다시 보려면 주소 뒤에 `?onboard=1`.
 - 두 빌드는 저장 키가 달라 서로 설정이 섞이지 않습니다.
 
+### Google Play 출시용 안드로이드 앱 → [`flutter/`](./flutter/)
+
+웹 출시용 빌드를 그대로 옮긴 Flutter 네이티브 앱. Play 에 올리는 AAB 는 여기서 나온다.
+GitHub Actions(`build-android.yml`)가 빌드하고, 서명 키 등록·Play Console 순서·데이터 안전 설문 답변은
+[`flutter/README.md`](./flutter/README.md) 에 클릭 단위로 적어 두었다. 개인정보처리방침 페이지는
+`docs/somrate-privacy.html`.
+
 ### 고칠 때는 프로토타입만 고친다
 
 앱 본체는 `currency-app-preview.html` **하나**만 수정하고, 출시용은 생성한다:
