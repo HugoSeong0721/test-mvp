@@ -134,21 +134,35 @@
   @keyframes winbounce {
     0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-4px) scale(1.1); }
   }
-  /* =/✕ 관계 배지 — 두 칸 사이 틈 위에 얹힌다 */
-  .pairb {
-    position: absolute;
-    z-index: 4;
-    width: 17px; height: 17px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    color: #4a4636;
-    font-size: 11px; font-weight: 900;
+  /* 행/열 가장자리 카운터 — 선택한 동물이 그 줄에 몇 마리 더 필요한지 */
+  .gut {
     display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
     pointer-events: none;
   }
-  .pairb.h { right: -11px; top: 50%; transform: translateY(-50%); }
-  .pairb.v { bottom: -11px; left: 50%; transform: translateX(-50%); }
+  .gut.catc { color: #e08a2e; }
+  .gut.dogc { color: #4a90d0; }
+  .gut.done { color: #b9d9a8; }
+  /* 팔레트 — 놓을 동물을 고른다 */
+  #palette { display: flex; gap: 10px; margin-top: 12px; width: min(92vw, 52vh, 440px); }
+  .pal-btn {
+    flex: 1;
+    border: none; border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(90,90,40,0.15);
+    font-size: 16px; font-weight: 800; color: #5f5a44;
+    padding: 11px 0;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+    font-variant-numeric: tabular-nums;
+  }
+  .pal-btn .pe { font-size: 27px; line-height: 1; }
+  .pal-btn.active { transform: scale(1.04); }
+  #pal-cat.active { box-shadow: 0 0 0 3px #e08a2e, 0 2px 10px rgba(224,138,46,0.4); background: #fff3e0; }
+  #pal-dog.active { box-shadow: 0 0 0 3px #4a90d0, 0 2px 10px rgba(74,144,208,0.4); background: #e8f2fc; }
   #msg {
     position: absolute;
     left: 50%; top: 42%;
@@ -161,6 +175,7 @@
     white-space: nowrap;
     z-index: 5;
   }
+  #msg.ok { color: #1d8a3c; }
   #msg.show { animation: msgfly 1.1s ease-out forwards; }
   @keyframes msgfly {
     0% { opacity: 0; transform: translate(-50%,-30%) scale(0.7); }
@@ -291,9 +306,9 @@
       <span id="hearts">❤️❤️❤️</span>
     </div>
     <div id="rules">
-      <div class="chip">3 cats &amp; 3 dogs<br>per row &amp; column</div>
-      <div class="chip">No 3 in a row<br>of the same</div>
-      <div class="chip">= same<br>✕ different</div>
+      <div class="chip">Fill every cell<br>with 🐱 or 🐶</div>
+      <div class="chip">3 🐱 &amp; 3 🐶<br>per row &amp; column</div>
+      <div class="chip">Never 3 of the<br>same in a row</div>
     </div>
   </div>
   <div id="status-row">
@@ -304,7 +319,11 @@
     <div id="board"></div>
     <div id="msg"></div>
   </div>
-  <div id="hint">Tap a cell: 🐱 → 🐶 → clear · framed cells are fixed</div>
+  <div id="palette">
+    <button id="pal-cat" class="pal-btn active"><span class="pe">🐱</span><span id="pal-cat-n"></span></button>
+    <button id="pal-dog" class="pal-btn"><span class="pe">🐶</span><span id="pal-dog-n"></span></button>
+  </div>
+  <div id="hint">Pick an animal, tap a cell to place it · tap again to erase</div>
 </div>
 
 <div id="title-panel">
@@ -315,7 +334,7 @@
     <div class="chip">No 3 in a row<br>of the same</div>
     <div class="chip">= same<br>✕ different</div>
   </div>
-  <div id="title-desc">Fill every cell with a cat or a dog.<br>Wrong move = 💔 lose a heart. The clock is your score!</div>
+  <div id="title-desc">Pick 🐱 or 🐶 below the board, tap to fill every cell.<br>The edge numbers show how many that row still needs.<br>Wrong move = 💔 lose a heart. The clock is your score!</div>
   <div id="title-ch"></div>
   <div id="title-best"></div>
   <button id="start-btn">TAP TO START</button>
@@ -390,8 +409,7 @@
   }
 
   // ---------- 퍼즐 생성 (날짜 시드 → 모두 같은 판, 유일해 보장) ----------
-  // pairs: {r, c, dir:'h'|'v', t:'='|'x'} — (r,c)와 오른쪽/아래 칸의 관계
-  var puzzleDay = '', solution = null, pairs = [], givens = null;
+  var puzzleDay = '', solution = null, givens = null;
 
   // g에 (r,c)=v를 놓아도 규칙에 어긋나지 않는가 (부분 채움 기준)
   function fits(g, r, c, v) {
@@ -417,19 +435,6 @@
     cnt = 1;
     for (var j = 0; j < N; j++) if (j !== r && g[j][c] === v) cnt++;
     if (cnt > HALF) return false;
-    // =/✕ 관계
-    for (var p = 0; p < pairs.length; p++) {
-      var pr = pairs[p];
-      var r2 = pr.dir === 'h' ? pr.r : pr.r + 1;
-      var c2 = pr.dir === 'h' ? pr.c + 1 : pr.c;
-      var va = -1, vb = -1;
-      if (pr.r === r && pr.c === c) { va = v; vb = g[r2][c2]; }
-      else if (r2 === r && c2 === c) { va = g[pr.r][pr.c]; vb = v; }
-      else continue;
-      if (va < 0 || vb < 0) continue;
-      if (pr.t === '=' && va !== vb) return false;
-      if (pr.t === 'x' && va === vb) return false;
-    }
     return true;
   }
   function emptyGrid() {
@@ -477,27 +482,13 @@
     puzzleDay = dayKey();
     var rand = mulberry32(seedFrom('catsvsdogs-' + puzzleDay));
     solution = genFull(rand);
-    // =/✕ 관계 8개를 무작위 이웃 쌍에서 뽑아 해답에서 유형을 읽는다
-    var edges = [];
-    for (var r = 0; r < N; r++) {
-      for (var c = 0; c < N; c++) {
-        if (c + 1 < N) edges.push({ r: r, c: c, dir: 'h' });
-        if (r + 1 < N) edges.push({ r: r, c: c, dir: 'v' });
-      }
-    }
-    shuffle(edges, rand);
-    pairs = edges.slice(0, 8).map(function (e) {
-      var v1 = solution[e.r][e.c];
-      var v2 = e.dir === 'h' ? solution[e.r][e.c + 1] : solution[e.r + 1][e.c];
-      return { r: e.r, c: e.c, dir: e.dir, t: v1 === v2 ? '=' : 'x' };
-    });
-    // 유일해가 유지되는 한 칸씩 비운다 (주어진 칸 8개 안팎에서 멈춤)
+    // 유일해가 유지되는 한 칸씩 비운다 (주어진 칸 12개 안팎에서 멈춤 — 너무 어렵지 않게)
     givens = solution.map(function (row) { return row.slice(); });
     var order = [];
     for (var i = 0; i < N * N; i++) order.push(i);
     shuffle(order, rand);
     var remain = N * N;
-    for (var k = 0; k < order.length && remain > 8; k++) {
+    for (var k = 0; k < order.length && remain > 12; k++) {
       var rr = Math.floor(order[k] / N), cc = order[k] % N;
       var keep = givens[rr][cc];
       givens[rr][cc] = -1;
@@ -511,7 +502,7 @@
   var state = STATE_TITLE;
   var cellV = [];      // -1 빈칸, 0 🐱, 1 🐶
   var locked = [];     // 처음부터 주어진 칸
-  var nextSym = [];    // 빈칸에서 다음 탭이 시도할 동물 (거절돼도 순환이 이어진다)
+  var brush = CAT;     // 팔레트에서 고른 동물 — 탭하면 이걸 놓는다
   var hearts = 3, filled = 0;
   var runStart = 0;
   var accumBase = 0;   // 오늘 누적 시간(초) — 실패해도 시계는 계속 간다
@@ -742,14 +733,28 @@
     note('Copy the link below and send it');
   }
 
-  // ---------- 보드 DOM ----------
+  // ---------- 보드 DOM (왼쪽/위 가장자리에 남은 마릿수 카운터) ----------
   var boardEl = document.getElementById('board');
-  var cellEls = [];
+  var cellEls = [], rowGutEls = [], colGutEls = [];
   function buildBoard() {
-    boardEl.style.gridTemplateColumns = 'repeat(' + N + ', 1fr)';
+    boardEl.style.gridTemplateColumns = '20px repeat(' + N + ', 1fr)';
+    boardEl.style.gridTemplateRows = '20px repeat(' + N + ', 1fr)';
     boardEl.textContent = '';
-    cellEls = [];
+    cellEls = []; rowGutEls = []; colGutEls = [];
+    var corner = document.createElement('div');
+    corner.className = 'gut';
+    boardEl.appendChild(corner);
+    for (var c0 = 0; c0 < N; c0++) {
+      var cg = document.createElement('div');
+      cg.className = 'gut';
+      boardEl.appendChild(cg);
+      colGutEls.push(cg);
+    }
     for (var r = 0; r < N; r++) {
+      var rg = document.createElement('div');
+      rg.className = 'gut';
+      boardEl.appendChild(rg);
+      rowGutEls.push(rg);
       cellEls.push([]);
       for (var c = 0; c < N; c++) {
         var d = document.createElement('div');
@@ -763,13 +768,35 @@
         cellEls[r].push(d);
       }
     }
-    // =/✕ 배지
-    pairs.forEach(function (p) {
-      var b = document.createElement('span');
-      b.className = 'pairb ' + p.dir;
-      b.textContent = p.t === '=' ? '=' : '✕';
-      cellEls[p.r][p.c].appendChild(b);
-    });
+  }
+  // 가장자리 카운터: 고른 동물이 각 행/열에 몇 마리 더 필요한지
+  function updateCounters() {
+    var cls = brush === CAT ? 'catc' : 'dogc';
+    for (var r = 0; r < N; r++) {
+      var need = HALF;
+      for (var c = 0; c < N; c++) if (cellV[r][c] === brush) need--;
+      rowGutEls[r].textContent = need > 0 ? need : '✓';
+      rowGutEls[r].className = 'gut ' + (need > 0 ? cls : 'done');
+    }
+    for (var c2 = 0; c2 < N; c2++) {
+      var need2 = HALF;
+      for (var r2 = 0; r2 < N; r2++) if (cellV[r2][c2] === brush) need2--;
+      colGutEls[c2].textContent = need2 > 0 ? need2 : '✓';
+      colGutEls[c2].className = 'gut ' + (need2 > 0 ? cls : 'done');
+    }
+    var totCat = 0, totDog = 0;
+    for (var r3 = 0; r3 < N; r3++) for (var c3 = 0; c3 < N; c3++) {
+      if (cellV[r3][c3] === CAT) totCat++;
+      else if (cellV[r3][c3] === DOG) totDog++;
+    }
+    document.getElementById('pal-cat-n').textContent = (18 - totCat) + ' left';
+    document.getElementById('pal-dog-n').textContent = (18 - totDog) + ' left';
+  }
+  function setBrush(b) {
+    brush = b;
+    document.getElementById('pal-cat').classList.toggle('active', b === CAT);
+    document.getElementById('pal-dog').classList.toggle('active', b === DOG);
+    updateCounters();
   }
   function updateCell(r, c) {
     var el = cellEls[r][c];
@@ -785,10 +812,11 @@
     document.getElementById('hearts').textContent = h;
     document.getElementById('progress').textContent = '🧩 ' + filled + '/' + (N * N);
   }
-  function flashMsg(text) {
+  function flashMsg(text, ok) {
     var m = document.getElementById('msg');
     m.textContent = text;
     m.classList.remove('show');
+    m.classList.toggle('ok', !!ok);
     void m.offsetWidth;
     m.classList.add('show');
   }
@@ -825,19 +853,6 @@
     var colCells = [[r, c]];
     for (var j2 = 0; j2 < N; j2++) if (j2 !== r && cellV[j2][c] === v) colCells.push([j2, c]);
     if (colCells.length > HALF) return { cells: colCells, why: 'ONLY 3 ' + SYMNAME[v] + ' PER COLUMN!' };
-    // =/✕ 관계
-    for (var p = 0; p < pairs.length; p++) {
-      var pr = pairs[p];
-      var r2 = pr.dir === 'h' ? pr.r : pr.r + 1;
-      var c2 = pr.dir === 'h' ? pr.c + 1 : pr.c;
-      var va, vb;
-      if (pr.r === r && pr.c === c) { va = v; vb = cellV[r2][c2]; }
-      else if (r2 === r && c2 === c) { va = cellV[pr.r][pr.c]; vb = v; }
-      else continue;
-      if (va < 0 || vb < 0) continue;
-      if (pr.t === '=' && va !== vb) return { cells: [[pr.r, pr.c], [r2, c2]], why: '= MUST MATCH!' };
-      if (pr.t === 'x' && va === vb) return { cells: [[pr.r, pr.c], [r2, c2]], why: '✕ MUST DIFFER!' };
-    }
     return null;
   }
 
@@ -858,15 +873,7 @@
   function tryPlace(r, c, v) {
     var viol = violationOf(r, c, v);
     if (viol) {
-      if (cellV[r][c] >= 0) {
-        // 놓인 동물을 바꾸다 거절됨 → 칸을 비운다 (같은 시도가 반복돼 하트가 연속으로 빠지는 것 방지)
-        cellV[r][c] = -1;
-        filled--;
-        nextSym[r][c] = CAT;
-        updateCell(r, c);
-      } else {
-        nextSym[r][c] = v === CAT ? DOG : CAT;   // 거절돼도 순환은 이어진다
-      }
+      // 거절 — 칸은 그대로 둔다 (탭 = 명시적 의도이므로 상태가 튀지 않는다)
       rejectMove(r, c, viol);
       return;
     }
@@ -874,6 +881,7 @@
     cellV[r][c] = v;
     if (wasEmpty) filled++;
     updateCell(r, c);
+    updateCounters();
     var el = cellEls[r][c];
     el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
     if (v === CAT) sndCatPlace(); else sndDogPlace();
@@ -882,7 +890,7 @@
     if (filled === N * N) gameOver(true);
   }
 
-  // ---------- 탭 ----------
+  // ---------- 탭: 팔레트에서 고른 동물을 놓는다 / 같은 동물을 다시 탭하면 지운다 ----------
   function tap(r, c) {
     if (state !== STATE_PLAY) return;
     if (locked[r][c]) {
@@ -890,18 +898,15 @@
       el.classList.remove('wiggle'); void el.offsetWidth; el.classList.add('wiggle');
       return;
     }
-    var cur = cellV[r][c];
-    if (cur === CAT) {
-      tryPlace(r, c, DOG);
-    } else if (cur === DOG) {
+    if (cellV[r][c] === brush) {
       cellV[r][c] = -1;
       filled--;
-      nextSym[r][c] = CAT;
       updateCell(r, c);
+      updateCounters();
       sndClear();
       updateHud();
     } else {
-      tryPlace(r, c, nextSym[r][c]);
+      tryPlace(r, c, brush);
     }
   }
 
@@ -924,15 +929,14 @@
 
   // ---------- 판 시작/리셋 ----------
   function resetBoard() {
-    cellV = []; locked = []; nextSym = [];
+    cellV = []; locked = [];
     filled = 0;
     for (var r = 0; r < N; r++) {
-      cellV.push([]); locked.push([]); nextSym.push([]);
+      cellV.push([]); locked.push([]);
       for (var c = 0; c < N; c++) {
         var g = givens[r][c];
         cellV[r].push(g);
         locked[r].push(g >= 0);
-        nextSym[r].push(CAT);
         if (g >= 0) filled++;
         cellEls[r][c].classList.toggle('locked', g >= 0);
         updateCell(r, c);
@@ -941,6 +945,7 @@
     hearts = 3;
     boardEl.classList.remove('won');
     updateHud();
+    updateCounters();
   }
   function startRun() {
     if (state === STATE_OVER && performance.now() - overAt < 500) return;
@@ -949,9 +954,11 @@
     resetBoard();
     practice = loadSolved() > 0;
     accumBase = practice ? 0 : loadAccum();
+    setBrush(CAT);
     runStart = performance.now();
     state = STATE_PLAY;
     document.getElementById('timer').className = practice ? 'practice' : '';
+    flashMsg('FILL EVERY CELL!', true);
     ac();
   }
 
@@ -1012,6 +1019,10 @@
     document.getElementById('share-fallback').classList.add('hidden');
     document.getElementById('over-panel').classList.remove('hidden');
   }
+
+  // ---------- 팔레트 ----------
+  document.getElementById('pal-cat').addEventListener('click', function () { setBrush(CAT); });
+  document.getElementById('pal-dog').addEventListener('click', function () { setBrush(DOG); });
 
   // ---------- 패널 버튼 ----------
   document.getElementById('retry-btn').addEventListener('click', function () { startRun(); });
@@ -1077,7 +1088,7 @@
       get filled() { return filled; },
       get solution() { return solution; },
       get givens() { return givens; },
-      get pairs() { return pairs; },
+      get brush() { return brush; },
       get cellV() { return cellV; },
       get locked() { return locked; },
       get won() { return won; },
@@ -1086,6 +1097,7 @@
       get chTime() { return chTime; },
       get chName() { return chName; },
       setHearts: function (n) { hearts = n; updateHud(); },
+      setBrush: setBrush,
       tap: tap,
       startRun: startRun
     };
