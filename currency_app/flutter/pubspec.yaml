@@ -1,0 +1,37 @@
+name: somrate
+description: "환율 변환 앱 — 기준 통화 하나에 여러 나라 금액을 동시에 보여준다."
+publish_to: 'none'
+
+# 스토어에 올릴 때마다 뒤 숫자(+N)를 1씩 올린다. Play는 같은 versionCode 를 두 번 받지 않는다.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.5.0
+  shared_preferences: ^2.5.0
+  intl: ^0.20.2
+  timezone: ^0.10.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+# 앱 아이콘 생성: dart run flutter_launcher_icons
+# (assets/icon/ 의 PNG 가 원본. 바꾸면 위 명령을 다시 실행)
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon-1024.png"
+  adaptive_icon_background: "#E8B44C"
+  adaptive_icon_foreground: "assets/icon/icon-fg-1024.png"
+  min_sdk_android: 21

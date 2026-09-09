@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>솜 환율 · 개인정보처리방침</title>
+<style>
+  :root{--bg:#F6F5F2;--fg:#1B222B;--muted:#5B6570;--line:#E3E0D9;--accent:#A97C1F}
+  @media (prefers-color-scheme:dark){:root{--bg:#0E1116;--fg:#E8EBEF;--muted:#9AA4B2;--line:#242C36;--accent:#E8B44C}}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+  main{max-width:640px;margin:0 auto;padding:48px 24px 64px}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:32px}
+  h2{font-size:17px;margin:32px 0 8px;padding-top:24px;border-top:1px solid var(--line)}
+  p,li{color:var(--fg)}
+  ul{padding-left:20px}
+  .en{color:var(--muted);font-size:14px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>솜 환율 개인정보처리방침</h1>
+  <div class="sub">Som Rate — Privacy Policy · 시행일 2026-09-09</div>
+
+  <p>솜 환율(이하 "앱")은 환율을 조회·환산하는 도구입니다. 앱은 <strong>계정을 만들지 않고, 개인정보를 수집하지 않으며, 어떤 데이터도 개발자 서버로 보내지 않습니다.</strong></p>
+  <p class="en">Som Rate is a currency conversion tool. It has no accounts, collects no personal information, and sends no data to the developer's servers.</p>
+
+  <h2>앱이 저장하는 것</h2>
+  <ul>
+    <li>선택한 기준 통화, 비교 통화 목록, 마지막 입력 금액</li>
+    <li>마지막으로 받아온 환율 (오프라인에서 쓰기 위해)</li>
+  </ul>
+  <p>이 정보는 <strong>사용자의 기기 안에만</strong> 저장되며, 앱을 삭제하면 함께 지워집니다.</p>
+  <p class="en">Your chosen currencies, last entered amount and the last fetched rates are stored only on your device and are removed when you uninstall the app.</p>
+
+  <h2>네트워크 사용</h2>
+  <p>앱은 최신 환율을 받기 위해 아래 공개 환율 데이터에 HTTPS 로 접속합니다. 이 요청에는 개인정보가 포함되지 않습니다.</p>
+  <ul>
+    <li>cdn.jsdelivr.net (fawazahmed0/currency-api)</li>
+    <li>currency-api.pages.dev (같은 데이터의 예비 주소)</li>
+  </ul>
+  <p class="en">The app fetches exchange rates over HTTPS from the public sources above. These requests contain no personal information.</p>
+
+  <h2>수집하지 않는 것</h2>
+  <ul>
+    <li>이름, 이메일, 전화번호 등 연락처 정보</li>
+    <li>위치 정보</li>
+    <li>기기 식별자, 광고 ID</li>
+    <li>사용 통계·분석 데이터</li>
+  </ul>
+  <p>앱에는 현재 광고와 분석 도구가 들어 있지 않습니다. 추후 광고를 넣게 되면 이 문서를 먼저 갱신합니다.</p>
+  <p class="en">The app contains no ads and no analytics. This policy will be updated before any such feature is added.</p>
+
+  <h2>아동</h2>
+  <p>앱은 특정 연령을 대상으로 하지 않으며, 어떤 사용자로부터도 개인정보를 수집하지 않습니다.</p>
+
+  <h2>문의</h2>
+  <p>이 방침에 관한 질문은 <a href="https://github.com/HugoSeong0721/test-mvp/issues">GitHub 저장소 이슈</a>로 남겨 주세요.</p>
+  <p class="en">Questions about this policy: open an issue on the GitHub repository linked above.</p>
+</main>
+</body>
+</html>
