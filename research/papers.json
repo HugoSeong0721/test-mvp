@@ -3254,5 +3254,106 @@
       "TCM clinical decision support syndrome differentiation"
     ],
     "first_seen": "2026-09-09"
+  },
+  {
+    "id": "doi:10.2196/90744",
+    "title": "Application of Large Language Models in Chronic Disease Care: Mixed Methods Systematic Review and Thematic Synthesis.",
+    "authors": [
+      "Zhang L",
+      "Huai P",
+      "Xu R",
+      "Sun J",
+      "Jin R",
+      "Lv H."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/90744",
+    "abstract": "<h4>Background</h4>Chronic diseases account for nearly three-quarters of global deaths and demand continuous, personalized long-term management; yet traditional care models often fall short in delivering such sustained support. Large language models, with advanced conversational and analytical capabilities, present promising opportunities to address the problem by offering scalable, interactive support. However, a comprehensive synthesis of evidence across diverse study designs, which moves beyond isolated technical metrics to evaluate large language models through a structured, theory-driven lens, remains limited.<h4>Objective</h4>This study aimed to synthesize quantitative, qualitative, and mixed methods evidence on technical performance, application scenarios, and documented challenges of large language models in chronic disease care, and to critically evaluate these findings through a theory-driven, 3D framework informed by Orem's Self-Care Theory.<h4>Methods</h4>The mixed methods systematic review adhered to the PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) 2020 and SWiM (Synthesis Without Meta-Analysis) guidelines. A comprehensive computer-based search was conducted across PubMed, Web of Science, Embase, Cochrane Library, CINAHL, Wiley Online Library, SpringerLink, ScienceDirect, China National Knowledge Infrastructure, Wanfang Data, VIP Database, and the China Biology Medicine Disc from inception to April 2026. Two independent researchers performed study screening, data extraction, and quality appraisal using the Mixed Methods Appraisal Tool 2018. Given significant clinical and methodological heterogeneity across the included studies, a quantitative meta-analysis was not appropriate; instead, thematic synthesis was used following Thomas and Harden's 3-step approach, with NVivo 14 (Lumivero) used for line-by-line coding and theme development, all informed by Orem's 3D framework.<h4>Results</h4>A total of 20 studies were included, all rated as moderate or high quality. The thematic synthesis revealed three core themes aligned with the proposed framework: (1) foundational safety, privacy, and fairness (hallucination risks and data concerns); (2) self-care enablement through perceived usefulness (patient education, decision support, and self-management); and (3) design and system integration challenges (readability mismatches and workflow gaps). Patient education and clinical decision support were the most common application scenarios. Key technical enhancements (retrieval-augmented generation [RAG] and fine-tuning) primarily strengthened the second theme, while barriers such as content readability, hallucination risks, and ethical ambiguities limited real-world readiness.<h4>Conclusions</h4>This review is the first to integrate Orem's Self-Care Theory into a 3D evaluative framework for large language models in chronic care, thereby moving beyond fragmented, technology-centric assessments toward a structured, nursing-informed, and theory-driven synthesis. Unlike prior reviews that primarily focused on isolated technical metrics or broad feasibility, this synthesis provides a layered, discipline-grounded evaluation distinguishing foundational safety, self-care enablement, and system integration. These findings show evidence mainly supports the intermediate layer, while safeguards and operational integration remain deficient, guiding nursing research toward safety assurances, health-literacy-adaptive design, and implementation science for equitable, patient-centered care.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1111/jep.70549",
+    "title": "Classification Without Reduction: The Epistemology of Clinical Taxonomy Examined Through TCM Constitution Theory.",
+    "authors": [
+      "Ge S",
+      "Zhou X",
+      "Shang X."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jep.70549",
+    "abstract": "<h4>Rationale, aims and objectives</h4>Clinical classifications operate at different explanatory levels-from molecular subtypes to phenotypic syndromes-yet the epistemological standing of a classification is often treated as though it depends on which level it occupies. This conflation of explanatory level with epistemological standing is unfounded. This essay identifies the minimal epistemological conditions that any clinical classification must satisfy and examines whether these conditions depend on explanatory level.<h4>Methods</h4>Philosophical analysis drawing on natural kinds theory (Boyd's homoeostatic property cluster theory), operationalism (Bridgman) and interventionist causation (Woodward). Traditional Chinese Medicine (TCM) constitution theory, developed by Wang Qi over four decades, is used as a developing top-down case study whose three core tenets-classifiable, measurable and modifiable-map onto the three philosophical frameworks.<h4>Results</h4>Three conditions were identified as necessary for a clinical classification to be scientifically tractable: ontologically grounded categories, operationalized measurement and testable causal propositions. These conditions are level-independent: they can be met by bottom-up molecular taxonomies and top-down phenotypic classifications alike. The TCM constitution case demonstrates uneven progress across the three conditions-operationalization is relatively advanced, ontological grounding has partial empirical support and causal validation remains nascent-illustrating the framework's utility as a diagnostic tool for assessing research programme maturity.<h4>Conclusion</h4>The epistemological standing of a clinical classification depends not on the explanatory level at which it operates, but on whether it satisfies the three identified conditions. This analysis is consistent with explanatory pluralism: molecular investigation and phenotypic classification address different questions along different axes, and evidence-based medicine's evaluative framework applies to both without prejudice.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1080/0886022x.2026.2702129",
+    "title": "Clinical manifestations, diagnosis, and management of renal involvement in Fabry disease.",
+    "authors": [
+      "Guo W",
+      "Bi J",
+      "Ji P",
+      "Xie Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1080/0886022x.2026.2702129",
+    "abstract": "Fabry disease is an X-linked hereditary lysosomal storage disease caused by variants in the <i>GLA</i> gene. These variants result in reduced or absent α-galactosidase A (α-Gal A) enzyme activity, leading to the progressive accumulation of enzyme metabolism substrates in multiple organs. This accumulation ultimately causes systemic clinical manifestations involving multiple organ systems. Renal involvement is a common clinical manifestation in Fabry disease and an important determinant of morbidity and disease progression. Early identification and active intervention of renal involvement in Fabry disease can effectively slow the progression of renal function deterioration and may significantly reduce the incidence of secondary cerebrovascular and cardiovascular events in advanced stages of Fabry disease nephropathy. This review summarizes the latest research advances on renal involvement in Fabry disease, covering its epidemiology, pathogenesis, clinical manifestations, diagnostic indicators, differential diagnosis and treatment strategies, in order to deepen the understanding of renal involvement in Fabry disease and reduce missed diagnosis and misdiagnosis.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1007/s00430-026-00884-0",
+    "title": "Single-cell profiling reveals IFI44L as a central regulator of immune dysregulation in high HIV viral load.",
+    "authors": [
+      "Gao J",
+      "Li Y",
+      "Huang J",
+      "Huang X",
+      "Zhu Q",
+      "Wei C",
+      "Chen J",
+      "Luo S",
+      "Xie Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1007/s00430-026-00884-0",
+    "abstract": "Human Immunodeficiency Virus (HIV) infection impairs the immune system, diminishing its ability to defend against pathogens and increasing susceptibility to infections and diseases. To gain a comprehensive understanding of the heterogeneity, functions, and regulatory mechanisms of immune cells affected by different HIV viral loads, we investigated the biological impacts of HIV infection on the human body. We reanalyzed a publicly available peripheral blood mononuclear cell (PBMC) single-cell RNA sequencing dataset (GSE157829) comprising three people living with HIV with high viral load (HL-HIV), three people living with HIV with low viral load (LL-HIV), and one healthy control donor. We constructed single-cell immune atlases that represent different viral load profiles. We also analyzed the dynamic changes in specific immune cell subpopulations to gain insights into their signaling pathways, developmental trajectories, and key transcriptional regulators. At the single-cell level, non-classical monocyte subpopulations, specifically ncMono_LYN_TCF7L2 and ncMono_IL32, functioned as immunosurveillance elements but also activated pro-inflammatory pathways, leading to immune activation. B_CD83 subpopulation was critical in B cell development, facilitating B cell differentiation and tolerance. Naive.T_TNFAIP3 subpopulation exhibited anti-inflammatory effects and protected against aberrant apoptosis. Central memory T (TCM)_TCF7_CCR7 subpopulation played a crucial role in regulating the expansion of HIV-specific CD8<sup>+</sup> T cells and maintaining the immune response. Additionally, we observed a significant enrichment of IFI44L-positive subpopulations across different cell types, particularly in HL-HIV samples. Our findings demonstrate that HIV infection increases the complexity of immune cell subpopulations. Notably, IFI44L has emerged as a potential disease hub gene in HL-HIV samples, highlighting its potential as a novel biomarker for HIV.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1038/s41413-026-00561-1",
+    "title": "Skeletal interoception regulates joint homeostasis and PGE2-induced pain: implication of disease-modifying treatment.",
+    "authors": [
+      "Hu Q",
+      "Qi B",
+      "Dong Y",
+      "Pan Y",
+      "Liu Y",
+      "Chen Z",
+      "Fang J",
+      "Liang Y",
+      "Zhang P."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1038/s41413-026-00561-1",
+    "abstract": "Interoception is a core process through which the body perceives its internal state and regulates physiological homeostasis via bidirectional communication between the central and peripheral nervous system. Skeletal interoception is a specific circuitry for the brain control of the weight-bearing system, particularly responsible for sensing bone-derived internal signals to maintain skeletal homeostasis in response to mechanical loading. Recent studies uncovered that prostaglandin E2 (PGE2) plays a crucial role in skeletal interoception, and is therefore involved in major skeletal disorders and pain conditions such as low back pain, osteoarthritis and particularly ankle osteoarthritis (AOA). Ankle pain is clinically common, with a prevalence of 9%-15% among adults, severely impairing work productivity and quality of life. This article reviews the progress of skeletal interoception in skeletal pathogenesis and pain, with AOA as an example. Specifically, it discusses PGE2 and skeletal interoception in relation to pain and inflammation. We also attempted to interpret non-steroidal anti-inflammatory drugs (NSAIDs), surgical interventions and Traditional Chinese Medicine (TCM) therapies, especially acupuncture and electroacupuncture, in the therapy of pain and osteoarthritis from the viewpoint of skeletal interoception. Interoception is an emerging science in understanding how the brain regulates peripheral organs. Skeletal interoception mediated by PGE2 provides an opportunity to understand the potential of NSAIDs and acupuncture in regulating interoception for the treatment of skeletal disorders including ankle pain.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-10"
   }
 ]
