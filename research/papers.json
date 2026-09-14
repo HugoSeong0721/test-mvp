@@ -3531,5 +3531,99 @@
       "multi-label symptom syndrome classification traditional chinese medicine"
     ],
     "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.3389/fimmu.2026.1904534",
+    "title": "Awakening antitumour immunity in the multimorbid host: a hypothesis coupling cryoablation-induced immunogenic cell death with multi-target Traditional Chinese Medicine.",
+    "authors": [
+      "Liu L",
+      "Chen H",
+      "Wang J",
+      "Yang J",
+      "Zhou Y",
+      "Luo B",
+      "Zhou Y",
+      "Hu K."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3389/fimmu.2026.1904534",
+    "abstract": "Most patients with cancer are older adults living with several other chronic illnesses, and both the tumour and its commonest companions-cardiometabolic disease, type 2 diabetes and depression-are sustained by a shared, immunosuppressive inflammatory milieu. In this setting many tumours are immunologically \"cold\": poorly infiltrated by cytotoxic T and natural killer (NK) cells, enriched for regulatory T cells (Tregs) and M2 macrophages, and embedded in a chronically inflamed \"soil\" that also drives the comorbidities. Here we advance a mechanistic hypothesis: that two low-harm modalities applied together can reawaken antitumour immunity in this host while sparing the physiological reserve that radical treatment consumes. Minimally invasive cryoablation destroys tumour <i>in situ</i> and releases tumour antigens together with damage-associated molecular patterns (calreticulin, ATP, HMGB1), driving immunogenic cell death, dendritic-cell maturation and CD8+ T-cell priming; multi-target Traditional Chinese Medicine (TCM) acts on the same inflammatory substrate-dampening NF-κB, IL-6 and TNF-α signalling, lowering lactate, and reducing regulatory-T-cell and M2 dominance-to remodel the tumour microenvironment. We propose that their convergence turns a \"cold\" microenvironment \"hot\" and, because the targeted substrate is shared, yields a one-to-many benefit that extends from the tumour to its inflammatory comorbidities. We situate this hypothesis within the three-stage Tumour Green Therapy framework-Dominant Control (<i>bà dào</i>, ), Supportive Integration (<i>wáng dào</i>, ) and Harmonisation and Maintenance (<i>dì dào</i>, )-which sequences local immunogenic debulking, systemic immune support and microenvironmental harmonisation according to tumour urgency and host constitution, and maps TCM syndrome patterns onto measurable immune and inflammatory readouts (neutrophil-to-lymphocyte ratio, CRP, IL-6/TNF-α) that could serve as biomarkers. We define the immunological phenotype of this host, specify which patients should and should not receive the approach, remain candid about its limitations-herb-drug interactions, product quality and the scarcity of randomised data-and pre-specify both a two-stage prospective test and the observations that would refute each element of the hypothesis. Its central, falsifiable claim is that cryoablation plus multi-target TCM reawakens antitumour immunity and reduces total treatment burden, including polypharmacy, without compromising survival or quality of life.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.21147/j.issn.1000-9604.2026.04.05",
+    "title": "AI agents in cancer imaging: Concepts, advances, and clinical perspectives.",
+    "authors": [
+      "Yao R."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.21147/j.issn.1000-9604.2026.04.05",
+    "abstract": "Medical imaging serves as a critical source of evidence for cancer diagnosis, treatment, and follow-up. However, most existing medical imaging artificial intelligence (AI) systems still operate on predefined tasks and inputs, limiting their ability to address the evolving needs of clinical practice and research. AI agents use foundation models as central engines for reasoning and orchestration. They organize analytical processes according to task objectives, invoke external tools and data resources, and adapt subsequent actions based on intermediate results. They may therefore facilitate a shift in cancer imaging AI from isolated model applications toward continuous workflow support. This review outlines the fundamental principles, system components, and evaluation approaches for AI agents from a cancer imaging perspective and summarizes representative advances in image interpretation, clinical decision support, and research workflows. Current evidence suggests that agents can connect previously fragmented imaging, clinical, and knowledge resources, thereby potentially improving the continuity and traceability of complex tasks. Nevertheless, clinical evidence for AI agents remains limited, as most studies have been conducted in controlled settings and have yet to demonstrate consistent value in real-world clinical workflows. Clinical translation is further constrained by the computational demands and potential error propagation inherent in multistep execution, as well as by the dependence of agent performance on specific tools, data environments, and workflow configurations. Future research should move beyond task-level performance toward system-level validation, with particular emphasis on whether agents can reliably organize information, interpret findings, and collaborate effectively with clinicians. Such evidence will be essential to clarify their practical role in cancer imaging care and research.",
+    "matched_queries": [
+      "large language model traditional chinese medicine diagnosis dialogue"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.21037/tp-2026-0205",
+    "title": "Traditional Chinese medicine combined with conventional Western medicine for chronic cough following respiratory infection in children: a systematic review and meta-analysis.",
+    "authors": [
+      "Cui S",
+      "Xie X",
+      "Yang J",
+      "Xiao Y",
+      "Wang W."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.21037/tp-2026-0205",
+    "abstract": "<h4>Background</h4>Chronic cough following respiratory infection in children is often refractory to conventional therapies. However, the current clinical evidence regarding the efficacy of traditional Chinese medicine (TCM) remains inconclusive and lacks systematic synthesis, leaving clinicians without clear guidance. This study systematically evaluated the efficacy and safety of TCM for chronic cough following respiratory infection in children to support clinical decision-making.<h4>Methods</h4>A systematic search was conducted in the Cochrane Library, PubMed, Embase, Web of Science, Wiley Online Library, China National Knowledge Infrastructure (CNKI), and Wanfang databases. Randomized controlled trials (RCTs) of TCM for chronic cough following respiratory infection in children were included. Meta-analyses were performed using RevMan 5.4 and Stata 16.0.<h4>Results</h4>A total of 23 RCTs involving 2,126 children were included. Meta-analysis demonstrated that, compared with conventional Western medical treatment alone, TCM combined with conventional treatment significantly improved the overall clinical effectiveness rate [risk ratio (RR) =1.19, 95% confidence interval (CI) (1.15, 1.24), P<0.001], shortened the time to cough resolution [mean difference (MD) =-3.19, 95% CI (-4.42, -1.97), P<0.001] and the time to disappearance of pulmonary rales [MD =-2.00, 95% CI (-2.47, -1.54), P<0.001], and significantly reduced cough symptom scores [MD =-1.32, 95% CI (-1.69, -0.95), P<0.001]. For secondary outcomes, combined TCM therapy significantly reduced TCM syndrome scores, improved immune function indicators [immunoglobulin A (IgA), immunoglobulin M (IgM), and immunoglobulin G (IgG)], and decreased levels of inflammatory biomarkers [C-reactive protein (CRP), interleukin-6 (IL-6), tumor necrosis factor-alpha (TNF-α), and monocyte chemoattractant protein-4 (MCP-4)]. No statistically significant difference was observed between groups in the incidence of adverse events.<h4>Conclusions</h4>TCM used as an adjunct to conventional Western medical treatment may provide additional benefits in improving clinical outcomes and alleviating symptoms in children with post-infectious chronic cough. However, due to limitations in study quality and heterogeneity, further high-quality, well-designed studies are warranted to strengthen the evidence base.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.1002/fsn3.72239",
+    "title": "Herbal Extracts and Plant-Derived Bioactives in Atopic Dermatitis: Evidence, Mechanisms, Pediatric Safety, and Translational Priorities.",
+    "authors": [
+      "Zeng M",
+      "Yuan Q",
+      "Huang S",
+      "Lu X."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1002/fsn3.72239",
+    "abstract": "Atopic dermatitis (AD) is a chronic, relapsing epithelial and neuroimmune disease in which barrier failure, type 2 inflammation, microbial dysbiosis, itching, metabolism, and environmental exposures reinforce one another. This review critically synthesizes clinical and preclinical evidence for herbal medicines, standardized extracts, food-derived bioactives, functional-food candidates, nutraceutical ingredients, and natural-product delivery systems in AD, with particular attention to pediatric safety. Recurrent experimental signals include attenuation of Th2 cytokines and IgE, suppression of mast-cell and IL-31-related itch pathways, restoration of filaggrin and tight-junction proteins, and modulation of MAPK/NF-κB, JAK/STAT, Nrf2/HO-1, and NLRP3 signaling. However, efficacy is not inferred from pathway changes alone. Human evidence remains heterogeneous, and apparently promising agents have failed to outperform active comparators, produced neutral microbiome results, or raised barrier and sensitization concerns. We therefore integrate four issues that are often treated separately: food sources and processing-dependent chemistry; oral bioaccessibility and food-matrix effects; gut-skin signaling and its uncertain causal direction; and compatibility with standard topical agents, cyclosporine, biologics, and JAK inhibitors. The evidence supports selected botanicals as investigational adjuncts rather than as replacements for guideline-based care. Translation requires authenticated materials, quantitative chemical fingerprints, exposure-response studies, age-appropriate safety surveillance, interaction assessment, and controlled trials using validated clinical and barrier endpoints.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.21037/tcr-2026-1075",
+    "title": "Non-small cell lung cancer and tumor-educated platelets: screening of biomarkers and construction of a prognostic model.",
+    "authors": [
+      "Zhao Y",
+      "Tang T",
+      "Li J",
+      "Chen L",
+      "Gu X",
+      "Li Q."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.21037/tcr-2026-1075",
+    "abstract": "<h4>Background</h4>Lung cancer is a leading cause of cancer-related mortality worldwide, emphasizing the urgent need for effective early detection strategies. Traditional Chinese medicine (TCM) provides a unique perspective on tumor pathogenesis, focusing on concepts such as \"long-term stasis leading to accumulation\". Tumor-educated platelets (TEPs) offer potential as biomarkers due to their ability to reflect cancer heterogeneity and facilitate less invasive diagnostic approaches. This study aims to identify TEP-related prognostic biomarkers for non-small cell lung cancer (NSCLC) and to construct and validate a multigene prognostic model by integrating platelet transcriptomic data with tumor tissue datasets.<h4>Methods</h4>We performed comprehensive analysis of gene expression datasets obtained from The Cancer Genome Atlas (TCGA) and Gene Expression Omnibus (GEO) repositories to characterize transcriptomic differences among lung cancer specimens, normal tissue samples, and TEPs. Using R software, we identified Differentially expressed genes (DEGs) and subsequently applied a multi-stage analytical pipeline to TEP-associated DEGs, incorporating univariate Cox proportional hazards regression, least absolute shrinkage and selection operator (LASSO) regression, multivariate Cox regression, and stepwise regression modeling to pinpoint genes with prognostic significance. These prognostically relevant genes served as the foundation for developing a risk stratification model. We computed individual risk scores across both training and validation cohorts, enabling patient stratification into high- and low-risk categories. Model robustness was assessed through internal cross-validation and external validation procedures, while predictive performance was quantified using risk calibration metrics and receiver operating characteristic (ROC) curve analysis.<h4>Results</h4>Through systematic bioinformatics screening, we identified a four-gene prognostic signature comprising <i>NELL2</i>, <i>C4orf48</i>, <i>PRAM1</i>, and <i>KLHL35</i>, which served as the foundation for developing our risk stratification algorithm. Rigorous internal cross-validation and external cohort validation substantiated the moderate predictive performance of this signature. Comprehensive clinicopathological correlation analysis revealed that elevated risk indices, advanced pathological staging (stage III-IV), increased primary tumor dimensions, regional lymph node metastasis, and distant organ dissemination each demonstrated statistically significant associations with diminished overall survival (OS) outcomes in lung cancer patients. The clinical nomogram exhibited acceptable calibration, with calibration plots showing reasonable concordance between predicted and observed survival probabilities across all time points. Discriminative capacity assessment via time-dependent ROC analysis yielded area under the curve (AUC) values consistently surpassing 0.6, confirming moderate prognostic discrimination. Furthermore, decision curve analysis (DCA) demonstrated that our integrated multi-gene model conferred potential net clinical benefit compared to individual prognostic variables across the full spectrum of clinically relevant threshold probabilities (0-1 range), thereby establishing its potential utility for risk-informed clinical decision-making.<h4>Conclusions</h4>This study identified <i>NELL2</i>, <i>C4orf48</i>, <i>PRAM1</i>, and <i>KLHL35</i> as candidate TEP-related prognostic biomarkers for non-small cell lung cancer (NSCLC). The developed prognostic model shows preliminary potential for patient stratification, but its clinical application, particularly as a platelet-based liquid biopsy tool, requires further validation in independent TEP-based cohorts.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-14"
   }
 ]
