@@ -3625,5 +3625,25 @@
       "TCM clinical decision support syndrome differentiation"
     ],
     "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.3390/healthcare14172778",
+    "title": "Integrative Rehabilitation for War-Related Polytrauma: A Narrative Review of Multidimensional Strategies and Implementation Challenges.",
+    "authors": [
+      "Sun J",
+      "Hirushan YMRC",
+      "Randula H",
+      "Zhang W",
+      "Wu Q",
+      "Han J."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/healthcare14172778",
+    "abstract": "<h4>Objective</h4>Modern high-intensity warfare, such as the Russo-Ukrainian conflict, generates a high incidence of multisystem polytrauma, blast-induced traumatic brain injury, and limb amputations often complicated by post-traumatic stress disorder and chronic pain. Traditional specialised rehabilitation protocols are structurally inadequate for these co-occurring symptoms and rely heavily on medical treatments, increasing the risk of opioid dependency. The primary aim of this review is to conceptualise a multidimensional integrative framework for war-related polytrauma; a secondary aim is to evaluate and summarise the evidence underpinning its key rehabilitation strategies for limited-resource, post-conflict environments.<h4>Methods</h4>This narrative review synthesises evidence identified through targeted database searches and purposive selection guided by clinical relevance, methodological quality, and applicability to war-related polytrauma across physical, technological, and non-pharmacological rehabilitation domains. Evidence was evaluated using a four-tier (A-D) hierarchy, comprising Tier A (systematic reviews and RCTs), Tier B (prospective cohort studies and non-randomised controlled trials), Tier C (descriptive, case-series, and retrospective studies), and Tier D (exploratory, mechanism-based, or expert opinion evidence). No systematic inclusion/exclusion protocol was applied, and no claims of comprehensive search coverage are made.<h4>Results</h4>Concurrent physical and trauma-focused psychological rehabilitation, evidenced by reduced pain and psychological symptom burden alongside improved functional independence, is supported by high-quality evidence (Tier A) for managing comorbid polytrauma. Robotic exoskeletons and AI-supported tele-rehabilitation demonstrate dose-dependent motor benefits in selected rehabilitation populations (Tier A-B), but their scalability in wartime settings is contingent on electricity supply, connectivity, equipment maintenance, and trained personnel. Acupuncture shows Tier A evidence for neuropathic pain and Tier B cost-effectiveness; evidence for phantom limb pain and PTSD is preliminary (Tier C-D) and requires dedicated RCTs in veteran populations. Ayurvedic herbal interventions are exploratory (Tier C-D) with no war-specific clinical trials; mechanistic plausibility is discussed as hypothesis-generating only.<h4>Conclusions</h4>Addressing the war-related rehabilitation gap requires integration of biomedical care, technology-assisted rehabilitation, and evidence-graded non-pharmacological adjuncts within a structured biopsychosocial framework. Future priorities include pragmatic, adapted trial designs (e.g., stepped-wedge or cohort-embedded designs, which are more feasible than classical RCTs under wartime conditions) for acupuncture in phantom limb pain, feasibility trials for robotic rehabilitation in frontline-adjacent facilities, and health-economic modelling adapted to the Ukrainian context.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-18"
   }
 ]
