@@ -3665,5 +3665,27 @@
       "chain of thought reasoning traditional chinese medicine"
     ],
     "first_seen": "2026-09-19"
+  },
+  {
+    "id": "doi:10.1007/s10620-026-10134-1",
+    "title": "The Potential of Complementary and Alternative Therapies in Improving Diarrhea-Predominant Irritable Bowel Syndrome: Strategies for Long-Term Efficacy.",
+    "authors": [
+      "Deng Y",
+      "Ao X",
+      "Liang X",
+      "Hao W",
+      "Liu Y",
+      "Zhao L",
+      "Li Z",
+      "Chen S."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1007/s10620-026-10134-1",
+    "abstract": "Diarrhea-predominant irritable bowel syndrome (IBS-D) is a common disorder of gut-brain interaction. Current therapeutic approaches frequently fail to provide sustained symptom relief. In recent years, complementary and alternative therapies-particularly traditional Chinese medicine, acupuncture, and dietary interventions-have attracted increasing attention due to their low side-effect profiles and are gradually becoming important adjunct strategies in the management of IBS-D. This review systematically summarizes the research advances of the past decade across these three therapeutic categories for IBS-D with a focus on their clinical efficacy and underlying mechanisms. The findings suggest that traditional Chinese medicine, acupuncture, and dietary interventions can provide sustained relief from core symptoms of IBS-D, including diarrhea and abdominal pain. Their therapeutic effects are mediated through multiple mechanisms, including modulation of the gut microbiota and its metabolites, restoration of intestinal mucosal barrier integrity, attenuation of visceral hypersensitivity, and regulation of the gut-brain axis. These therapies exhibit multi-target and systemic effects with a low incidence of adverse events, highlighting their promising clinical potential. They offer feasible strategies for achieving long-term remission and facilitating personalized management of IBS-D.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-21"
   }
 ]
