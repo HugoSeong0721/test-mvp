@@ -3687,5 +3687,30 @@
       "multi-label symptom syndrome classification traditional chinese medicine"
     ],
     "first_seen": "2026-09-21"
+  },
+  {
+    "id": "doi:10.1186/s13020-026-01490-1",
+    "title": "FuTCM-PDD: a multi-level information fusion framework integrating KAN modeling and AutoML for phenotype-based drug discovery from Traditional Chinese Medicine.",
+    "authors": [
+      "Wang Z",
+      "Liu Y",
+      "Ren Y",
+      "Li Q",
+      "Tian J",
+      "Yu B",
+      "Zhu Y",
+      "Wang J",
+      "Li M",
+      "Qiao L",
+      "Zhang Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13020-026-01490-1",
+    "abstract": "Phenotype-based drug discovery has attracted increasing attention due to its critical role in first-in-class drug development and higher clinical translation rates. Chinese Materia Medica (CMM), with its emphasis on properties and efficacies, provides a unique framework for phenotype-oriented therapeutic discovery. We developed an AI-driven framework, FuTCM-PDD, that integrates CMMs, compounds, targets, pathways, pharmacological effects, CMM efficacies, and CMM properties to enable phenotype-based drug discovery. For drug-target interaction (DTI) prediction, a Kolmogorov-Arnold Network (KAN) model with circle loss optimization was established, outperforming the best baseline by 16.14% in Recall@10 and validated by literature, databases, and molecular docking. In addition, an Automated Machine Learning (AutoML) framework integrating 168 machine learning algorithms was implemented using pharmacological effects to predict CMM properties and efficacies. By integrating model predictions of targets, pharmacological effects, properties, and efficacies, covering 809,645 associations across 7141 CMM herbs, 30,731 compounds, 4321 targets, 40 pharmacological effects, 18 properties, and 18 efficacies, we constructed a multi-layer biological network centered on CMM properties and efficacies. The integrative network was validated via randomization analyses, establishing its biological significance and enabling quantitative mappings across CMM herbs, compounds, targets, pharmacological effects, and CMM phenotypic concepts through network-topology metrics, information-flow modeling, and randomized perturbation embedding. Using an approach distinct from conventional network pharmacology, the FuTCM-PDD identified a lipid-lowering pharmacological effect of Notopterygii Rhizoma et Radix (NRR, Qianghuo) and its active compounds, which were experimentally validated using an in vitro hepatic steatosis model. FuTCM-PDD provides an AI-assisted framework for phenotype-based discovery of potential drug candidates from CMM through multi-level data fusion, helping move beyond the recurrent prioritization of commonly reported associations in conventional network pharmacology and supporting the identification of pharmacologically relevant candidate compounds associated with specific phenotypic contexts.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-23"
   }
 ]
