@@ -3254,5 +3254,628 @@
       "TCM clinical decision support syndrome differentiation"
     ],
     "first_seen": "2026-09-09"
+  },
+  {
+    "id": "doi:10.2196/90744",
+    "title": "Application of Large Language Models in Chronic Disease Care: Mixed Methods Systematic Review and Thematic Synthesis.",
+    "authors": [
+      "Zhang L",
+      "Huai P",
+      "Xu R",
+      "Sun J",
+      "Jin R",
+      "Lv H."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/90744",
+    "abstract": "<h4>Background</h4>Chronic diseases account for nearly three-quarters of global deaths and demand continuous, personalized long-term management; yet traditional care models often fall short in delivering such sustained support. Large language models, with advanced conversational and analytical capabilities, present promising opportunities to address the problem by offering scalable, interactive support. However, a comprehensive synthesis of evidence across diverse study designs, which moves beyond isolated technical metrics to evaluate large language models through a structured, theory-driven lens, remains limited.<h4>Objective</h4>This study aimed to synthesize quantitative, qualitative, and mixed methods evidence on technical performance, application scenarios, and documented challenges of large language models in chronic disease care, and to critically evaluate these findings through a theory-driven, 3D framework informed by Orem's Self-Care Theory.<h4>Methods</h4>The mixed methods systematic review adhered to the PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) 2020 and SWiM (Synthesis Without Meta-Analysis) guidelines. A comprehensive computer-based search was conducted across PubMed, Web of Science, Embase, Cochrane Library, CINAHL, Wiley Online Library, SpringerLink, ScienceDirect, China National Knowledge Infrastructure, Wanfang Data, VIP Database, and the China Biology Medicine Disc from inception to April 2026. Two independent researchers performed study screening, data extraction, and quality appraisal using the Mixed Methods Appraisal Tool 2018. Given significant clinical and methodological heterogeneity across the included studies, a quantitative meta-analysis was not appropriate; instead, thematic synthesis was used following Thomas and Harden's 3-step approach, with NVivo 14 (Lumivero) used for line-by-line coding and theme development, all informed by Orem's 3D framework.<h4>Results</h4>A total of 20 studies were included, all rated as moderate or high quality. The thematic synthesis revealed three core themes aligned with the proposed framework: (1) foundational safety, privacy, and fairness (hallucination risks and data concerns); (2) self-care enablement through perceived usefulness (patient education, decision support, and self-management); and (3) design and system integration challenges (readability mismatches and workflow gaps). Patient education and clinical decision support were the most common application scenarios. Key technical enhancements (retrieval-augmented generation [RAG] and fine-tuning) primarily strengthened the second theme, while barriers such as content readability, hallucination risks, and ethical ambiguities limited real-world readiness.<h4>Conclusions</h4>This review is the first to integrate Orem's Self-Care Theory into a 3D evaluative framework for large language models in chronic care, thereby moving beyond fragmented, technology-centric assessments toward a structured, nursing-informed, and theory-driven synthesis. Unlike prior reviews that primarily focused on isolated technical metrics or broad feasibility, this synthesis provides a layered, discipline-grounded evaluation distinguishing foundational safety, self-care enablement, and system integration. These findings show evidence mainly supports the intermediate layer, while safeguards and operational integration remain deficient, guiding nursing research toward safety assurances, health-literacy-adaptive design, and implementation science for equitable, patient-centered care.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1111/jep.70549",
+    "title": "Classification Without Reduction: The Epistemology of Clinical Taxonomy Examined Through TCM Constitution Theory.",
+    "authors": [
+      "Ge S",
+      "Zhou X",
+      "Shang X."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jep.70549",
+    "abstract": "<h4>Rationale, aims and objectives</h4>Clinical classifications operate at different explanatory levels-from molecular subtypes to phenotypic syndromes-yet the epistemological standing of a classification is often treated as though it depends on which level it occupies. This conflation of explanatory level with epistemological standing is unfounded. This essay identifies the minimal epistemological conditions that any clinical classification must satisfy and examines whether these conditions depend on explanatory level.<h4>Methods</h4>Philosophical analysis drawing on natural kinds theory (Boyd's homoeostatic property cluster theory), operationalism (Bridgman) and interventionist causation (Woodward). Traditional Chinese Medicine (TCM) constitution theory, developed by Wang Qi over four decades, is used as a developing top-down case study whose three core tenets-classifiable, measurable and modifiable-map onto the three philosophical frameworks.<h4>Results</h4>Three conditions were identified as necessary for a clinical classification to be scientifically tractable: ontologically grounded categories, operationalized measurement and testable causal propositions. These conditions are level-independent: they can be met by bottom-up molecular taxonomies and top-down phenotypic classifications alike. The TCM constitution case demonstrates uneven progress across the three conditions-operationalization is relatively advanced, ontological grounding has partial empirical support and causal validation remains nascent-illustrating the framework's utility as a diagnostic tool for assessing research programme maturity.<h4>Conclusion</h4>The epistemological standing of a clinical classification depends not on the explanatory level at which it operates, but on whether it satisfies the three identified conditions. This analysis is consistent with explanatory pluralism: molecular investigation and phenotypic classification address different questions along different axes, and evidence-based medicine's evaluative framework applies to both without prejudice.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1080/0886022x.2026.2702129",
+    "title": "Clinical manifestations, diagnosis, and management of renal involvement in Fabry disease.",
+    "authors": [
+      "Guo W",
+      "Bi J",
+      "Ji P",
+      "Xie Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1080/0886022x.2026.2702129",
+    "abstract": "Fabry disease is an X-linked hereditary lysosomal storage disease caused by variants in the <i>GLA</i> gene. These variants result in reduced or absent α-galactosidase A (α-Gal A) enzyme activity, leading to the progressive accumulation of enzyme metabolism substrates in multiple organs. This accumulation ultimately causes systemic clinical manifestations involving multiple organ systems. Renal involvement is a common clinical manifestation in Fabry disease and an important determinant of morbidity and disease progression. Early identification and active intervention of renal involvement in Fabry disease can effectively slow the progression of renal function deterioration and may significantly reduce the incidence of secondary cerebrovascular and cardiovascular events in advanced stages of Fabry disease nephropathy. This review summarizes the latest research advances on renal involvement in Fabry disease, covering its epidemiology, pathogenesis, clinical manifestations, diagnostic indicators, differential diagnosis and treatment strategies, in order to deepen the understanding of renal involvement in Fabry disease and reduce missed diagnosis and misdiagnosis.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1007/s00430-026-00884-0",
+    "title": "Single-cell profiling reveals IFI44L as a central regulator of immune dysregulation in high HIV viral load.",
+    "authors": [
+      "Gao J",
+      "Li Y",
+      "Huang J",
+      "Huang X",
+      "Zhu Q",
+      "Wei C",
+      "Chen J",
+      "Luo S",
+      "Xie Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1007/s00430-026-00884-0",
+    "abstract": "Human Immunodeficiency Virus (HIV) infection impairs the immune system, diminishing its ability to defend against pathogens and increasing susceptibility to infections and diseases. To gain a comprehensive understanding of the heterogeneity, functions, and regulatory mechanisms of immune cells affected by different HIV viral loads, we investigated the biological impacts of HIV infection on the human body. We reanalyzed a publicly available peripheral blood mononuclear cell (PBMC) single-cell RNA sequencing dataset (GSE157829) comprising three people living with HIV with high viral load (HL-HIV), three people living with HIV with low viral load (LL-HIV), and one healthy control donor. We constructed single-cell immune atlases that represent different viral load profiles. We also analyzed the dynamic changes in specific immune cell subpopulations to gain insights into their signaling pathways, developmental trajectories, and key transcriptional regulators. At the single-cell level, non-classical monocyte subpopulations, specifically ncMono_LYN_TCF7L2 and ncMono_IL32, functioned as immunosurveillance elements but also activated pro-inflammatory pathways, leading to immune activation. B_CD83 subpopulation was critical in B cell development, facilitating B cell differentiation and tolerance. Naive.T_TNFAIP3 subpopulation exhibited anti-inflammatory effects and protected against aberrant apoptosis. Central memory T (TCM)_TCF7_CCR7 subpopulation played a crucial role in regulating the expansion of HIV-specific CD8<sup>+</sup> T cells and maintaining the immune response. Additionally, we observed a significant enrichment of IFI44L-positive subpopulations across different cell types, particularly in HL-HIV samples. Our findings demonstrate that HIV infection increases the complexity of immune cell subpopulations. Notably, IFI44L has emerged as a potential disease hub gene in HL-HIV samples, highlighting its potential as a novel biomarker for HIV.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1038/s41413-026-00561-1",
+    "title": "Skeletal interoception regulates joint homeostasis and PGE2-induced pain: implication of disease-modifying treatment.",
+    "authors": [
+      "Hu Q",
+      "Qi B",
+      "Dong Y",
+      "Pan Y",
+      "Liu Y",
+      "Chen Z",
+      "Fang J",
+      "Liang Y",
+      "Zhang P."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1038/s41413-026-00561-1",
+    "abstract": "Interoception is a core process through which the body perceives its internal state and regulates physiological homeostasis via bidirectional communication between the central and peripheral nervous system. Skeletal interoception is a specific circuitry for the brain control of the weight-bearing system, particularly responsible for sensing bone-derived internal signals to maintain skeletal homeostasis in response to mechanical loading. Recent studies uncovered that prostaglandin E2 (PGE2) plays a crucial role in skeletal interoception, and is therefore involved in major skeletal disorders and pain conditions such as low back pain, osteoarthritis and particularly ankle osteoarthritis (AOA). Ankle pain is clinically common, with a prevalence of 9%-15% among adults, severely impairing work productivity and quality of life. This article reviews the progress of skeletal interoception in skeletal pathogenesis and pain, with AOA as an example. Specifically, it discusses PGE2 and skeletal interoception in relation to pain and inflammation. We also attempted to interpret non-steroidal anti-inflammatory drugs (NSAIDs), surgical interventions and Traditional Chinese Medicine (TCM) therapies, especially acupuncture and electroacupuncture, in the therapy of pain and osteoarthritis from the viewpoint of skeletal interoception. Interoception is an emerging science in understanding how the brain regulates peripheral organs. Skeletal interoception mediated by PGE2 provides an opportunity to understand the potential of NSAIDs and acupuncture in regulating interoception for the treatment of skeletal disorders including ankle pain.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-10"
+  },
+  {
+    "id": "doi:10.1097/jcma.0000000000001404",
+    "title": "Interactions between cytochrome P450 enzymes and traditional Chinese herbs: A comprehensive review.",
+    "authors": [
+      "Hsieh YH",
+      "Huang ST."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1097/jcma.0000000000001404",
+    "abstract": "Cytochrome P450 (CYP) enzymes, predominantly expressed in the liver and intestine, are central to phase I drug metabolism. The CYP1, CYP2, and particularly CYP3 families account for most oxidative biotransformation and nearly half of all drug elimination. Their activities are modulated by genetic polymorphisms, environmental factors, and drug interactions, contributing to interindividual variability in drug efficacy, safety, and susceptibility to drug-induced liver injury. This study systematically evaluated the regulatory effects of commonly used Traditional Chinese Medicine (TCM) and Western herbal medicines on major CYP isoforms. PubMed and Google Scholar were searched for studies published between January 2000 and March 2025, with UpToDate used as a supplementary resource. Eligible evidence included in vitro assays, in vivo animal studies, human pharmacokinetic investigations, and well-documented case reports assessing herbal effects on CYP3A4, CYP2C9, CYP2D6, and CYP1A2. Evidence was graded by strength and integrated with mechanistic and pharmacokinetic data for interaction risk assessment. Herbal candidates included Astragalus membranaceus (Huangqi, ), Salvia miltiorrhiza (Danshen, ), Ginkgo biloba (Ginkgo, ), Bupleurum chinense (Chaihu, ), and Hypericum perforatum (St. John's wort, ). Many herbs demonstrated clinically relevant induction or inhibition of CYP activity, particularly CYP3A4, with the potential to alter drug exposure, reduce therapeutic efficacy, or increase toxicity. Collectively, these findings underscore the imperative for systematic assessment of CYP-mediated herb-drug interactions in integrative medicine and support the development of safer, personalized therapeutic strategies grounded in a refined understanding of metabolic variability.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.3390/bioengineering13080885",
+    "title": "Machine Learning Integrating SERF-MEG and VEP for Diagnosis and Differential Diagnosis of Optic Neuropathies.",
+    "authors": [
+      "Wang H",
+      "Qi Y",
+      "Lou Y",
+      "Zhang X",
+      "Song X."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/bioengineering13080885",
+    "abstract": "Visual evoked potential (VEP) is widely used to assess optic nerve function, but its ability to differentiate optic neuropathies remains limited. This study investigated the diagnostic value of spin-exchange relaxation-free magnetoencephalography (SERF-MEG), alone and in combination with VEP, using machine learning. A total of 142 eyes, including 71 healthy controls (HC), 34 eyes with optic neuritis (ON), and 37 eyes with ischemic optic neuropathy (ION), were enrolled. Three feature sets were constructed from VEP, SERF-MEG, and their combination. Repeated stratified 5-fold nested cross-validation was used to evaluate nine supervised machine learning algorithms, and SHAP analysis was used to evaluate the interpretability of the models. The multilayer perceptron model obtained an AUC of 0.792 and an MCC of 0.470, whereas the combination VEP-MEG model performed the best in differentiating HC from optic neuropathies. The MEG model fared better than the VEP and combined models for distinguishing ON from ION, with logistic regression obtaining the greatest AUC of 0.847. Cortical network measurements and visually evoked response properties were found to contribute the most to model prediction, according to SHAP analysis. These results imply that SERF-MEG may enhance the diagnosis and differential diagnosis of optic neuropathies by offering supplementary neurophysiological data beyond traditional VEP.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1002/brb3.71713",
+    "title": "Comorbidity Mechanism and Management of Chronic Low Back Pain and Major Depressive Disorder: From Neural Circuit Remodeling to Precision Medicine.",
+    "authors": [
+      "Faqu L",
+      "Chenjuan L",
+      "Xiangyin X",
+      "Xin L."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1002/brb3.71713",
+    "abstract": "<h4>Objective</h4>This review systematically elaborates multi-system interactive mechanisms underlying comorbid chronic low back pain (CLBP) and major depressive disorder (MDD), synthesizes recent advances in diagnosis, treatment, and management, and proposes precision medicine directions to address clinical challenges, including missed diagnosis, treatment resistance, and poor prognosis.<h4>Method</h4>We reviewed 86 studies published between 2015 and 2025 from the PubMed, Embase, and CNKI databases. We focused on basic research and clinical trials, integrating multi-omics data to construct mechanistic frameworks and therapeutic evidence.<h4>Result</h4>The comorbid pathogenesis of CLBP and MDD is driven by dysregulation of the \"neural-immune-endocrine-gut-brain axis\" network. Spinal dorsal horn N-methyl-D-aspartate (NMDA) receptor NR2B phosphorylation amplifies pain signals 2- to 3-fold, while anterior cingulate cortex (ACC)-insula connectivity correlates positively with depression severity. Microglial toll-like receptor 4/nuclear factor-κB (TLR4/NF-κB) activation increases cerebrospinal fluid interleukin-6 (IL-6) and tumor necrosis factor-α (TNF-α) by 3.2- and 2.7-fold, respectively. Hypothalamic-pituitary-adrenal (HPA) axis dysfunction causes a flattened cortisol rhythm, with glucocorticoid receptor gene (NR3C1) hypermethylation reducing glucocorticoid sensitivity by 45%. Gut dysbiosis decreases short-chain fatty acids (SCFAs) by 30% and increases plasma lipopolysaccharide (LPS) by 2.3-fold, accompanied by abnormal proliferation of pro-inflammatory E. coli and Desulfovibrio as well as depletion of anti-inflammatory Prevotella. Duloxetine reduces visual analog scale (VAS) pain scores by 40% and Hamilton Depression Rating Scale (HAM-D) scores by 35% relative to placebo. Closed-loop spinal cord stimulation (SCS) improves treatment response rates to 68% compared with open-loop stimulation. Electroacupuncture at BL23/LR3 alleviates clinical symptoms in 75% of patients relative to sham acupuncture. At the 12-month follow-up, duloxetine's pain relief efficacy slightly declined from 40% to 38%, a phenomenon speculated to be linked to serotonin transporter upregulation. At the 1-year follow-up, closed-loop SCS efficacy decreases to 55%, which may be associated with secondary neural circuit re-remodeling. At the 6-month follow-up, electroacupuncture treatment carries a 22% symptom recurrence rate, which researchers hypothesize arises from secondary gut microbiota re-dysbiosis featuring reduced Prevotella abundance.<h4>Conclusion</h4>Pathological progression of concurrent CLBP and MDD relies on multi-level remodeling of molecular, cellular, and systemic biological networks. Precision interventions targeting neural circuits, neuroinflammation, and the gut-brain axis, combined with multidisciplinary clinical collaboration, represent core strategies to break through current diagnostic and therapeutic bottlenecks.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1186/s13020-026-01512-y",
+    "title": "DFGLM-TCM: an integrated knowledge-and experience-driven large language model system for Traditional Chinese Medicine practice.",
+    "authors": [
+      "Zhong R",
+      "Liu D",
+      "Dai Y",
+      "Li Z",
+      "Song Z",
+      "Li Z",
+      "Zhang L",
+      "Chen S",
+      "Su Y",
+      "Sun Y",
+      "Zhang W",
+      "Jia P",
+      "Jiang M",
+      "Gao L",
+      "Hu K."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13020-026-01512-y",
+    "abstract": "Traditional Chinese Medicine (TCM) clinical practice depends on both codified theoretical knowledge and practitioner-specific experience, which differ in their data sources, reasoning patterns, and scope of generalization. We developed DFGLM-TCM, a modular large language model-based service system that separately models these two knowledge types through task-oriented components and coordinates them within a unified multi-task architecture. The knowledge-oriented component integrated a curated 22-GB TCM corpus containing approximately 3 million structured entries, a manually validated knowledge graph with more than 200,000 entities, and retrieval-augmented generation for literature retrieval and general TCM question answering. The experience-oriented component was trained using approximately 5000 authentic outpatient records from a senior TCM practitioner and 2000 expert-reviewed augmented cases to provide practitioner-specific diagnostic and prescription references. Through standardized interfaces and role-based access, the system supports knowledge retrieval, question answering, structured consultation, and prescription reference for clinicians, patients, and students. In an expert-rated evaluation of 100 TCM knowledge questions, DFGLM-TCM achieved the highest descriptive mean score among the evaluated models (4.48 ± 0.76). In 454 independent pulmonary-nodule cases, the experience-oriented component achieved a prescription-consistency score of 8.95 ± 0.63, exceeding that of the model additionally trained with general TCM knowledge (7.52 ± 0.44). A one-month assessment involving 35 physicians at three primary-care institutions suggested favorable short-term usability and acceptance. These findings highlight the value of separating general TCM knowledge from practitioner-specific experience while coordinating task-oriented training and multi-task services within a unified system, and support further evaluation of DFGLM-TCM as an auxiliary reference tool in broader clinical settings.",
+    "matched_queries": [
+      "large language model traditional chinese medicine diagnosis dialogue"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1186/s13020-026-01505-x",
+    "title": "ShenNongDiet: a medicine diet recommendation system based on graph-semantic hybrid retrieval and evidence constraint generation.",
+    "authors": [
+      "Yan X",
+      "Guo Z",
+      "Lin N",
+      "Zhang Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13020-026-01505-x",
+    "abstract": "<h4>Background</h4>Medicinal diet, a core practice in Traditional Chinese medicine (TCM) rooted in the principle of \"medicine and food homology\", offers potential for chronic disease management and sub-health regulation. However, the broader adoption is constrained by fragmented knowledge, poor personalization, and safety risks arising from improper ingredient combinations or constitution-therapy mismatches.<h4>Objective</h4>We developed and validated ShenNongDiet, a knowledge graph (KG) and retrieval-augmented generation (RAG) system for TCM dietary recommendation that explicitly models constitution suitability and ingredient contraindications.<h4>Methods</h4>A Neo4j KG was constructed from the \"Guoyi Jinghua Yao Shan\" book series encompassing 3376 medicinal diets, 2110 ingredients, 1176 effects, 1122 population groups, 1078 symptoms, 459 diseases, 38,669 relationships. The system integrates dual-pathway retrieval (symbolic reasoning from KG + dense vector search using Qwen3-embedding-8B), RAG-based evidence packaging, and Low-Rank Adaptation (LoRA) fine-tuning of Qwen3-8B on 8509 evidence-constrained instruction samples to reduce the risk of the model generating unsupported content. A multi-scenario test set was constructed to evaluate system effectiveness and robustness.<h4>Results</h4>ShenNongDiet achieved Hit@1, Hit@3, and Hit@5 of 84.00%, 90.00%, and 92.67% respectively, with a Mean Reciprocal Rank (MRR) of 0.8778. RAGAs evaluation yielded a faithfulness score of 0.831 and context recall of 0.526. Expert human evaluation further confirmed the system's strong performance in recommendation accuracy, evidence relevance, and generation faithfulness. Ablation experiments confirmed that the hybrid architecture significantly outperformed every single retrieval channel (P < 0.001), validating the complementary benefit of the symbolic and semantic retrieval.<h4>Conclusion</h4>This study systematically constructs an explicit-semantics knowledge model of TCM medicinal diet and integrates KG reasoning with language model generation under evidence constraints. ShenNongDiet offers an expandable and safety-constrained solution for intelligent dietary services, facilitating the digital preservation of traditional dietary culture and artificial intelligence-driven personalized health management.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1097/md.0000000000050311",
+    "title": "Evidence mapping and meta-analysis of traditional Chinese medicine for postmenopausal osteoporosis.",
+    "authors": [
+      "Xi X",
+      "Yan X",
+      "Fan J",
+      "Zhang Y",
+      "Wang Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1097/md.0000000000050311",
+    "abstract": "<h4>Background</h4>Postmenopausal osteoporosis (PMOP) is a common metabolic bone disorder characterized by estrogen deficiency - induced bone loss and increased fracture risk. Traditional Chinese medicine (TCM) has demonstrated unique advantages in PMOP management, but comprehensive, standardized evidence synthesis remains limited.<h4>Methods</h4>Chinese and English databases (CNKI, Wanfang, VIP, SinoMed, PubMed, EMBASE, Web of Science, and Cochrane Library) were systematically searched up to July 31, 2024. Eligible studies included interventional, observational, and evidence-based research. Data extraction and quality assessment followed the Preferred Reporting Items for Systematic Reviews and Meta-Analyses 2020 statement. Meta-analyses were performed using RevMan 5.4 with random- or fixed-effects models depending on heterogeneity.<h4>Results</h4>A total of 319 studies were included: 232 interventional, 60 observational, 25 systematic reviews or meta-analyses, and 2 guidelines. Among 99 randomized controlled trials, TCM interventions significantly improved clinical efficacy (risk ratio = 1.22, 95% confidence interval [CI]: 1.17-1.27, I2 = 55%) and reduced pain (standardized mean difference [SMD] = -2.15, 95% CI: -2.95 to - 2.17, I2 = 96%). TCM also enhanced bone mineral density at both lumbar (SMD = 0.74, 95% CI: 0.57-0.91, I2 = 90%) and femoral sites (SMD = 0.60, 95% CI: 0.41-0.80, I2 = 89%).<h4>Conclusion</h4>TCM interventions significantly improve bone density and pain outcomes in PMOP. However, high heterogeneity and moderate methodological quality highlight the need for high-quality, standardized clinical trials integrating syndrome differentiation.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1111/jep.70568",
+    "title": "Clinical Teaching Models in Traditional Chinese Medicine: Historical Evolution and Contemporary Integration.",
+    "authors": [
+      "Liu T",
+      "Zhao P",
+      "Wu X",
+      "Rong Y",
+      "Li M."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jep.70568",
+    "abstract": "<h4>Rationale</h4>Traditional Chinese Medicine (TCM) has developed a distinctive tradition of clinical teaching shaped by historical inheritance, institutional transformation and the modernization of medical education. Among its major teaching models, the master-apprentice system, the academy system and modern clinical rotations represent three key stages in the evolution of clinical training. However, these models are often examined separately, and an integrated understanding of their historical continuity and contemporary educational significance remains limited.<h4>Aims and objectives</h4>This review aimed to examine the evolution of major clinical teaching models in TCM and to explore their implications for contemporary clinical education.<h4>Method</h4>A narrative review with a historical-analytical perspective was conducted to analyse the origins, educational characteristics, strengths, limitations and modern transformation of the master-apprentice system, the academy system and the clinical rotation model.<h4>Results</h4>The review indicates that the master-apprentice model has played a central role in transmitting tacit clinical knowledge, mentorship-based learning and individualized professional formation. The academy system promoted the institutionalization of TCM education by integrating classical learning, scholarly exchange and practical cultivation. Modern clinical rotations have strengthened structured supervision, practical competence and exposure to diverse clinical settings, making them essential to contemporary TCM education. Each model, however, also has limitations, including the low standardizability of apprenticeship, the historical constraints of academy-based teaching and the risk that overly standardized rotations may weaken the distinctive interpretive logic of TCM.<h4>Conclusion</h4>The evolution of TCM clinical teaching reflects a process of educational adaptation in which continuity and reform coexist. Future TCM clinical education should integrate mentorship, institutional learning and competency-oriented practical training to cultivate clinically competent practitioners grounded in the intellectual traditions of TCM.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1097/md.0000000000050149",
+    "title": "Traditional Chinese medicine treatment in a patient with severe COVID-19: A case report.",
+    "authors": [
+      "Zhong M",
+      "Sun S",
+      "Zhang F",
+      "Zhang W."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1097/md.0000000000050149",
+    "abstract": "<h4>Rationale</h4>Elderly patients with severe COVID-19 frequently develop chronic critical illness marked by prolonged ventilation, multidrug-resistant infections, enteral-nutrition (EN) intolerance, and persistent inflammation-immunosuppression-catabolism syndrome, making liberation from the ventilator and recovery difficult. Integrative Chinese and Western medicine (ICWM) is hypothesized to modulate immunity and the gut-lung axis and to stabilize frail physiology during long ICU courses.<h4>Patient concerns</h4>An 87-year-old man with >10-year Parkinson's disease experienced septic shock, invasive ventilation, and tracheotomy after COVID-19, prompting a request for ICWM.<h4>Diagnoses</h4>Severe pneumonia due to COVID-19 (CURB-65 score of 3); multiple organ dysfunction syndrome (respiratory failure, acute renal failure, and acute heart failure); sepsis; malnutrition; Parkinson's disease; and lower extremity venous thrombosis. The traditional Chinese medicine diagnosis was based on \"epidemic disease,\" with dampness toxin stagnation in the lung, and spleen and kidney deficiency.<h4>Interventions</h4>A multidisciplinary team delivered individualized ICWM aligned with the \"Shanghai Expert Consensus\" and the traditional Chinese medicine principle of \"benefiting qi and strengthening the body.\" Prescriptions were dynamically adjusted to syndrome evolution and to gastrointestinal tolerance, successively including Buzhong Yiqi decoction, Shenling Baizhu powder, Weijing decoction, Tounong decoction, and Shengxian decoction; when gastrointestinal absorption was limited or shock was present, intravenous Shenfu injection was added. Standard care comprised culture-guided antimicrobials, bronchoscopy-assisted secretion clearance, invasive ventilatory support, and nutrition therapy with EN. The ICWM plan was titrated specifically to address EN-intolerance diarrhea and to support nutritional rehabilitation.<h4>Outcomes</h4>After treatment, intolerance symptoms improved; sputum cultures converted to negative by ICU day 41. The patient weaned from mechanical ventilation and the tracheal tube 10 days later, and remained afebrile without productive cough, enabling discharge to home convalescence.<h4>Lessons</h4>This case highlights the need for ICWM in critically ill patients, especially in those with chronic critical illness and persistent inflammation-immunosuppression-catabolism syndrome.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.1515/jtim-2026-0078",
+    "title": "Efficacy and safety of Shulie'an capsules in treating chronic prostatitis: A multicenter, prospective, open-label clinical trial.",
+    "authors": [
+      "Yang Y",
+      "Peng J",
+      "Zhang X",
+      "Jiang T",
+      "Zhang N",
+      "Jiang H."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1515/jtim-2026-0078",
+    "abstract": "<h4>Background and objectives</h4>Chronic prostatitis is a highly prevalent urological disorder affecting millions of men globally and significantly impairing quality of life. The aim of this study was to evaluate the efficacy and safety of Shulie'an (SLA) capsules in patients with chronic prostatitis.<h4>Methods</h4>In this multicenter, prospective, open-label, self-controlled clinical trial, 100 male patients with clinically confirmed chronic prostatitis were enrolled in China. The participants received oral SLA (two capsules per dose, three times daily) for 28 days. The primary endpoint was the change in the National Institutes of Health Chronic Prostatitis Symptom Index (NIH-CPSI) total score from baseline to endpoint. Secondary endpoints included NIH-CPSI individual domain scores and disappearance rate of traditional Chinese medicine (TCM) symptoms. Safety assessments involved monitoring and recording all adverse events throughout the study period.<h4>Results</h4>After 28 days of treatment, SLA capsules exhibited significant clinical efficacy, with an overall response rate of 91.75%. The mean NIH-CPSI total score reduction was 9.2±5.82 and 15.0±6.79 points on the 14th and 28th day, respectively. Approximately 95.88% of the participants achieved more than 4-point reduction in the NIH-CPSI score from baseline after treating for 28 days. All symptom domains showed statistically significant improvements, with symptoms of pain being the most remarkable (complete resolution rate: 41.57%). Besides, after 28 days of treatment, the total TCM syndrome score of the participants significantly improved, and the treatment was considerably safe with no reported serious adverse events.<h4>Conclusion</h4>This study demonstrated that SLA capsules are a promising therapeutic option for chronic prostatitis, significantly improving clinical symptoms and quality of life with a favorable safety profile.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-11"
+  },
+  {
+    "id": "doi:10.3389/fimmu.2026.1904534",
+    "title": "Awakening antitumour immunity in the multimorbid host: a hypothesis coupling cryoablation-induced immunogenic cell death with multi-target Traditional Chinese Medicine.",
+    "authors": [
+      "Liu L",
+      "Chen H",
+      "Wang J",
+      "Yang J",
+      "Zhou Y",
+      "Luo B",
+      "Zhou Y",
+      "Hu K."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3389/fimmu.2026.1904534",
+    "abstract": "Most patients with cancer are older adults living with several other chronic illnesses, and both the tumour and its commonest companions-cardiometabolic disease, type 2 diabetes and depression-are sustained by a shared, immunosuppressive inflammatory milieu. In this setting many tumours are immunologically \"cold\": poorly infiltrated by cytotoxic T and natural killer (NK) cells, enriched for regulatory T cells (Tregs) and M2 macrophages, and embedded in a chronically inflamed \"soil\" that also drives the comorbidities. Here we advance a mechanistic hypothesis: that two low-harm modalities applied together can reawaken antitumour immunity in this host while sparing the physiological reserve that radical treatment consumes. Minimally invasive cryoablation destroys tumour <i>in situ</i> and releases tumour antigens together with damage-associated molecular patterns (calreticulin, ATP, HMGB1), driving immunogenic cell death, dendritic-cell maturation and CD8+ T-cell priming; multi-target Traditional Chinese Medicine (TCM) acts on the same inflammatory substrate-dampening NF-κB, IL-6 and TNF-α signalling, lowering lactate, and reducing regulatory-T-cell and M2 dominance-to remodel the tumour microenvironment. We propose that their convergence turns a \"cold\" microenvironment \"hot\" and, because the targeted substrate is shared, yields a one-to-many benefit that extends from the tumour to its inflammatory comorbidities. We situate this hypothesis within the three-stage Tumour Green Therapy framework-Dominant Control (<i>bà dào</i>, ), Supportive Integration (<i>wáng dào</i>, ) and Harmonisation and Maintenance (<i>dì dào</i>, )-which sequences local immunogenic debulking, systemic immune support and microenvironmental harmonisation according to tumour urgency and host constitution, and maps TCM syndrome patterns onto measurable immune and inflammatory readouts (neutrophil-to-lymphocyte ratio, CRP, IL-6/TNF-α) that could serve as biomarkers. We define the immunological phenotype of this host, specify which patients should and should not receive the approach, remain candid about its limitations-herb-drug interactions, product quality and the scarcity of randomised data-and pre-specify both a two-stage prospective test and the observations that would refute each element of the hypothesis. Its central, falsifiable claim is that cryoablation plus multi-target TCM reawakens antitumour immunity and reduces total treatment burden, including polypharmacy, without compromising survival or quality of life.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.21147/j.issn.1000-9604.2026.04.05",
+    "title": "AI agents in cancer imaging: Concepts, advances, and clinical perspectives.",
+    "authors": [
+      "Yao R."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.21147/j.issn.1000-9604.2026.04.05",
+    "abstract": "Medical imaging serves as a critical source of evidence for cancer diagnosis, treatment, and follow-up. However, most existing medical imaging artificial intelligence (AI) systems still operate on predefined tasks and inputs, limiting their ability to address the evolving needs of clinical practice and research. AI agents use foundation models as central engines for reasoning and orchestration. They organize analytical processes according to task objectives, invoke external tools and data resources, and adapt subsequent actions based on intermediate results. They may therefore facilitate a shift in cancer imaging AI from isolated model applications toward continuous workflow support. This review outlines the fundamental principles, system components, and evaluation approaches for AI agents from a cancer imaging perspective and summarizes representative advances in image interpretation, clinical decision support, and research workflows. Current evidence suggests that agents can connect previously fragmented imaging, clinical, and knowledge resources, thereby potentially improving the continuity and traceability of complex tasks. Nevertheless, clinical evidence for AI agents remains limited, as most studies have been conducted in controlled settings and have yet to demonstrate consistent value in real-world clinical workflows. Clinical translation is further constrained by the computational demands and potential error propagation inherent in multistep execution, as well as by the dependence of agent performance on specific tools, data environments, and workflow configurations. Future research should move beyond task-level performance toward system-level validation, with particular emphasis on whether agents can reliably organize information, interpret findings, and collaborate effectively with clinicians. Such evidence will be essential to clarify their practical role in cancer imaging care and research.",
+    "matched_queries": [
+      "large language model traditional chinese medicine diagnosis dialogue"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.21037/tp-2026-0205",
+    "title": "Traditional Chinese medicine combined with conventional Western medicine for chronic cough following respiratory infection in children: a systematic review and meta-analysis.",
+    "authors": [
+      "Cui S",
+      "Xie X",
+      "Yang J",
+      "Xiao Y",
+      "Wang W."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.21037/tp-2026-0205",
+    "abstract": "<h4>Background</h4>Chronic cough following respiratory infection in children is often refractory to conventional therapies. However, the current clinical evidence regarding the efficacy of traditional Chinese medicine (TCM) remains inconclusive and lacks systematic synthesis, leaving clinicians without clear guidance. This study systematically evaluated the efficacy and safety of TCM for chronic cough following respiratory infection in children to support clinical decision-making.<h4>Methods</h4>A systematic search was conducted in the Cochrane Library, PubMed, Embase, Web of Science, Wiley Online Library, China National Knowledge Infrastructure (CNKI), and Wanfang databases. Randomized controlled trials (RCTs) of TCM for chronic cough following respiratory infection in children were included. Meta-analyses were performed using RevMan 5.4 and Stata 16.0.<h4>Results</h4>A total of 23 RCTs involving 2,126 children were included. Meta-analysis demonstrated that, compared with conventional Western medical treatment alone, TCM combined with conventional treatment significantly improved the overall clinical effectiveness rate [risk ratio (RR) =1.19, 95% confidence interval (CI) (1.15, 1.24), P<0.001], shortened the time to cough resolution [mean difference (MD) =-3.19, 95% CI (-4.42, -1.97), P<0.001] and the time to disappearance of pulmonary rales [MD =-2.00, 95% CI (-2.47, -1.54), P<0.001], and significantly reduced cough symptom scores [MD =-1.32, 95% CI (-1.69, -0.95), P<0.001]. For secondary outcomes, combined TCM therapy significantly reduced TCM syndrome scores, improved immune function indicators [immunoglobulin A (IgA), immunoglobulin M (IgM), and immunoglobulin G (IgG)], and decreased levels of inflammatory biomarkers [C-reactive protein (CRP), interleukin-6 (IL-6), tumor necrosis factor-alpha (TNF-α), and monocyte chemoattractant protein-4 (MCP-4)]. No statistically significant difference was observed between groups in the incidence of adverse events.<h4>Conclusions</h4>TCM used as an adjunct to conventional Western medical treatment may provide additional benefits in improving clinical outcomes and alleviating symptoms in children with post-infectious chronic cough. However, due to limitations in study quality and heterogeneity, further high-quality, well-designed studies are warranted to strengthen the evidence base.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.1002/fsn3.72239",
+    "title": "Herbal Extracts and Plant-Derived Bioactives in Atopic Dermatitis: Evidence, Mechanisms, Pediatric Safety, and Translational Priorities.",
+    "authors": [
+      "Zeng M",
+      "Yuan Q",
+      "Huang S",
+      "Lu X."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1002/fsn3.72239",
+    "abstract": "Atopic dermatitis (AD) is a chronic, relapsing epithelial and neuroimmune disease in which barrier failure, type 2 inflammation, microbial dysbiosis, itching, metabolism, and environmental exposures reinforce one another. This review critically synthesizes clinical and preclinical evidence for herbal medicines, standardized extracts, food-derived bioactives, functional-food candidates, nutraceutical ingredients, and natural-product delivery systems in AD, with particular attention to pediatric safety. Recurrent experimental signals include attenuation of Th2 cytokines and IgE, suppression of mast-cell and IL-31-related itch pathways, restoration of filaggrin and tight-junction proteins, and modulation of MAPK/NF-κB, JAK/STAT, Nrf2/HO-1, and NLRP3 signaling. However, efficacy is not inferred from pathway changes alone. Human evidence remains heterogeneous, and apparently promising agents have failed to outperform active comparators, produced neutral microbiome results, or raised barrier and sensitization concerns. We therefore integrate four issues that are often treated separately: food sources and processing-dependent chemistry; oral bioaccessibility and food-matrix effects; gut-skin signaling and its uncertain causal direction; and compatibility with standard topical agents, cyclosporine, biologics, and JAK inhibitors. The evidence supports selected botanicals as investigational adjuncts rather than as replacements for guideline-based care. Translation requires authenticated materials, quantitative chemical fingerprints, exposure-response studies, age-appropriate safety surveillance, interaction assessment, and controlled trials using validated clinical and barrier endpoints.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.21037/tcr-2026-1075",
+    "title": "Non-small cell lung cancer and tumor-educated platelets: screening of biomarkers and construction of a prognostic model.",
+    "authors": [
+      "Zhao Y",
+      "Tang T",
+      "Li J",
+      "Chen L",
+      "Gu X",
+      "Li Q."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.21037/tcr-2026-1075",
+    "abstract": "<h4>Background</h4>Lung cancer is a leading cause of cancer-related mortality worldwide, emphasizing the urgent need for effective early detection strategies. Traditional Chinese medicine (TCM) provides a unique perspective on tumor pathogenesis, focusing on concepts such as \"long-term stasis leading to accumulation\". Tumor-educated platelets (TEPs) offer potential as biomarkers due to their ability to reflect cancer heterogeneity and facilitate less invasive diagnostic approaches. This study aims to identify TEP-related prognostic biomarkers for non-small cell lung cancer (NSCLC) and to construct and validate a multigene prognostic model by integrating platelet transcriptomic data with tumor tissue datasets.<h4>Methods</h4>We performed comprehensive analysis of gene expression datasets obtained from The Cancer Genome Atlas (TCGA) and Gene Expression Omnibus (GEO) repositories to characterize transcriptomic differences among lung cancer specimens, normal tissue samples, and TEPs. Using R software, we identified Differentially expressed genes (DEGs) and subsequently applied a multi-stage analytical pipeline to TEP-associated DEGs, incorporating univariate Cox proportional hazards regression, least absolute shrinkage and selection operator (LASSO) regression, multivariate Cox regression, and stepwise regression modeling to pinpoint genes with prognostic significance. These prognostically relevant genes served as the foundation for developing a risk stratification model. We computed individual risk scores across both training and validation cohorts, enabling patient stratification into high- and low-risk categories. Model robustness was assessed through internal cross-validation and external validation procedures, while predictive performance was quantified using risk calibration metrics and receiver operating characteristic (ROC) curve analysis.<h4>Results</h4>Through systematic bioinformatics screening, we identified a four-gene prognostic signature comprising <i>NELL2</i>, <i>C4orf48</i>, <i>PRAM1</i>, and <i>KLHL35</i>, which served as the foundation for developing our risk stratification algorithm. Rigorous internal cross-validation and external cohort validation substantiated the moderate predictive performance of this signature. Comprehensive clinicopathological correlation analysis revealed that elevated risk indices, advanced pathological staging (stage III-IV), increased primary tumor dimensions, regional lymph node metastasis, and distant organ dissemination each demonstrated statistically significant associations with diminished overall survival (OS) outcomes in lung cancer patients. The clinical nomogram exhibited acceptable calibration, with calibration plots showing reasonable concordance between predicted and observed survival probabilities across all time points. Discriminative capacity assessment via time-dependent ROC analysis yielded area under the curve (AUC) values consistently surpassing 0.6, confirming moderate prognostic discrimination. Furthermore, decision curve analysis (DCA) demonstrated that our integrated multi-gene model conferred potential net clinical benefit compared to individual prognostic variables across the full spectrum of clinically relevant threshold probabilities (0-1 range), thereby establishing its potential utility for risk-informed clinical decision-making.<h4>Conclusions</h4>This study identified <i>NELL2</i>, <i>C4orf48</i>, <i>PRAM1</i>, and <i>KLHL35</i> as candidate TEP-related prognostic biomarkers for non-small cell lung cancer (NSCLC). The developed prognostic model shows preliminary potential for patient stratification, but its clinical application, particularly as a platelet-based liquid biopsy tool, requires further validation in independent TEP-based cohorts.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-14"
+  },
+  {
+    "id": "doi:10.3390/healthcare14172778",
+    "title": "Integrative Rehabilitation for War-Related Polytrauma: A Narrative Review of Multidimensional Strategies and Implementation Challenges.",
+    "authors": [
+      "Sun J",
+      "Hirushan YMRC",
+      "Randula H",
+      "Zhang W",
+      "Wu Q",
+      "Han J."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/healthcare14172778",
+    "abstract": "<h4>Objective</h4>Modern high-intensity warfare, such as the Russo-Ukrainian conflict, generates a high incidence of multisystem polytrauma, blast-induced traumatic brain injury, and limb amputations often complicated by post-traumatic stress disorder and chronic pain. Traditional specialised rehabilitation protocols are structurally inadequate for these co-occurring symptoms and rely heavily on medical treatments, increasing the risk of opioid dependency. The primary aim of this review is to conceptualise a multidimensional integrative framework for war-related polytrauma; a secondary aim is to evaluate and summarise the evidence underpinning its key rehabilitation strategies for limited-resource, post-conflict environments.<h4>Methods</h4>This narrative review synthesises evidence identified through targeted database searches and purposive selection guided by clinical relevance, methodological quality, and applicability to war-related polytrauma across physical, technological, and non-pharmacological rehabilitation domains. Evidence was evaluated using a four-tier (A-D) hierarchy, comprising Tier A (systematic reviews and RCTs), Tier B (prospective cohort studies and non-randomised controlled trials), Tier C (descriptive, case-series, and retrospective studies), and Tier D (exploratory, mechanism-based, or expert opinion evidence). No systematic inclusion/exclusion protocol was applied, and no claims of comprehensive search coverage are made.<h4>Results</h4>Concurrent physical and trauma-focused psychological rehabilitation, evidenced by reduced pain and psychological symptom burden alongside improved functional independence, is supported by high-quality evidence (Tier A) for managing comorbid polytrauma. Robotic exoskeletons and AI-supported tele-rehabilitation demonstrate dose-dependent motor benefits in selected rehabilitation populations (Tier A-B), but their scalability in wartime settings is contingent on electricity supply, connectivity, equipment maintenance, and trained personnel. Acupuncture shows Tier A evidence for neuropathic pain and Tier B cost-effectiveness; evidence for phantom limb pain and PTSD is preliminary (Tier C-D) and requires dedicated RCTs in veteran populations. Ayurvedic herbal interventions are exploratory (Tier C-D) with no war-specific clinical trials; mechanistic plausibility is discussed as hypothesis-generating only.<h4>Conclusions</h4>Addressing the war-related rehabilitation gap requires integration of biomedical care, technology-assisted rehabilitation, and evidence-graded non-pharmacological adjuncts within a structured biopsychosocial framework. Future priorities include pragmatic, adapted trial designs (e.g., stepped-wedge or cohort-embedded designs, which are more feasible than classical RCTs under wartime conditions) for acupuncture in phantom limb pain, feasibility trials for robotic rehabilitation in frontline-adjacent facilities, and health-economic modelling adapted to the Ukrainian context.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-18"
+  },
+  {
+    "id": "doi:10.2196/104092",
+    "title": "Fine-Tuning, Retrieval-Augmented Generation, and Hybrid Adaptation of Language Models for Clinical Decision-Making in Health Care: Systematic Review.",
+    "authors": [
+      "Patel A",
+      "Khand Y",
+      "Vallamchetla SK",
+      "Li P",
+      "Tao C",
+      "Cheung J."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/104092",
+    "abstract": "<h4>Background</h4>Large language models (LLMs) demonstrate strong performance on medical knowledge benchmarks, but their safe and effective use in clinical practice depends on posttraining adaptation rather than raw model capability. Fine-tuning, retrieval-augmented generation (RAG), and hybrid approaches are principal strategies for grounding language models in clinical evidence, yet their comparative effectiveness remains unclear.<h4>Objective</h4>This systematic review aims to synthesize evidence on fine-tuning, RAG, and hybrid posttraining strategies for clinical diagnosis and decision-support tasks and to identify strategy-task alignments and methodological features associated with improved performance.<h4>Methods</h4>We conducted a systematic review in accordance with PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) 2020 guidelines. PubMed/MEDLINE, Scopus, and Web of Science were searched from January 2018 through May 2026. Eligible studies evaluated transformer-based language models that underwent posttraining adaptation, retrieval augmentation, or both for clinical decision support, diagnosis, triage, risk stratification, or related health care applications. Studies evaluating nonadapted models, non-language-model AI systems, prompt engineering without performance evaluation, or nonclinical applications were excluded. Data extracted included model architecture, adaptation strategy, clinical domain, validation approach, and performance outcomes. Risk of bias was assessed using PROBAST+AI (Prediction model Risk of Bias Assessment Tool for AI). Studies were grouped according to the primary enhancement strategy (fine-tuning or parameter-efficient fine-tuning, RAG, or hybrid approaches), and findings were synthesized descriptively.<h4>Results</h4>Of 1890 identified records, 35 studies published between 2024 and 2026 met eligibility criteria. Enhancement strategies included RAG (17/35, 48.6%), fine-tuning or parameter-efficient fine-tuning (7/35, 20%), and hybrid approaches (11/35, 31.4%). Studies included diverse specialties from oncology, neurology, radiology, mental health, cardiology, ophthalmology, and surgical care. Fine-tuning demonstrated strong performance for task-specific applications, achieving area under the receiver operating characteristic curve values up to 0.912 for cancer detection and area under curve of 0.892 for major depressive disorder prediction, while matching clinician-level diagnostic performance in several studies. RAG improved guideline adherence and diagnostic accuracy, with increases from 71.1% to 92.1% and from 78.9% to 94.7% in guideline-based decision-support tasks. However, benefits were inconsistent across larger reasoning-capable models. Hybrid systems generally achieved the strongest performance in complex clinical workflows, with external validation accuracies exceeding 90% in stroke triage, dermatology, multimodal imaging, and oncology applications. Risk-of-bias assessment identified substantial methodological limitations, with 25 studies judged as high risk, 9 as unclear risk, and only 1 as low risk overall. Common concerns included inadequate external validation, lack of calibration assessment, nonrepresentative participant selection, and insufficient reporting of analytical methods.<h4>Conclusions</h4>Adaptation strategies should align with task needs, using fine-tuning for narrow classification, RAG for guideline-grounded reasoning, and hybrid approaches for complex multimodal tasks. However, the evidence base remains largely retrospective or benchmark-based. Prospective studies with external validation, calibration, and standardized safety reporting are needed before broader clinical use.",
+    "matched_queries": [
+      "chain of thought reasoning traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-19"
+  },
+  {
+    "id": "doi:10.1007/s10620-026-10134-1",
+    "title": "The Potential of Complementary and Alternative Therapies in Improving Diarrhea-Predominant Irritable Bowel Syndrome: Strategies for Long-Term Efficacy.",
+    "authors": [
+      "Deng Y",
+      "Ao X",
+      "Liang X",
+      "Hao W",
+      "Liu Y",
+      "Zhao L",
+      "Li Z",
+      "Chen S."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1007/s10620-026-10134-1",
+    "abstract": "Diarrhea-predominant irritable bowel syndrome (IBS-D) is a common disorder of gut-brain interaction. Current therapeutic approaches frequently fail to provide sustained symptom relief. In recent years, complementary and alternative therapies-particularly traditional Chinese medicine, acupuncture, and dietary interventions-have attracted increasing attention due to their low side-effect profiles and are gradually becoming important adjunct strategies in the management of IBS-D. This review systematically summarizes the research advances of the past decade across these three therapeutic categories for IBS-D with a focus on their clinical efficacy and underlying mechanisms. The findings suggest that traditional Chinese medicine, acupuncture, and dietary interventions can provide sustained relief from core symptoms of IBS-D, including diarrhea and abdominal pain. Their therapeutic effects are mediated through multiple mechanisms, including modulation of the gut microbiota and its metabolites, restoration of intestinal mucosal barrier integrity, attenuation of visceral hypersensitivity, and regulation of the gut-brain axis. These therapies exhibit multi-target and systemic effects with a low incidence of adverse events, highlighting their promising clinical potential. They offer feasible strategies for achieving long-term remission and facilitating personalized management of IBS-D.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-21"
+  },
+  {
+    "id": "doi:10.1186/s13020-026-01490-1",
+    "title": "FuTCM-PDD: a multi-level information fusion framework integrating KAN modeling and AutoML for phenotype-based drug discovery from Traditional Chinese Medicine.",
+    "authors": [
+      "Wang Z",
+      "Liu Y",
+      "Ren Y",
+      "Li Q",
+      "Tian J",
+      "Yu B",
+      "Zhu Y",
+      "Wang J",
+      "Li M",
+      "Qiao L",
+      "Zhang Y."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1186/s13020-026-01490-1",
+    "abstract": "Phenotype-based drug discovery has attracted increasing attention due to its critical role in first-in-class drug development and higher clinical translation rates. Chinese Materia Medica (CMM), with its emphasis on properties and efficacies, provides a unique framework for phenotype-oriented therapeutic discovery. We developed an AI-driven framework, FuTCM-PDD, that integrates CMMs, compounds, targets, pathways, pharmacological effects, CMM efficacies, and CMM properties to enable phenotype-based drug discovery. For drug-target interaction (DTI) prediction, a Kolmogorov-Arnold Network (KAN) model with circle loss optimization was established, outperforming the best baseline by 16.14% in Recall@10 and validated by literature, databases, and molecular docking. In addition, an Automated Machine Learning (AutoML) framework integrating 168 machine learning algorithms was implemented using pharmacological effects to predict CMM properties and efficacies. By integrating model predictions of targets, pharmacological effects, properties, and efficacies, covering 809,645 associations across 7141 CMM herbs, 30,731 compounds, 4321 targets, 40 pharmacological effects, 18 properties, and 18 efficacies, we constructed a multi-layer biological network centered on CMM properties and efficacies. The integrative network was validated via randomization analyses, establishing its biological significance and enabling quantitative mappings across CMM herbs, compounds, targets, pharmacological effects, and CMM phenotypic concepts through network-topology metrics, information-flow modeling, and randomized perturbation embedding. Using an approach distinct from conventional network pharmacology, the FuTCM-PDD identified a lipid-lowering pharmacological effect of Notopterygii Rhizoma et Radix (NRR, Qianghuo) and its active compounds, which were experimentally validated using an in vitro hepatic steatosis model. FuTCM-PDD provides an AI-assisted framework for phenotype-based discovery of potential drug candidates from CMM through multi-level data fusion, helping move beyond the recurrent prioritization of commonly reported associations in conventional network pharmacology and supporting the identification of pharmacologically relevant candidate compounds associated with specific phenotypic contexts.",
+    "matched_queries": [
+      "multi-label symptom syndrome classification traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-23"
+  },
+  {
+    "id": "doi:10.2196/85825",
+    "title": "Symptom Terminology Normalization in Traditional Chinese Medicine: Development and Evaluation of a 2-Stage Deep Learning Framework Based on Fine-Grained Semantic Classification.",
+    "authors": [
+      "Yao J",
+      "Gou X",
+      "Lai W",
+      "Gao Y",
+      "Wang S",
+      "Zhou C",
+      "Ye H",
+      "Tian J",
+      "Yi J",
+      "Cao D."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/85825",
+    "abstract": "<h4>Background</h4>Due to the heterogeneity of symptom terminology and the lack of industry standards, the same symptom is often described using multiple expressions. Current normalization approaches struggle to comprehensively retrieve standard terms when a raw term maps to multiple symptoms.<h4>Objective</h4>This study aimed to address the lack of industry standards for traditional Chinese medicine (TCM) symptom terminology. This study proposed the split-then-concatenate normalization framework (STC-NF), a novel approach based on fine-grained semantic classification and a 2-stage deep learning architecture that uses electronic medical records (EMRs) as the data source.<h4>Methods</h4>This study proposed a 2-stage deep learning framework, \"split-then-concatenate.\" In the splitting stage, TCM symptom entities were categorized into 12 fine-grained semantic labels, and 3 named entity recognition (NER) models were trained to extract TCM symptom terminology from EMRs. In the concatenation stage, standard terms with the same concept as raw terms were identified using a Bidirectional Encoder Representations from Transformers (BERT)-based binary classification model. The standard terms with specific semantic labels were concatenated and reordered according to predefined rules to output structured text, thereby normalizing TCM symptom terminology.<h4>Results</h4>The proposed STC-NF model achieved an accuracy of 91.4% (180/197) and an <i>F</i><sub>1</sub>-score of 360 out of 389 (92.5%) on the single-implication test set. For multi-implication terms, STC-NF achieved an accuracy of 84.3% (311/369) and an <i>F</i><sub>1</sub>-score of 1958 out of 2316 (84.5%), outperforming sequence generation in accuracy by 33.1 percentage points. On the mixed test set containing both single- and multi-implication terms, STC-NF achieved an accuracy of 88.1% (990/1124) and an <i>F</i><sub>1</sub>-score of 3862 out of 4385 (88.1%), exceeding the best-performing baseline model, multi-task candidate generator (MTCG), by 16.7 and 22.2 percentage points in accuracy and <i>F</i><sub>1</sub>-score, respectively.<h4>Conclusions</h4>In this study, we verified that the fine-grained semantic classification and the 2-stage \"split-then-concatenate\" framework effectively improved performance of named entity recognition and entity alignment, providing an improved approach to normalizing TCM symptom terminology.",
+    "matched_queries": [
+      "traditional chinese medicine syndrome differentiation decision tree"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "doi:10.2196/100063",
+    "title": "Longitudinal Digital Phenotyping of Traditional Chinese Medicine Constitution From Routine Health Examination Records: Retrospective Clinical Informatics Study.",
+    "authors": [
+      "Huo Y",
+      "Deng G",
+      "Kang L",
+      "Qin H",
+      "Xiao L",
+      "Deng Y",
+      "Chen X",
+      "Ding D",
+      "Wang F",
+      "Zhang M",
+      "Chen M."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.2196/100063",
+    "abstract": "<h4>Background</h4>Traditional Chinese medicine (TCM) constitution is a structured health state taxonomy used in preventive care, but its relationship with routinely collected health examination data, disease-related markers, and longitudinal change remains difficult to interpret in clinical informatics settings.<h4>Objective</h4>This study aimed to develop and evaluate a longitudinal clinical informatics framework for characterizing TCM constitution as a computable, explainable, record-based phenotype using routine health examination records.<h4>Methods</h4>We conducted a retrospective longitudinal analysis of 47,417 examination-constitution records from 11,355 older adults examined between 2017 and 2026. Baseline analyses used the first available record per participant, and longitudinal analyses used 32,648 pairs of adjacent annual visits. The framework included bidirectional disease-constitution mapping, nonoverlapping multimarker burden modeling, lagged next-visit association models, constitution-state transition analysis, and temporal evaluation of routine examination-based label prediction models. Additional sensitivity analyses evaluated participant overlap across calendar-year splits, participant-disjoint temporal evaluation, BMI-only and BMI-plus-waist baselines, exclusion of anthropometric predictors, adiposity adjustment of longitudinal models, and new-onset and persistence outcomes.<h4>Results</h4>Phlegm-dampness showed the clearest record-based signature and was associated with higher cardiometabolic marker burden than balanced constitution (incidence rate ratio 1.65, 95% CI 1.60-1.70). In lagged models, its associations with a subsequent abdominal ultrasound abnormality flag and cardiometabolic risk clustering persisted after BMI adjustment, whereas associations with diabetes-related markers, proteinuria, dyslipidemia, and glucose abnormalities were substantially attenuated. Of 11,355 participants, 8122 appeared in at least 2 original calendar-year splits. In a participant-disjoint temporal sensitivity analysis with 1054 new test participants, extreme gradient boosting (XGBoost) identified phlegm-dampness label presence with an area under the receiver operating characteristic curve of 0.927 (95% CI 0.912-0.941). A BMI-only model achieved 0.923 (95% CI 0.907-0.938), whereas XGBoost without anthropometric predictors achieved 0.685 (95% CI 0.653-0.717).<h4>Conclusions</h4>Routine health examination data captured a reproducible, predominantly adiposity-centered phlegm-dampness label phenotype in this cohort of older adults. High discrimination was retained in participant-disjoint evaluation but was nearly matched by the BMI-only model, and several longitudinal associations were explained by adiposity. The models should therefore be interpreted as decision-support and communication aids for an existing constitution assessment process and not as stand-alone diagnostic systems or comprehensive classifiers of TCM constitution.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "arxiv:2609.25715",
+    "title": "LingLan: An Advancing Traditional Chinese Medicine Diagnosis LLM with Multimodal Data",
+    "authors": [
+      "Zheng Chen",
+      "Zhicheng Du",
+      "Haoxuan Li",
+      "Yingshan Liang",
+      "Peiwu Qin"
+    ],
+    "year": "2026",
+    "source": "arXiv",
+    "url": "https://arxiv.org/abs/2609.25715v1",
+    "abstract": "Though artificial intelligence (AI) increasingly transforms modern medicine, its integration into Traditional Chinese Medicine (TCM) has been relatively slow, primarily due to TCM's reliance on holistic, subjective diagnostic methods---namely Inspection, Auscultation and Olfaction, Inquiry, and Palpation(I-AOI-P)---which are difficult to align with quantitative, standardized medical systems. In this work, we introduce a Unification Framework for Multimodal Data (UFMD), which automatically processes tongue and pulse images into structured, clinically standard descriptions, integrating multi-source diagnostic information into a unified digital record of I-AOI-P process. Building on this structured data, we create LingLan-14B, a TCM-specific large language model fine-tuned via supervised learning to emulate the diagnostic logic and workflow of I-AOI-P process. Experimental results show that our method significantly enhances diagnostic accuracy, achieving a relative improvement of 103.5% over the baseline (62.72% vs. 30.82%) and reaching an F1-score of up to 82%.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "arxiv:2609.33014",
+    "title": "TCMQA: A 38K-Question Traditional Chinese Medicine Benchmark with a Licensed-Practitioner Reference",
+    "authors": [
+      "Tzu-Heng Huang",
+      "Jet Lin",
+      "Eric Lin"
+    ],
+    "year": "2026",
+    "source": "arXiv",
+    "url": "https://arxiv.org/abs/2609.33014v1",
+    "abstract": "Medical benchmarks for language models are built almost entirely on Western biomedicine. Traditional Chinese Medicine (TCM) is a separate system, with its own diagnostic framework and its own literature, and it remains largely unmeasured. The few TCM evaluations that exist are small, narrow, and rarely paired with a human reference. We present TCMQA, an open benchmark of 38,279 questions from Chinese TCM licensing examinations, paired with 15,151 responses from 101 licensed practitioners. We evaluate 29 instruction-tuned models from 9 families, spanning 0.27B to 14.8B parameters. Accuracy ranges over 59 points, and no model approaches saturation. Pretraining data predicts TCM ability far better than scale: a 12B Western-pretrained model reaches 39.6%, while a Chinese-pretrained model an eighth its size reaches 60.8%. Nine models exceed the practitioner majority vote of 64.9%, the best by 21.8 points, and all nine come from that same Chinese-pretrained family. Yet difficulty does not transfer between models and practitioners: accuracy is flat across practitioner-rated difficulty, item-level agreement is near zero for all 29 models, and on $8.4\\%$ of items the practitioners are correct where the leading model is wrong. We release the corpus, the practitioner responses, the harness, and per-item model outputs at https://huggingface.co/datasets/TechTCM/TCMQA.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "doi:10.3390/ijms27188320",
+    "title": "Advances in Research on &lt;i&gt;Panax Ginseng&lt;/i&gt;-Derived EV-like Particles.",
+    "authors": [
+      "Yan Q",
+      "Sun T",
+      "Wang E."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/ijms27188320",
+    "abstract": "<i>Panax ginseng</i>-derived EV-like particles (PG-EVLPs) are nanoscale lipid bilayer vesicles extracted from ginseng roots, stems, leaves, or cell cultures, with diameters typically between 50 and 200 nm. Available preclinical studies have demonstrated that PG-EVLPs exhibit favorable in vitro and in vivo biocompatibility and short-term safety, without obvious hemolysis, cytotoxicity or organ damage, making them an active area of research at the intersection of traditional Chinese medicine and nanomedicine. This review covers separation and purification methods, physicochemical characterization techniques, bioactive component composition, and pharmacological mechanisms of PG-EVLPs. It also evaluates several delivery strategies, including natural nanocarrier delivery, engineering modification, and hydrogel composite systems, and discusses current challenges in standardization, safety assessment, and clinical translation.",
+    "matched_queries": [
+      "adaptive symptom questionnaire traditional chinese medicine"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "arxiv:2609.17544",
+    "title": "Large Language Models Versus Physicians in Traditional Chinese Medicine: A Real-World Clinical Case Evaluation",
+    "authors": [
+      "Jiacheng Xie",
+      "Xiaoting Tang",
+      "Yang Yu",
+      "Jinpu Li",
+      "Shouli Li",
+      "Congcong Jing",
+      "Yantao Yang",
+      "Zhiyong Zhao",
+      "Ziyang Zhang",
+      "Qilin Song",
+      "Guanghui An",
+      "Dong Xu"
+    ],
+    "year": "2026",
+    "source": "arXiv",
+    "url": "https://arxiv.org/abs/2609.17544v1",
+    "abstract": "Large language models (LLMs) are increasingly being explored for clinical applications, yet their assessment for real-world traditional Chinese medicine (TCM) practice remains limited We constructed a clinical case library comprising 349 de-identified outpatient cases from 62 hospitals and evaluated 16 LLMs and a comparator cohort of 60 practicing TCM physicians using 60 representative cases selected from this library. Model outputs and physician reports were anonymized and scored by five senior TCM experts across nine diagnostic and therapeutic dimensions. Cutting-edge general-purpose LLMs achieved higher expert scores than the physician comparators, particularly for medical advice, treatment principles and selected diagnostic tasks. However, prescription-level analyses revealed discrepancies in herb selection, dosage, and treatment strategy, and qualitative safety review identified hallucinations and undesirable template-driven outputs. These findings highlight the potential of LLMs for TCM decision support while underscoring the need for physician oversight, safety constraints and prospective clinical evaluation.",
+    "matched_queries": [
+      "large language model traditional chinese medicine diagnosis dialogue"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "arxiv:2609.25712",
+    "title": "TCMaster: Confidence-Aware Querying and Workload-Guided Physical Design for Multi-Source Traditional Chinese Medicine Knowledge Graphs",
+    "authors": [
+      "Zheng Chen",
+      "Yuzhu Li",
+      "Haoxuan Li",
+      "Zhongde Zhang",
+      "Lianshun Jin",
+      "Peiwu Qin"
+    ],
+    "year": "2026",
+    "source": "arXiv",
+    "url": "https://arxiv.org/abs/2609.25712v1",
+    "abstract": "Multi-source knowledge graphs (KGs) need query mechanisms that expose reliability and exploit domain structure. This paper presents TCMaster, a property-graph query substrate for confidence-aware traversal and workload-guided physical design over Traditional Chinese Medicine KGs. TCMaster integrates pharmacopoeias, prescriptions, molecular databases, and LLM-extracted micro-semantics into a KG with approximately 221K entities and 723K base edges. It annotates edges with provenance-level confidence, rewrites Cypher queries with confidence predicates, ranks multi-hop paths under PRODUCT, MIN, or weighted-average policies, and uses ontology skew through direction selection, herb-attribute bitmaps, and materialized shortcut edges. On Neo4j, direction selection improves attribute lookup by a factor of 1.47, shortcuts accelerate high-fanout target counting by a factor of 4.42, confidence filtering removes 39.3 percent of low-quality heterogeneous paths, and KG retrieval improves TCMbench QA accuracy by 20.0 percentage points.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-29"
+  },
+  {
+    "id": "doi:10.3390/healthcare14183011",
+    "title": "Representing Traditional East Asian Medicine in International Health Informatics Standards: A Scoping Review.",
+    "authors": [
+      "Lee S",
+      "Woo Y",
+      "Lee S."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/healthcare14183011",
+    "abstract": "<h4>Background/objectives</h4>Traditional East Asian medicine (TEAM), comprising traditional Korean medicine (TKM), traditional Chinese medicine (TCM), and Japanese Kampo, is increasingly recorded in electronic health records, and sharing these data depends on interoperability standards. Yet, TEAM concepts rest on conceptual foundations differing from those of biomedical standards. Prior reviews examined traditional medicine's own systems, not how TEAM concepts fit into mainstream biomedical standards. This review examined how TEAM concepts have been mapped or modeled into international health informatics standards.<h4>Methods</h4>Following JBI methodology and PRISMA-ScR guidelines with a Population, Concept, and Context framework, we searched PubMed, Embase, Scopus, and IEEE Xplore for English reports from January 2016 to March 2026, with gray literature and citation searching. Screening was conducted by a single reviewer with senior verification and a 10% inter-rater reliability check. Findings were synthesized descriptively by functional category and clinical object type.<h4>Results</h4>Of 16,763 records, 10 studies (2017 to 2026) were included; seven addressed TCM, three TKM, and none Kampo. Terminology work predominated, most often SNOMED CT, UMLS, and MeSH. The OMOP Common Data Model was the only data model, and no exchange standard such as HL7 FHIR appeared. Representability followed a gradient by clinical object type: acupuncture points anchored directly to terminologies, whereas only 1 of 260 ICD-11 Chapter 26 patterns had a SNOMED CT equivalent. Symptoms and disorders fit only partially, and compound herbal medicines required extension or decomposition. Most studies supplemented standards locally, and none of their additions were incorporated into a released standard.<h4>Conclusions</h4>The work identified here has centered on establishing shared meaning rather than moving data between systems, and because supplementation stays external, the same gaps recur. Because the search covered only English-language, internationally indexed reports, these findings, including the absence of Kampo, reflect internationally visible work rather than the full literature published in Chinese, Korean, and Japanese national databases. Priorities are upstreaming TEAM content, encoding it in exchange standards, and building dedicated content for patterns.",
+    "matched_queries": [
+      "traditional chinese medicine knowledge graph syndrome differentiation"
+    ],
+    "first_seen": "2026-09-29"
   }
 ]
