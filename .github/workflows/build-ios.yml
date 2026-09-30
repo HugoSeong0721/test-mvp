@@ -72,8 +72,12 @@ jobs:
           # HTTPS 만 쓰므로 수출 규정 질문(암호화)에 매번 답하지 않아도 되게
           $PB -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST"
 
+          # ios/Podfile 은 flutter create 가 아니라 플러그인 등록(pub get) 때 생긴다
+          flutter pub get
           # 광고 SDK 최소 iOS 13
-          sed -i '' -E "s/^#? *platform :ios, '[0-9.]+'/platform :ios, '13.0'/" ios/Podfile
+          if [ -f ios/Podfile ]; then
+            sed -i '' -E "s/^#? *platform :ios, '[0-9.]+'/platform :ios, '13.0'/" ios/Podfile
+          fi
 
           # 앱 아이콘 (assets/icon → ios/Runner/Assets.xcassets)
           dart run flutter_launcher_icons
