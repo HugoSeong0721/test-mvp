@@ -128,7 +128,8 @@ AdMob 콘솔의 "Payment setup incomplete" 는 수익이 생기기 전까지는 
 
 ### 맥에서 App Store 에 올리기 (Apple Developer 가입 후)
 
-준비: Apple Developer Program 가입($99/년, 본인 Apple ID) · 맥에 Xcode(App Store) · Flutter · CocoaPods(`sudo gem install cocoapods`).
+준비: Apple Developer Program 가입($99/년, 본인 Apple ID) · 맥에 Xcode(App Store) · Flutter.
+(플러그인은 Swift Package Manager 로 붙어 CocoaPods 는 필요 없다. `ios/` 는 CI 가 이미 만들어 두었다.)
 
 ```
 git pull
