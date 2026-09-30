@@ -3877,5 +3877,103 @@
       "traditional chinese medicine knowledge graph syndrome differentiation"
     ],
     "first_seen": "2026-09-29"
+  },
+  {
+    "id": "doi:10.3390/healthcare14183077",
+    "title": "Evaluating Acupuncture for Chemotherapy-Induced Peripheral Neuropathic Pain: A Narrative Review of Clinical Evidence and Mechanistic Perspectives.",
+    "authors": [
+      "Sousa P",
+      "Deus M",
+      "Pedrosa M",
+      "Rodrigues JM",
+      "Pereira F",
+      "Criado MB",
+      "Machado JP",
+      "Moreira A."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.3390/healthcare14183077",
+    "abstract": "<h4>Background/objectives</h4>Despite the high prevalence of chemotherapy-induced peripheral neuropathic pain (CIPNp), its management remains challenging, and reliable preventive strategies are still lacking. Current treatment is largely symptomatic and often provides only modest benefits, as available pharmacological therapies have shown limited and inconsistent efficacy. In this context, acupuncture has been investigated as a non-pharmacological intervention, but the certainty and clinical applicability of the available evidence remain unclear. This critical narrative review examines the clinical evidence, mechanistic plausibility, and current research gaps concerning acupuncture for CIPNp.<h4>Methods</h4>A non-systematic narrative review was conducted with preference given to peer-reviewed articles published in English, including clinical trials, systematic reviews, meta-analyses, clinical guidelines, mechanistic studies, and narrative reviews considered relevant to the objectives. Publications were not selected according to a predefined systematic protocol, and no formal quality assessment, risk-of-bias analysis, or meta-analysis was performed. The extracted information was organized thematically rather than quantitatively.<h4>Results</h4>Clinical trials and evidence syntheses suggest that acupuncture may be associated with reductions in pain and sensory symptoms in some patients with CIPN. However, confidence in these findings is limited by small samples sizes, heterogeneous acupuncture protocols, variable comparators and outcome measures, and limited long-term follow-up. Much of the proposed mechanistic rationale derives from animal models or human studies in non-CIPN pain conditions.<h4>Conclusions</h4>Acupuncture may be considered a monitored adjunctive option for selected patients with persistent CIPNp. More rigorous and adequately powered trials are required to determine efficacy, optimal treatment protocols, durability of benefit, and potential treatment-response modifiers.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-30"
+  },
+  {
+    "id": "doi:10.1111/jep.70621",
+    "title": "Duagnosis: Locating Clinical Uncertainty in the Diagnostic Framework.",
+    "authors": [
+      "Hanaoka K",
+      "Miyamori D",
+      "Ogawa-Ochiai K."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jep.70621",
+    "abstract": "<h4>Rationale, aims and objectives</h4>Clinical reasoning research has predominantly operated within a single epistemological system. The prevailing response to clinical uncertainty in primary care has been to cultivate tolerance, embrace ambiguity, or learn to navigate it: each treats uncertainty as inherent to the encounter. We propose a complementary move. Much of what is called clinical uncertainty may be attributed less to the patient's condition than to the reach of the diagnostic framework through which the clinician reasons. We introduce the concept of duagnosis (dual + gnosis, 'knowing'): the clinical cognition in which two independent diagnostic systems are simultaneously activated within a single clinician's reasoning.<h4>Methods</h4>Conceptual analysis proceeding through concept definition, differentiation from neighbouring frameworks, development of the epistemological argument, and institutional comparison across East Asia. The analysis draws on clinical reasoning research, the philosophy of medicine, evidence on the care of persistent physical symptoms, and comparative scholarship on traditional medicine.<h4>Results</h4>The core contribution is epistemological: what one framework cannot formulate may resolve into a recognisable, actionable pattern in another, so that uncertainty is partly a property of the framework and not only of the patient. Duagnosis can be stated in two versions: a broad sense continuous with family medicine's plural readings of the patient, and a strict sense in which the criteria of evidence themselves change. An East Asian institutional comparison shows that Japan's unified medical licence locates diagnostic duality within individual clinician cognition for every physician, a capacity medical education has not cultivated.<h4>Conclusion</h4>Expanding the diagnostic repertoire, not merely tolerating uncertainty, can reduce the proportion of presentations for which no clinical formulation exists. Locating uncertainty partly in the reach of the framework, rather than in the patient, is a reframing that applies beyond any one health system, with implications for communication and referral.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-30"
+  },
+  {
+    "id": "doi:10.1111/jebm.70162",
+    "title": "AI-Assisted Literature Mining Reveals Spatiotemporal Heterogeneity and Progression Trajectories of Traditional Chinese Medicine Syndromes in Coronary Heart Disease in China.",
+    "authors": [
+      "Che Q",
+      "Song T",
+      "Gong Z",
+      "Wang C",
+      "Liu B",
+      "Hu M",
+      "Liang N",
+      "Zhang H",
+      "Li H",
+      "Zeng Q",
+      "Chen L",
+      "Leng Y",
+      "Cao X",
+      "Wan J",
+      "Guo J",
+      "Shi N."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jebm.70162",
+    "abstract": "Despite the centrality of syndrome differentiation in guiding personalized traditional Chinese medicine (TCM) interventions for coronary heart disease (CHD), existing studies of TCM syndrome distribution are constrained by fragmented methodologies and limited spatiotemporal resolution. In this study, we employed an artificial intelligence (AI)-assisted literature mining framework combined with statistical and pattern-mining analyses to characterize the spatiotemporal patterns and evolutionary dynamics of CHD syndrome elements across China. We mined data from 651 peer-reviewed publications reporting 234,656 CHD patients, published between January 2000 and December 2023. A customized constrained Sequential PAttern Discovery using Equivalence classes algorithm was applied to quantify syndrome transition trajectories, while hierarchical clustering integrated with similarity-matrix heatmaps was utilized to detect syndrome co-occurrence patterns. Analyses were stratified by four disease stages, six geographic regions and three periods (2000-2009, 2010-2019, post-2020). Meta-analysis and clustering results revealed that blood stasis, qi deficiency and phlegm emerged as conserved core syndrome elements across all stages, dynamically interacting with qi-yin dual deficiency and phlegm-turbidity as the disease progressed. Geospatial analysis identified a Northern China predominance of qi stagnation-blood stasis, whereas humid subtropical regions exhibited accelerated phlegm-stasis synergy. Temporal analysis uncovered a paradigm shift toward blood stasis-phlegm synergy, coinciding with modern dietary transitions and sedentary lifestyle trends. By leveraging AI-driven methodologies, this study reveals the spatiotemporal heterogeneity of CHD syndrome patterns and underscores the necessity for geographically personalized and temporally adaptive TCM therapeutic strategies for CHD management.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-30"
+  },
+  {
+    "id": "doi:10.1111/jebm.70151",
+    "title": "Evidence Map Analysis on Randomized Controlled Trials: Chinese Patent Medicines and Classic Traditional Chinese Medicine Prescriptions.",
+    "authors": [
+      "Wu X",
+      "Zhang Y",
+      "Zhao J",
+      "Hu H",
+      "Fauci AJ",
+      "Lee MS",
+      "Sang Z",
+      "Li D",
+      "Qin N",
+      "Sun T",
+      "Yu J",
+      "Shi M",
+      "Zhang B",
+      "Zhang J",
+      "Ji Z."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jebm.70151",
+    "abstract": "<h4>Objectives</h4>To evaluate the status and methodological quality of randomized controlled trials published in 2024 on Chinese patent medicines and Classic Traditional Chinese Medicine Prescriptions, providing evidence for clinical practice and policy.<h4>Methods</h4>We systematically searched multiple Chinese and English databases and trial registries for randomized controlled trials (RCTs) on Chinese patent medicines (CPMs) and Classic Traditional Chinese Medicine Prescriptions (CTCMPs) published in 2024. Two researchers independently screened studies, extracted data, and assessed methodological quality using the Cochrane RoB tool. Inter-rater reliability was evaluated using Kappa statistics and intraclass correlation coefficient. Spearman's correlation and Wilcoxon rank-sum tests were performed to analyze factors influencing methodological quality.<h4>Results</h4>In 2024, 1874 RCTs were included (1550 CPM, 324 CTCMP). Circulatory and digestive diseases predominated in CPM and CTCMP studies, respectively. Two-arm \"Chinese medicine plus Western medicine\" designs were mainstream. CPM RCTs favored physical/chemical outcomes, while CTCMP RCTs prioritized symptoms/signs outcomes; 169 patient-reported outcomes were identified. Most studies had small samples (100 cases) and were single-center. Methodological quality revealed adequate randomization but serious deficiencies in allocation concealment and blinding. Ethics approval (CPM≈68.5%, CTCMP≈61.1%) and trial registration (CPM≈3.8%, CTCMP≈0.9%) were suboptimal. Funding, higher journal IF, and multicenter design were positively associated with ROB scores.<h4>Conclusions</h4>This evidence mapping reveals a significant disconnect between the quantity and quality of randomized controlled trials in Traditional Chinese Medicine. Persistent methodological weaknesses undermine evidence reliability. Future research should prioritize methodological rigor, adequate statistical power, and prospective trial registration. There is an urgent need to develop a dedicated evaluation framework that captures both methodological quality and clinical value.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-09-30"
   }
 ]
