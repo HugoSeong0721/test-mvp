@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
+import 'core/ads.dart';
 import 'core/rate_service.dart';
 import 'core/store.dart';
 import 'core/theme.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   await AppStore.i.load();
   // 환율은 기다리지 않는다 — 스냅샷으로 먼저 그리고 도착하면 갈아끼운다
   RateService.i.load();
+  initAds();
   runApp(const SomRateApp());
 }
 
@@ -76,9 +78,15 @@ class _ShellState extends State<_Shell> {
             children: const [ConverterScreen(), ChartScreen()],
           ),
         ),
-        bottomNavigationBar: _TabBar(
-          index: _tab,
-          onChanged: (i) => setState(() => _tab = i),
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AdBanner(),
+            _TabBar(
+              index: _tab,
+              onChanged: (i) => setState(() => _tab = i),
+            ),
+          ],
         ),
       ),
     );

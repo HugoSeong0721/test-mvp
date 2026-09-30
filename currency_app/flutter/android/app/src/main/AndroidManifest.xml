@@ -33,6 +33,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- AdMob 앱 ID. 없으면 광고 SDK 초기화 때 앱이 죽는다.
+             안드로이드용 AdMob 앱을 아직 등록하지 않아 Google 테스트 앱 ID — 등록 후
+             실제 ID 로 바꾸고 lib/core/ads.dart 의 배너 단위도 함께 바꾼다. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

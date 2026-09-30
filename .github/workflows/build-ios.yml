@@ -1,0 +1,107 @@
+name: Build iOS (환율 앱)
+
+# currency_app/flutter 가 바뀌면 macOS 러너에서 iOS 앱을 빌드해 본다.
+#
+# 1) ios/ 폴더가 아직 없으면 `flutter create --platforms=ios` 로 만들고,
+#    AdMob 앱 ID·표시 이름·아이콘까지 채운 뒤 main 에 커밋한다 (처음 한 번만).
+# 2) 서명 없이(--no-codesign) 릴리스 빌드가 통과하는지 확인하고 Runner.app 을 아티팩트로 올린다.
+#    이 산출물은 폰에 설치할 수 없다 — App Store 업로드는 맥의 Xcode 에서 한다
+#    (순서는 currency_app/flutter/README.md 의 iOS 절 참고).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "currency_app/flutter/**"
+      - ".github/workflows/build-ios.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-ios
+  cancel-in-progress: true
+
+env:
+  ADMOB_IOS_APP_ID: ca-app-pub-4724352880074547~5579610172
+
+jobs:
+  build:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: currency_app/flutter
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.47.2"
+          cache: true
+
+      - name: Resolve packages
+        run: flutter pub get
+
+      - name: Generate iOS project (ios/ 가 없을 때 한 번만)
+        id: gen
+        run: |
+          if [ -d ios ]; then
+            echo "generated=false" >> "$GITHUB_OUTPUT"
+            echo "ios/ 가 이미 있어 생성 단계를 건너뜁니다."
+            exit 0
+          fi
+          flutter create --platforms=ios --org com.iottie --project-name somrate .
+
+          # flutter create 가 ios/ 밖에 새로 만들거나 되돌린 파일은 버린다 (.metadata·pubspec.lock 만 유지)
+          git ls-files -m | grep -v -e '^\.metadata$' -e '^pubspec\.lock$' | xargs git checkout --
+          git clean -fd -e ios -e .metadata
+
+          PLIST=ios/Runner/Info.plist
+          PB=/usr/libexec/PlistBuddy
+          $PB -c "Set :CFBundleDisplayName 솜 환율" "$PLIST"
+          $PB -c "Add :GADApplicationIdentifier string $ADMOB_IOS_APP_ID" "$PLIST"
+          # SKAdNetwork — iOS 14+ 에서 광고 성과 측정에 필요 (Google 네트워크 ID)
+          $PB -c "Add :SKAdNetworkItems array" "$PLIST"
+          $PB -c "Add :SKAdNetworkItems:0 dict" "$PLIST"
+          $PB -c "Add :SKAdNetworkItems:0:SKAdNetworkIdentifier string cstr6suwn9.skadnetwork" "$PLIST"
+          # HTTPS 만 쓰므로 수출 규정 질문(암호화)에 매번 답하지 않아도 되게
+          $PB -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST"
+
+          # 광고 SDK 최소 iOS 13
+          sed -i '' -E "s/^#? *platform :ios, '[0-9.]+'/platform :ios, '13.0'/" ios/Podfile
+
+          # 앱 아이콘 (assets/icon → ios/Runner/Assets.xcassets)
+          dart run flutter_launcher_icons
+
+          echo "generated=true" >> "$GITHUB_OUTPUT"
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Build iOS (unsigned)
+        run: flutter build ios --release --no-codesign
+
+      - name: Commit generated iOS project
+        if: steps.gen.outputs.generated == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ios .metadata pubspec.lock
+          git commit -m "환율 앱: iOS 프로젝트 생성 (flutter create, CI)"
+          # 아이콘 재생성 등으로 남은 잡동사니는 버리고 최신 main 위에 얹어 푸시
+          git checkout -- .
+          git clean -fd
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Upload Runner.app (unsigned)
+        uses: actions/upload-artifact@v4
+        with:
+          name: somrate-ios-unsigned
+          path: currency_app/flutter/build/ios/iphoneos/Runner.app
+          if-no-files-found: error

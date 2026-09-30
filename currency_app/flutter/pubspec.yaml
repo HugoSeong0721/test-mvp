@@ -16,6 +16,7 @@ dependencies:
   shared_preferences: ^2.5.0
   intl: ^0.20.2
   timezone: ^0.10.0
+  google_mobile_ads: ^9.0.0
 
 dev_dependencies:
   flutter_test:
@@ -30,7 +31,8 @@ flutter:
 # (assets/icon/ 의 PNG 가 원본. 바꾸면 위 명령을 다시 실행)
 flutter_launcher_icons:
   android: true
-  ios: false
+  ios: true
+  remove_alpha_ios: true   # App Store 는 알파 채널이 있는 아이콘을 거부한다
   image_path: "assets/icon/icon-1024.png"
   adaptive_icon_background: "#E8B44C"
   adaptive_icon_foreground: "assets/icon/icon-fg-1024.png"

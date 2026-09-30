@@ -76,7 +76,7 @@ android/                          안드로이드 프로젝트 (flutter create �
    - 피처 그래픽 1024×500, 스크린샷 최소 2장 (폰에서 캡처)
 4. **Monitor and improve → Policy and programs → App content** 에서 필수 항목 채우기
    - 개인정보처리방침 URL → `https://hugoseong0721.github.io/test-mvp/somrate-privacy.html`
-   - 광고: 현재 **없음** (AdMob 붙이면 "예"로 바꾼다)
+   - 광고: **예** (AdMob 배너 — 아래 "광고" 절)
    - 데이터 안전(Data safety): 아래 초안 참고
    - 콘텐츠 등급 설문: 유틸리티, 폭력·도박 등 전부 아니오 → 전체이용가
    - 타겟 연령: 18세 이상 성인 대상으로 두는 게 심사가 단순
@@ -100,6 +100,60 @@ AdMob 을 붙이는 순간 "광고 ID 수집"으로 답이 바뀌니 그때 다�
 
 2023-11-13 이후 만든 **개인** 개발자 계정은 프로덕션 전에 **비공개 테스트 12명 × 연속 14일**이 필수다.
 회사(Organization) 계정은 면제. Developer account → Account details 에서 확인.
+
+## 광고 (AdMob)
+
+탭바 바로 위 320×50 배너 하나 — `lib/core/ads.dart`.
+
+| 플랫폼 | AdMob 앱 | 앱 ID | 배너 단위 ID |
+|---|---|---|---|
+| iOS | Currency Exchange (mg.seong0721 계정) | `ca-app-pub-4724352880074547~5579610172` (ios/Runner/Info.plist) | `ca-app-pub-4724352880074547/2514463130` |
+| Android | **아직 미등록** — Google 테스트 ID 사용 중 | AndroidManifest.xml `APPLICATION_ID` | `ads.dart` |
+
+안드로이드에 실제 광고를 내려면 AdMob 에서 Android 앱을 하나 더 만들고 위 두 곳의 테스트 ID 를 교체한다.
+AdMob 콘솔의 "Payment setup incomplete" 는 수익이 생기기 전까지는 광고 송출을 막지 않지만,
+**앱이 스토어에 올라간 뒤 AdMob 앱에 스토어 링크를 연결하고 결제 프로필을 채워야** 광고가 정상 송출된다.
+
+## iOS (App Store)
+
+번들 ID `com.iottie.somrate`, 표시 이름 `솜 환율`. 안드로이드와 같은 Dart 코드를 그대로 쓴다.
+
+### CI 가 해 두는 것
+
+`main` 에 이 폴더 변경이 푸시되면 `.github/workflows/build-ios.yml` 이 macOS 러너에서 돈다.
+- `ios/` 가 없으면 `flutter create --platforms=ios` 로 만들고 AdMob 앱 ID·표시 이름·아이콘·
+  `ITSAppUsesNonExemptEncryption=false` 를 채워 **main 에 커밋**한다 (처음 한 번).
+- 서명 없이 릴리스 빌드가 통과하는지 확인한다. Actions 에 올라오는 `somrate-ios-unsigned` 는
+  검증용일 뿐 폰에 설치할 수 없다.
+
+### 맥에서 App Store 에 올리기 (Apple Developer 가입 후)
+
+준비: Apple Developer Program 가입($99/년, 본인 Apple ID) · 맥에 Xcode(App Store) · Flutter · CocoaPods(`sudo gem install cocoapods`).
+
+```
+git pull
+cd currency_app/flutter
+flutter pub get
+open ios/Runner.xcworkspace          # .xcodeproj 가 아니라 .xcworkspace
+```
+
+Xcode 에서:
+1. **Xcode → Settings → Accounts** 에 본인 Apple ID 추가.
+2. 왼쪽 Runner → TARGETS Runner → **Signing & Capabilities** → Team 에 본인 계정 선택,
+   "Automatically manage signing" 체크. 인증서·프로파일은 Xcode 가 알아서 만든다.
+3. 상단 기기 선택을 **Any iOS Device (arm64)** 로.
+4. **Product → Archive** → 끝나면 Organizer 창 → **Distribute App → App Store Connect → Upload**.
+   (본인 아이폰을 연결하고 ▶ 로 먼저 실행해 보면 광고 자리까지 확인할 수 있다.)
+
+App Store Connect(appstoreconnect.apple.com)에서:
+1. **My Apps → + → New App** — 이름 `솜 환율`(또는 원하는 이름), 번들 ID `com.iottie.somrate` 선택, SKU 아무거나(`somrate`).
+2. 업로드된 빌드 선택, 스크린샷(6.7형 iPhone 최소 1장 — 실행한 폰에서 캡처), 설명, 키워드, 지원 URL.
+3. **App Privacy**: 광고 SDK 가 있으므로 "식별자(기기 ID)·사용 데이터 수집 — 제3자 광고 목적" 으로 답한다.
+   개인정보처리방침 URL → `https://hugoseong0721.github.io/test-mvp/somrate-privacy.html` (광고 문구 추가 필요).
+4. 연령 등급 설문 전부 "없음" → 4+. 가격 무료.
+5. **Submit for Review**. 보통 1~2일.
+
+업데이트할 때는 `pubspec.yaml` 의 `version` 뒤 `+N` 을 올리고 같은 순서로 Archive → Upload.
 
 ## 로컬에서 돌려보기 (Flutter 설치된 PC)
 
