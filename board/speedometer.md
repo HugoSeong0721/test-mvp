@@ -1,10 +1,10 @@
 # GPS 속도계 (speedometer 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 07:10 (KST)
+마지막 갱신: 2026-10-03 06:45 (KST)
 
 ## 지금 상태 (3줄 이내)
 Flutter 1차 완성(`speedometer_app/flutter/`): 큰 숫자/게이지·HUD·속도 경고·모드 4개·이동 기록. 테스트 37개 통과(엔진 18 + 로봇 19).
 웹 미리보기 https://soulfulfillable.github.io/test-mvp/speedometer-app/index.html — 폰 위치로 **진짜 속도**, `?demo=1` 은 가짜 주행. 광고는 배너만(테스트 ID).
-이름 **Glance Speed: GPS Speedometer**·번들 `com.soulfulfill.speedometer` 확정(사용자) → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
+이름 **Glance Speed: GPS Speedometer** 확정, 번들 `com.soulfulfill.speedometer` **Apple 등록 완료**(Actions 로그 "새로 등록함"). 다음: ASC 앱 레코드·AdMob(사용자) → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
 - [사용자] 웹 미리보기를 차에서(조수석) 켜 보고 '느낌' 한마디.
