@@ -27,7 +27,7 @@ class AppStore extends ChangeNotifier {
   int get levelsSolved => level - 1;
   Future<void> completeLevel(int lv) async {
     await _p.remove(levelBoardKey(lv));
-    if (lv == level) {
+    if (lv >= level) {
       await _p.setInt('level', lv + 1);
       notifyListeners();
     }

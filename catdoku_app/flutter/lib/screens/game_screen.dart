@@ -51,7 +51,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       p,
       mode: widget.mode,
       levelNo: level,
-      carried: daily && !practice ? AppStore.i.carriedTime(day) : 0,
+      carried: daily
+          ? (practice ? 0 : AppStore.i.carriedTime(day))
+          : (AppStore.i.loadBoard(AppStore.levelBoardKey(level))?['secs']
+                    as int? ??
+                0),
     );
     final saved = _boardKey == null ? null : AppStore.i.loadBoard(_boardKey!);
     if (saved != null) game.restore(saved);
@@ -133,6 +137,9 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   }
 
   void _restart({bool next = false}) {
+    // 버튼을 두 번 누르면 두 번 불린다 — 승리/패배 상태일 때만, 한 번만.
+    if (next && game.status != GameStatus.won) return;
+    if (!next && game.status != GameStatus.lost) return;
     _saveCarry();
     final k = _boardKey;
     if (k != null && !next) AppStore.i.clearBoard(k);
@@ -140,10 +147,13 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     _lostTimer = null;
     game.removeListener(_onGame);
     game.dispose();
-    if (next) level++;
+    // 다음 단계는 저장된 진행에서 가져온다 (level++ 를 두 번 하면 한 단계를 건너뛰었다)
+    if (next) level = AppStore.i.level > level ? AppStore.i.level : level + 1;
     _recorded = false;
     _wonTime = null;
     setState(_newGame);
+    // 버튼의 두 번째 탭이 새 판에 떨어져 엉뚱한 고양이가 놓이지 않게
+    game.blockInput();
   }
 
   /// 영상이 아직 안 받아져서 기다리는 중 (화면에 "Loading video…").
@@ -183,6 +193,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     if (game.status != GameStatus.playing) return;
     final yes = await showDialog<bool>(
       context: context,
+      // 힌트를 두 번 누르면 두 번째 탭이 바깥을 눌러 창이 바로 닫혔다
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         backgroundColor: C.bg,
         title: const Text(
@@ -196,12 +208,14 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(minimumSize: const Size(0, 52)),
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Not now', style: TextStyle(fontSize: 17)),
+            child: const Text('Not now', style: TextStyle(fontSize: 18)),
           ),
           FilledButton(
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 52)),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('▶ Watch video', style: TextStyle(fontSize: 17)),
+            child: const Text('▶ Watch video', style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
@@ -230,74 +244,85 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         bottom: false,
         child: Stack(
           children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 4, 14, 0),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        key: const Key('back'),
-                        tooltip: 'Back',
-                        iconSize: 30,
-                        color: C.ink,
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_rounded),
-                      ),
-                      Expanded(
-                        child: Text(
-                          title,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
+            // 패널·영상 대기 화면이 떠 있으면 뒤의 버튼(뒤로·붓·힌트)은 눌리지 않게
+            AbsorbPointer(
+              absorbing: _overlayUp,
+              child: ExcludeSemantics(
+                excluding: _overlayUp,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 4, 14, 0),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            key: const Key('back'),
+                            tooltip: 'Back',
+                            iconSize: 30,
                             color: C.ink,
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back_rounded),
                           ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: C.card,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: shadow,
-                        ),
-                        child: Text(
-                          fmtTime(game.seconds),
-                          key: const Key('timer'),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: C.ink,
-                            fontFeatures: [FontFeature.tabularFigures()],
+                          // 좁은 화면에서 날짜·연습 표시가 잘리지 않게 줄여서라도 다 보인다
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: C.ink,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: C.card,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: shadow,
+                            ),
+                            child: Text(
+                              fmtTime(game.seconds),
+                              key: const Key('timer'),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: C.ink,
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Hearts(game.hearts),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      Hearts(game.hearts),
-                    ],
-                  ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
+                      child: RuleChips(),
+                    ),
+                    SizedBox(height: 40, child: Center(child: _statusLine())),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Board(game: game),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _palette(),
+                    const SizedBox(height: 8),
+                    Ads.i.banner(),
+                    SizedBox(height: MediaQuery.of(context).padding.bottom),
+                  ],
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
-                  child: RuleChips(),
-                ),
-                SizedBox(height: 40, child: Center(child: _statusLine())),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Board(game: game),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _palette(),
-                const SizedBox(height: 8),
-                Ads.i.banner(),
-                SizedBox(height: MediaQuery.of(context).padding.bottom),
-              ],
+              ),
             ),
             if (game.status == GameStatus.won && _wonTime != null) _winPanel(),
             if (game.status == GameStatus.lost && _showLost) _lostPanel(),
@@ -307,6 +332,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       ),
     );
   }
+
+  bool get _overlayUp =>
+      _waitingVideo ||
+      (game.status == GameStatus.won && _wonTime != null) ||
+      (game.status == GameStatus.lost && _showLost);
 
   Widget _statusLine() {
     final v = game.lastViolation;
@@ -434,7 +464,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                       Text(
                         '▶ video',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: C.muted,
                         ),

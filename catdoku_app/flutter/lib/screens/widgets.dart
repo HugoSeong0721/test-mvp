@@ -65,7 +65,7 @@ class RuleChips extends StatelessWidget {
           t,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: big ? 15 : 12.5,
+            fontSize: big ? 15 : 14,
             height: 1.25,
             fontWeight: FontWeight.w700,
             color: C.sub,
