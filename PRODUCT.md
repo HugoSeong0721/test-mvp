@@ -43,8 +43,10 @@
 |---|---|---|
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출. v1.1 후보 = 빌드 9(TestFlight): 줄 꾹 눌러 끌기로 순서 변경, 긴 이름 줄 넘침 수정. 스크린샷 v2(금·BTC 첫 장) 준비됨 | 승인 대기 → AdMob 스토어 링크·결제 정보 → v1.1 제출(빌드 9 + 스크린샷 v2, `App Store 등록 정보 채우기`) → 리뷰·수익 확인 |
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
-| **대출 계산기** (`plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
-| **소음 측정기** (`plans/decibel-app.md`, `board/decibel.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
+| **물때 시간** (`plans/tides-app.md`, `board/tides.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
+| **GPS 속도계** (`plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
+| **대출 계산기** (`plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-02 개발 세션 시작 | 이름·번들 ID 결정 → 개발 → TestFlight |
+| **소음 측정기** (`plans/decibel-app.md`, `board/decibel.md`) | 2026-10-02 개발 세션 시작 | 이름·번들 ID 결정 → 개발 → TestFlight |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
@@ -68,6 +70,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-02 | 유틸 2개 추가 개발: 물때 시간(`plans/tides-app.md`) + GPS 속도계(`plans/speedometer-app.md`), 각각 별도 세션. 대출 계산기·소음 측정기 세션은 사용자가 시작함 | 사용자 "물때시간이랑 속도계도 만들자" |
 | 2026-10-02 | 유틸 2개 개발 시작: 대출 계산기(`plans/mortgage-app.md`) + 소음 측정기(`plans/decibel-app.md`), 앱마다 별도 세션. 세션끼리 `board/` 게시판으로 피드백·노하우 공유, 기획 파트너가 전체 조율 | 사용자 "각 별도 세션으로, 서로 공유하고 발전하게" |
 | 2026-10-02 | Catdoku 앱 이름 **Kitty Queens: Cat Sudoku**, 번들 ID `com.soulfulfill.catdoku`, 게임 양 A(오늘의 퍼즐+무한 단계), 출시 진행 | "Catdoku" 는 스토어에 동명 앱 다수. 사용자: 추천대로, "내볼까" |
 | 2026-10-02 | Catdoku 보상형 광고 자리 = 힌트·하트 다 잃었을 때 이어하기 (영상 보면 알려 주고 보상) | 사용자 "하트 다 쓰거나 힌트로 비디오(광고) 보면 알려주고" |
