@@ -40,7 +40,7 @@ class _BoardState extends State<Board> with TickerProviderStateMixin {
   int _seenViolation = 0;
   int _seenHint = 0;
   (int, int)? _popCell;
-  bool _dragMarking = false;
+  DragMode _drag = DragMode.none;
   (int, int)? _lastDragCell;
 
   Game get g => widget.game;
@@ -104,7 +104,7 @@ class _BoardState extends State<Board> with TickerProviderStateMixin {
     final cell = _cellAt(p, size);
     if (cell == null) return;
     final before = g.cats;
-    _dragMarking = g.tap(cell.$1, cell.$2);
+    _drag = g.tap(cell.$1, cell.$2);
     _lastDragCell = cell;
     if (g.cats > before) {
       _popCell = cell;
@@ -116,11 +116,11 @@ class _BoardState extends State<Board> with TickerProviderStateMixin {
   }
 
   void _move(Offset p, double size) {
-    if (!_dragMarking) return;
+    if (_drag == DragMode.none) return;
     final cell = _cellAt(p, size);
     if (cell == null || cell == _lastDragCell) return;
     _lastDragCell = cell;
-    g.dragMark(cell.$1, cell.$2);
+    g.dragPaint(cell.$1, cell.$2, _drag);
   }
 
   @override
@@ -153,8 +153,8 @@ class _BoardState extends State<Board> with TickerProviderStateMixin {
                       behavior: HitTestBehavior.opaque,
                       onPointerDown: (e) => _down(e.localPosition, size - 10),
                       onPointerMove: (e) => _move(e.localPosition, size - 10),
-                      onPointerUp: (_) => _dragMarking = false,
-                      onPointerCancel: (_) => _dragMarking = false,
+                      onPointerUp: (_) => _drag = DragMode.none,
+                      onPointerCancel: (_) => _drag = DragMode.none,
                       child: SizedBox.square(
                         dimension: size - 10,
                         child: CustomPaint(

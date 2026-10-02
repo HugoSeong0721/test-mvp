@@ -60,6 +60,8 @@ Future<void> tapCell(WidgetTester t, int r, int c, {String? label}) async {
   await t.tapAt(rect.topLeft + Offset((c + 0.5) * cs, (r + 0.5) * cs));
   pressed.add(label ?? 'cell($r,$c)');
   await t.pump(const Duration(milliseconds: 50));
+  // 반칙 뒤에는 판이 0.7초 잠긴다 — 로봇은 사람처럼 잠깐 기다린다
+  await t.pump(const Duration(milliseconds: 700));
 }
 
 /// 정답이 아니고 놓인 고양이와 부딪히는 칸 하나.
@@ -82,6 +84,8 @@ Future<void> solveRest(WidgetTester t) async {
     final c = g.puzzle.solution[r];
     if (g.cells[r][c] != Mark.cat) await tapCell(t, r, c);
   }
+  // 승리 패널은 0.9초 뒤에 뜬다
+  await t.pump(const Duration(milliseconds: 600));
   await t.pump(const Duration(milliseconds: 600));
 }
 
@@ -533,6 +537,98 @@ void main() {
     await t.pump(const Duration(milliseconds: 500));
     expect(find.text('Need a hint?'), findsOneWidget);
     await press(t, find.text('Not now'), 'Hint dialog: Not now');
+    await finish(t);
+  });
+
+  testWidgets('double-tapping a rule-breaking square costs only one heart', (
+    t,
+  ) async {
+    await boot(t, prefs: {'seenHowTo': true});
+    await press(t, find.text('Start'), 'Home: Level Start');
+    final g = gameOf(t);
+    await tapCell(t, 0, g.puzzle.solution[0]);
+    final bad = conflictCell(g);
+    final rect = t.getRect(find.byKey(const Key('board')));
+    final cs = rect.width / g.n;
+    final at = rect.topLeft + Offset((bad.$2 + 0.5) * cs, (bad.$1 + 0.5) * cs);
+    await t.tapAt(at);
+    await t.pump(const Duration(milliseconds: 110));
+    await t.tapAt(at);
+    await t.pump(const Duration(milliseconds: 60));
+    await t.tapAt(at);
+    pressed.add('cell(conflict) triple tap');
+    await t.pump(const Duration(seconds: 1));
+    expect(g.hearts, 2);
+    await finish(t);
+  });
+
+  testWidgets(
+    'double-tapping the last square shows the win panel (not skip it)',
+    (t) async {
+      await boot(t, prefs: {'seenHowTo': true});
+      await press(t, find.text('Start'), 'Home: Level Start');
+      final g = gameOf(t);
+      for (var r = 0; r < g.n - 1; r++) {
+        await tapCell(t, r, g.puzzle.solution[r]);
+      }
+      final rect = t.getRect(find.byKey(const Key('board')));
+      final cs = rect.width / g.n;
+      final last = g.n - 1;
+      final at =
+          rect.topLeft +
+          Offset((g.puzzle.solution[last] + 0.5) * cs, (last + 0.5) * cs);
+      await t.tapAt(at);
+      await t.pump(const Duration(milliseconds: 120));
+      await t.tapAt(at);
+      pressed.add('last cell double tap');
+      await t.pump(const Duration(milliseconds: 600));
+      await t.pump(const Duration(milliseconds: 600));
+      expect(find.text('🎉 Level 1 cleared!'), findsOneWidget);
+      expect(find.text('Level 1'), findsOneWidget);
+      await finish(t);
+    },
+  );
+
+  testWidgets('Mark brush: never deletes a cat; dragging from a ✕ erases ✕s', (
+    t,
+  ) async {
+    await boot(t, prefs: {'seenHowTo': true});
+    await press(t, find.text('Start'), 'Home: Level Start');
+    final g = gameOf(t);
+    final s0 = g.puzzle.solution[0];
+    await tapCell(t, 0, s0);
+    await press(t, find.byKey(const Key('brush-mark')), 'Mark brush');
+    await tapCell(t, 0, s0);
+    expect(g.cells[0][s0], Mark.cat, reason: 'Mark must not delete a cat');
+    final rect = t.getRect(find.byKey(const Key('board')));
+    final cs = rect.width / g.n;
+    final y = cs * (g.n - 0.5);
+    // 맨 아래 줄을 ✕ 로 끌어 칠한 뒤, ✕ 에서 시작해 다시 끌면 지워진다
+    for (final erase in [false, true]) {
+      final gs = await t.startGesture(rect.topLeft + Offset(cs * 0.5, y));
+      for (var c = 1; c < g.n; c++) {
+        await gs.moveTo(rect.topLeft + Offset(cs * (c + 0.5), y));
+        await t.pump(const Duration(milliseconds: 16));
+      }
+      await gs.up();
+      await t.pump(const Duration(milliseconds: 100));
+      final row = [for (var c = 0; c < g.n; c++) g.cells[g.n - 1][c]];
+      expect(
+        row.every((m) => m == (erase ? Mark.empty : Mark.cross)),
+        isTrue,
+        reason: erase ? 'drag from ✕ erases' : 'drag marks',
+      );
+    }
+    pressed.add('drag-mark / drag-erase');
+    await finish(t);
+  });
+
+  testWidgets('a broken saved board does not crash the game screen', (t) async {
+    await boot(t, prefs: {'seenHowTo': true, 'board_level_1': '{"n":5}'});
+    await press(t, find.text('Start'), 'Home: Level Start');
+    expect(find.text('Level 1'), findsOneWidget);
+    expect(gameOf(t).cats, 0);
+    await press(t, find.byKey(const Key('back')), 'Game: Back');
     await finish(t);
   });
 

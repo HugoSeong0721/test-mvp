@@ -74,7 +74,7 @@ Future<void> showHowTo(BuildContext context) => showModalBottomSheet(
 );
 
 Widget _row(String icon, String text) => Padding(
-  padding: const EdgeInsets.symmetric(vertical: 7),
+  padding: const EdgeInsets.symmetric(vertical: 5),
   child: Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [

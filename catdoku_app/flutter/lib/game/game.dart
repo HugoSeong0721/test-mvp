@@ -10,6 +10,9 @@ enum Mark { empty, cross, cat }
 
 enum GameStatus { playing, won, lost }
 
+/// ✕ 붓으로 끌 때: 처음 누른 칸에 ✕ 를 놓았으면 계속 놓고, 지웠으면 계속 지운다.
+enum DragMode { none, mark, erase }
+
 enum GameMode { daily, level }
 
 /// 규칙 위반 한 건 — 화면에 빨갛게 번쩍이고 이유를 띄운다.
@@ -90,38 +93,42 @@ class Game extends ChangeNotifier {
 
   /// 칸을 누른다. 고른 붓에 따라:
   ///  🐱 붓 — 빈칸/✕ → 고양이 시도, 고양이 → 치우기
-  ///  ✕ 붓 — 빈칸 → ✕, ✕ → 지우기, 고양이 → 치우고 ✕
-  /// 반환값: 끌어서 이어 칠할 때 쓸 동작 (✕ 칠하기 중이면 true).
-  bool tap(int r, int c) {
-    if (status != GameStatus.playing) return false;
+  ///  ✕ 붓 — 빈칸 → ✕, ✕ → 지우기, 고양이 → 그대로 (✕ 붓으로 고양이가 몰래 지워지지 않게)
+  /// 반환값: 이어서 끌면 할 동작.
+  DragMode tap(int r, int c) {
+    if (status != GameStatus.playing || _blocked) return DragMode.none;
     final cur = cells[r][c];
     if (brush == Brush.mark) {
+      if (cur == Mark.cat) return DragMode.none;
       if (cur == Mark.cross) {
         cells[r][c] = Mark.empty;
         notifyListeners();
-        return false;
+        return DragMode.erase;
       }
-      if (cur == Mark.cat) _removeCat(r, c);
       cells[r][c] = Mark.cross;
       notifyListeners();
-      return true;
+      return DragMode.mark;
     }
     if (cur == Mark.cat) {
       _removeCat(r, c);
       notifyListeners();
-      return false;
+      return DragMode.none;
     }
     _tryCat(r, c);
     notifyListeners();
-    return false;
+    return DragMode.none;
   }
 
-  /// ✕ 붓으로 끌 때 지나간 빈칸에 ✕.
-  void dragMark(int r, int c) {
+  /// ✕ 붓으로 끌 때 지나간 칸에 ✕ 를 놓거나(빈칸만) 지운다(✕ 만).
+  void dragPaint(int r, int c, DragMode mode) {
     if (status != GameStatus.playing || brush != Brush.mark) return;
-    if (cells[r][c] != Mark.empty) return;
-    cells[r][c] = Mark.cross;
-    notifyListeners();
+    if (mode == DragMode.mark && cells[r][c] == Mark.empty) {
+      cells[r][c] = Mark.cross;
+      notifyListeners();
+    } else if (mode == DragMode.erase && cells[r][c] == Mark.cross) {
+      cells[r][c] = Mark.empty;
+      notifyListeners();
+    }
   }
 
   void _tryCat(int r, int c) {
@@ -139,6 +146,8 @@ class Game extends ChangeNotifier {
       lastViolation = Violation(r, c, reasons.join(' '), [
         for (final f in conf) (f.$1, f.$2),
       ]);
+      // 실수로 두 번·세 번 누르면 하트가 한꺼번에 날아갔다 — 반칙 뒤 잠깐 판을 잠근다
+      blockInput(const Duration(milliseconds: 700));
       if (hearts <= 0) {
         hearts = 0;
         _end(GameStatus.lost);
@@ -277,23 +286,35 @@ class Game extends ChangeNotifier {
     'secs': seconds,
   };
 
+  /// 저장된 판을 되살린다. 저장 형식이 깨져 있으면 조용히 빈 판으로 시작한다
+  /// (예전엔 형식이 다르면 회색 화면에서 못 빠져나왔다).
   void restore(Map<String, dynamic> s) {
-    if (s['n'] != n) return;
-    for (final p in (s['marks'] as List).cast<int>()) {
-      cells[p ~/ n][p % n] = Mark.cross;
-    }
-    for (final p in (s['cats'] as List).cast<int>()) {
-      final r = p ~/ n, c = p % n;
-      if (conflictsWith(r, c).isEmpty) {
-        cells[r][c] = Mark.empty;
-        _placeCat(r, c);
+    try {
+      if (s['n'] != n) return;
+      List<int> cellsOf(Object? v) => [
+        if (v is List)
+          for (final p in v)
+            if (p is int && p >= 0 && p < n * n) p,
+      ];
+      for (final p in cellsOf(s['marks'])) {
+        cells[p ~/ n][p % n] = Mark.cross;
       }
-    }
-    hearts = (s['hearts'] as int).clamp(0, maxHearts);
-    if (hearts == 0) {
-      _end(GameStatus.lost);
-    } else if (cats == n) {
-      _end(GameStatus.won);
+      for (final p in cellsOf(s['cats'])) {
+        final r = p ~/ n, c = p % n;
+        if (cells[r][c] != Mark.cat && conflictsWith(r, c).isEmpty) {
+          cells[r][c] = Mark.empty;
+          _placeCat(r, c);
+        }
+      }
+      final h = s['hearts'];
+      hearts = h is int ? h.clamp(0, maxHearts) : maxHearts;
+      if (hearts == 0) {
+        _end(GameStatus.lost);
+      } else if (cats == n) {
+        _end(GameStatus.won);
+      }
+    } catch (_) {
+      // 깨진 저장은 무시
     }
     notifyListeners();
   }

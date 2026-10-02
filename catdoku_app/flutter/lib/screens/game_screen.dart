@@ -94,10 +94,19 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   bool _recorded = false;
   int? _wonTime;
+
+  /// 승리 패널은 고양이들이 기뻐하는 걸 잠깐 보여 준 뒤에 띄운다.
+  /// 마지막 칸을 두 번 누르면 두 번째 탭이 바로 뜬 패널 버튼(Next Level/Home)을 눌러 축하가 건너뛰어졌다.
+  bool _showWin = false;
+  Timer? _winTimer;
+
   Future<void> _onWin() async {
     if (_recorded) return;
     _recorded = true;
     _wonTime = game.seconds;
+    _winTimer = Timer(const Duration(milliseconds: 900), () {
+      if (mounted) setState(() => _showWin = true);
+    });
     if (daily && !practice) {
       await AppStore.i.markDailySolved(
         day,
@@ -131,6 +140,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _tick?.cancel();
     _lostTimer?.cancel();
+    _winTimer?.cancel();
     game.removeListener(_onGame);
     game.dispose();
     super.dispose();
@@ -151,6 +161,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     if (next) level = AppStore.i.level > level ? AppStore.i.level : level + 1;
     _recorded = false;
     _wonTime = null;
+    _showWin = false;
+    _winTimer?.cancel();
     setState(_newGame);
     // 버튼의 두 번째 탭이 새 판에 떨어져 엉뚱한 고양이가 놓이지 않게
     game.blockInput();
@@ -324,7 +336,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                 ),
               ),
             ),
-            if (game.status == GameStatus.won && _wonTime != null) _winPanel(),
+            if (game.status == GameStatus.won && _wonTime != null && _showWin)
+              _winPanel(),
             if (game.status == GameStatus.lost && _showLost) _lostPanel(),
             if (_waitingVideo) _loadingVideo(),
           ],
@@ -335,7 +348,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   bool get _overlayUp =>
       _waitingVideo ||
-      (game.status == GameStatus.won && _wonTime != null) ||
+      (game.status == GameStatus.won && _wonTime != null && _showWin) ||
       (game.status == GameStatus.lost && _showLost);
 
   Widget _statusLine() {
