@@ -18,7 +18,7 @@
   (GitHub 아이디 `soulfulfillable`, 번들 ID 접두 `com.soulfulfill.`).
 - 회사 관련 내용이 들어갈 것 같으면 **작업을 멈추고 사용자에게 먼저 확인한다.**
 
-## 환율 앱 (Glance: Currency Converter) — 출시 방침
+## 환율 앱 (Glance FX: Currency Converter) — 출시 방침
 
 - **미국 App Store 대상, 앱 UI·스토어 문구 전부 영어.** 기본 언어 English (U.S.).
 - 기본 통화도 미국 사용자 기준(USD 기준 + EUR·GBP·MXN, 인기 USD·EUR·GBP·CAD·MXN·JPY).

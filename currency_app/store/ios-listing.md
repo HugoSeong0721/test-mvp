@@ -1,4 +1,4 @@
-# Glance: Currency Converter — App Store 등록 문구
+# Glance FX: Currency Converter — App Store 등록 문구
 
 **대상: 미국 App Store. 기본 언어 English (U.S.).** 앱 UI 도 영어.
 App Store Connect → Apps → Glance → iOS App 1.0 에 그대로 붙여넣는다.
@@ -24,8 +24,7 @@ App Store 검색은 **이름 > 부제 > 키워드 필드** 순으로 가중치�
 
 | 항목 | 값 |
 |---|---|
-| Name (30) | `Glance: Currency Converter` |
-| 이름 중복 시 | `Glance FX: Currency Converter` |
+| Name (30) | `Glance FX: Currency Converter` (등록 완료 — `Glance:` 는 이미 사용 중이었음) |
 | Subtitle (30) | `Exchange Rate Money Calculator` |
 | Bundle ID | `com.soulfulfill.currency` |
 | SKU | `currency` |
@@ -147,6 +146,6 @@ Info.plist 에 `ITSAppUsesNonExemptEncryption = NO` 가 있어 업로드 때 묻
 
 ## 이름 일치
 
-- App Store Connect 앱 이름: `Glance: Currency Converter`
+- App Store Connect 앱 이름: `Glance FX: Currency Converter`
 - 홈 화면 이름(Info.plist CFBundleDisplayName / Android label): `Glance`
 - 개인정보처리방침 제목: Glance
