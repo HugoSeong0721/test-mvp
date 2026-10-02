@@ -77,15 +77,21 @@ class BigButton extends StatelessWidget {
               children: [
                 Icon(icon, size: 22, color: fg),
                 const SizedBox(height: 3),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: fg,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: tabular,
+                // 길면 '…' 로 자르지 않고 살짝 줄인다 ("Alert 155 KM/H" 의 숫자가 잘리면 안 된다).
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: fg,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        fontFeatures: tabular,
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -2,8 +2,12 @@
 // 막힌 길(버튼이 가려져 안 눌림)·뒤로가기 불가·깨진 레이아웃(overflow 는 Flutter 가 예외로 던져 테스트 실패)을 잡는다.
 // 실행: flutter test test/robot_test.dart  → 누른 버튼 목록이 로그로 찍힌다.
 // (텍스트 입력칸이 없는 앱이라 키보드가 뜨는 상태는 해당 없음)
+import 'dart:io';
+
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speedometer/app.dart';
@@ -31,6 +35,42 @@ late Prefs prefs;
 final opened = <Uri>[];
 double lat = 37.0;
 
+var _fontsLoaded = false;
+
+/// 테스트 기본 글꼴(Ahem)은 모든 글자가 정사각형이라 실제보다 훨씬 넓다 → 잘림 검사가 틀린다.
+/// SDK 에 들어 있는 Roboto(아이폰 SF 와 폭이 비슷)를 넣어 실제 글자 폭으로 잰다 (대출 세션 노하우).
+Future<void> loadFonts() async {
+  if (_fontsLoaded) return;
+  _fontsLoaded = true;
+  final root =
+      '${Platform.environment['FLUTTER_ROOT'] ?? '/opt/flutter'}/bin/cache/artifacts/material_fonts';
+  Future<void> family(String name, List<String> files) async {
+    final loader = FontLoader(name);
+    for (final f in files) {
+      final file = File('$root/$f');
+      if (!file.existsSync()) {
+        // ignore: avoid_print
+        print(
+          'WARNING: font not found $root/$f — truncation checks use test font',
+        );
+        return;
+      }
+      loader.addFont(
+        Future.value(ByteData.sublistView(file.readAsBytesSync())),
+      );
+    }
+    await loader.load();
+  }
+
+  await family('Roboto', [
+    'Roboto-Regular.ttf',
+    'Roboto-Medium.ttf',
+    'Roboto-Bold.ttf',
+    'Roboto-Black.ttf',
+  ]);
+  await family('MaterialIcons', ['MaterialIcons-Regular.otf']);
+}
+
 Future<void> boot(
   WidgetTester t, {
   Size size = const Size(390, 844),
@@ -42,6 +82,7 @@ Future<void> boot(
   double textScale = 1,
   bool keepPrefs = false,
 }) async {
+  await t.runAsync(loadFonts);
   t.view.physicalSize = size * ratio;
   t.view.devicePixelRatio = ratio;
   t.platformDispatcher.textScaleFactorTestValue = textScale;
@@ -83,6 +124,21 @@ Future<void> press(WidgetTester t, Finder f, String label) async {
   await t.pump();
   await t.pump(const Duration(milliseconds: 350));
   await t.pump(const Duration(milliseconds: 350));
+  expectNoTruncatedText(t, 'after $label');
+}
+
+/// 화면의 글자가 '…' 이나 잘림으로 끊기지 않았는지 (대출 세션 노하우 — 큰 값·작은 화면에서만 드러난다).
+void expectNoTruncatedText(WidgetTester t, String where) {
+  for (final e in find.byType(RichText).evaluate()) {
+    final ro = e.renderObject;
+    if (ro is RenderParagraph && ro.attached) {
+      expect(
+        ro.didExceedMaxLines,
+        isFalse,
+        reason: 'truncated text $where: "${ro.text.toPlainText()}"',
+      );
+    }
+  }
 }
 
 /// [mph] 로 [secs] 초 달린다 (1초마다 GPS 측정 1번).
@@ -274,6 +330,33 @@ void main() {
     await press(t, key('settings'), 'Settings');
     await press(t, key('settings-done'), 'Settings Done');
   });
+
+  testWidgets(
+    'longest labels (km/h, alert 155, boat) fit on iPhone SE at 135% text',
+    (t) async {
+      await boot(
+        t,
+        size: const Size(375, 667),
+        ratio: 2,
+        textScale: 1.35,
+        initial: {
+          'seenSafety': true,
+          'unit_car': 'kmh',
+          'alertOn_car': true,
+          'alertMs_car': SpeedUnit.kmh.toMs(155),
+        },
+      );
+      await drive(t, 99, 3);
+      expect(find.text('Alert 155 KM/H'), findsOneWidget);
+      expectNoTruncatedText(t, 'main km/h');
+      await press(t, key('display'), 'Gauge');
+      await press(t, key('mode-boat'), 'Boat mode');
+      await press(t, key('unit'), 'Unit pill');
+      await press(t, key('unit'), 'Unit pill');
+      await press(t, key('hud'), 'HUD');
+      await press(t, key('hud-exit'), 'Exit HUD');
+    },
+  );
 
   testWidgets('speed alert: red screen + beep, repeats, clears when slower', (
     t,
