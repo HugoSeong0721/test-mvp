@@ -2,11 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../core/currencies.dart';
 import '../../core/format.dart';
 import '../../core/rate_service.dart';
 import '../../core/store.dart';
 import '../../core/theme.dart';
 import '../../core/widgets.dart';
+import '../converter/currency_picker_sheet.dart';
 
 /// 기간별 실제 환율 추이 (RateService.history — 날짜별 공개 환율 파일).
 class ChartScreen extends StatefulWidget {
@@ -18,7 +20,6 @@ class ChartScreen extends StatefulWidget {
 
 class _ChartScreenState extends State<ChartScreen> {
   String _period = '1M';
-  bool _inverted = false;
 
   static const _periods = ['1W', '1M', '3M', '1Y'];
 
@@ -27,11 +28,20 @@ class _ChartScreenState extends State<ChartScreen> {
 
   (String, String) _pair() {
     final s = AppStore.i;
+    final from = s.chartFrom ?? s.base;
     var to = s.chartTo;
-    if (to == s.base || !s.targets.contains(to)) {
-      to = s.targets.firstWhere((t) => t != s.base, orElse: () => 'USD');
+    if (to == from || !currencyByCode.containsKey(to)) {
+      to = [...s.targets, s.base, 'USD', 'EUR'].firstWhere((t) => t != from);
     }
-    return _inverted ? (to, s.base) : (s.base, to);
+    return (from, to);
+  }
+
+  Future<void> _pick(bool left) async {
+    final (a, b) = _pair();
+    final code = await CurrencyPickerSheet.show(context,
+        mode: PickMode.chart, exclude: left ? b : a);
+    if (code == null || code == kRemoveResult) return;
+    left ? AppStore.i.setChartPair(code, b) : AppStore.i.setChartPair(a, code);
   }
 
   Future<List<(DateTime, double)>> _historyFor(String a, String b) {
@@ -74,30 +84,23 @@ class _ChartScreenState extends State<ChartScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(999),
-                      onTap: () => setState(() => _inverted = !_inverted),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: fx.surface,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: fx.line),
+                    Row(
+                      children: [
+                        _CodeChip(code: a, onTap: () => _pick(true)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Icon(Icons.arrow_forward,
+                              size: 15, color: fx.muted),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('$a → $b',
-                                style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
-                                    color: fx.text)),
-                            const SizedBox(width: 6),
-                            Icon(Icons.swap_horiz, size: 14, color: fx.muted),
-                          ],
+                        _CodeChip(code: b, onTap: () => _pick(false)),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          tooltip: 'Swap',
+                          onPressed: () => AppStore.i.setChartPair(b, a),
+                          icon: Icon(Icons.swap_horiz,
+                              size: 20, color: fx.text2),
                         ),
-                      ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -335,4 +338,41 @@ class _ChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ChartPainter old) =>
       old.data != data || old.color != color;
+}
+
+/// 차트 통화 선택 칩 — 눌러서 아무 통화로나 바꾼다.
+class _CodeChip extends StatelessWidget {
+  const _CodeChip({required this.code, required this.onTap});
+  final String code;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final fx = Fx.of(context);
+    final c = currencyByCode[code]!;
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(6, 5, 10, 5),
+        decoration: BoxDecoration(
+          color: fx.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: fx.line),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FlagDot(c, size: 22),
+            const SizedBox(width: 6),
+            Text(code,
+                style: TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w700, color: fx.text)),
+            const SizedBox(width: 2),
+            Icon(Icons.expand_more, size: 16, color: fx.muted),
+          ],
+        ),
+      ),
+    );
+  }
 }

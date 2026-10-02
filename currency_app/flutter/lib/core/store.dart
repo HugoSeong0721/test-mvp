@@ -24,6 +24,9 @@ class AppStore extends ChangeNotifier {
   List<String> targets = ['EUR', 'GBP', 'MXN'];
   String active = 'USD';
   String chartTo = 'USD';
+
+  /// 차트 왼쪽 통화. null 이면 기준 통화를 따른다.
+  String? chartFrom;
   List<String> recents = ['EUR', 'GBP'];
 
   /// 첫 실행 온보딩(기준 통화 선택)을 마쳤는지
@@ -47,6 +50,8 @@ class AppStore extends ChangeNotifier {
       active = (j['active'] as String?) ?? base;
       if (!currencyByCode.containsKey(active)) active = base;
       chartTo = (j['chartTo'] as String?) ?? chartTo;
+      final cf = j['chartFrom'] as String?;
+      chartFrom = currencyByCode.containsKey(cf) ? cf : null;
       recents = (j['recents'] as List?)?.cast<String>() ?? recents;
       onboarded = (j['onboarded'] as bool?) ?? true; // 저장된 설정이 있으면 이미 골랐던 것
     } catch (_) {}
@@ -61,6 +66,7 @@ class AppStore extends ChangeNotifier {
         'targets': targets,
         'active': active,
         'chartTo': chartTo,
+        'chartFrom': chartFrom,
         'recents': recents,
         'onboarded': onboarded,
       }),
@@ -164,6 +170,13 @@ class AppStore extends ChangeNotifier {
 
   void setChartTo(String code) {
     chartTo = code;
+    _commit();
+  }
+
+  void setChartPair(String from, String to) {
+    chartFrom = from;
+    chartTo = to;
+    _pushRecent(from == base ? to : from);
     _commit();
   }
 

@@ -7,22 +7,27 @@ import '../../core/store.dart';
 import '../../core/theme.dart';
 import '../../core/widgets.dart';
 
-enum PickMode { base, add, replace }
+enum PickMode { base, add, replace, chart }
 
 /// 시트에서 "목록에서 제거"를 눌렀을 때 돌아오는 값
 const kRemoveResult = '__remove__';
 
 /// 통화 선택 바텀시트. 고른 통화 코드(또는 [kRemoveResult])를 돌려준다.
 class CurrencyPickerSheet extends StatefulWidget {
-  const CurrencyPickerSheet({super.key, required this.mode, this.replaceIndex});
+  const CurrencyPickerSheet(
+      {super.key, required this.mode, this.replaceIndex, this.exclude});
 
   final PickMode mode;
   final int? replaceIndex;
+
+  /// [PickMode.chart] 에서 고를 수 없는 통화 (차트 반대편 통화)
+  final String? exclude;
 
   static Future<String?> show(
     BuildContext context, {
     required PickMode mode,
     int? replaceIndex,
+    String? exclude,
   }) {
     return showModalBottomSheet<String>(
       context: context,
@@ -30,7 +35,8 @@ class CurrencyPickerSheet extends StatefulWidget {
       backgroundColor: Colors.transparent,
       barrierColor: Fx.of(context).appBg.withValues(alpha: .6),
       builder: (_) =>
-          CurrencyPickerSheet(mode: mode, replaceIndex: replaceIndex),
+          CurrencyPickerSheet(
+              mode: mode, replaceIndex: replaceIndex, exclude: exclude),
     );
   }
 
@@ -47,12 +53,14 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
       PickMode.base => 'Change base currency',
       PickMode.add => 'Add currency',
       PickMode.replace => 'Replace ${s.targets[widget.replaceIndex!]}',
+      PickMode.chart => 'Choose currency',
     };
   }
 
   bool _taken(String code) {
     final s = AppStore.i;
     if (widget.mode == PickMode.base) return code == s.base;
+    if (widget.mode == PickMode.chart) return code == widget.exclude;
     return code == s.base || s.targets.contains(code);
   }
 
