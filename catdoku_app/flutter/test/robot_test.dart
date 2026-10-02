@@ -294,32 +294,29 @@ void main() {
     await finish(t);
   });
 
-  testWidgets(
-    'no video yet → "Loading video…" → tells the user, game continues',
-    (t) async {
-      final ads = FakeAds(
-        result: RewardResult.unavailable,
-        ready: false,
-        delay: const Duration(seconds: 3),
-      );
-      await boot(t, prefs: {'seenHowTo': true}, ads: ads);
-      await press(t, find.text('Play'), 'Home: Today Play');
-      await press(t, find.byKey(const Key('hint')), 'Hint');
-      await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
-      expect(find.text('Loading video…'), findsOneWidget);
-      await t.pump(const Duration(seconds: 3));
-      await t.pump(const Duration(milliseconds: 500));
-      expect(find.text('Loading video…'), findsNothing);
-      expect(
-        find.textContaining('No video available right now'),
-        findsOneWidget,
-      );
-      expect(ads.shown, [RewardPlacement.hint]);
-      expect(gameOf(t).cats, 0);
-      expect(gameOf(t).status, GameStatus.playing);
-      await finish(t);
-    },
-  );
+  testWidgets('no video yet → "Loading video…" → free hint, game continues', (
+    t,
+  ) async {
+    final ads = FakeAds(
+      result: RewardResult.unavailable,
+      ready: false,
+      delay: const Duration(seconds: 3),
+    );
+    await boot(t, prefs: {'seenHowTo': true}, ads: ads);
+    await press(t, find.text('Play'), 'Home: Today Play');
+    await press(t, find.byKey(const Key('hint')), 'Hint');
+    await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
+    expect(find.text('Loading video…'), findsOneWidget);
+    await t.pump(const Duration(seconds: 3));
+    await t.pump(const Duration(milliseconds: 500));
+    expect(find.text('Loading video…'), findsNothing);
+    // 영상이 없으면 막히지 않게 그냥 준다
+    expect(find.textContaining('this one’s on us'), findsOneWidget);
+    expect(ads.shown, [RewardPlacement.hint]);
+    expect(gameOf(t).cats, 1);
+    expect(gameOf(t).status, GameStatus.playing);
+    await finish(t);
+  });
 
   testWidgets('closing the video early gives no reward and says why', (
     t,
@@ -629,6 +626,35 @@ void main() {
     expect(find.text('Level 1'), findsOneWidget);
     expect(gameOf(t).cats, 0);
     await press(t, find.byKey(const Key('back')), 'Game: Back');
+    await finish(t);
+  });
+
+  testWidgets('dead end (a wrong cat leaves no spot) is explained on screen', (
+    t,
+  ) async {
+    await boot(t, prefs: {'seenHowTo': true});
+    await press(t, find.text('Start'), 'Home: Level Start');
+    final g = gameOf(t);
+    // 규칙엔 맞지만 정답이 아닌 고양이를 놓아 막다른 길을 만든다 (못 만들면 판을 바꿔 시도)
+    var made = false;
+    for (var r = 0; r < g.n && !made; r++) {
+      for (var c = 0; c < g.n && !made; c++) {
+        if (g.puzzle.isSolutionCell(r, c) || g.cells[r][c] == Mark.cat) {
+          continue;
+        }
+        if (g.conflictsWith(r, c).isNotEmpty) continue;
+        await tapCell(t, r, c);
+        made = g.stuck;
+      }
+    }
+    expect(made, isTrue, reason: 'could not build a dead end on level 1');
+    await t.pump(const Duration(seconds: 3));
+    expect(find.byKey(const Key('stuck')), findsOneWidget);
+    // 힌트를 쓰면 틀린 고양이를 치워 다시 길이 열린다
+    await press(t, find.byKey(const Key('hint')), 'Hint');
+    await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
+    expect(g.stuck, isFalse);
+    expect(find.byKey(const Key('stuck')), findsNothing);
     await finish(t);
   });
 

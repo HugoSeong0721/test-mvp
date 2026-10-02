@@ -73,6 +73,37 @@ class Game extends ChangeNotifier {
 
   bool isAutoCross(int r, int c) => _auto[r][c] > 0;
 
+  /// 막다른 길: 고양이가 아직 없는 행·열·구역 가운데, 놓을 수 있는 칸이 하나도 안 남은 곳이 있다.
+  /// = 이미 놓은 고양이 중 하나가 틀린 자리. (TestFlight 에서 사용자가 이 상태로 갇혔다)
+  bool get stuck {
+    if (status != GameStatus.playing || cats >= n) return false;
+    bool open(int r, int c) =>
+        cells[r][c] != Mark.cat && conflictsWith(r, c).isEmpty;
+    for (var i = 0; i < n; i++) {
+      if (!rowDone(i) &&
+          ![for (var c = 0; c < n; c++) open(i, c)].contains(true)) {
+        return true;
+      }
+      if (!colDone(i) &&
+          ![for (var r = 0; r < n; r++) open(r, i)].contains(true)) {
+        return true;
+      }
+      if (!regionDone(i)) {
+        var any = false;
+        for (var r = 0; r < n && !any; r++) {
+          for (var c = 0; c < n; c++) {
+            if (puzzle.region[r][c] == i && open(r, c)) {
+              any = true;
+              break;
+            }
+          }
+        }
+        if (!any) return true;
+      }
+    }
+    return false;
+  }
+
   /// 화면 가장자리 표시용 — 그 행/열/구역에 고양이가 있나.
   bool rowDone(int r) => cells[r].contains(Mark.cat);
   bool colDone(int c) =>

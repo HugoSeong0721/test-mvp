@@ -15,7 +15,8 @@ enum RewardResult {
   /// 영상은 떴지만 보상 전에 닫았다.
   closedEarly,
 
-  /// 기다려도 영상이 오지 않았다 (오프라인·광고 재고 없음).
+  /// 기다려도 영상이 오지 않았다 (오프라인·광고 재고 없음·새 앱 검토 중).
+  /// 화면은 이때 보상을 그냥 준다 (game_screen.dart _watchVideo).
   unavailable,
 }
 

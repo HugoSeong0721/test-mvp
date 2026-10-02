@@ -182,11 +182,12 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     setState(() => _waitingVideo = false);
     game.resumeClock();
     game.blockInput();
+    // 영상이 없으면(오프라인·광고 재고 없음·새 앱 검토 중) 그냥 준다 — 막혀서 그만두는 게 더 큰 손해.
+    // 중간에 닫은 경우만 보상 없음.
     final msg = switch (r) {
       RewardResult.rewarded => null,
       RewardResult.closedEarly => 'Watch the whole video to get your reward.',
-      RewardResult.unavailable =>
-        'No video available right now. Check your connection and try again.',
+      RewardResult.unavailable => 'No video right now — this one’s on us! 🎁',
     };
     if (msg != null) {
       ScaffoldMessenger.of(context)
@@ -198,7 +199,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
           ),
         );
     }
-    return r == RewardResult.rewarded;
+    return r != RewardResult.closedEarly;
   }
 
   Future<void> _hint() async {
@@ -384,6 +385,20 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                   fontWeight: FontWeight.w900,
                   color: color,
                 ),
+              ),
+            ),
+          );
+        }
+        if (game.stuck) {
+          return const FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '🤔 No spot left — move a cat or try 💡 Hint',
+              key: Key('stuck'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: C.sub,
               ),
             ),
           );
