@@ -22,7 +22,7 @@ DOCS = HERE.parent / 'docs'
 
 REPLACEMENTS = [
     ("'fx-proto-v3'", "'fx-app-v1'", 2),
-    ('<title>환율 · Currency</title>', '<title>솜 환율 · Som Currency</title>', 1),
+    ('<title>환율 · Currency</title>', '<title>한눈환율 · Glance FX</title>', 1),
 ]
 
 

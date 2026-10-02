@@ -1,4 +1,4 @@
-package com.iottie.somrate
+package com.mgseong.currency
 
 import io.flutter.embedding.android.FlutterActivity
 

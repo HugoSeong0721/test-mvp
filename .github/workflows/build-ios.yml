@@ -55,7 +55,7 @@ jobs:
             echo "ios/ 가 이미 있어 생성 단계를 건너뜁니다."
             exit 0
           fi
-          flutter create --platforms=ios --org com.iottie --project-name somrate .
+          flutter create --platforms=ios --org com.mgseong --project-name somrate .
 
           # flutter create 가 ios/ 밖에 새로 만들거나 되돌린 파일은 버린다 (.metadata·pubspec.lock 만 유지)
           git ls-files -m | grep -v -e '^\.metadata$' -e '^pubspec\.lock$' | xargs git checkout --
@@ -63,7 +63,7 @@ jobs:
 
           PLIST=ios/Runner/Info.plist
           PB=/usr/libexec/PlistBuddy
-          $PB -c "Set :CFBundleDisplayName 솜 환율" "$PLIST"
+          $PB -c "Set :CFBundleDisplayName 한눈환율" "$PLIST"
           $PB -c "Add :GADApplicationIdentifier string $ADMOB_IOS_APP_ID" "$PLIST"
           # SKAdNetwork — iOS 14+ 에서 광고 성과 측정에 필요 (Google 네트워크 ID)
           $PB -c "Add :SKAdNetworkItems array" "$PLIST"

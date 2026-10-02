@@ -94,4 +94,4 @@ const groupLabels = {
 };
 
 /// 온보딩 첫 화면에 타일로 보여줄 "많이 쓰는 통화"
-const popularCodes = ['KGS', 'USD', 'KRW', 'RUB', 'KZT', 'EUR'];
+const popularCodes = ['USD', 'KRW', 'EUR', 'JPY', 'CNY', 'GBP'];

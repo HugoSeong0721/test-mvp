@@ -26,7 +26,7 @@ class SomRateApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '솜 환율',
+      title: '한눈환율',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Fx.light, Brightness.light),
       darkTheme: buildTheme(Fx.dark, Brightness.dark),

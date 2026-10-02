@@ -559,8 +559,8 @@ const GROUPS = [['fiat','법정통화'],['crypto','암호화폐'],['metal','귀�
    targets = 아래에 깔리는 변환 대상 국가들
    active  = 지금 숫자를 입력 중인 통화 (기준이든 아래 행이든 아무거나)
    buf     = active 통화의 입력 버퍼 — 나머지 금액은 여기서 환산된다 */
-const DEFAULTS = {base:'KGS', buf:'1000', targets:['USD','KRW'], active:'KGS',
-                  chartTo:'USD', recents:['USD','KRW']};
+const DEFAULTS = {base:'KRW', buf:'10000', targets:['USD','JPY','EUR'], active:'KRW',
+                  chartTo:'USD', recents:['USD','JPY']};
 let S = load();
 function load(){
   try{
