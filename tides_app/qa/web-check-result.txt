@@ -1,0 +1,45 @@
+PASS  Welcome screen shows
+      📸 01-welcome.png
+PASS  Use My Location → nearest station San Francisco
+PASS  Rising/Falling shown
+PASS  height now in ft
+PASS  today chart title
+PASS  NOAA hilo + 6-minute requested
+PASS  requests carry no location
+      📸 02-home.png
+PASS  chart tap shows time · height
+      📸 03-chart-readout.png
+PASS  tap Saturday row → chart shows Saturday
+      📸 04-saturday.png
+PASS  settings sheet with Not for navigation
+      📸 05-settings.png
+PASS  meters applied
+PASS  back to feet
+PASS  favorite star on
+PASS  stations: favorites section
+PASS  stations: nearby section
+PASS  search "santa monica" finds the pier
+      📸 06-search.png
+PASS  picked Santa Monica → home
+PASS  times in PDT
+PASS  subordinate station opens
+PASS  subordinate: curve marked as estimated
+      📸 07-subordinate.png
+      console errors: 0
+PASS  no console errors (session 1)
+PASS  offline, nothing saved → No data (no fake curve)
+PASS  readable reason
+      📸 08-no-data.png
+PASS  Try again online → data
+PASS  Honolulu nearest
+      console errors: 4 → Failed to load resource: net::ERR_INTERNET_DISCONNECTED | Failed to load resource: net::ERR_INTERNET_DISCONNECTED | Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+PASS  location not given → message (no endless spinner)
+      📸 09-location-denied.png
+PASS  search screen with popular stations
+PASS  Back → welcome
+      console errors: 0
+PASS  iPhone SE: New York nearest
+      📸 10-iphone-se.png
+PASS  no console errors (SE)
+
+✅ 30 passed, 0 failed

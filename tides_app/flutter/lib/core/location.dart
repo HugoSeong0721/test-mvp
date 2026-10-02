@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 enum LocationProblem { serviceOff, denied, deniedForever, unavailable }
@@ -55,7 +56,12 @@ class DeviceLocation extends LocationService {
         return const LocationResult.failed(LocationProblem.serviceOff);
       }
       var p = await Geolocator.checkPermission();
-      if (p == LocationPermission.denied) p = await Geolocator.requestPermission();
+      if (p == LocationPermission.denied) {
+        // iOS keeps its own prompt up until answered. A browser prompt can be left
+        // unanswered forever, so the web preview gives up after a while.
+        final ask = Geolocator.requestPermission();
+        p = kIsWeb ? await ask.timeout(const Duration(seconds: 15), onTimeout: () => LocationPermission.denied) : await ask;
+      }
       if (p == LocationPermission.denied) {
         return const LocationResult.failed(LocationProblem.denied);
       }

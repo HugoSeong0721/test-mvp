@@ -317,27 +317,21 @@ class _DayCard extends StatelessWidget {
         SizedBox(height: 190, child: TideChart(day: day, units: units, now: now)),
         Padding(
           padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
-          child: Row(children: [
-            const Icon(Icons.wb_sunny_outlined, size: 17, color: Color(0xFFE0A100)),
-            const SizedBox(width: 5),
-            Flexible(
-              child: Text(sunText,
-                  key: const Key('sun-times'),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, color: Palette.sub)),
-            ),
-            const SizedBox(width: 12),
-            MoonIcon(illumination: day.moon.illumination, waxing: day.moon.waxing),
-            const SizedBox(width: 5),
-            Flexible(
-              child: Text('${day.moon.phase.label} · ${(day.moon.illumination * 100).round()}%',
-                  key: const Key('moon-phase'),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, color: Palette.sub)),
-            ),
-          ]),
+          // Scales down a little on narrow phones instead of cutting the moon phase off.
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.wb_sunny_outlined, size: 17, color: Color(0xFFE0A100)),
+              const SizedBox(width: 5),
+              Text(sunText, key: const Key('sun-times'), style: const TextStyle(fontSize: 13, color: Palette.sub)),
+              const SizedBox(width: 12),
+              MoonIcon(illumination: day.moon.illumination, waxing: day.moon.waxing),
+              const SizedBox(width: 5),
+              Text('${day.moon.phase.label} · ${(day.moon.illumination * 100).round()}%',
+                  key: const Key('moon-phase'), style: const TextStyle(fontSize: 13, color: Palette.sub)),
+            ]),
+          ),
         ),
       ]),
     );

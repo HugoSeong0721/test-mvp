@@ -19,7 +19,7 @@ class FakeNoaa {
   int calls = 0;
   final List<Uri> requests = [];
 
-  static const captured = {'9414290', '1612340', '8518750', '9410068'};
+  static const captured = {'9414290', '1612340', '8518750', '9410068', '9455920', '8723214'};
 
   late final http.Client client = MockClient((req) async {
     calls++;
@@ -33,8 +33,8 @@ class FakeNoaa {
       return http.Response(
           '{"error": {"message":"No Predictions data was found. Please make sure the Datum input is valid."}}', 200);
     }
-    var src = captured.contains(id) ? id : (isSub ? '9410068' : '9414290');
-    if (six && src == '8518750') src = '9414290';
+    // Captured stations answer with their own data; others get one consistent stand-in pair.
+    final src = captured.contains(id) ? id : (isSub ? '9410068' : '9414290');
     return http.Response(fixture('${src}_${six ? '6min' : 'hilo'}'), 200,
         headers: {'content-type': 'application/json;charset=UTF-8'});
   });

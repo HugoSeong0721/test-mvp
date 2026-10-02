@@ -23,8 +23,9 @@ function noaaBody(url) {
   if (six && SUB.has(id)) {
     return '{"error": {"message":"No Predictions data was found. Please make sure the Datum input is valid."}}';
   }
-  let src = fs.existsSync(path.join(FIX, `${id}_hilo.json`)) ? id : (SUB.has(id) ? '9410068' : '9414290');
-  if (six && !fs.existsSync(path.join(FIX, `${src}_6min.json`))) src = '9414290';
+  // Captured stations answer with their own data; others get one consistent stand-in pair
+  // (San Francisco, or San Nicolas Island for subordinate stations) — never mixed.
+  const src = fs.existsSync(path.join(FIX, `${id}_hilo.json`)) ? id : (SUB.has(id) ? '9410068' : '9414290');
   return fs.readFileSync(path.join(FIX, `${src}_${six ? '6min' : 'hilo'}.json`), 'utf8');
 }
 
