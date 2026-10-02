@@ -1,0 +1,47 @@
+name: Fetch NOAA tides data
+
+# The dev sandbox cannot reach api.tidesandcurrents.noaa.gov, so the tides app's
+# station list, API probe (timing, CORS headers, field names) and real
+# prediction fixtures for tests are fetched here and committed to the
+# `tides-noaa-data` branch (not main, so Pages is not redeployed for raw data).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-noaa
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Switch to data branch
+        run: |
+          if git ls-remote --exit-code --heads origin tides-noaa-data >/dev/null; then
+            git fetch origin tides-noaa-data
+            git checkout -B tides-noaa-data origin/tides-noaa-data
+            git checkout "$GITHUB_SHA" -- tools/tides
+          else
+            git checkout -B tides-noaa-data
+          fi
+
+      - name: Probe NOAA and snapshot data
+        run: python3 -u tools/tides/fetch_noaa.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/tides
+          git commit -m "tides: NOAA probe + station snapshot" || echo "nothing new"
+          git push origin tides-noaa-data
