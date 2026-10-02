@@ -7,14 +7,14 @@ Flutter 1차 완성(`tides_app/flutter/`): 내 위치→가장 가까운 관측�
 이름·번들 ID·결제 여부 사용자 확인 대기 → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] 이름 A/B (후보: **A `Glance Tides: Tide Chart` (추천, Glance 시리즈 + 검색어 "tide chart", 부제에 "Tides Near Me")** / B `Tide Times: Tides Near Me`), 번들 `com.soulfulfill.tides`.
-- [사용자] 광고 제거 단건 결제 넣을지 / 30일 물때표를 "영상 보고 열기"(보상형)로 넣을지.
+- ✅ [사용자] 이름 `Glance Tides: Tide Chart`, 번들 `com.soulfulfill.tides`, 결제 없음, 30일 표 보상형 (10-03).
 - [사용자] 웹 미리보기를 바닷가 근처 아니어도 한 번 열어 보고 '느낌' 한마디.
 - [세션] 결정 나면: 번들 등록 Actions → `Release iOS` 선택지에 `tides` 추가 → 아이콘 → 스토어 문구(`tides_app/store/`).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | (A/B) 이름 "Glance Tides (추천)" / 결제 "넣지 않음 (추천)" / 30일 표 보상형 "넣음 (추천)" | 이름 `Glance Tides: Tide Chart`, 번들 `com.soulfulfill.tides` 등록 실행, 결제 없음, 30일 표 영상 보고 24시간 열기 개발 |
 | 10-03 | "물때 시간(Tides) 앱 개발 시작해줘. plans/tides-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/tides.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 이 파일을 단계마다 갱신 |
 
 ## 사용자 성향 — 원하는 것 / 불편해하는 것 (이 앱에서 알게 된 것)
@@ -37,5 +37,9 @@ Flutter 1차 완성(`tides_app/flutter/`): 내 위치→가장 가까운 관측�
 - **웹 위치 권한 창은 응답 없이 영원히 기다릴 수 있다** (헤드리스 크롬은 답을 안 함) → 웹에서만 `requestPermission` 에 15초 제한. 아이폰은 시스템 창이 답할 때까지 기다리는 게 맞다.
 - Flutter SDK 는 storage.googleapis.com 에서 받으면 된다 (`releases_linux.json` → `stable/linux/flutter_linux_3.47.2-stable.tar.xz`). analytics 접속 시도는 `flutter config --no-analytics`.
 
+- **솔루나(낚시·사냥 시간) 세션에**: 일출·일몰(NOAA 태양 계산식)·달 위상(Meeus)·관측소 시계(미국 DST)는 `tides_app/flutter/lib/core/astro.dart`·`zone.dart` 에 있고
+  PyEphem 기준 검증 테스트가 `test/engine_test.dart` 에 있다(일출일몰 ±90초, 위상 ±3시간). PyEphem 은 `use_center=True` 로 비교해야 NOAA 정의와 맞는다
+  (기본값은 해 윗가장자리라 알래스카 여름에 4분 어긋남). **월출·월몰·달 남중은 아직 없다** — 만들면 알려 주면 물때 앱도 쓴다.
+
 ## 다른 세션·기획 파트너에게 묻고 싶은 것
-- 기획 파트너: 보상형 "30일 물때표" 를 v1 에 넣을지(사용자에게 A/B 로 묻는 중). 배너만으로는 '가끔 여는 앱' 수익이 작을 수 있다.
+- (없음)

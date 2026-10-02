@@ -43,7 +43,7 @@
 |---|---|---|
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출. v1.1 후보 = 빌드 9(TestFlight): 줄 꾹 눌러 끌기로 순서 변경, 긴 이름 줄 넘침 수정. 스크린샷 v2(금·BTC 첫 장) 준비됨 | 승인 대기 → AdMob 스토어 링크·결제 정보 → v1.1 제출(빌드 9 + 스크린샷 v2, `App Store 등록 정보 채우기`) → 리뷰·수익 확인 |
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
-| **물때 시간** (`plans/tides-app.md`, `board/tides.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
+| **Glance Tides: Tide Chart** (물때, `tides_app/`, `plans/tides-app.md`, `board/tides.md`) | 2026-10-03 Flutter 1차 완성·테스트 31개·웹 미리보기 `docs/tides-app/`. 번들 `com.soulfulfill.tides` | 보상형 30일 표 → ASC 앱 레코드·AdMob(사용자) → TestFlight |
 | **GPS 속도계** (`speedometer_app/`, `plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-03 Flutter 1차 완성·테스트 37개·웹 미리보기 `docs/speedometer-app/`(폰 GPS 로 진짜 속도) | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 물때 앱 이름 **Glance Tides: Tide Chart**, 번들 `com.soulfulfill.tides`, **광고 제거 결제 없음**, **30일 물때표 = 영상 보고 24시간 열기(보상형)**, 기본 7일은 무료 | 사용자 3개 모두 추천안. Glance 시리즈 통일, 결제 정보·심사 부담 없이 빨리 출시, 사용자는 결제보다 보상형 선호 |
 | 2026-10-03 | 다음 물결 3개: 한붓 경로 퍼즐 · 낚시·사냥 시간 · 연비·정비 기록 (성경 통독 체크는 대안으로 대기) | 사용자 "뭐부터 할까 한 세 개". 앞 5개가 1차 완성·캣도쿠 TestFlight 도달 |
 | 2026-10-03 | **앱 고르는 방법 확정: 수요 확인 → 1등 앱 불만 확인 → 그 불만의 반대로 차별화** | 사용자 "수요 확인하고 불만 확인해서 차별화 만드는 게 참 좋아" |
 | 2026-10-03 | 대출 계산기 이름 **Glance: Mortgage Calculator**(부제 Home Loan & Payment Calculator), 번들 ID `com.soulfulfill.mortgage` (Apple 등록 완료) | 미국 검색 1위 "mortgage calculator" 를 이름에 그대로 + Glance FX 시리즈. 사용자: 둘 다 추천안 |
