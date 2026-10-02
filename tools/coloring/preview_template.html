@@ -51,7 +51,7 @@ function load(i){
   cur=(i+PICS.length)%PICS.length;const P=PICS[cur],D=P.data;filled=new Set();
   $('title').textContent=`${cur+1}/${PICS.length} · ${P.meta.title||P.id}`;
   const q=D.qa;
-  $('info').innerHTML=`<b>${q.regions}</b> regions · <b>${q.colors}</b> colors · min radius ${q.min_r}px · est. ~${q.est_minutes} min<br>Source: <a href="${P.meta.source_item_url}" target="_blank" rel="noopener">${P.meta.source_name}</a> · ${P.meta.artist||'?'} · ${P.meta.license_id||P.meta.license_seen_on_page}`;
+  $('info').innerHTML=`<b>${q.regions}</b> regions · <b>${q.colors}</b> colors · min radius ${q.min_r}px · est. ~${q.est_minutes} min · colors: <b>${D.color_source==="artwork"?"from the artwork":"temporary auto"}</b><br>Source: <a href="${P.meta.source_item_url}" target="_blank" rel="noopener">${P.meta.source_name}</a> · ${P.meta.artist||'?'} · ${P.meta.license_id||P.meta.license_seen_on_page}`;
   const f=$('fills');f.innerHTML='';
   D.regions.forEach((r,k)=>{const p=document.createElementNS(NS,'path');p.setAttribute('d',r.d);p.setAttribute('class','rg');p.dataset.k=k;f.appendChild(p)});
   D.regions.forEach((r,k)=>{const t=document.createElementNS(NS,'text');t.setAttribute('x',r.x);t.setAttribute('y',r.y);t.setAttribute('class','num');t.style.fontSize=Math.min(r.r*1.1,46)+'px';t.dataset.k=k;t.textContent=r.c;f.appendChild(t)});
