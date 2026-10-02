@@ -48,7 +48,7 @@
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
-| **한붓 경로 퍼즐** (`plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
+| **한붓 경로 퍼즐** (`path_puzzle_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
 | **낚시·사냥 시간** (`plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | **연비·정비 기록** (`plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 경로 퍼즐 1차 범위(개발 세션 판단): 오늘의 퍼즐 **6×6**, 벽 없음(규칙 2개), 실패·하트 없음(점수 = 시간), 보상형 = 힌트(정답 길을 다음 숫자까지 그어 줌), 되돌리기·지우기 무료 무제한. 상표 Zip·Flow·Numbrix·Hidato 사용 금지 | 원조 게임 기본 크기 6×6(숫자 평균 10), 캣도쿠 7×7 첫 판 "어렵다" 피드백, 경쟁 앱 불만(힌트가 길을 안 보여 줌·되돌리기 없음·코인) 의 반대. 벽은 TestFlight 느낌 보고 |
 | 2026-10-03 | 사용자 몫 최소화: 테스트까지는 **ASC 신규 앱 1회 등록만**, 그 뒤 TestFlight 초대 메일 → 코드 입력. 초대 자동화는 공용 작업 요청(`board/_shared.md`). AdMob 은 스토어 제출 직전 | 사용자 "그냥 이메일로 테스트 코드 받아 넣어서 해보고 싶은데" |
 | 2026-10-03 | Apple 앱 레코드·AdMob 앱/광고 단위는 사용자 몫으로 남김(자동화 불가 확인). 대신 폰용 할 일 페이지 `docs/todo.html` + 몰아서 처리, AdMob 은 스토어 제출 전까지만 | 사용자 "애플·애드몹 가서 넣는 게 힘든데 너가 못 하니" |
 | 2026-10-03 | 속도계 앱 이름 **Glance Speed: GPS Speedometer**, 번들 ID `com.soulfulfill.speedometer` | 미국 1·2위 검색어(speedometer·gps speedometer)를 이름에 담고 Glance 시리즈. 사용자: 둘 다 추천대로 |
