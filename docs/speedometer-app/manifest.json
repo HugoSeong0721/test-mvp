@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#0B0E13",
     "theme_color": "#0B0E13",
-    "description": "GPS speedometer \u2014 big numbers, HUD, speed alert, trip stats.",
+    "description": "GPS speedometer — big numbers, HUD, speed alert, trip stats.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
