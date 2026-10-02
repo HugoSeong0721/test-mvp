@@ -59,8 +59,7 @@ class SolveResult {
 }
 
 class PathPuzzle {
-  PathPuzzle(this.n, this.path, this.clues)
-    : numberAt = Int32List(n * n) {
+  PathPuzzle(this.n, this.path, this.clues) : numberAt = Int32List(n * n) {
     for (var k = 0; k < clues.length; k++) {
       numberAt[clues[k]] = k + 1;
     }
@@ -131,8 +130,7 @@ class PathPuzzle {
       }
       if (!unique) continue;
       // 목표 개수까지 빼 보기 (양 끝은 그대로)
-      final inner = idx.where((i) => i != 0 && i != total - 1).toList()
-        ..sort();
+      final inner = idx.where((i) => i != 0 && i != total - 1).toList()..sort();
       rng.shuffle(inner);
       for (final i in inner) {
         if (idx.length <= target) break;
@@ -154,8 +152,9 @@ class PathPuzzle {
     _ => 13,
   };
 
-  static List<int> _cluesOf(List<int> path, Set<int> idx) =>
-      [for (final i in idx.toList()..sort()) path[i]];
+  static List<int> _cluesOf(List<int> path, Set<int> idx) => [
+    for (final i in idx.toList()..sort()) path[i],
+  ];
 
   static int _midOfLongestGap(Set<int> idx, int total) {
     final s = idx.toList()..sort();

@@ -262,14 +262,22 @@ class Game extends ChangeNotifier {
   };
 
   /// 저장된 줄을 한 칸씩 다시 그어 본다 — 규칙에 맞는 데까지만 살린다.
+  /// 저장이 깨져 있으면(형식이 다르면) 숫자 1부터 새로 — 회색 화면에 갇히지 않게 (캣도쿠 점검 3차).
   void restore(Map<String, dynamic> s) {
-    if (s['n'] != n) return;
-    final saved = (s['path'] as List?)?.cast<int>() ?? const <int>[];
-    if (saved.isEmpty || saved.first != puzzle.clues.first) return;
-    for (final c in saved.skip(1)) {
-      if (c < 0 || c >= puzzle.cells || !step(c)) break;
+    try {
+      if (s['n'] != n) return;
+      final raw = s['path'];
+      if (raw is! List || raw.isEmpty || raw.first != puzzle.clues.first) {
+        return;
+      }
+      for (final c in raw.skip(1)) {
+        if (c is! int || c < 0 || c >= puzzle.cells || !step(c)) break;
+      }
+      final h = s['hints'];
+      hintsUsed = h is int ? h : 0;
+    } catch (_) {
+      _truncate(1);
     }
-    hintsUsed = (s['hints'] as int?) ?? 0;
     // 복원 중 생긴 막힘 표시는 지운다
     lastBlock = null;
     eventSeq = 0;
@@ -278,9 +286,8 @@ class Game extends ChangeNotifier {
 
   @visibleForTesting
   void solveAllButLast() {
-    for (final c in puzzle.path.skip(path.length).take(
-      puzzle.cells - path.length - 1,
-    )) {
+    for (final c
+        in puzzle.path.skip(path.length).take(puzzle.cells - path.length - 1)) {
       if (!step(c)) break;
     }
   }
