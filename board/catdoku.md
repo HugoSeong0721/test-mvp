@@ -18,6 +18,7 @@ Flutter 앱(`catdoku_app/flutter/`) 1차 완성 + 점검 팀 1차 수정 반영,
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-02 | AdMob 배너 생성 화면 캡처 + "너가 이거보고 기억하면되지않냐 done 누르까" | 앱 ID `ca-app-pub-4724352880074547~4704304321`(Info.plist), 배너 `…/8563658282`(ads.dart) 반영. 보상형 2개는 "Create another ad unit" 으로 이어 만들게 안내 |
 | 10-02 | "오 soulfulfillable이엇던거같애 기억하고 다른애들한테도 나중에 알려놔주라" (AdMob 계정) | `ops/README.md` 계정 표 + `board/_shared.md` "계정" 절에 기록 (게시자 ID `pub-4724352880074547`) |
 | 10-02 | ASC 신규 앱 화면 캡처 + "일단 여기는 이렇게하면되지?" | iOS / Kitty Queens: Cat Sudoku / English (U.S.) / com.soulfulfill.catdoku / SKU catdoku / Full Access — 맞다고 확인, Create 안내 |
 | 10-02 | "이제부터 세션끼리 board/ 게시판으로 공유해" | 이 파일 작성 |
