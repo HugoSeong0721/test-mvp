@@ -29,6 +29,8 @@
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
 
 ### 2026-10-03 개발 세션 1 (05~07시 KST)
+- **이름 `Glance dB: Decibel Meter`·번들 `com.soulfulfill.decibel` 확정(사용자 "추천대로") → Actions 로 Apple 번들 ID 등록 완료.**
+  `Release iOS`·`App Store 등록 정보 채우기` 선택지에 decibel 추가.
 - ①경쟁 앱 조사: 1위 검색어 **"decibel meter"**(그다음 sound meter·noise meter). Decibel X 는 첫 실행 구독(연 $49.99)·무료판 dBA 잠금,
   광고형 앱은 "광고 소리가 측정을 망친다" 불만, 이웃 소음 증거용 리포트 수요 확인 → `decibel_app/store/ios-listing.md`.
 - ②③ `decibel_app/flutter/` (Flutter 3.47.2): 측정 엔진 `lib/core/meter.dart` — A/C/Z 가중(쌍일차 변환, IEC 61672 표와 31.5 Hz~4 kHz ±0.13 dB,
@@ -43,4 +45,4 @@
   스크린샷으로 찾아 고친 것: 큰 숫자가 눈금과 겹침, 리포트 레벨 막대 높이 0, 대화(60 dB)가 "Noisy" 로 뜨던 구간 이름.
 - 개인정보처리방침 `docs/decibel-privacy.html`. 아이콘 `assets/icon/icon.svg`(직접 그림) → 1024 PNG.
 - **기본 보정 +94 dB 는 공개 자료 추정치** — TestFlight 실기기에서 NIOSH SLM 과 비교해 확인 필요 (확인 못 함).
-- 남은 것: 이름·번들 ID 사용자 확인 → 번들 등록 Actions → ASC 앱 레코드·AdMob(사용자) → `Release iOS` 에 decibel 추가 → TestFlight.
+- 남은 것: ASC 앱 레코드·AdMob 배너 단위(사용자) → 광고 ID 교체 → `Release iOS`(decibel) → TestFlight → 보정값 실기기 확인.
