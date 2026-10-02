@@ -37,6 +37,9 @@ jobs:
       - name: Probe NOAA and snapshot data
         run: python3 -u tools/tides/fetch_noaa.py
 
+      - name: Build compact station list (with DST flags)
+        run: python3 -u tools/tides/build_stations.py
+
       - name: Commit
         if: always()
         run: |
