@@ -14,8 +14,12 @@ const kRemoveResult = '__remove__';
 
 /// 통화 선택 바텀시트. 고른 통화 코드(또는 [kRemoveResult])를 돌려준다.
 class CurrencyPickerSheet extends StatefulWidget {
-  const CurrencyPickerSheet(
-      {super.key, required this.mode, this.replaceIndex, this.exclude});
+  const CurrencyPickerSheet({
+    super.key,
+    required this.mode,
+    this.replaceIndex,
+    this.exclude,
+  });
 
   final PickMode mode;
   final int? replaceIndex;
@@ -34,9 +38,11 @@ class CurrencyPickerSheet extends StatefulWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Fx.of(context).appBg.withValues(alpha: .6),
-      builder: (_) =>
-          CurrencyPickerSheet(
-              mode: mode, replaceIndex: replaceIndex, exclude: exclude),
+      builder: (_) => CurrencyPickerSheet(
+        mode: mode,
+        replaceIndex: replaceIndex,
+        exclude: exclude,
+      ),
     );
   }
 
@@ -68,88 +74,104 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
   Widget build(BuildContext context) {
     final fx = Fx.of(context);
     final s = AppStore.i;
-    final canRemove =
-        widget.mode == PickMode.replace && s.targets.length > 1;
+    final canRemove = widget.mode == PickMode.replace && s.targets.length > 1;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * .86,
-      ),
-      decoration: BoxDecoration(
-        color: fx.appBg,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(top: BorderSide(color: fx.line)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.only(top: 10, bottom: 4),
-            decoration: BoxDecoration(
-              color: fx.line,
-              borderRadius: BorderRadius.circular(2),
+    // 키보드 위에 올려놓고 높이를 고정한다. 목록 길이에 맞춰 줄어들면 검색 결과가 적을 때
+    // 시트 전체(검색창 포함)가 키보드 뒤로 내려가 사라진 것처럼 보였다.
+    final kb = MediaQuery.viewInsetsOf(context).bottom;
+    final avail = MediaQuery.sizeOf(context).height - kb;
+    return Padding(
+      padding: EdgeInsets.only(bottom: kb),
+      child: Container(
+        height: avail * (kb > 0 ? .92 : .86),
+        decoration: BoxDecoration(
+          color: fx.appBg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(top: BorderSide(color: fx.line)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.only(top: 10, bottom: 4),
+              decoration: BoxDecoration(
+                color: fx.line,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 6, 12, 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(_title,
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: fx.text)),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Close',
-                      style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: fx.muted)),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            child: CurrencySearchField(onChanged: (v) => setState(() => _q = v)),
-          ),
-          if (canRemove)
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context, kRemoveResult),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: fx.neg,
-                    backgroundColor: fx.surface,
-                    side: BorderSide(color: fx.line),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+              padding: const EdgeInsets.fromLTRB(20, 6, 12, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: fx.text,
+                      ),
+                    ),
                   ),
-                  child: Text(
-                    '− Remove ${s.targets[widget.replaceIndex!]}',
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w700),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Close',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: fx.muted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+              child: CurrencySearchField(
+                onChanged: (v) => setState(() => _q = v),
+              ),
+            ),
+            if (canRemove)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, kRemoveResult),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: fx.neg,
+                      backgroundColor: fx.surface,
+                      side: BorderSide(color: fx.line),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      '− Remove ${s.targets[widget.replaceIndex!]}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ),
+            Expanded(
+              child: CurrencyList(
+                query: _q,
+                showRecents: true,
+                isTaken: _taken,
+                shrinkWrap: false,
+                onPick: (code) => Navigator.pop(context, code),
+              ),
             ),
-          Flexible(
-            child: CurrencyList(
-              query: _q,
-              showRecents: true,
-              isTaken: _taken,
-              onPick: (code) => Navigator.pop(context, code),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -174,7 +196,10 @@ class CurrencySearchField extends StatelessWidget {
         filled: true,
         fillColor: fx.surface,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 11,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide(color: fx.line),
@@ -196,12 +221,14 @@ class CurrencyList extends StatelessWidget {
     required this.onPick,
     this.isTaken,
     this.showRecents = false,
+    this.shrinkWrap = true,
   });
 
   final String query;
   final ValueChanged<String> onPick;
   final bool Function(String code)? isTaken;
   final bool showRecents;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
@@ -222,8 +249,9 @@ class CurrencyList extends StatelessWidget {
 
     var any = false;
     for (final g in CurrencyGroup.values) {
-      final items =
-          currencies.where((c) => c.group == g && c.matches(q)).toList();
+      final items = currencies
+          .where((c) => c.group == g && c.matches(q))
+          .toList();
       if (items.isEmpty) continue;
       any = true;
       children.add(_group(groupLabels[g]!));
@@ -233,31 +261,34 @@ class CurrencyList extends StatelessWidget {
     if (!any) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 30),
-        child: Text('No matches',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: fx.muted)),
+        child: Text(
+          'No matches',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 13, color: fx.muted),
+        ),
       );
     }
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
-      shrinkWrap: true,
+      shrinkWrap: shrinkWrap,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: children,
     );
   }
 
   Widget _group(String label) => Builder(
-        builder: (context) => Padding(
-          padding: const EdgeInsets.fromLTRB(10, 16, 10, 7),
-          child: Eyebrow(label),
-        ),
-      );
+    builder: (context) => Padding(
+      padding: const EdgeInsets.fromLTRB(10, 16, 10, 7),
+      child: Eyebrow(label),
+    ),
+  );
 
   Widget _row(Currency c) => CurrencyRow(
-        currency: c,
-        taken: isTaken?.call(c.code) ?? false,
-        onTap: () => onPick(c.code),
-      );
+    currency: c,
+    taken: isTaken?.call(c.code) ?? false,
+    onTap: () => onPick(c.code),
+  );
 }
 
 class CurrencyRow extends StatelessWidget {
@@ -291,30 +322,41 @@ class CurrencyRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(currency.code,
-                        style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: .5,
-                            fontFamily: 'monospace',
-                            color: fx.text)),
-                    Text(currency.name,
-                        style: TextStyle(fontSize: 11.5, color: fx.muted)),
+                    Text(
+                      currency.code,
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: .5,
+                        fontFamily: 'monospace',
+                        color: fx.text,
+                      ),
+                    ),
+                    Text(
+                      currency.name,
+                      style: TextStyle(fontSize: 11.5, color: fx.muted),
+                    ),
                   ],
                 ),
               ),
               if (taken)
-                Text('✓',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: fx.pos))
+                Text(
+                  '✓',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: fx.pos,
+                  ),
+                )
               else
-                Text('1 USD = ${fmtAmount(rate)}',
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: fx.text2,
-                        fontFeatures: tabularNums)),
+                Text(
+                  '1 USD = ${fmtAmount(rate)}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: fx.text2,
+                    fontFeatures: tabularNums,
+                  ),
+                ),
             ],
           ),
         ),
