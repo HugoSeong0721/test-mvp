@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iottie_automation/features/patient_requests/presentation/patient_requests_screen.dart';
-import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
+import 'package:clinic_app/features/patient_requests/presentation/patient_requests_screen.dart';
+import 'package:clinic_app/features/visit_history/presentation/visit_history_screen.dart';
 
 import 'core/navigation/current_route_tracker.dart';
 import 'core/data/clinic_data_store.dart';

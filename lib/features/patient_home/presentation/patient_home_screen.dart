@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:iottie_automation/features/patient_requests/presentation/patient_requests_screen.dart';
-import 'package:iottie_automation/features/visit_history/presentation/visit_history_screen.dart';
+import 'package:clinic_app/features/patient_requests/presentation/patient_requests_screen.dart';
+import 'package:clinic_app/features/visit_history/presentation/visit_history_screen.dart';
 
 import '../../../core/data/clinic_data_store.dart';
 import '../../../core/services/app_firestore_service.dart';

@@ -27,7 +27,7 @@ Last updated: 2026-04-14 (America/New_York)
 - [ ] GitHub board created
 
 ## How to Track Day to Day
-1. Open [EXECUTION_TRACKER.csv](/C:/Users/mgseo/iottie_automation/EXECUTION_TRACKER.csv) in Excel.
+1. Open [EXECUTION_TRACKER.csv](/C:/Users/mgseo/clinic_app/EXECUTION_TRACKER.csv) in Excel.
 2. Update only these columns every day: `Status`, `DoneDate`, `Blocker`, `NextAction`.
 3. Keep one row = one concrete action (max 1-2 hours).
 4. If blocked for 24h, split task into smaller steps.

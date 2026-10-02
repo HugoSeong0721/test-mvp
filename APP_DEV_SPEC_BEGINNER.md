@@ -2,7 +2,7 @@
 
 ## 0) 이 문서 목적
 - 개발이 처음이어도 "무엇을 먼저 만들지"를 헷갈리지 않게 하는 실행 문서.
-- MVP 범위는 [APP_MVP_SCOPE.md](C:/Users/mgseo/iottie_automation/APP_MVP_SCOPE.md) 기준.
+- MVP 범위는 [APP_MVP_SCOPE.md](C:/Users/mgseo/clinic_app/APP_MVP_SCOPE.md) 기준.
 
 ## 1) 먼저 답변: 실제 화면 볼 수 있나요?
 - 가능해요. 개발 중에 실제 화면을 계속 볼 수 있습니다.
@@ -142,6 +142,6 @@
 5. 텍스트/버튼 크기 등 접근성 정리.
 
 ## 8) 지금 당장 할 일
-1. [SCREEN_PREVIEW.html](C:/Users/mgseo/iottie_automation/SCREEN_PREVIEW.html) 열어서 화면 구조 체감.
+1. [SCREEN_PREVIEW.html](C:/Users/mgseo/clinic_app/SCREEN_PREVIEW.html) 열어서 화면 구조 체감.
 2. 화면 보고 문구/순서 수정 포인트 5개 메모.
 3. 그 수정본으로 실제 Flutter 화면 구현 시작.

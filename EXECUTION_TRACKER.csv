@@ -3,7 +3,7 @@ Epic,StepID,Task,Status,Priority,StartDate,DueDate,DoneDate,Owner,Blocker,Eviden
 0.Setup,0.2,Wireframe v1 text draft,Done,P0,2026-04-14,2026-04-14,2026-04-14,Me,None,APP_WIREFRAME.md,Convert to real UI
 0.Setup,0.3,Beginner dev spec draft,Done,P1,2026-04-14,2026-04-14,2026-04-14,Me,None,APP_DEV_SPEC_BEGINNER.md,Review with spouse
 1.Foundation,1.1,Install Flutter SDK,Done,P0,2026-04-14,2026-04-14,2026-04-14,Codex,None,flutter doctor output,Pin exact runtime commands
-1.Foundation,1.2,Create runnable Flutter project,Done,P0,2026-04-14,2026-04-14,2026-04-14,Codex,None,C:/Users/mgseo/iottie_automation pubspec.yaml,Stabilize project path
+1.Foundation,1.2,Create runnable Flutter project,Done,P0,2026-04-14,2026-04-14,2026-04-14,Codex,None,C:/Users/mgseo/clinic_app pubspec.yaml,Stabilize project path
 1.Foundation,1.3,Implement 3 MVP screens skeleton,In Progress,P0,2026-04-14,2026-04-15,,Codex,Project path confusion,acupuncture_mvp/lib/* screens,Move screens to active app root
 1.Foundation,1.4,Reliable local run command documented,Blocked,P0,2026-04-14,2026-04-14,,Codex,puro path mismatch,PowerShell error screenshot,Use direct flutter path + one script
 2.RoleUX,2.1,Patient intake screen polish,Todo,P1,2026-04-15,2026-04-16,,Me,None,,Finalize field order and labels
