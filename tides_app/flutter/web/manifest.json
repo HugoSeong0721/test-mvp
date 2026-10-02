@@ -3,7 +3,7 @@
     "short_name": "Glance Tides",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#F4F8FC",
+    "background_color": "#0B3A66",
     "theme_color": "#1677C9",
     "description": "Tide times and tide charts from NOAA predictions.",
     "orientation": "portrait-primary",

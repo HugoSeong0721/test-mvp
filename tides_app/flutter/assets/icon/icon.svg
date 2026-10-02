@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B3A66"/>
+      <stop offset="1" stop-color="#1677C9"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7CC4F5"/>
+      <stop offset="1" stop-color="#2F8FDB" stop-opacity="0.15"/>
+    </linearGradient>
+    <mask id="crescent">
+      <rect width="1024" height="1024" fill="#000"/>
+      <circle cx="742" cy="270" r="92" fill="#fff"/>
+      <circle cx="790" cy="236" r="84" fill="#000"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+  <!-- moon -->
+  <rect width="1024" height="1024" fill="#F2E3A6" mask="url(#crescent)"/>
+  <!-- tide curve with fill -->
+  <path d="M0 640 C 140 640, 200 420, 340 420 S 560 700, 700 700 S 900 470, 1024 470 L 1024 1024 L 0 1024 Z" fill="url(#sea)"/>
+  <path d="M0 640 C 140 640, 200 420, 340 420 S 560 700, 700 700 S 900 470, 1024 470" fill="none" stroke="#FFFFFF" stroke-width="44" stroke-linecap="round"/>
+  <!-- high tide marker -->
+  <circle cx="340" cy="420" r="40" fill="#FFFFFF"/>
+  <circle cx="340" cy="420" r="20" fill="#1677C9"/>
+</svg>
