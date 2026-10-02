@@ -53,17 +53,20 @@ void main() {
     expect(g.path, [0]);
   });
 
-  test('reaching the last number early: cannot go past it, must slide back', () {
-    final g = newGame();
-    for (final c in [1, 2, 5, 4, 7, 8]) {
-      expect(g.step(c), isTrue);
-    }
-    expect(g.status, GameStatus.playing, reason: '3 and 6 are still empty');
-    expect(g.left, 2);
-    // 끝 숫자 너머로는 못 간다 (8 은 구석이라 붙은 빈칸이 없다 → 아무 칸이나)
-    expect(g.step(5), isTrue, reason: 'stepping back onto the line erases');
-    expect(g.path, [0, 1, 2, 5]);
-  });
+  test(
+    'reaching the last number early: cannot go past it, must slide back',
+    () {
+      final g = newGame();
+      for (final c in [1, 2, 5, 4, 7, 8]) {
+        expect(g.step(c), isTrue);
+      }
+      expect(g.status, GameStatus.playing, reason: '3 and 6 are still empty');
+      expect(g.left, 2);
+      // 끝 숫자 너머로는 못 간다 (8 은 구석이라 붙은 빈칸이 없다 → 아무 칸이나)
+      expect(g.step(5), isTrue, reason: 'stepping back onto the line erases');
+      expect(g.path, [0, 1, 2, 5]);
+    },
+  );
 
   test('past-end block when the last number has an empty neighbour', () {
     // 0 1 2 / 5 4 3 / 6 7 8 에서 끝을 4번 칸(가운데)으로 바꾼 판: 0→1→2→5→4 로 끝 숫자에 닿은 뒤 3 으로 가려 하면 막힌다
@@ -123,35 +126,41 @@ void main() {
     expect(g.status, GameStatus.won);
   });
 
-  test('hint always moves at least 3 squares even if the next number is close', () {
-    final p = PathPuzzle(3, [0, 1, 2, 5, 4, 3, 6, 7, 8], [0, 1, 8]);
-    final g = Game(p, mode: GameMode.level);
-    g.applyHint();
-    expect(g.path.length, greaterThanOrEqualTo(1 + Game.minHintCells));
-  });
+  test(
+    'hint always moves at least 3 squares even if the next number is close',
+    () {
+      final p = PathPuzzle(3, [0, 1, 2, 5, 4, 3, 6, 7, 8], [0, 1, 8]);
+      final g = Game(p, mode: GameMode.level);
+      g.applyHint();
+      expect(g.path.length, greaterThanOrEqualTo(1 + Game.minHintCells));
+    },
+  );
 
-  test('save / restore keeps the line; a broken save keeps only the valid part', () {
-    final g = newGame();
-    for (final c in [1, 2, 5]) {
-      g.step(c);
-    }
-    final snap = g.snapshot();
-    final g2 = newGame()..restore(snap);
-    expect(g2.path, [0, 1, 2, 5]);
-    expect(g2.eventSeq, 0, reason: 'no stray message after restoring');
-    final g3 = newGame()
-      ..restore({
-        'n': 3,
-        'path': [0, 1, 7, 8],
-        'secs': 3,
-      });
-    expect(g3.path, [0, 1]);
-    final g4 = newGame()
-      ..restore({
-        'n': 4,
-        'path': [0, 1],
-        'secs': 3,
-      });
-    expect(g4.path, [0], reason: 'wrong board size is ignored');
-  });
+  test(
+    'save / restore keeps the line; a broken save keeps only the valid part',
+    () {
+      final g = newGame();
+      for (final c in [1, 2, 5]) {
+        g.step(c);
+      }
+      final snap = g.snapshot();
+      final g2 = newGame()..restore(snap);
+      expect(g2.path, [0, 1, 2, 5]);
+      expect(g2.eventSeq, 0, reason: 'no stray message after restoring');
+      final g3 = newGame()
+        ..restore({
+          'n': 3,
+          'path': [0, 1, 7, 8],
+          'secs': 3,
+        });
+      expect(g3.path, [0, 1]);
+      final g4 = newGame()
+        ..restore({
+          'n': 4,
+          'path': [0, 1],
+          'secs': 3,
+        });
+      expect(g4.path, [0], reason: 'wrong board size is ignored');
+    },
+  );
 }

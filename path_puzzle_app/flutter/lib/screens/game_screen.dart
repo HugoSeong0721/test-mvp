@@ -55,7 +55,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       levelNo: level,
       carried: daily
           ? (practice ? 0 : AppStore.i.carriedTime(day))
-          : (saved?['secs'] as int? ?? 0),
+          : (saved?['secs'] is int ? saved!['secs'] as int : 0),
     );
     if (saved != null) game.restore(saved);
     game.addListener(_onGame);
@@ -94,6 +94,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   /// 줄이 끝까지 이어지는 걸 보여 준 뒤에 결과 패널을 띄운다.
   bool _showWin = false;
+  bool _panelArmed = false;
   Timer? _winTimer;
 
   Future<void> _onWin() async {
@@ -101,7 +102,15 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     _recorded = true;
     _wonTime = game.seconds < 1 ? 1 : game.seconds;
     _winTimer = Timer(const Duration(milliseconds: 900), () {
-      if (mounted) setState(() => _showWin = true);
+      if (!mounted) return;
+      setState(() {
+        _showWin = true;
+        _panelArmed = false;
+      });
+      // 뜬 직후 0.45초는 버튼이 안 눌린다 — 마지막 칸을 연타하던 손가락이 패널 버튼에 떨어져 축하를 건너뛰지 않게
+      _winTimer = Timer(const Duration(milliseconds: 450), () {
+        if (mounted) setState(() => _panelArmed = true);
+      });
     });
     if (daily && !practice) {
       await AppStore.i.markDailySolved(day, _wonTime!);
@@ -148,7 +157,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   void _next() {
     // 버튼을 두 번 누르면 두 번 불린다 — 승리 상태일 때만, 한 번만.
-    if (game.status != GameStatus.won || !_showWin) return;
+    if (game.status != GameStatus.won || !_showWin || !_panelArmed) return;
     _winTimer?.cancel();
     game.removeListener(_onGame);
     game.dispose();
@@ -520,21 +529,23 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   }
 
   Widget _panel(List<Widget> kids) => Positioned.fill(
-    child: Container(
-      color: const Color(0x66000000),
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(22),
-      child: SingleChildScrollView(
-        child: Container(
-          key: const Key('panel'),
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 18),
-          decoration: BoxDecoration(
-            color: C.bg,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: shadow,
-          ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: kids),
+    child: IgnorePointer(ignoring: !_panelArmed, child: _panelBody(kids)),
+  );
+
+  Widget _panelBody(List<Widget> kids) => Container(
+    color: const Color(0x66000000),
+    alignment: Alignment.center,
+    padding: const EdgeInsets.all(22),
+    child: SingleChildScrollView(
+      child: Container(
+        key: const Key('panel'),
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 18),
+        decoration: BoxDecoration(
+          color: C.bg,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: shadow,
         ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: kids),
       ),
     ),
   );

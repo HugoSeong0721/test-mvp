@@ -149,7 +149,8 @@ Offset cellCenter(WidgetTester t, int cell) {
   final g = gameOf(t);
   final rect = t.getRect(find.byKey(const Key('board')));
   final cs = rect.width / g.n;
-  return rect.topLeft + Offset((cell % g.n + 0.5) * cs, (cell ~/ g.n + 0.5) * cs);
+  return rect.topLeft +
+      Offset((cell % g.n + 0.5) * cs, (cell ~/ g.n + 0.5) * cs);
 }
 
 /// 손가락으로 칸들을 차례로 지나며 긋는다 (칸 가운데를 잇는 직선 움직임).
@@ -178,8 +179,14 @@ Future<void> draw(
 Future<void> drawRest(WidgetTester t) async {
   final g = gameOf(t);
   expect(g.correctPrefix, g.path.length, reason: 'line must be on the answer');
-  await draw(t, g.puzzle.path.sublist(g.path.length - 1), label: 'draw to the end');
+  await draw(
+    t,
+    g.puzzle.path.sublist(g.path.length - 1),
+    label: 'draw to the end',
+  );
+  // 결과 패널은 0.9초 뒤에 뜨고, 그 뒤 0.45초는 버튼이 잠겨 있다
   await t.pump(const Duration(milliseconds: 1000));
+  await t.pump(const Duration(milliseconds: 500));
 }
 
 Future<void> finish(WidgetTester t) async {
@@ -251,7 +258,11 @@ void main() {
       }
       if (wrongTarget == null) {
         // 줄 끝 옆에 큰 숫자가 없으면, 큰 숫자 옆까지 정답을 따라가 본다
-        for (var i = g.path.length; i < sol.length - 1 && wrongTarget == null; i++) {
+        for (
+          var i = g.path.length;
+          i < sol.length - 1 && wrongTarget == null;
+          i++
+        ) {
           await draw(t, [g.head, sol[i]]);
           for (final c in PathPuzzle.neighbors(g.n)[g.head]) {
             if (g.puzzle.numberAt[c] > g.nextNumber && !g.isOnPath(c)) {
@@ -265,7 +276,10 @@ void main() {
       await draw(t, [g.head, wrongTarget!], label: 'draw into a wrong number');
       expect(g.path, before, reason: 'wrong number must block');
       await t.pump(const Duration(milliseconds: 100));
-      expect(find.textContaining('first — numbers go in order'), findsOneWidget);
+      expect(
+        find.textContaining('first — numbers go in order'),
+        findsOneWidget,
+      );
       await shot(t, '04-wrong-number');
       await t.pump(const Duration(seconds: 3));
 
@@ -334,31 +348,32 @@ void main() {
     },
   );
 
-  testWidgets('levels: win → next → back keeps progress and the half-drawn line', (
-    t,
-  ) async {
-    await boot(t, prefs: {'seenHowTo': true});
-    await press(t, find.text('Start'), 'Home: Level Start');
-    var g = gameOf(t);
-    expect(g.n, 5);
-    await drawRest(t);
-    expect(find.text('🎉 Level 1 cleared!'), findsOneWidget);
-    expect(AppStore.i.level, 2);
-    await press(t, find.byKey(const Key('next')), 'Won: Next Level');
-    expect(find.text('Level 2'), findsOneWidget);
-    g = gameOf(t);
-    await draw(t, g.puzzle.path.sublist(0, 6));
-    await press(t, find.byKey(const Key('back')), 'Game: Back');
-    expect(find.text('Level 2'), findsOneWidget);
-    expect(find.text('Continue'), findsOneWidget);
-    await press(t, find.text('Continue'), 'Home: Level Continue');
-    g = gameOf(t);
-    expect(g.path, g.puzzle.path.sublist(0, 6), reason: 'line kept');
-    await drawRest(t);
-    await press(t, find.byKey(const Key('home')), 'Won: Home');
-    expect(find.text('Level 3'), findsOneWidget);
-    await finish(t);
-  });
+  testWidgets(
+    'levels: win → next → back keeps progress and the half-drawn line',
+    (t) async {
+      await boot(t, prefs: {'seenHowTo': true});
+      await press(t, find.text('Start'), 'Home: Level Start');
+      var g = gameOf(t);
+      expect(g.n, 5);
+      await drawRest(t);
+      expect(find.text('🎉 Level 1 cleared!'), findsOneWidget);
+      expect(AppStore.i.level, 2);
+      await press(t, find.byKey(const Key('next')), 'Won: Next Level');
+      expect(find.text('Level 2'), findsOneWidget);
+      g = gameOf(t);
+      await draw(t, g.puzzle.path.sublist(0, 6));
+      await press(t, find.byKey(const Key('back')), 'Game: Back');
+      expect(find.text('Level 2'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
+      await press(t, find.text('Continue'), 'Home: Level Continue');
+      g = gameOf(t);
+      expect(g.path, g.puzzle.path.sublist(0, 6), reason: 'line kept');
+      await drawRest(t);
+      await press(t, find.byKey(const Key('home')), 'Won: Home');
+      expect(find.text('Level 3'), findsOneWidget);
+      await finish(t);
+    },
+  );
 
   testWidgets('a fast swipe that skips squares still fills them in order', (
     t,
@@ -409,29 +424,33 @@ void main() {
     await finish(t);
   });
 
-  testWidgets('no video yet → "Loading video…" → tells the user, line unchanged', (
-    t,
-  ) async {
-    final ads = FakeAds(
-      result: RewardResult.unavailable,
-      ready: false,
-      delay: const Duration(seconds: 3),
-    );
-    await boot(t, prefs: {'seenHowTo': true}, ads: ads);
-    await press(t, find.text('Play'), 'Home: Today Play');
-    await press(t, find.byKey(const Key('hint')), 'Hint');
-    await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
-    expect(find.text('Loading video…'), findsOneWidget);
-    await shot(t, '08-loading-video');
-    await t.pump(const Duration(seconds: 3));
-    await t.pump(const Duration(milliseconds: 500));
-    expect(find.text('Loading video…'), findsNothing);
-    expect(find.textContaining('No video available right now'), findsOneWidget);
-    expect(ads.shown, [RewardPlacement.hint]);
-    expect(gameOf(t).path.length, 1);
-    expect(gameOf(t).hintsUsed, 0);
-    await finish(t);
-  });
+  testWidgets(
+    'no video yet → "Loading video…" → tells the user, line unchanged',
+    (t) async {
+      final ads = FakeAds(
+        result: RewardResult.unavailable,
+        ready: false,
+        delay: const Duration(seconds: 3),
+      );
+      await boot(t, prefs: {'seenHowTo': true}, ads: ads);
+      await press(t, find.text('Play'), 'Home: Today Play');
+      await press(t, find.byKey(const Key('hint')), 'Hint');
+      await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
+      expect(find.text('Loading video…'), findsOneWidget);
+      await shot(t, '08-loading-video');
+      await t.pump(const Duration(seconds: 3));
+      await t.pump(const Duration(milliseconds: 500));
+      expect(find.text('Loading video…'), findsNothing);
+      expect(
+        find.textContaining('No video available right now'),
+        findsOneWidget,
+      );
+      expect(ads.shown, [RewardPlacement.hint]);
+      expect(gameOf(t).path.length, 1);
+      expect(gameOf(t).hintsUsed, 0);
+      await finish(t);
+    },
+  );
 
   testWidgets('closing the video early gives no hint and says why', (t) async {
     final ads = FakeAds(result: RewardResult.closedEarly);
@@ -450,46 +469,59 @@ void main() {
     await finish(t);
   });
 
-  testWidgets('double taps: one dialog, one video, no stray line under the dialog', (
-    t,
-  ) async {
-    final ads = FakeAds(delay: const Duration(seconds: 1));
-    await boot(t, prefs: {'seenHowTo': true}, ads: ads);
-    await press(t, find.text('Play'), 'Home: Today Play');
-    final g = gameOf(t);
-    // 힌트 두 번 → 창은 그대로 하나
-    final h = t.getCenter(find.byKey(const Key('hint')));
-    await t.tapAt(h);
-    await t.pump(const Duration(milliseconds: 60));
-    await t.tapAt(h);
-    pressed.add('Hint (double tap)');
-    await t.pump(const Duration(milliseconds: 500));
-    expect(find.text('Need a hint?'), findsOneWidget);
-    // Not now 두 번 → 두 번째 탭이 판에 떨어져도 줄이 생기지 않는다
-    final btn = t.getCenter(find.text('Not now'));
-    await t.tapAt(btn);
-    await t.pump(const Duration(milliseconds: 80));
-    await t.tapAt(btn);
-    pressed.add('Hint dialog: Not now (double tap)');
-    await t.pump(const Duration(milliseconds: 600));
-    expect(g.path.length, 1);
-    // Watch video 두 번 → 영상 1번
-    await press(t, find.byKey(const Key('hint')), 'Hint');
-    final watch = t.getCenter(find.text('▶ Watch video'));
-    await t.tapAt(watch);
-    await t.pump(const Duration(milliseconds: 50));
-    await t.tapAt(watch);
-    pressed.add('Hint dialog: Watch video (double tap)');
-    await t.pump(const Duration(seconds: 2));
-    expect(ads.rewardedShown, 1);
-    expect(g.hintsUsed, 1);
-    await finish(t);
-  });
+  testWidgets(
+    'double taps: one dialog, one video, no stray line under the dialog',
+    (t) async {
+      final ads = FakeAds(delay: const Duration(seconds: 1));
+      await boot(t, prefs: {'seenHowTo': true}, ads: ads);
+      await press(t, find.text('Play'), 'Home: Today Play');
+      final g = gameOf(t);
+      // 힌트 두 번 → 창은 그대로 하나
+      final h = t.getCenter(find.byKey(const Key('hint')));
+      await t.tapAt(h);
+      await t.pump(const Duration(milliseconds: 60));
+      await t.tapAt(h);
+      pressed.add('Hint (double tap)');
+      await t.pump(const Duration(milliseconds: 500));
+      expect(find.text('Need a hint?'), findsOneWidget);
+      // Not now 두 번 → 두 번째 탭이 판에 떨어져도 줄이 생기지 않는다
+      final btn = t.getCenter(find.text('Not now'));
+      await t.tapAt(btn);
+      await t.pump(const Duration(milliseconds: 80));
+      await t.tapAt(btn);
+      pressed.add('Hint dialog: Not now (double tap)');
+      await t.pump(const Duration(milliseconds: 600));
+      expect(g.path.length, 1);
+      // Watch video 두 번 → 영상 1번
+      await press(t, find.byKey(const Key('hint')), 'Hint');
+      final watch = t.getCenter(find.text('▶ Watch video'));
+      await t.tapAt(watch);
+      await t.pump(const Duration(milliseconds: 50));
+      await t.tapAt(watch);
+      pressed.add('Hint dialog: Watch video (double tap)');
+      await t.pump(const Duration(seconds: 2));
+      expect(ads.rewardedShown, 1);
+      expect(g.hintsUsed, 1);
+      await finish(t);
+    },
+  );
 
   testWidgets('double-tapping Next Level does not skip a level', (t) async {
     await boot(t, prefs: {'seenHowTo': true});
     await press(t, find.text('Start'), 'Home: Level Start');
-    await drawRest(t);
+    // 마지막 칸을 그은 손가락이 바로 뜬 패널 버튼을 누르면 무시된다
+    final g0 = gameOf(t);
+    await draw(t, g0.puzzle.path, label: 'draw whole line');
+    await t.pump(const Duration(milliseconds: 950));
+    expect(find.byKey(const Key('next')), findsOneWidget);
+    await t.tap(find.byKey(const Key('next')), warnIfMissed: false);
+    await t.pump(const Duration(milliseconds: 100));
+    expect(
+      find.text('🎉 Level 1 cleared!'),
+      findsOneWidget,
+      reason: 'panel ignores taps for 0.45s',
+    );
+    await t.pump(const Duration(milliseconds: 500));
     final next = t.getCenter(find.byKey(const Key('next')));
     await t.tapAt(next);
     await t.pump(const Duration(milliseconds: 40));
@@ -527,6 +559,39 @@ void main() {
     await finish(t);
   });
 
+  testWidgets('a corrupted save never traps the player on a grey screen', (
+    t,
+  ) async {
+    // 캣도쿠 점검 3차: 깨진 저장 한 줄로 회색 화면에 갇혔다 → 같은 일을 일부러 만들어 본다
+    for (final bad in [
+      '{"n":6,"path":"oops","secs":"x","hints":"y"}',
+      '{"n":6,"path":[1,2,"z"],"secs":5}',
+      'not json at all',
+      '{"n":"6","path":null}',
+    ]) {
+      await boot(
+        t,
+        prefs: {
+          'seenHowTo': true,
+          'board_daily_20261002': bad,
+          'level': 2,
+          'board_level_2': bad,
+        },
+      );
+      await press(t, find.text('Play'), 'Home: Today Play (corrupted save)');
+      expect(gameOf(t).path.length, 1, reason: 'fresh line for $bad');
+      expect(find.byKey(const Key('board')), findsOneWidget);
+      await press(t, find.byKey(const Key('back')), 'Game: Back');
+      await press(
+        t,
+        find.text('Continue'),
+        'Home: Level Continue (corrupted save)',
+      );
+      expect(gameOf(t).path.length, 1);
+      await finish(t);
+    }
+  });
+
   testWidgets('home rolls over to the new day while open', (t) async {
     await boot(
       t,
@@ -548,7 +613,9 @@ void main() {
   });
 
   for (final e in devices.entries) {
-    testWidgets('layout on ${e.key}: every screen, 8x8 board, panel', (t) async {
+    testWidgets('layout on ${e.key}: every screen, 8x8 board, panel', (
+      t,
+    ) async {
       final (size, ratio) = e.value;
       final tag = e.key.split(' (').first.replaceAll(' ', '-');
       await boot(t, size: size, ratio: ratio, prefs: {'level': 30});
@@ -578,7 +645,10 @@ void main() {
       await shot(t, '09-level30-8x8-$tag');
       await drawRest(t);
       expect(find.byKey(const Key('panel')), findsOneWidget);
-      expect(t.getRect(find.byKey(const Key('panel'))).bottom <= size.height, isTrue);
+      expect(
+        t.getRect(find.byKey(const Key('panel'))).bottom <= size.height,
+        isTrue,
+      );
       expectNoTruncatedText(t, 'win panel');
       await shot(t, '10-level-cleared-$tag');
       await press(t, find.byKey(const Key('home')), 'Won: Home');

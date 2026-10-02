@@ -26,31 +26,34 @@ void main() {
     }
   });
 
-  test('generated puzzles: start on 1, end on the last number, one solution', () {
-    for (final n in [5, 6, 7, 8]) {
-      for (var s = 0; s < 12; s++) {
-        final p = PathPuzzle.generate(n, Rng.seedOf('t-$n-$s'));
-        expectValidPath(n, p.path);
-        expect(p.clues.first, p.path.first);
-        expect(p.clues.last, p.path.last);
-        // 숫자는 정답 줄을 따라 1, 2, 3 … 순서
-        var last = -1;
-        for (final c in p.clues) {
-          final i = p.path.indexOf(c);
-          expect(i, greaterThan(last));
-          last = i;
+  test(
+    'generated puzzles: start on 1, end on the last number, one solution',
+    () {
+      for (final n in [5, 6, 7, 8]) {
+        for (var s = 0; s < 12; s++) {
+          final p = PathPuzzle.generate(n, Rng.seedOf('t-$n-$s'));
+          expectValidPath(n, p.path);
+          expect(p.clues.first, p.path.first);
+          expect(p.clues.last, p.path.last);
+          // 숫자는 정답 줄을 따라 1, 2, 3 … 순서
+          var last = -1;
+          for (final c in p.clues) {
+            final i = p.path.indexOf(c);
+            expect(i, greaterThan(last));
+            last = i;
+          }
+          // 넉넉한 한도로 다시 풀어도 해는 하나
+          final r = PathPuzzle.solve(n, p.clues, p.path, 2, 20000000);
+          expect(r.exhausted, isFalse);
+          expect(r.count, 1, reason: 'n=$n seed=$s must have one solution');
+          expect(
+            p.clues.length,
+            inInclusiveRange(PathPuzzle.defaultClues(n), n * n ~/ 2),
+          );
         }
-        // 넉넉한 한도로 다시 풀어도 해는 하나
-        final r = PathPuzzle.solve(n, p.clues, p.path, 2, 20000000);
-        expect(r.exhausted, isFalse);
-        expect(r.count, 1, reason: 'n=$n seed=$s must have one solution');
-        expect(
-          p.clues.length,
-          inInclusiveRange(PathPuzzle.defaultClues(n), n * n ~/ 2),
-        );
       }
-    }
-  });
+    },
+  );
 
   test('fast solver counts exactly like brute force (4x4, 5x5)', () {
     // 가지치기가 해를 하나라도 빠뜨리면 "해가 하나"라고 잘못 믿게 된다 → 무식한 풀이와 개수를 맞춰 본다
@@ -146,16 +149,10 @@ void main() {
   });
 
   test('level sizes grow 5 → 8', () {
-    expect([1, 3, 4, 10, 11, 25, 26, 500].map(PathPuzzle.sizeForLevel).toList(), [
-      5,
-      5,
-      6,
-      6,
-      7,
-      7,
-      8,
-      8,
-    ]);
+    expect(
+      [1, 3, 4, 10, 11, 25, 26, 500].map(PathPuzzle.sizeForLevel).toList(),
+      [5, 5, 6, 6, 7, 7, 8, 8],
+    );
   });
 }
 
