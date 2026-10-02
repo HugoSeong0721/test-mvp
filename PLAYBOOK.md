@@ -59,6 +59,10 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 솔루나 | 다른 날을 누르면(위쪽 "지금" 카드가 빠짐) 목록을 맨 위로 보냈는데 230px 에서 멈춤 — `animateTo`/`jumpTo`/다음 프레임 모두 실패 | 내용이 바뀌는 목록은 `KeyedSubtree(key: 날짜·장소)` 로 새로 만들고 `ScrollController(keepScrollOffset: false)`. 로봇에서 "누른 뒤 제목이 화면 안" 을 검사 |
+| 2026-10-03 | 솔루나 | `timezone` 패키지 `latest_all.dart` 가 웹 스크립트를 1.8MB 키움 | `.tzf` 를 자산으로 넣고 `tz.initializeDatabase(bytes)` |
+| 2026-10-03 | 솔루나 | 다른 앱에서 복사한 코드에 "station" 문구가 남음 — 테스트 통과, 웹 스크린샷에서만 보임 | 복사해 온 파일은 문구를 grep, 로봇에 "옛 앱 단어 없음" 검사 |
+| 2026-10-03 | 솔루나 | AppBar 제목 자리 InkWell 이 웹/VoiceOver 에서 버튼이 아니라 제목으로만 읽힘 | `Semantics(container: true, button: true, label: …)` 로 감싸고 로봇에서 `find.bySemanticsLabel` 로 확인 |
 | 2026-10-03 | 물때 | 작업 환경에서 NOAA API 가 막힘 (WebFetch 도) | Actions 워크플로로 받아 데이터 브랜치에 커밋 → 그 실제 응답으로 테스트·웹 점검 (`fetch-noaa.yml`) |
 | 2026-10-03 | 물때 | NOAA 관측소 메타데이터(서머타임·시간대)가 수십~천여 곳 틀리거나 빔 | 공공 데이터도 "모든 항목을 화면에 띄우는" 테스트로 훑고, 틀린 건 규칙으로 보정 + 대표값 고정 테스트 |
 | 2026-10-03 | 물때 | 테스트 헬퍼 일괄 치환이 헬퍼 자신을 바꿔 무한 재귀 → flutter_tester 5GB·무응답 | 일괄 치환 뒤 헬퍼 본문 확인. 멈추면 `pkill -9 -f flutter_tester`, 단계 print 로 위치 찾기 |

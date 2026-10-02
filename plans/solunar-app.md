@@ -24,3 +24,20 @@
 ①경쟁 앱 화면·리뷰 확인 → ②계산 엔진 + 검증(공개 솔루나 표와 몇 날짜 대조) → ③테스트 로봇 → ④Flutter → ⑤광고 → ⑥Release iOS → ⑦TestFlight
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
+
+### 2026-10-03 개발 세션 1
+- ①경쟁 앱(백그라운드 조사 에이전트, WebSearch): 1등 Fishing & Hunting Solunar Time 4.7★ 약 1.6만(Pro 구독, 무료는 2~3일 앞까지), Solunar Best $3.99/월·$24.99/년,
+  iSolunar 구독, Fishing Times Calendar Pro $3.99. 불만 = 구독·재결제, "내 지역에 안 맞다"·GPS 오류, 새 UI "bloated, hard to read". 상세 `solunar_app/store/ios-listing.md`.
+- ②계산 엔진(`solunar_app/flutter/lib/core/`): 해·위상은 물때 앱 코드, 달 위치는 Meeus 47장(60+60항), 월출·월몰은 USNO 정의(윗가장자리·굴절 34′), 남중/북중은 시간각.
+  PyEphem 대조(13곳, 2026~2030, 1,839건): 남중 ±1초, 월출·월몰 ±30초, 일출일몰 ±90초, 위상 ±2시간. 공개 표 대조: solunarforecast.com Tool TX 9/3 Major·Minor,
+  timeanddate 뉴욕 10/10·산호세 10/22 월출·월몰·남중 — 전부 2분 이내.
+  Major = 달 남중·북중 ±1시간, Minor = 월출·월몰 ±30분. **점수 = 위상 60(cos², 삭·망 최고) + 일출/일몰과 구간 겹침 25 + 달 거리 15(근지점 최고)**, Best 70+ · Good 50+ · Fair 30+ · Slow.
+  화면에서 "How is this scored?" 로 세 부분 점수와 설명을 그대로 보여 준다(과장 없음). 사냥 허용 시간 = 일출 − N분 ~ 일몰 + M분(기본 30/30, 0~90분, 빠른 설정 3개, 주 규정 확인 안내).
+- 장소: 미국·캐나다 1,000명+ 마을 20,102곳 + 시간대 내장(GeoNames, `tools/solunar/make_places.py`), 오프라인 검색. GPS 지점은 폰 시간대, 마을은 그 마을 시간대. 저장한 곳 20개(GPS 지점은 이름 붙여 저장).
+- ③테스트 로봇 12개(모든 버튼·3기종·135% 글씨·키보드·24시간 매시·자정 넘김·광고 실패 3종·북극권/하와이/애리조나/캐나다/시드니·저장 20개) + 엔진 22개 = 34개 통과.
+  로봇이 잡은 것: 장소 화면 ListTile 배경이 터치 효과를 가림, 다른 날을 누르면 목록이 맨 위로 안 감(스크롤 보정 버그), 135% 글씨에서 달력 칸 넘침.
+- ④Flutter 앱 한 화면(점수·지금/다음·24시간 막대·구간 목록·사냥 카드·해/달·30일 달력 버튼) + 장소·설정·달력 화면. 아이콘은 SVG 직접 그림. 아이폰 전용·세로, 위치 권한 문구.
+- ⑤광고: 배너 + 보상형(30일 달력 24시간) — 아직 Google 테스트 ID. 영상이 안 오면 8초 뒤 그냥 열어 줌.
+- 웹 미리보기 `docs/solunar-app/` + 클릭 점검 39/39(`solunar_app/qa/web-check.js`), 개인정보처리방침 `docs/solunar-privacy.html`.
+- 남은 것: 이름·번들(사용자) → 번들 등록 → `Release iOS` 에 solunar 추가 → ASC 앱 레코드·AdMob(사용자) → TestFlight → 스토어 문구·스크린샷.
+
