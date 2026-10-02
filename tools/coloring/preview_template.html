@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Coloring Converter Preview</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#222;--sub:#666;--line:#e6e0d6;--acc:#d9622b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17161a;--card:#222127;--ink:#eee;--sub:#aaa;--line:#36343c;--acc:#f08a55}}
+:root[data-theme="dark"]{--bg:#17161a;--card:#222127;--ink:#eee;--sub:#aaa;--line:#36343c;--acc:#f08a55}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+#spacer{height:240px}
+header{display:flex;align-items:center;gap:8px;padding:10px 16px}
+header h1{font-size:18px;margin:0;flex:1}
+.nav{min-width:60px;height:60px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:22px;font-weight:700}
+#info{padding:0 16px;font-size:13px;color:var(--sub)}
+#info b{color:var(--ink)}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 16px;touch-action:pan-y}
+#pic{position:relative;width:min(100%,60vh);aspect-ratio:1;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px #0002}
+#pic svg{position:absolute;inset:0;width:100%;height:100%}
+#lines{pointer-events:none}
+.rg{fill:#fff;stroke:none;transition:fill .25s}
+.rg.hl{animation:pulse 1s infinite alternate}
+@keyframes pulse{from{fill:#fff}to{fill:#d9d4ff}}
+.num{font-weight:700;font-family:sans-serif;fill:#888;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+#pal{display:flex;gap:8px;overflow-x:auto;padding:10px 16px 18px;touch-action:pan-x pan-y}
+.sw{flex:none;width:64px;height:64px;border-radius:16px;border:3px solid transparent;font:800 24px sans-serif;color:#222;display:flex;align-items:center;justify-content:center;position:relative}
+.sw.on{border-color:var(--ink);transform:translateY(-3px)}
+.sw.done{opacity:.35}
+.sw small{position:absolute;bottom:2px;font-size:10px;font-weight:600}
+#done{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#0006;color:#fff;font:800 32px sans-serif}
+</style>
+</head>
+<body>
+<div id="spacer"></div>
+<div id="app">
+<header><button class="nav" id="prev">‹</button><h1 id="title"></h1><button class="nav" id="next">›</button></header>
+<div id="info"></div>
+<div id="stage"><div id="pic"><svg id="fills" viewBox="0 0 1024 1024"></svg><div id="lines"></div><div id="done">Done! 🎉</div></div></div>
+<div id="pal"></div>
+</div>
+<script>
+const PICS=/*PICS*/[];
+const NS='http://www.w3.org/2000/svg';
+let cur=0,sel=1,filled=new Set();
+const $=id=>document.getElementById(id);
+function lum(h){const n=parseInt(h.slice(1),16);return(.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255}
+function load(i){
+  cur=(i+PICS.length)%PICS.length;const P=PICS[cur],D=P.data;filled=new Set();
+  $('title').textContent=`${cur+1}/${PICS.length} · ${P.meta.title||P.id}`;
+  const q=D.qa;
+  $('info').innerHTML=`<b>${q.regions}</b> regions · <b>${q.colors}</b> colors · min radius ${q.min_r}px · est. ~${q.est_minutes} min<br>Source: <a href="${P.meta.source_item_url}" target="_blank" rel="noopener">${P.meta.source_name}</a> · ${P.meta.artist||'?'} · ${P.meta.license_id||P.meta.license_seen_on_page}`;
+  const f=$('fills');f.innerHTML='';
+  D.regions.forEach((r,k)=>{const p=document.createElementNS(NS,'path');p.setAttribute('d',r.d);p.setAttribute('class','rg');p.dataset.k=k;f.appendChild(p)});
+  D.regions.forEach((r,k)=>{const t=document.createElementNS(NS,'text');t.setAttribute('x',r.x);t.setAttribute('y',r.y);t.setAttribute('class','num');t.style.fontSize=Math.min(r.r*1.1,46)+'px';t.dataset.k=k;t.textContent=r.c;f.appendChild(t)});
+  $('lines').innerHTML=P.svg;const s=$('lines').querySelector('svg');
+  if(s){s.setAttribute('preserveAspectRatio','xMidYMid meet');s.removeAttribute('width');s.removeAttribute('height')}
+  $('done').style.display='none';
+  pal();pick(1);
+}
+function left(c){return PICS[cur].data.regions.filter((r,k)=>r.c===c&&!filled.has(k)).length}
+function pal(){
+  const D=PICS[cur].data;$('pal').innerHTML='';
+  D.palette.forEach((h,i)=>{const b=document.createElement('button');b.className='sw';b.style.background=h;b.style.color=lum(h)>.55?'#222':'#fff';
+    b.innerHTML=`${i+1}<small>${left(i+1)}</small>`;b.dataset.c=i+1;b.onclick=()=>pick(i+1);$('pal').appendChild(b)});
+}
+function pick(c){sel=c;document.querySelectorAll('.sw').forEach(b=>{b.classList.toggle('on',+b.dataset.c===c);b.classList.toggle('done',left(+b.dataset.c)===0)});
+  document.querySelectorAll('.rg').forEach(p=>{const k=+p.dataset.k;p.classList.toggle('hl',!filled.has(k)&&PICS[cur].data.regions[k].c===c)})}
+$('fills').addEventListener('click',e=>{
+  const p=e.target.closest('.rg');if(!p)return;const k=+p.dataset.k,R=PICS[cur].data.regions[k];
+  if(filled.has(k)||R.c!==sel){p.animate([{transform:'translateX(0)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:150});return}
+  filled.add(k);p.classList.remove('hl');p.style.fill=PICS[cur].data.palette[R.c-1];
+  document.querySelector(`.num[data-k="${k}"]`).style.display='none';
+  pal();
+  if(left(sel)===0){const nx=PICS[cur].data.palette.findIndex((_,i)=>left(i+1)>0);if(nx>=0)pick(nx+1);else{pick(0);$('done').style.display='flex'}}else pick(sel);
+});
+$('prev').onclick=()=>load(cur-1);$('next').onclick=()=>load(cur+1);
+const se=document.scrollingElement;se.scrollTop=120;addEventListener('scroll',()=>{if(se.scrollTop<40||se.scrollTop>200)se.scrollTop=120});
+load(0);
+</script>
+</body>
+</html>
