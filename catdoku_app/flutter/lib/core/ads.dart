@@ -34,7 +34,7 @@ class AdIds {
           : 'ca-app-pub-3940256099942544/5224354917',
     RewardPlacement.continueGame =>
       _ios
-          ? 'ca-app-pub-3940256099942544/1712485313'
+          ? 'ca-app-pub-4724352880074547/7933102895'
           : 'ca-app-pub-3940256099942544/5224354917',
   };
 }
