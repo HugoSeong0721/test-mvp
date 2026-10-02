@@ -4,12 +4,12 @@
 
 | 세션(앱) | 무엇을 | 시작 | 상태 |
 |---|---|---|---|
-| mortgage | `release-ios.yml`·`asc-metadata.yml` 선택지에 mortgage 추가 + BUNDLE_ID 를 `com.soulfulfill.<앱>` 규칙 한 줄로(앱마다 줄 추가 불필요) | 10-03 | 작업 중 |
 
 ## 이미 만들어진 공용 도구 (다시 만들지 말 것)
 
 - `Release iOS` · `App Store 등록 정보 채우기` 워크플로: **앱 선택형으로 일반화됨** (Catdoku 세션, 2026-10-02).
-  새 앱은 선택지에 자기 앱을 추가해서 쓴다.
+  새 앱은 선택지(`options:`)에 자기 앱 이름만 추가한다 — 번들 ID 는 `com.soulfulfill.<이름>` 규칙으로 자동 (mortgage 세션, 10-03).
+  번들 ID 가 이 규칙과 다르게 등록된 앱이 생기면 그때 매핑을 다시 넣는다.
 - 번들 ID 등록 Actions (Catdoku 세션).
 - AdMob 보상형 광고 처리(대기·실패·중간 닫기): `catdoku_app/` 참고.
 

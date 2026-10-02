@@ -14,8 +14,9 @@ name: Release iOS (앱 선택 → App Store Connect)
 #
 # 빌드 번호는 실행 번호(run_number)를 써서 올릴 때마다 자동으로 커진다 (앱이 달라도 계속 커져서 문제없다).
 #
-# 앱 추가: 아래 options 에 이름을 넣고 APP_DIR/BUNDLE_ID 매핑에 한 줄씩 더한다.
-#   폴더는 <이름>_app/flutter, 번들 ID 는 developer.apple.com 에 먼저 등록돼 있어야 한다.
+# 앱 추가: 아래 options 에 이름만 넣는다. 규칙: 폴더 <이름>_app/flutter, 번들 ID com.soulfulfill.<이름>.
+#   번들 ID 는 developer.apple.com 에 먼저 등록돼 있어야 한다 (Actions `iOS 번들 ID 등록 · 앱 레코드 확인`).
+#   (여러 세션이 이 줄에 앱을 더한다 — 충돌 나면 선택지를 전부 살려서 합친다)
 
 on:
   workflow_dispatch:
@@ -23,7 +24,7 @@ on:
       app:
         description: "올릴 앱"
         type: choice
-        options: [currency, catdoku]
+        options: [currency, catdoku, mortgage]
         default: currency
 
 permissions:
@@ -40,7 +41,8 @@ jobs:
       run:
         working-directory: ${{ inputs.app }}_app/flutter
     env:
-      BUNDLE_ID: ${{ inputs.app == 'catdoku' && 'com.soulfulfill.catdoku' || 'com.soulfulfill.currency' }}
+      # 모든 앱이 com.soulfulfill.<이름> 규칙 (currency·catdoku 도 그대로 맞는다)
+      BUNDLE_ID: com.soulfulfill.${{ inputs.app }}
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
