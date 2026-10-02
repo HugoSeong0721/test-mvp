@@ -42,7 +42,7 @@
 | 앱 | 상태 | 다음 할 일 |
 |---|---|---|
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출 | 승인 대기 → AdMob 스토어 링크·결제 정보 → 금·코인 스크린샷 교체(v1.1) → 리뷰·수익 확인 |
-| **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | 방향만 확정, 개발 전 | ①미국 상위 색칠 앱 조사 ②기획서 1장 ③테스트 로봇 ④개발 → TestFlight |
+| **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | 기획서 완료 (`docs/coloring-plan.html`), 사용자 OK·A~D 결정 대기 | ①미국 상위 색칠 앱 조사 ②기획서 1장 ③테스트 로봇 ④개발 → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
 
