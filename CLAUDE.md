@@ -24,6 +24,9 @@
 - 기본 통화도 미국 사용자 기준(USD 기준 + EUR·GBP·MXN, 인기 USD·EUR·GBP·CAD·MXN·JPY).
 - 이름·부제·키워드는 **미국 검색량이 가장 큰 검색어** 기준으로 정한다 (`currency_app/store/ios-listing.md`).
 - 번들 ID `com.soulfulfill.currency` (Apple 에 등록 완료, 변경 불가).
+- Apple 개발자 계정은 **개인(Individual)** — 판매자 칸에 실명이 표시되는 건 감수하고 출시. 사용자가 실명 노출을
+  싫어하므로 **수익이 생기면 LLC + D-U-N-S 로 사업자 전환**한다(앱·리뷰 유지). Copyright 는 `2026 Soulfulfill`.
+- EU 판매자(trader) 신고는 주소·전화 공개라 사용자 확인 없이 진행하지 않는다.
 - 화면에 보이는 숫자는 진짜여야 한다 — 차트는 실제 과거 환율(`RateService.history`), 가짜 데이터·
   "제공 예정" 버튼 금지 (심사 거절 사유이자 사용자 기만).
 
