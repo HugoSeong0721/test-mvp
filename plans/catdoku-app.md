@@ -33,6 +33,14 @@
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
 
+### 2026-10-03 개발 세션 1 (이어서) — TestFlight
+- ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278) 생성(사용자), AdMob(`soulfulfillable` 계정) 앱·단위 3개 → 실제 ID 반영.
+- TestFlight 빌드 10(첫 설치 확인) → 11(점검 3차: 연타·저장 손상·Mark 붓) → 12(영상 없으면 무료 보상, 막다른 길 안내).
+- 점검 워크플로 `catdoku-button-qa`: 5명 426회 누름 + 재현 검증 46건. 테스트 로봇 28개 통과.
+- 사용자 첫 TestFlight 캡처: Level 3 막다른 판 + "No video available" → 위 빌드 12 로 대응.
+- 남은 것: 사용자 '느낌' 피드백 → 스크린샷(1290×2796)·`catdoku_app/store/ios-metadata.json` → `App Store 등록 정보 채우기`(app=catdoku) → 심사.
+  출시 뒤: AdMob 앱에 App Store 링크 연결(광고 재고 정상화).
+
 ### 2026-10-02 개발 세션 1
 - 웹판 점검: 직접 찍은 ✕ 를 지우려 다시 탭하면 고양이 시도로 처리돼 하트 손실(재현) → 앱은 🐱/✕ 팔레트 + ✕ 끌어 칠하기.
 - `catdoku_app/flutter/`: 퍼즐 엔진(`lib/core/puzzle.dart`, xorshift32 시드라 iOS·웹 같은 판, 유일해 보정 생성기 9×9 ≤60ms),
