@@ -28,13 +28,13 @@ li{margin:4px 0}
 </head>
 <body>
 <h1>내가 할 일 (Apple · AdMob)</h1>
-<p class="lead">Apple 이 앱 등록을 API로 막아 둬서 이 두 가지만 직접 하시면 돼요. 나머지(번들 등록·업로드·스토어 문구·스크린샷)는 세션이 자동으로 해요. 값은 <b>복사</b> 눌러서 붙여 넣기.</p>
+<p class="lead"><b>테스트해 보려면 ①만 하면 돼요.</b> 앱마다 한 번 등록하면, 그 뒤엔 세션이 빌드를 올리고 <b>TestFlight 초대 메일</b>이 와요 → 메일의 코드를 TestFlight 앱에 입력. ②AdMob 은 스토어 제출 직전에.</p>
 
 <h2>① App Store Connect — 신규 앱 (앱마다 1~2분)</h2>
 <p class="note">appstoreconnect.apple.com → 앱 → ＋ → 신규 앱. 플랫폼 <b>iOS</b>, 기본 언어 <b>English (U.S.)</b>, 사용자 액세스 <b>Full Access</b>. 이름·번들·SKU 만 아래 값으로.</p>
 <div id="asc"></div>
 
-<h2>② AdMob — 앱 + 배너 광고 단위 (앱마다 2분)</h2>
+<h2>② (나중에, 스토어 제출 전) AdMob — 앱 + 배너 광고 단위</h2>
 <p class="note">admob.google.com (<b>soulfulfillable</b> 계정) → 앱 → 앱 추가 → iOS → "스토어에 등록되지 않음" → 이름 입력 → 광고 단위 추가 → <b>형식은 "배너(Banner)" 카드</b>, 이름은 <code>banner</code> 직접 입력.<br>
 다 만든 뒤 <b>AdMob 앱 목록·광고 단위 화면을 캡처해서 각 세션에 붙여 넣으면</b> 세션이 ID를 읽어 넣어요.<br>
 급하지 않아요 — TestFlight 까지는 테스트 광고로 돌고, <b>스토어 제출 전에만</b> 있으면 돼요.</p>
