@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2638"/><stop offset="1" stop-color="#0B1019"/></linearGradient></defs>
+<rect width="1024" height="1024" fill="url(#bg)"/>
+<circle cx="287.1" cy="772.9" r="39.0" fill="#3DDC97"/><circle cx="736.9" cy="772.9" r="39.0" fill="#E8457C"/><path d="M287.1,772.9 A318,318 0 0 1 194.3,561.9" stroke="#3DDC97" stroke-width="78" fill="none" stroke-linecap="butt"/><path d="M194.3,534.1 A318,318 0 0 1 277.5,333.2" stroke="#9BE15D" stroke-width="78" fill="none" stroke-linecap="butt"/><path d="M297.2,313.5 A318,318 0 0 1 498.1,230.3" stroke="#FFD43B" stroke-width="78" fill="none" stroke-linecap="butt"/><path d="M525.9,230.3 A318,318 0 0 1 726.8,313.5" stroke="#FF9F43" stroke-width="78" fill="none" stroke-linecap="butt"/><path d="M746.5,333.2 A318,318 0 0 1 829.7,534.1" stroke="#FF6B5B" stroke-width="78" fill="none" stroke-linecap="butt"/><path d="M829.7,561.9 A318,318 0 0 1 736.9,772.9" stroke="#E8457C" stroke-width="78" fill="none" stroke-linecap="butt"/>
+<path d="M531.0,565.8 L681.8,367.2 L493.0,530.2 Z" fill="#F2F5F9"/><circle cx="512" cy="548" r="44" fill="#F2F5F9"/><circle cx="512" cy="548" r="18" fill="#141C2A"/>
+<text x="512" y="868" text-anchor="middle" font-family="Liberation Sans" font-weight="700" font-size="150" fill="#F2F5F9" letter-spacing="2">dB</text>
+</svg>

@@ -27,3 +27,20 @@
 → ⑤`Release iOS`(앱 선택형)에 추가 → ⑥TestFlight → ⑦스토어
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
+
+### 2026-10-03 개발 세션 1 (05~07시 KST)
+- ①경쟁 앱 조사: 1위 검색어 **"decibel meter"**(그다음 sound meter·noise meter). Decibel X 는 첫 실행 구독(연 $49.99)·무료판 dBA 잠금,
+  광고형 앱은 "광고 소리가 측정을 망친다" 불만, 이웃 소음 증거용 리포트 수요 확인 → `decibel_app/store/ios-listing.md`.
+- ②③ `decibel_app/flutter/` (Flutter 3.47.2): 측정 엔진 `lib/core/meter.dart` — A/C/Z 가중(쌍일차 변환, IEC 61672 표와 31.5 Hz~4 kHz ±0.13 dB,
+  8 kHz −0.6 dB), Fast 125 ms, 평균=에너지 평균(Leq), 최대·최소, 1초 기록. 마이크는 `record` PCM16 + iOS `measurement` 모드(자동 음량 보정 끔).
+- 화면: 첫 안내(마이크 이유 정직하게, 버튼 "Continue") → 측정(게이지·구간 색·"Like a vacuum cleaner"·AVG/MAX/TIME·최근 1분 그래프·
+  85 dBA 넘으면 NIOSH 안내) / 비유표(10~140 dB, 지금 줄 NOW) / 리포트(메모·평균·최대·최소·가장 시끄러운 시각·그래프·레벨별 시간 →
+  이미지 공유) / 기록(자동 저장, 삭제) / 설정(보정 ±0.5 dB, dBA·dBC·dBZ, 화면 켜짐, 방침 링크).
+- 정직하게: 앱을 떠나거나 전화가 오면 멈추고 이유를 보여 줌(백그라운드 녹음 없음), 녹음 파일 없음, 무음은 "<20".
+- 광고: 배너만(Google 테스트 ID). 측정 중 전면 광고 없음.
+- 테스트 27개 통과 (엔진 14 + 로봇 13: 버튼 88번·14개 화면·3개 기기 크기·키보드·권한 거부·앱 나감·전화·3분 측정·공유 실패).
+- 웹 미리보기 `docs/decibel-app/` (폰 브라우저에서 진짜 마이크로 측정). 헤드리스 크롬 가짜 마이크로 전 버튼 점검, 콘솔 에러 0.
+  스크린샷으로 찾아 고친 것: 큰 숫자가 눈금과 겹침, 리포트 레벨 막대 높이 0, 대화(60 dB)가 "Noisy" 로 뜨던 구간 이름.
+- 개인정보처리방침 `docs/decibel-privacy.html`. 아이콘 `assets/icon/icon.svg`(직접 그림) → 1024 PNG.
+- **기본 보정 +94 dB 는 공개 자료 추정치** — TestFlight 실기기에서 NIOSH SLM 과 비교해 확인 필요 (확인 못 함).
+- 남은 것: 이름·번들 ID 사용자 확인 → 번들 등록 Actions → ASC 앱 레코드·AdMob(사용자) → `Release iOS` 에 decibel 추가 → TestFlight.
