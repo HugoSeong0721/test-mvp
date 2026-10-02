@@ -14,7 +14,11 @@ import 'package:tides/core/zone.dart';
 import 'support.dart';
 
 void expectNear(DateTime a, DateTime b, Duration tol, {String? reason}) {
-  expect(a.difference(b).abs() <= tol, isTrue, reason: '${reason ?? ''} got $a, want $b ±$tol');
+  expect(
+    a.difference(b).abs() <= tol,
+    isTrue,
+    reason: '${reason ?? ''} got $a, want $b ±$tol',
+  );
 }
 
 void main() {
@@ -26,10 +30,22 @@ void main() {
     const pacific = StationZone(-8, observesDst: true);
     const hawaii = StationZone(-10, observesDst: false);
     test('US DST 2026: Mar 8 → Nov 1', () {
-      expect(pacific.isDst(DateTime.utc(2026, 3, 8, 9, 59)), isFalse); // 1:59 PST
-      expect(pacific.isDst(DateTime.utc(2026, 3, 8, 10, 0)), isTrue); // 2:00 PST → 3:00 PDT
-      expect(pacific.isDst(DateTime.utc(2026, 11, 1, 8, 59)), isTrue); // 1:59 PDT
-      expect(pacific.isDst(DateTime.utc(2026, 11, 1, 9, 0)), isFalse); // back to 1:00 PST
+      expect(
+        pacific.isDst(DateTime.utc(2026, 3, 8, 9, 59)),
+        isFalse,
+      ); // 1:59 PST
+      expect(
+        pacific.isDst(DateTime.utc(2026, 3, 8, 10, 0)),
+        isTrue,
+      ); // 2:00 PST → 3:00 PDT
+      expect(
+        pacific.isDst(DateTime.utc(2026, 11, 1, 8, 59)),
+        isTrue,
+      ); // 1:59 PDT
+      expect(
+        pacific.isDst(DateTime.utc(2026, 11, 1, 9, 0)),
+        isFalse,
+      ); // back to 1:00 PST
       expect(pacific.abbreviation(testNow), 'PDT');
       expect(pacific.abbreviation(DateTime.utc(2026, 1, 5)), 'PST');
       expect(hawaii.abbreviation(testNow), 'HST');
@@ -39,11 +55,18 @@ void main() {
       final w = pacific.toWall(testNow);
       expect((w.hour, w.day), (12, 2));
       expect(pacific.fromWall(w), testNow);
-      expect(pacific.startOfDay(DateTime.utc(2026, 10, 2)), DateTime.utc(2026, 10, 2, 7));
+      expect(
+        pacific.startOfDay(DateTime.utc(2026, 10, 2)),
+        DateTime.utc(2026, 10, 2, 7),
+      );
       // DST change days are 23 / 25 hours long.
       final mar8 = DayInfo(db.byId('9414290')!, null, DateTime.utc(2026, 3, 8));
       expect(mar8.end.difference(mar8.start).inHours, 23);
-      final nov1 = DayInfo(db.byId('9414290')!, null, DateTime.utc(2026, 11, 1));
+      final nov1 = DayInfo(
+        db.byId('9414290')!,
+        null,
+        DateTime.utc(2026, 11, 1),
+      );
       expect(nov1.end.difference(nov1.start).inHours, 25);
       const guam = StationZone(10, observesDst: false);
       expect(guam.toWall(testNow).hour, 5);
@@ -53,7 +76,12 @@ void main() {
 
   group('NOAA predictions', () {
     test('request uses GMT, MLLW, feet, our app name', () {
-      final u = NoaaApi.predictionsUri('9414290', DateTime.utc(2026, 9, 30), DateTime.utc(2026, 10, 10), 'hilo');
+      final u = NoaaApi.predictionsUri(
+        '9414290',
+        DateTime.utc(2026, 9, 30),
+        DateTime.utc(2026, 10, 10),
+        'hilo',
+      );
       expect(u.host, 'api.tidesandcurrents.noaa.gov');
       expect(u.queryParameters['time_zone'], 'gmt');
       expect(u.queryParameters['datum'], 'MLLW');
@@ -70,15 +98,33 @@ void main() {
       expect(d.hasOfficialCurve, isTrue);
       // NOAA lst_ldt for 2026-10-01: H 04:24 4.416, L 08:36 3.109, H 14:58 6.219, L 22:04 -0.188
       final oct1 = DayInfo(sf, d, DateTime.utc(2026, 10, 1));
-      expect([for (final e in oct1.events) '${clock(e.time, sf.zone)} ${e.feet} ${e.isHigh ? 'H' : 'L'}'],
-          ['4:24 AM 4.416 H', '8:36 AM 3.109 L', '2:58 PM 6.219 H', '10:04 PM -0.188 L']);
+      expect(
+        [
+          for (final e in oct1.events)
+            '${clock(e.time, sf.zone)} ${e.feet} ${e.isHigh ? 'H' : 'L'}',
+        ],
+        [
+          '4:24 AM 4.416 H',
+          '8:36 AM 3.109 L',
+          '2:58 PM 6.219 H',
+          '10:04 PM -0.188 L',
+        ],
+      );
       // The 6-minute curve agrees with the high/low heights.
       for (final e in d.events.take(20)) {
-        expect((d.heightAt(e.time)! - e.feet).abs(), lessThan(0.06), reason: '${e.time}');
+        expect(
+          (d.heightAt(e.time)! - e.feet).abs(),
+          lessThan(0.06),
+          reason: '${e.time}',
+        );
       }
       final days = buildDays(sf, d, testNow);
       expect(days.length, 7);
-      expect(days.every((x) => x.hasData), isTrue, reason: 'fixtures cover the week');
+      expect(
+        days.every((x) => x.hasData),
+        isTrue,
+        reason: 'fixtures cover the week',
+      );
       expect(days.every((x) => x.events.length >= 3), isTrue);
     });
 
@@ -87,7 +133,11 @@ void main() {
       final s = db.byId('9410068')!;
       expect(s.isReference, isFalse);
       final d = await NoaaApi(noaa.client).fetch(s, testNow);
-      expect(noaa.calls, 1, reason: 'no 6-minute request for subordinate stations');
+      expect(
+        noaa.calls,
+        1,
+        reason: 'no 6-minute request for subordinate stations',
+      );
       expect(d.hasOfficialCurve, isFalse);
       for (final e in d.events) {
         expect(d.heightAt(e.time), closeTo(e.feet, 1e-9));
@@ -95,24 +145,44 @@ void main() {
       // Between a high and the next low the estimate only goes down, and stays inside them.
       final a = d.events[3], b = d.events[4];
       var prev = d.heightAt(a.time)!;
-      for (var t = a.time; t.isBefore(b.time); t = t.add(const Duration(minutes: 6))) {
+      for (
+        var t = a.time;
+        t.isBefore(b.time);
+        t = t.add(const Duration(minutes: 6))
+      ) {
         final h = d.heightAt(t)!;
-        expect(h, inInclusiveRange(a.feet < b.feet ? a.feet : b.feet, a.feet > b.feet ? a.feet : b.feet));
+        expect(
+          h,
+          inInclusiveRange(
+            a.feet < b.feet ? a.feet : b.feet,
+            a.feet > b.feet ? a.feet : b.feet,
+          ),
+        );
         if (a.isHigh) expect(h, lessThanOrEqualTo(prev + 1e-9));
         prev = h;
       }
       // Nothing is drawn before the first or after the last NOAA prediction.
-      expect(d.heightAt(d.events.first.time.subtract(const Duration(minutes: 1))), isNull);
-      expect(d.heightAt(d.events.last.time.add(const Duration(minutes: 1))), isNull);
+      expect(
+        d.heightAt(d.events.first.time.subtract(const Duration(minutes: 1))),
+        isNull,
+      );
+      expect(
+        d.heightAt(d.events.last.time.add(const Duration(minutes: 1))),
+        isNull,
+      );
     });
 
     test('NOAA error and network failure become readable messages', () async {
       final noaa = FakeNoaa()..offline = true;
-      await expectLater(NoaaApi(noaa.client).fetch(db.byId('9414290')!, testNow), throwsA(isA<NoaaException>()));
+      await expectLater(
+        NoaaApi(noaa.client).fetch(db.byId('9414290')!, testNow),
+        throwsA(isA<NoaaException>()),
+      );
     });
 
     test('cache round trip keeps everything', () async {
-      final d = await NoaaApi(FakeNoaa().client).fetch(db.byId('9414290')!, testNow);
+      final d = await NoaaApi(FakeNoaa().client)
+          .fetch(db.byId('9414290')!, testNow);
       final back = TideData.decode(d.encode())!;
       expect(back.events.length, d.events.length);
       expect(back.curve!.feet.length, d.curve!.feet.length);
@@ -136,15 +206,37 @@ void main() {
     });
     test('Anchorage solstices', () {
       var s = sunTimes(DateTime.utc(2026, 12, 21), 61.238, -149.89);
-      expectNear(s.sunrise!, DateTime.utc(2026, 12, 21, 19, 14, 33), const Duration(minutes: 2));
-      expectNear(s.sunset!, DateTime.utc(2026, 12, 22, 0, 41, 6), const Duration(minutes: 2));
+      expectNear(
+        s.sunrise!,
+        DateTime.utc(2026, 12, 21, 19, 14, 33),
+        const Duration(minutes: 2),
+      );
+      expectNear(
+        s.sunset!,
+        DateTime.utc(2026, 12, 22, 0, 41, 6),
+        const Duration(minutes: 2),
+      );
       s = sunTimes(DateTime.utc(2026, 6, 21), 61.238, -149.89);
-      expectNear(s.sunrise!, DateTime.utc(2026, 6, 21, 12, 19, 58), const Duration(minutes: 2));
-      expectNear(s.sunset!, DateTime.utc(2026, 6, 22, 7, 42, 55), const Duration(minutes: 2));
+      expectNear(
+        s.sunrise!,
+        DateTime.utc(2026, 6, 21, 12, 19, 58),
+        const Duration(minutes: 2),
+      );
+      expectNear(
+        s.sunset!,
+        DateTime.utc(2026, 6, 22, 7, 42, 55),
+        const Duration(minutes: 2),
+      );
     });
     test('Arctic: polar day and polar night', () {
-      expect(sunTimes(DateTime.utc(2026, 6, 21), 71.36, -156.7).alwaysUp, isTrue);
-      expect(sunTimes(DateTime.utc(2026, 12, 21), 71.36, -156.7).alwaysDown, isTrue);
+      expect(
+        sunTimes(DateTime.utc(2026, 6, 21), 71.36, -156.7).alwaysUp,
+        isTrue,
+      );
+      expect(
+        sunTimes(DateTime.utc(2026, 12, 21), 71.36, -156.7).alwaysDown,
+        isTrue,
+      );
     });
   });
 
@@ -152,19 +244,50 @@ void main() {
     const tol = Duration(hours: 3);
     test('October 2026 phases', () {
       final from = DateTime.utc(2026, 10, 1);
-      expectNear(nextPrincipalPhase(MoonPhase.lastQuarter, from), DateTime.utc(2026, 10, 3, 13, 25), tol);
-      expectNear(nextPrincipalPhase(MoonPhase.newMoon, from), DateTime.utc(2026, 10, 10, 15, 50), tol);
-      expectNear(nextPrincipalPhase(MoonPhase.firstQuarter, from), DateTime.utc(2026, 10, 18, 16, 13), tol);
-      expectNear(nextPrincipalPhase(MoonPhase.fullMoon, from), DateTime.utc(2026, 10, 26, 4, 12), tol);
-      expectNear(nextPrincipalPhase(MoonPhase.newMoon, DateTime.utc(2026, 7, 1)), DateTime.utc(2026, 7, 14, 9, 44), tol);
-      expectNear(nextPrincipalPhase(MoonPhase.fullMoon, DateTime.utc(2026, 1, 1)), DateTime.utc(2026, 1, 3, 10, 3), tol);
+      expectNear(
+        nextPrincipalPhase(MoonPhase.lastQuarter, from),
+        DateTime.utc(2026, 10, 3, 13, 25),
+        tol,
+      );
+      expectNear(
+        nextPrincipalPhase(MoonPhase.newMoon, from),
+        DateTime.utc(2026, 10, 10, 15, 50),
+        tol,
+      );
+      expectNear(
+        nextPrincipalPhase(MoonPhase.firstQuarter, from),
+        DateTime.utc(2026, 10, 18, 16, 13),
+        tol,
+      );
+      expectNear(
+        nextPrincipalPhase(MoonPhase.fullMoon, from),
+        DateTime.utc(2026, 10, 26, 4, 12),
+        tol,
+      );
+      expectNear(
+        nextPrincipalPhase(MoonPhase.newMoon, DateTime.utc(2026, 7, 1)),
+        DateTime.utc(2026, 7, 14, 9, 44),
+        tol,
+      );
+      expectNear(
+        nextPrincipalPhase(MoonPhase.fullMoon, DateTime.utc(2026, 1, 1)),
+        DateTime.utc(2026, 1, 3, 10, 3),
+        tol,
+      );
     });
     test('illumination and day names', () {
-      expect(moonIllumination(DateTime.utc(2026, 10, 2, 19)), closeTo(0.5887, 0.02));
-      expect(moonIllumination(DateTime.utc(2026, 10, 26, 12)), closeTo(0.997, 0.02));
+      expect(
+        moonIllumination(DateTime.utc(2026, 10, 2, 19)),
+        closeTo(0.5887, 0.02),
+      );
+      expect(
+        moonIllumination(DateTime.utc(2026, 10, 26, 12)),
+        closeTo(0.997, 0.02),
+      );
       expect(moonIllumination(DateTime.utc(2026, 10, 10, 12)), lessThan(0.02));
       final sf = db.byId('9414290')!;
-      String phase(int day) => DayInfo(sf, null, DateTime.utc(2026, 10, day)).moon.phase.label;
+      String phase(int day) =>
+          DayInfo(sf, null, DateTime.utc(2026, 10, day)).moon.phase.label;
       expect(phase(2), 'Waning Gibbous');
       expect(phase(3), 'Last Quarter');
       expect(phase(5), 'Waning Crescent');
@@ -188,14 +311,26 @@ void main() {
     });
     test('real civil time zones where NOAA metadata is off', () {
       String zone(String id) => db.byId(id)!.zone.abbreviation(testNow);
-      expect(zone('8726601'), 'EDT'); // Indian Rocks Beach, FL (NOAA says Central)
-      expect(zone('8729717'), 'CDT'); // Navarre, FL Panhandle (NOAA says Eastern)
+      expect(
+        zone('8726601'),
+        'EDT',
+      ); // Indian Rocks Beach, FL (NOAA says Central)
+      expect(
+        zone('8729717'),
+        'CDT',
+      ); // Navarre, FL Panhandle (NOAA says Eastern)
       expect(zone('8729142'), 'CDT'); // Panama City
-      expect(zone('8728978'), 'EDT'); // Cape San Blas (Gulf County, Eastern part)
+      expect(
+        zone('8728978'),
+        'EDT',
+      ); // Cape San Blas (Gulf County, Eastern part)
       expect(zone('8770570'), 'CDT'); // Sabine Pass, TX
       expect(zone('1619645'), 'HST'); // Laysan Island, HI
       expect(zone('9461380'), 'HDT'); // Adak (Hawaii–Aleutian, observes DST)
-      expect(zone('9464212'), 'AKDT'); // St. Paul Island (Pribilofs use Alaska time)
+      expect(
+        zone('9464212'),
+        'AKDT',
+      ); // St. Paul Island (Pribilofs use Alaska time)
       expect(zone('9462450'), 'AKDT'); // Nikolski, east of 169°30′W
       expect(zone('8218361'), 'PDT'); // Kumeon Bay, B.C.
       expect(zone('1770000'), 'SST'); // Pago Pago
@@ -227,28 +362,31 @@ void main() {
   });
 
   group('store (cache, offline)', () {
-    test('first fetch saves; next launch offline shows saved data with a notice', () async {
-      SharedPreferences.setMockInitialValues({'station': '9414290'});
-      final noaa = FakeNoaa();
-      final a = AppStore()
-        ..clock = (() => testNow)
-        ..httpClient = noaa.client;
-      await a.load();
-      await a.refresh();
-      expect(a.data, isNotNull);
-      expect(a.offline, isFalse);
-      // 13 hours later, no signal
-      noaa.offline = true;
-      final b = AppStore()
-        ..clock = (() => testNow.add(const Duration(hours: 13)))
-        ..httpClient = noaa.client;
-      await b.load();
-      expect(b.data, isNotNull, reason: 'cache loaded before any network');
-      await b.refresh();
-      expect(b.offline, isTrue);
-      expect(b.error, contains("Couldn't reach NOAA"));
-      expect(b.data!.fetchedAt, testNow);
-    });
+    test(
+      'first fetch saves; next launch offline shows saved data with a notice',
+      () async {
+        SharedPreferences.setMockInitialValues({'station': '9414290'});
+        final noaa = FakeNoaa();
+        final a = AppStore()
+          ..clock = (() => testNow)
+          ..httpClient = noaa.client;
+        await a.load();
+        await a.refresh();
+        expect(a.data, isNotNull);
+        expect(a.offline, isFalse);
+        // 13 hours later, no signal
+        noaa.offline = true;
+        final b = AppStore()
+          ..clock = (() => testNow.add(const Duration(hours: 13)))
+          ..httpClient = noaa.client;
+        await b.load();
+        expect(b.data, isNotNull, reason: 'cache loaded before any network');
+        await b.refresh();
+        expect(b.offline, isTrue);
+        expect(b.error, contains("Couldn't reach NOAA"));
+        expect(b.data!.fetchedAt, testNow);
+      },
+    );
     test('fresh cache is not refetched', () async {
       SharedPreferences.setMockInitialValues({'station': '9414290'});
       final noaa = FakeNoaa();

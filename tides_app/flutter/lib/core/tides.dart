@@ -14,14 +14,17 @@ class TideEvent {
   final double feet;
   final bool isHigh;
 
-  Map<String, Object> toJson() =>
-      {'t': time.millisecondsSinceEpoch, 'v': feet, 'h': isHigh};
+  Map<String, Object> toJson() => {
+    't': time.millisecondsSinceEpoch,
+    'v': feet,
+    'h': isHigh,
+  };
 
   factory TideEvent.fromJson(Map<String, dynamic> j) => TideEvent(
-        DateTime.fromMillisecondsSinceEpoch(j['t'] as int, isUtc: true),
-        (j['v'] as num).toDouble(),
-        isHigh: j['h'] as bool,
-      );
+    DateTime.fromMillisecondsSinceEpoch(j['t'] as int, isUtc: true),
+    (j['v'] as num).toDouble(),
+    isHigh: j['h'] as bool,
+  );
 }
 
 /// Evenly spaced NOAA predictions (6-minute series, reference stations only).
@@ -32,7 +35,8 @@ class TideCurve {
   final int stepMinutes;
   final List<double> feet;
 
-  DateTime get end => start.add(Duration(minutes: stepMinutes * (feet.length - 1)));
+  DateTime get end =>
+      start.add(Duration(minutes: stepMinutes * (feet.length - 1)));
 
   double? at(DateTime utc) {
     final m = utc.difference(start).inSeconds / 60 / stepMinutes;
@@ -44,16 +48,16 @@ class TideCurve {
   }
 
   Map<String, Object> toJson() => {
-        's': start.millisecondsSinceEpoch,
-        'm': stepMinutes,
-        'v': [for (final v in feet) (v * 1000).round()],
-      };
+    's': start.millisecondsSinceEpoch,
+    'm': stepMinutes,
+    'v': [for (final v in feet) (v * 1000).round()],
+  };
 
   factory TideCurve.fromJson(Map<String, dynamic> j) => TideCurve(
-        DateTime.fromMillisecondsSinceEpoch(j['s'] as int, isUtc: true),
-        j['m'] as int,
-        [for (final v in j['v'] as List<dynamic>) (v as num) / 1000],
-      );
+    DateTime.fromMillisecondsSinceEpoch(j['s'] as int, isUtc: true),
+    j['m'] as int,
+    [for (final v in j['v'] as List<dynamic>) (v as num) / 1000],
+  );
 }
 
 /// Everything NOAA returned for one station, as cached on the device.
@@ -84,12 +88,16 @@ class TideData {
     if (c != null) return c;
     final i = events.indexWhere((e) => e.time.isAfter(utc));
     if (i <= 0) {
-      if (i == -1 && events.isNotEmpty && events.last.time == utc) return events.last.feet;
+      if (i == -1 && events.isNotEmpty && events.last.time == utc) {
+        return events.last.feet;
+      }
       return null;
     }
     final a = events[i - 1], b = events[i];
-    final f = utc.difference(a.time).inSeconds / b.time.difference(a.time).inSeconds;
-    return (a.feet + b.feet) / 2 + (a.feet - b.feet) / 2 * math.cos(math.pi * f);
+    final f =
+        utc.difference(a.time).inSeconds / b.time.difference(a.time).inSeconds;
+    return (a.feet + b.feet) / 2 +
+        (a.feet - b.feet) / 2 * math.cos(math.pi * f);
   }
 
   TideEvent? nextEvent(DateTime utc, {bool? high}) {
@@ -108,15 +116,17 @@ class TideData {
     return last;
   }
 
-  List<TideEvent> eventsBetween(DateTime from, DateTime to) =>
-      [for (final e in events) if (!e.time.isBefore(from) && e.time.isBefore(to)) e];
+  List<TideEvent> eventsBetween(DateTime from, DateTime to) => [
+    for (final e in events)
+      if (!e.time.isBefore(from) && e.time.isBefore(to)) e,
+  ];
 
   String encode() => jsonEncode({
-        'id': stationId,
-        'f': fetchedAt.millisecondsSinceEpoch,
-        'e': [for (final e in events) e.toJson()],
-        if (curve != null) 'c': curve!.toJson(),
-      });
+    'id': stationId,
+    'f': fetchedAt.millisecondsSinceEpoch,
+    'e': [for (final e in events) e.toJson()],
+    if (curve != null) 'c': curve!.toJson(),
+  });
 
   static TideData? decode(String? s) {
     if (s == null) return null;
@@ -124,11 +134,17 @@ class TideData {
       final j = jsonDecode(s) as Map<String, dynamic>;
       return TideData(
         stationId: j['id'] as String,
-        fetchedAt: DateTime.fromMillisecondsSinceEpoch(j['f'] as int, isUtc: true),
+        fetchedAt: DateTime.fromMillisecondsSinceEpoch(
+          j['f'] as int,
+          isUtc: true,
+        ),
         events: [
-          for (final e in j['e'] as List<dynamic>) TideEvent.fromJson(e as Map<String, dynamic>)
+          for (final e in j['e'] as List<dynamic>)
+            TideEvent.fromJson(e as Map<String, dynamic>),
         ],
-        curve: j['c'] == null ? null : TideCurve.fromJson(j['c'] as Map<String, dynamic>),
+        curve: j['c'] == null
+            ? null
+            : TideCurve.fromJson(j['c'] as Map<String, dynamic>),
       );
     } catch (_) {
       return null;
@@ -155,25 +171,34 @@ class NoaaApi {
   static String _d(DateTime u) =>
       '${u.year}${u.month.toString().padLeft(2, '0')}${u.day.toString().padLeft(2, '0')}';
 
-  static Uri predictionsUri(String station, DateTime beginUtc, DateTime endUtc, String interval) =>
-      Uri.https(host, '/api/prod/datagetter', {
-        'product': 'predictions',
-        'application': 'soulfulfill_tides',
-        'begin_date': _d(beginUtc),
-        'end_date': _d(endUtc),
-        'datum': 'MLLW',
-        'station': station,
-        'time_zone': 'gmt',
-        'units': 'english',
-        'interval': interval,
-        'format': 'json',
-      });
+  static Uri predictionsUri(
+    String station,
+    DateTime beginUtc,
+    DateTime endUtc,
+    String interval,
+  ) => Uri.https(host, '/api/prod/datagetter', {
+    'product': 'predictions',
+    'application': 'soulfulfill_tides',
+    'begin_date': _d(beginUtc),
+    'end_date': _d(endUtc),
+    'datum': 'MLLW',
+    'station': station,
+    'time_zone': 'gmt',
+    'units': 'english',
+    'interval': interval,
+    'format': 'json',
+  });
 
   static DateTime _parseTime(String t) {
     // "2026-10-01 04:00" in GMT
     final p = t.split(RegExp(r'[- :]'));
-    return DateTime.utc(int.parse(p[0]), int.parse(p[1]), int.parse(p[2]),
-        int.parse(p[3]), int.parse(p[4]));
+    return DateTime.utc(
+      int.parse(p[0]),
+      int.parse(p[1]),
+      int.parse(p[2]),
+      int.parse(p[3]),
+      int.parse(p[4]),
+    );
   }
 
   Future<List<dynamic>> _get(Uri uri) async {
@@ -189,13 +214,43 @@ class NoaaApi {
     try {
       j = jsonDecode(res.body) as Map<String, dynamic>;
     } catch (_) {
-      throw NoaaException('NOAA sent an unexpected answer (HTTP ${res.statusCode}).');
+      throw NoaaException(
+        'NOAA sent an unexpected answer (HTTP ${res.statusCode}).',
+      );
     }
     final err = j['error'];
-    if (err is Map) throw NoaaException('NOAA: ${(err['message'] ?? 'error').toString().trim()}');
+    if (err is Map) {
+      throw NoaaException(
+        'NOAA: ${(err['message'] ?? 'error').toString().trim()}',
+      );
+    }
     final p = j['predictions'];
     if (p is! List) throw NoaaException('NOAA sent no predictions.');
     return p;
+  }
+
+  /// High/low predictions for the 30-day table (rewarded feature): yesterday to 31 days ahead.
+  Future<TideData> fetchMonth(Station s, DateTime nowUtc) async {
+    final hilo = await _get(
+      predictionsUri(
+        s.id,
+        nowUtc.subtract(const Duration(days: 1)),
+        nowUtc.add(const Duration(days: 31)),
+        'hilo',
+      ),
+    );
+    final events = <TideEvent>[
+      for (final p in hilo)
+        TideEvent(
+          _parseTime(p['t'] as String),
+          double.parse(p['v'] as String),
+          isHigh: p['type'] == 'H',
+        ),
+    ]..sort((a, b) => a.time.compareTo(b.time));
+    if (events.isEmpty) {
+      throw NoaaException('NOAA has no predictions for this station.');
+    }
+    return TideData(stationId: s.id, fetchedAt: nowUtc, events: events);
   }
 
   /// High/low predictions plus, for reference stations, the 6-minute series.
@@ -208,15 +263,21 @@ class NoaaApi {
     // The 6-minute series is a bonus: if it fails, the chart falls back to
     // interpolating NOAA's highs/lows. Errors are caught here so they never go unhandled.
     final Future<List<dynamic>?> curveF = s.isReference
-        ? _get(predictionsUri(s.id, begin, end, '6')).then<List<dynamic>?>((v) => v, onError: (Object _) => null)
+        ? _get(predictionsUri(s.id, begin, end, '6'))
+              .then<List<dynamic>?>((v) => v, onError: (Object _) => null)
         : Future.value(null);
     final hilo = await hiloF;
     final events = <TideEvent>[
       for (final p in hilo)
-        TideEvent(_parseTime(p['t'] as String), double.parse(p['v'] as String),
-            isHigh: p['type'] == 'H')
+        TideEvent(
+          _parseTime(p['t'] as String),
+          double.parse(p['v'] as String),
+          isHigh: p['type'] == 'H',
+        ),
     ]..sort((a, b) => a.time.compareTo(b.time));
-    if (events.isEmpty) throw NoaaException('NOAA has no predictions for this station.');
+    if (events.isEmpty) {
+      throw NoaaException('NOAA has no predictions for this station.');
+    }
     TideCurve? curve;
     final pts = await curveF;
     if (pts != null && pts.length > 2) {
@@ -224,9 +285,16 @@ class NoaaApi {
       final last = _parseTime(pts.last['t'] as String);
       // Only trust an unbroken 6-minute series; otherwise interpolate.
       if (last.difference(first).inMinutes == 6 * (pts.length - 1)) {
-        curve = TideCurve(first, 6, [for (final p in pts) double.parse(p['v'] as String)]);
+        curve = TideCurve(first, 6, [
+          for (final p in pts) double.parse(p['v'] as String),
+        ]);
       }
     }
-    return TideData(stationId: s.id, fetchedAt: nowUtc, events: events, curve: curve);
+    return TideData(
+      stationId: s.id,
+      fetchedAt: nowUtc,
+      events: events,
+      curve: curve,
+    );
   }
 }

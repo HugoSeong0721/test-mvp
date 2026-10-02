@@ -7,9 +7,7 @@ enum LocationProblem { serviceOff, denied, deniedForever, unavailable }
 
 class LocationResult {
   const LocationResult.found(this.lat, this.lng) : problem = null;
-  const LocationResult.failed(this.problem)
-      : lat = null,
-        lng = null;
+  const LocationResult.failed(this.problem) : lat = null, lng = null;
 
   final double? lat;
   final double? lng;
@@ -18,13 +16,13 @@ class LocationResult {
   bool get ok => problem == null;
 
   String get message => switch (problem) {
-        LocationProblem.serviceOff => 'Location Services are off. Turn them on in Settings, or search for a station.',
-        LocationProblem.denied => 'Location permission was not given. You can search for a station instead.',
-        LocationProblem.deniedForever =>
-          'Location is turned off for this app. Allow it in Settings, or search for a station.',
-        LocationProblem.unavailable => "Couldn't get your location. Try again or search for a station.",
-        null => '',
-      };
+    LocationProblem.serviceOff => 'Location Services are off. Turn them on in Settings, or search for a station.',
+    LocationProblem.denied => 'Location permission was not given. You can search for a station instead.',
+    LocationProblem.deniedForever => 'Location is turned off for this app. Allow it in Settings, or search for a station.',
+    LocationProblem.unavailable =>
+      "Couldn't get your location. Try again or search for a station.",
+    null => '',
+  };
 }
 
 /// Where the device is. Used once to pick the nearest station; the location
@@ -43,7 +41,8 @@ class DeviceLocation extends LocationService {
   Future<bool> hasPermission() async {
     try {
       final p = await Geolocator.checkPermission();
-      return p == LocationPermission.always || p == LocationPermission.whileInUse;
+      return p == LocationPermission.always ||
+          p == LocationPermission.whileInUse;
     } catch (_) {
       return false;
     }
@@ -60,7 +59,12 @@ class DeviceLocation extends LocationService {
         // iOS keeps its own prompt up until answered. A browser prompt can be left
         // unanswered forever, so the web preview gives up after a while.
         final ask = Geolocator.requestPermission();
-        p = kIsWeb ? await ask.timeout(const Duration(seconds: 15), onTimeout: () => LocationPermission.denied) : await ask;
+        p = kIsWeb
+            ? await ask.timeout(
+                const Duration(seconds: 15),
+                onTimeout: () => LocationPermission.denied,
+              )
+            : await ask;
       }
       if (p == LocationPermission.denied) {
         return const LocationResult.failed(LocationProblem.denied);

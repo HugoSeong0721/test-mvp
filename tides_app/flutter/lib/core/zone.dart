@@ -34,8 +34,14 @@ class StationZone {
 
   /// Station-local clock reading (fields of [wall]) → UTC instant.
   DateTime fromWall(DateTime wall) {
-    final w = DateTime.utc(wall.year, wall.month, wall.day, wall.hour,
-        wall.minute, wall.second);
+    final w = DateTime.utc(
+      wall.year,
+      wall.month,
+      wall.day,
+      wall.hour,
+      wall.minute,
+      wall.second,
+    );
     final guess = w.subtract(_std);
     return w.subtract(offsetAt(guess));
   }

@@ -42,6 +42,16 @@ class AppStore extends ChangeNotifier {
 
   static const _maxCached = 12;
 
+  /// 30-day table: one rewarded video opens it for this long (any station).
+  static const monthOpenFor = Duration(hours: 24);
+  DateTime? monthOpenUntil; // UTC
+  bool get monthOpen =>
+      monthOpenUntil != null && clock().isBefore(monthOpenUntil!);
+
+  TideData? month; // 30-day highs/lows for [station]
+  bool monthLoading = false;
+  String? monthError;
+
   /// Fetch again after this long even if the saved data still covers the week.
   static const refreshAfter = Duration(hours: 12);
 
@@ -51,6 +61,13 @@ class AppStore extends ChangeNotifier {
     units = _prefs.getString('units') == 'm' ? Units.meters : Units.feet;
     favorites = _prefs.getStringList('favorites') ?? [];
     followLocation = _prefs.getBool('followLocation') ?? false;
+    final until = _prefs.getInt('month.until');
+    monthOpenUntil = until == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(until, isUtc: true);
+    month = null;
+    monthLoading = false;
+    monthError = null;
     final id = _prefs.getString('station');
     station = id == null ? null : db.byId(id);
     data = station == null ? null : _cached(station!.id);
@@ -81,7 +98,10 @@ class AppStore extends ChangeNotifier {
     final r = await LocationService.i.current();
     if (r.ok) {
       here = (r.lat!, r.lng!);
-      await selectStation(db.nearest(r.lat!, r.lng!, count: 1).first.$1, viaLocation: true);
+      await selectStation(
+        db.nearest(r.lat!, r.lng!, count: 1).first.$1,
+        viaLocation: true,
+      );
     } else {
       notifyListeners();
     }
@@ -134,7 +154,8 @@ class AppStore extends ChangeNotifier {
     }
   }
 
-  TideData? _cached(String id) => TideData.decode(_prefs.getString('cache.$id'));
+  TideData? _cached(String id) =>
+      TideData.decode(_prefs.getString('cache.$id'));
 
   Future<void> _save(TideData d) async {
     final ids = (_prefs.getStringList('cache.ids') ?? [])..remove(d.stationId);
@@ -144,6 +165,50 @@ class AppStore extends ChangeNotifier {
     }
     await _prefs.setStringList('cache.ids', ids);
     await _prefs.setString('cache.${d.stationId}', d.encode());
+  }
+
+  Future<void> openMonth() async {
+    monthOpenUntil = clock().add(monthOpenFor);
+    await _prefs.setInt('month.until', monthOpenUntil!.millisecondsSinceEpoch);
+    notifyListeners();
+  }
+
+  /// Loads the 30-day highs/lows for the current station (saved copy first, then NOAA).
+  Future<void> loadMonth({bool force = false}) async {
+    final s = station;
+    if (s == null || monthLoading) return;
+    final now = clock();
+    if (month?.stationId != s.id) {
+      month = TideData.decode(_prefs.getString('month.${s.id}'));
+    }
+    final m = month;
+    final fresh =
+        m != null &&
+        now.difference(m.fetchedAt) < refreshAfter &&
+        m.coversUntil!.isAfter(now.add(const Duration(days: 29)));
+    if (fresh && !force) {
+      notifyListeners();
+      return;
+    }
+    monthLoading = true;
+    monthError = null;
+    notifyListeners();
+    try {
+      final d = await NoaaApi(httpClient).fetchMonth(s, now);
+      await _prefs.setString('month.${s.id}', d.encode());
+      final ids = (_prefs.getStringList('month.ids') ?? [])..remove(s.id);
+      ids.insert(0, s.id);
+      while (ids.length > 4) {
+        await _prefs.remove('month.${ids.removeLast()}');
+      }
+      await _prefs.setStringList('month.ids', ids);
+      if (station == s) month = d;
+    } on NoaaException catch (e) {
+      if (station == s) monthError = e.message;
+    } finally {
+      monthLoading = false;
+      notifyListeners();
+    }
   }
 
   bool isFavorite(Station s) => favorites.contains(s.id);
@@ -160,8 +225,10 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Station> get favoriteStations =>
-      [for (final id in favorites) if (db.byId(id) != null) db.byId(id)!];
+  List<Station> get favoriteStations => [
+    for (final id in favorites)
+      if (db.byId(id) != null) db.byId(id)!,
+  ];
 }
 
 /// One-tap starting points when the search box is empty. All NOAA reference stations.

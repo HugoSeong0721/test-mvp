@@ -2,13 +2,37 @@ import 'zone.dart';
 
 enum Units { feet, meters }
 
-const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const _months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const _longDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const _longDays = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
 
 String height(double feet, Units u, {bool unit = true}) {
   final v = u == Units.feet ? feet : feet * 0.3048;
-  final s = v.toStringAsFixed(1).replaceFirst('-0.0', '0.0').replaceFirst('-', '−');
+  final s = v
+      .toStringAsFixed(1)
+      .replaceFirst('-0.0', '0.0')
+      .replaceFirst('-', '−');
   if (!unit) return s;
   return '$s ${u == Units.feet ? 'ft' : 'm'}';
 }
@@ -30,7 +54,8 @@ String shortDay(DateTime wallDay) => _days[wallDay.weekday - 1];
 
 String longDay(DateTime wallDay) => _longDays[wallDay.weekday - 1];
 
-String monthDay(DateTime wallDay) => '${_months[wallDay.month - 1]} ${wallDay.day}';
+String monthDay(DateTime wallDay) =>
+    '${_months[wallDay.month - 1]} ${wallDay.day}';
 
 /// "in 2h 14m" / "in 35m"
 String until(Duration d) {
@@ -47,4 +72,5 @@ String deviceStamp(DateTime utc) {
   return '${_months[w.month - 1]} ${w.day}, $h12:${w.minute.toString().padLeft(2, '0')} ${w.hour < 12 ? 'AM' : 'PM'}';
 }
 
-String miles(double mi) => mi < 10 ? '${mi.toStringAsFixed(1)} mi' : '${mi.round()} mi';
+String miles(double mi) =>
+    mi < 10 ? '${mi.toStringAsFixed(1)} mi' : '${mi.round()} mi';

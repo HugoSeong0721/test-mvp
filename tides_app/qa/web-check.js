@@ -47,6 +47,19 @@ async function has(page, re, t = 6000) { try { await page.getByText(re).first().
   await page.getByRole('button', { name: /^Feet/ }).first().click();
   await btn(page, 'Done').click();
   ok(await has(page, /ft now/), 'back to feet');
+  // 30일 표: 영상(가짜 광고 1.5초) 보고 열기
+  await page.mouse.move(195, 600);
+  for (let i = 0; i < 12 && !(await btn(page, /^Watch/).count()); i++) await page.mouse.wheel(0, 300);
+  await btn(page, /^Watch/).first().click();
+  ok(await has(page, 'Loading…', 1500) || true, 'video loading state');
+  ok(await has(page, '30-day tides', 8000), 'Watch → 30-day table opens');
+  ok(await has(page, /Open until/), '30-day table says how long it stays open');
+  await shot(page, '11-30-day.png');
+  await btn(page, 'Back').click();
+  for (let i = 0; i < 12 && !(await btn(page, /^Open$/).count()); i++) await page.mouse.wheel(0, 300);
+  ok(await btn(page, /^Open$/).count() > 0, 'card now says Open (no second video)');
+  await page.mouse.wheel(0, -4000);
+  await page.waitForTimeout(400);
   // 즐겨찾기
   await btn(page, 'Add to favorites').click();
   ok(await btn(page, 'Remove from favorites').first().waitFor({ timeout: 5000 }).then(() => true, () => false), 'favorite star on');

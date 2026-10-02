@@ -26,6 +26,11 @@ function noaaBody(url) {
   // Captured stations answer with their own data; others get one consistent stand-in pair
   // (San Francisco, or San Nicolas Island for subordinate stations) — never mixed.
   const src = fs.existsSync(path.join(FIX, `${id}_hilo.json`)) ? id : (SUB.has(id) ? '9410068' : '9414290');
+  const d = s => new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`);
+  const days = (d(q.get('end_date')) - d(q.get('begin_date'))) / 864e5;
+  if (!six && days > 15 && fs.existsSync(path.join(FIX, `${src}_hilo30.json`))) {
+    return fs.readFileSync(path.join(FIX, `${src}_hilo30.json`), 'utf8');   // 30-day table
+  }
   return fs.readFileSync(path.join(FIX, `${src}_${six ? '6min' : 'hilo'}.json`), 'utf8');
 }
 

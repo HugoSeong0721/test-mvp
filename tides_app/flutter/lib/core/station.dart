@@ -29,14 +29,14 @@ class Station {
   final StationZone zone;
 
   factory Station.fromRow(List<dynamic> r) => Station(
-        id: r[0] as String,
-        name: r[1] as String,
-        state: r[2] as String,
-        lat: (r[3] as num).toDouble(),
-        lng: (r[4] as num).toDouble(),
-        isReference: r[5] == 1,
-        zone: StationZone((r[6] as num).toInt(), observesDst: r[7] == 1),
-      );
+    id: r[0] as String,
+    name: r[1] as String,
+    state: r[2] as String,
+    lat: (r[3] as num).toDouble(),
+    lng: (r[4] as num).toDouble(),
+    isReference: r[5] == 1,
+    zone: StationZone((r[6] as num).toInt(), observesDst: r[7] == 1),
+  );
 
   String get stateName => usStates[state] ?? '';
 
@@ -51,16 +51,37 @@ class Station {
 }
 
 const usStates = {
-  'AL': 'Alabama', 'AK': 'Alaska', 'CA': 'California', 'CT': 'Connecticut',
-  'DE': 'Delaware', 'DC': 'District of Columbia', 'FL': 'Florida',
-  'GA': 'Georgia', 'HI': 'Hawaii', 'LA': 'Louisiana', 'ME': 'Maine',
-  'MD': 'Maryland', 'MA': 'Massachusetts', 'MS': 'Mississippi',
-  'NH': 'New Hampshire', 'NJ': 'New Jersey', 'NY': 'New York',
-  'NC': 'North Carolina', 'OR': 'Oregon', 'PA': 'Pennsylvania',
-  'RI': 'Rhode Island', 'SC': 'South Carolina', 'TX': 'Texas',
-  'VA': 'Virginia', 'WA': 'Washington', 'PR': 'Puerto Rico',
-  'VI': 'U.S. Virgin Islands', 'GU': 'Guam', 'AS': 'American Samoa',
-  'FM': 'Micronesia', 'MP': 'Northern Mariana Islands',
+  'AL': 'Alabama',
+  'AK': 'Alaska',
+  'CA': 'California',
+  'CT': 'Connecticut',
+  'DE': 'Delaware',
+  'DC': 'District of Columbia',
+  'FL': 'Florida',
+  'GA': 'Georgia',
+  'HI': 'Hawaii',
+  'LA': 'Louisiana',
+  'ME': 'Maine',
+  'MD': 'Maryland',
+  'MA': 'Massachusetts',
+  'MS': 'Mississippi',
+  'NH': 'New Hampshire',
+  'NJ': 'New Jersey',
+  'NY': 'New York',
+  'NC': 'North Carolina',
+  'OR': 'Oregon',
+  'PA': 'Pennsylvania',
+  'RI': 'Rhode Island',
+  'SC': 'South Carolina',
+  'TX': 'Texas',
+  'VA': 'Virginia',
+  'WA': 'Washington',
+  'PR': 'Puerto Rico',
+  'VI': 'U.S. Virgin Islands',
+  'GU': 'Guam',
+  'AS': 'American Samoa',
+  'FM': 'Micronesia',
+  'MP': 'Northern Mariana Islands',
 };
 
 /// Great-circle distance in miles.
@@ -68,7 +89,8 @@ double milesBetween(double lat1, double lng1, double lat2, double lng2) {
   const r = 3958.8;
   final dLat = (lat2 - lat1) * math.pi / 180;
   final dLng = (lng2 - lng1) * math.pi / 180;
-  final a = math.pow(math.sin(dLat / 2), 2) +
+  final a =
+      math.pow(math.sin(dLat / 2), 2) +
       math.cos(lat1 * math.pi / 180) *
           math.cos(lat2 * math.pi / 180) *
           math.pow(math.sin(dLng / 2), 2);
@@ -85,38 +107,54 @@ class StationDb {
 
   static Future<StationDb> load([AssetBundle? bundle]) async {
     if (_cached != null) return _cached!;
-    final text = await (bundle ?? rootBundle).loadString('assets/stations.json');
+    final text = await (bundle ?? rootBundle).loadString(
+      'assets/stations.json',
+    );
     final rows = jsonDecode(text) as List<dynamic>;
-    return _cached = StationDb([for (final r in rows) Station.fromRow(r as List<dynamic>)]);
+    return _cached = StationDb([
+      for (final r in rows) Station.fromRow(r as List<dynamic>),
+    ]);
   }
 
   Station? byId(String id) => _byId[id];
 
   List<(Station, double)> nearest(double lat, double lng, {int count = 10}) {
-    final list = [for (final s in all) (s, milesBetween(lat, lng, s.lat, s.lng))]
-      ..sort((a, b) => a.$2.compareTo(b.$2));
+    final list = [
+      for (final s in all) (s, milesBetween(lat, lng, s.lat, s.lng)),
+    ]..sort((a, b) => a.$2.compareTo(b.$2));
     return list.take(count).toList();
   }
 
   /// Search by station name, city, state ("CA" or "California") or station ID.
   /// Every word of the query must match; names starting with the query come first.
-  List<Station> search(String query, {double? lat, double? lng, int limit = 60}) {
+  List<Station> search(
+    String query, {
+    double? lat,
+    double? lng,
+    int limit = 60,
+  }) {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return const [];
-    final words = q.split(RegExp(r'[\s,]+')).where((w) => w.isNotEmpty).toList();
+    final words = q
+        .split(RegExp(r'[\s,]+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
     final hits = <(Station, int, double)>[];
     for (final s in all) {
       final name = s.name.toLowerCase();
-      final hay = '$name ${s.state.toLowerCase()} ${s.stateName.toLowerCase()} ${s.id}';
+      final hay =
+          '$name ${s.state.toLowerCase()} ${s.stateName.toLowerCase()} ${s.id}';
       if (!words.every(hay.contains)) continue;
       final rank = s.id == q
           ? 0
           : name.startsWith(q)
-              ? 1
-              : RegExp('\\b${RegExp.escape(words.first)}').hasMatch(name)
-                  ? 2
-                  : 3;
-      final d = (lat != null && lng != null) ? milesBetween(lat, lng, s.lat, s.lng) : 0.0;
+          ? 1
+          : RegExp('\\b${RegExp.escape(words.first)}').hasMatch(name)
+          ? 2
+          : 3;
+      final d = (lat != null && lng != null)
+          ? milesBetween(lat, lng, s.lat, s.lng)
+          : 0.0;
       hits.add((s, rank, d));
     }
     hits.sort((a, b) {

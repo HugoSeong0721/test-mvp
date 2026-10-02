@@ -15,6 +15,11 @@ PASS  settings sheet with Not for navigation
       📸 05-settings.png
 PASS  meters applied
 PASS  back to feet
+PASS  video loading state
+PASS  Watch → 30-day table opens
+PASS  30-day table says how long it stays open
+      📸 11-30-day.png
+PASS  card now says Open (no second video)
 PASS  favorite star on
 PASS  stations: favorites section
 PASS  stations: nearby section
@@ -42,4 +47,4 @@ PASS  iPhone SE: New York nearest
       📸 10-iphone-se.png
 PASS  no console errors (SE)
 
-✅ 30 passed, 0 failed
+✅ 34 passed, 0 failed

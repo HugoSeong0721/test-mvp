@@ -29,7 +29,10 @@ ThemeData buildTheme() {
     scaffoldBackgroundColor: Palette.bg,
   );
   return base.copyWith(
-    textTheme: base.textTheme.apply(bodyColor: Palette.ink, displayColor: Palette.ink),
+    textTheme: base.textTheme.apply(
+      bodyColor: Palette.ink,
+      displayColor: Palette.ink,
+    ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Palette.bg,
       foregroundColor: Palette.ink,
