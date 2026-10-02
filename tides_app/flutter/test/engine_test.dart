@@ -186,6 +186,22 @@ void main() {
       expect(db.byId('1612340')!.zone.observesDst, isFalse); // Hawaii
       expect(db.byId('9414290')!.zone.observesDst, isTrue);
     });
+    test('real civil time zones where NOAA metadata is off', () {
+      String zone(String id) => db.byId(id)!.zone.abbreviation(testNow);
+      expect(zone('8726601'), 'EDT'); // Indian Rocks Beach, FL (NOAA says Central)
+      expect(zone('8729717'), 'CDT'); // Navarre, FL Panhandle (NOAA says Eastern)
+      expect(zone('8729142'), 'CDT'); // Panama City
+      expect(zone('8728978'), 'EDT'); // Cape San Blas (Gulf County, Eastern part)
+      expect(zone('8770570'), 'CDT'); // Sabine Pass, TX
+      expect(zone('1619645'), 'HST'); // Laysan Island, HI
+      expect(zone('9461380'), 'HDT'); // Adak (Hawaii–Aleutian, observes DST)
+      expect(zone('9464212'), 'AKDT'); // St. Paul Island (Pribilofs use Alaska time)
+      expect(zone('9462450'), 'AKDT'); // Nikolski, east of 169°30′W
+      expect(zone('8218361'), 'PDT'); // Kumeon Bay, B.C.
+      expect(zone('1770000'), 'SST'); // Pago Pago
+      expect(zone('1630000'), 'ChST'); // Apra Harbor, Guam
+      expect(zone('9755371'), 'AST'); // San Juan, PR (no DST)
+    });
     test('search by name, city, state, ID', () {
       expect(db.search('santa monica').first.id, '9410840');
       expect(db.search('9414290').first.id, '9414290');

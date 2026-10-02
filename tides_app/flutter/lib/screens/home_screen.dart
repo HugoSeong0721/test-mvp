@@ -375,14 +375,24 @@ class _DayRow extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 9, 8, 9),
             child: Row(children: [
               SizedBox(
-                width: 54,
+                width: 60,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(name, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700)),
+                  Text(name,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
                   Row(children: [
                     MoonIcon(illumination: day.moon.illumination, waxing: day.moon.waxing, size: 12),
                     const SizedBox(width: 4),
-                    Text(monthDay(day.wallDay), style: const TextStyle(fontSize: 11.5, color: Palette.sub)),
+                    Flexible(
+                      child: Text(monthDay(day.wallDay),
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                          style: const TextStyle(fontSize: 11.5, color: Palette.sub)),
+                    ),
                   ]),
                 ]),
               ),

@@ -7,6 +7,9 @@ import '../core/theme.dart';
 
 const privacyUrl = 'https://soulfulfillable.github.io/test-mvp/tides-privacy.html';
 
+/// Opens a link in Safari. Tests replace it.
+Future<bool> Function(Uri) openLink = (u) => launchUrl(u, mode: LaunchMode.externalApplication);
+
 Future<void> showAboutSheet(BuildContext context) => showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -80,7 +83,7 @@ class _AboutSheetState extends State<AboutSheet> {
               leading: const Icon(Icons.privacy_tip_outlined),
               title: const Text('Privacy Policy'),
               trailing: const Icon(Icons.open_in_new, size: 18),
-              onTap: () => launchUrl(Uri.parse(privacyUrl), mode: LaunchMode.externalApplication),
+              onTap: () => openLink(Uri.parse(privacyUrl)),
             ),
             const SizedBox(height: 4),
             Align(

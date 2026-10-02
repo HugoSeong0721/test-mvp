@@ -14,9 +14,7 @@ final testNow = DateTime.utc(2026, 10, 2, 19);
 /// station gets San Francisco's series and any subordinate station San Nicolas
 /// Island's highs/lows (layout tests only — the app itself never invents data).
 class FakeNoaa {
-  FakeNoaa({this.subordinate = const {'9410068'}});
-
-  final Set<String> subordinate;
+  final Set<String> subordinate = {'9410068'};
   bool offline = false;
   int calls = 0;
   final List<Uri> requests = [];

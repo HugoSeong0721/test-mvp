@@ -128,14 +128,14 @@ class _StationsScreenState extends State<StationsScreen> {
       ),
       if (favs.isNotEmpty) ...[
         const _Section('Favorites'),
-        for (final s in favs) _tile(s, here),
+        for (final s in favs) _tile(s, here, 'fav'),
       ],
       if (here != null) ...[
         const _Section('Nearby'),
-        for (final (s, _) in store.db.nearest(here.$1, here.$2, count: 8)) _tile(s, here),
+        for (final (s, _) in store.db.nearest(here.$1, here.$2, count: 8)) _tile(s, here, 'near'),
       ],
       const _Section('Popular'),
-      for (final s in popular) _tile(s, here),
+      for (final s in popular) _tile(s, here, 'pop'),
     ];
   }
 
@@ -153,11 +153,12 @@ class _StationsScreenState extends State<StationsScreen> {
     }
     return [
       _Section('${results.length == 60 ? '60+' : results.length} stations'),
-      for (final s in results) _tile(s, here),
+      for (final s in results) _tile(s, here, 'res'),
     ];
   }
 
-  Widget _tile(Station s, (double, double)? here) {
+  /// [section] keeps keys unique: a station can be a favorite, nearby and popular at once.
+  Widget _tile(Station s, (double, double)? here, String section) {
     final fav = store.isFavorite(s);
     final current = store.station == s;
     final parts = [
@@ -166,7 +167,7 @@ class _StationsScreenState extends State<StationsScreen> {
       if (here != null) miles(milesBetween(here.$1, here.$2, s.lat, s.lng)),
     ];
     return ListTile(
-      key: Key('station-${s.id}'),
+      key: Key('station-$section-${s.id}'),
       title: Text(s.name,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -174,7 +175,7 @@ class _StationsScreenState extends State<StationsScreen> {
       subtitle: Text(parts.join(' · ')),
       leading: Icon(current ? Icons.place : Icons.place_outlined, color: current ? Palette.sea : Palette.faint),
       trailing: IconButton(
-        key: Key('fav-${s.id}'),
+        key: Key('fav-$section-${s.id}'),
         tooltip: fav ? 'Remove from favorites' : 'Add to favorites',
         icon: Icon(fav ? Icons.star_rounded : Icons.star_outline_rounded,
             color: fav ? const Color(0xFFF2A900) : Palette.faint),

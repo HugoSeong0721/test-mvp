@@ -9,6 +9,8 @@ Input: tools/tides/out/stations_raw.json from the `tides-noaa-data` branch
 
 NOAA's per-station `observedst` is missing for ~1,250 stations and wrong for
 some (Hawaii marked DST), so daylight saving is decided here by region.
+NOAA's `timezonecorr` is also wrong for a few dozen stations (Florida Panhandle,
+Aleutians, British Columbia) — see std_offset().
 Row format: [id, name, state, lat, lng, isReference(1/0), stdOffsetHours, dst(1/0)]
 """
 import json
@@ -46,6 +48,28 @@ KEEP_CAPS = {"ICWW", "USCG", "MARAD", "LAWMA", "NERR", "NOAA", "ANVSA", "GNSS", 
              "AFB", "MSF", "PGA", "ICW", "NAB", "GPS", "RR"}
 
 
+def std_offset(s):
+    """NOAA's timezonecorr, corrected where it disagrees with the real civil time zone
+    (found by the app's all-stations layout test, 2026-10-03)."""
+    st, tz, lat, lng = s.get("state") or "", int(s["timezonecorr"]), float(s["lat"]), float(s["lng"])
+    if st == "FL":
+        # Central time west of the Apalachicola River / Gulf County line
+        return -6 if lng < -85.41 else -5
+    if st in ("TX", "LA", "MS", "AL"):
+        return -6
+    if st == "HI":
+        return -10
+    alaska = st == "AK" or (not st and tz in (-9, -10, -11) and lat > 51 and (lng < -129.8 or lng > 170)
+                            and "B.C." not in s["name"] and s["id"] != "8218447")
+    if alaska:
+        # Hawaii–Aleutian time on the Aleutian chain west of 169°30′W (Atka, Adak, Attu);
+        # Alaska time elsewhere, including the Pribilofs and St. Lawrence Island
+        return -10 if lat < 53.5 and (lng < -169.5 or lng > 0) else -9
+    if not st and ("B.C." in s["name"] or s["id"] == "8218447"):
+        return -8  # British Columbia (Pacific time)
+    return tz
+
+
 def tidy(name):
     name = re.sub(r"\s+", " ", name.strip())
     return re.sub(r"\b[A-Z]{3,}\b",
@@ -61,7 +85,7 @@ def main():
             s["id"], tidy(s["name"]), s.get("state") or "",
             round(float(s["lat"]), 4), round(float(s["lng"]), 4),
             1 if s.get("type") == "R" else 0,
-            int(s["timezonecorr"]), 1 if observes_dst(s) else 0,
+            std_offset(s), 1 if observes_dst(s) else 0,
         ])
     rows.sort(key=lambda r: r[0])
     dst = os.path.join(os.path.dirname(__file__), "..", "..", "tides_app", "flutter", "assets", "stations.json")

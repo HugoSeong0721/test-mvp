@@ -126,13 +126,13 @@ class _TideChartState extends State<TideChart> {
                 right: 0,
                 child: Center(
                   child: Container(
-                    key: const Key('chart-readout'),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: Palette.ink,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(readout,
+                        key: const Key('chart-readout'),
                         style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
                   ),
                 ),
