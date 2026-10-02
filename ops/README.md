@@ -10,10 +10,10 @@ GitHub(`soulfulfillable`)만 살아 있으면 새 Claude 계정에서 그대로 
 | 코드·문서·기획(`PRODUCT.md`, `CLAUDE.md`) | GitHub | 안전 | — (원본이 GitHub) |
 | GitHub Actions 비밀값(App Store API 키 등) | GitHub 리포 설정 | 안전 | — |
 | 대화 세션 기록 | Claude 계정 | **사라짐** | 중요한 결정은 세션이 끝나기 전 `PRODUCT.md` 결정 로그에 기록 (규칙: `CLAUDE.md`) |
-| 루틴(주간 점검 등) | Claude 계정 | **사라짐** | `ops/routines/*.md` 에 일정·프롬프트 원문 보관 |
+| 루틴(주간 점검 등) | Claude 계정 | **사라짐** | `ops/routines/*.md` 에 일정·프롬프트 원문 보관. 루틴은 저장소 쓰기 권한이 자동으로 안 붙어서 프롬프트 0단계에서 add_repo(push) 를 직접 호출한다 |
 | Claude 클라우드 환경 설정 | Claude 계정 | **사라짐** | 아래 "새 계정에서 복구" 참고 (특별한 설정 없음) |
-| Apple 개발자·App Store Connect | Apple ID | Claude 와 무관 | 어떤 이메일인지 사용자 확인 필요 ⚠️ |
-| AdMob(광고 수익 입금처) | Google 계정 | Claude 와 무관 | 어떤 이메일인지 사용자 확인 필요 ⚠️ |
+| Apple 개발자·App Store Connect | Apple ID | Claude 와 무관 | ✅ 개인 Gmail 로 가입 (사용자 확인 2026-10-02) |
+| AdMob(광고 수익 입금처) | Google 계정 | Claude 와 무관 | ⚠️ 개인 Gmail 둘 중 하나로 추정, 확인 필요 (admob.google.com 오른쪽 위 프로필) |
 
 ## 새 Claude 계정에서 복구 (5분)
 
