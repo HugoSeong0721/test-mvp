@@ -1,0 +1,658 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 5008.09 5008.079">
+  <defs>
+    <linearGradient id="a" data-name="White, Black" x1="2463.685" y1="2298.388" x2="2544.395" y2="2298.388" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1"/>
+    </linearGradient>
+    <linearGradient id="b" x1="2499.994" y1="2325.938" x2="2713.743" y2="2325.938" xlink:href="#a"/>
+    <linearGradient id="c" x1="2499.994" y1="2401.211" x2="2864.288" y2="2401.211" xlink:href="#a"/>
+    <linearGradient id="d" x1="2499.994" y1="2504.04" x2="2919.389" y2="2504.04" xlink:href="#a"/>
+    <linearGradient id="e" x1="2499.994" y1="2606.869" x2="2864.288" y2="2606.869" xlink:href="#a"/>
+    <linearGradient id="f" x1="2499.994" y1="2682.142" x2="2713.743" y2="2682.142" xlink:href="#a"/>
+    <linearGradient id="g" x1="2463.685" y1="2709.692" x2="2544.395" y2="2709.692" xlink:href="#a"/>
+    <linearGradient id="h" x1="2294.337" y1="2682.142" x2="2508.085" y2="2682.142" xlink:href="#a"/>
+    <linearGradient id="i" x1="2143.791" y1="2606.869" x2="2508.085" y2="2606.869" xlink:href="#a"/>
+    <linearGradient id="j" x1="2088.69" y1="2504.04" x2="2508.085" y2="2504.04" xlink:href="#a"/>
+    <linearGradient id="k" x1="2143.791" y1="2401.211" x2="2508.085" y2="2401.211" xlink:href="#a"/>
+    <linearGradient id="l" x1="2294.337" y1="2325.938" x2="2508.085" y2="2325.938" xlink:href="#a"/>
+    <linearGradient id="m" x1="2294.337" y1="2120.286" x2="2508.085" y2="2120.286" xlink:href="#a"/>
+    <linearGradient id="n" x1="2499.994" y1="2120.286" x2="2713.743" y2="2120.286" xlink:href="#a"/>
+    <linearGradient id="o" x1="2599.193" y1="2223.109" x2="2970.747" y2="2223.109" xlink:href="#a"/>
+    <linearGradient id="p" x1="2635.503" y1="2401.211" x2="3140.085" y2="2401.211" xlink:href="#a"/>
+    <linearGradient id="q" x1="2635.503" y1="2606.869" x2="3140.085" y2="2606.869" xlink:href="#a"/>
+    <linearGradient id="r" x1="2599.193" y1="2784.97" x2="2970.747" y2="2784.97" xlink:href="#a"/>
+    <linearGradient id="s" x1="2499.994" y1="2887.794" x2="2713.743" y2="2887.794" xlink:href="#a"/>
+    <linearGradient id="t" x1="2294.337" y1="2887.794" x2="2508.085" y2="2887.794" xlink:href="#a"/>
+    <linearGradient id="u" x1="2037.332" y1="2784.97" x2="2408.886" y2="2784.97" xlink:href="#a"/>
+    <linearGradient id="v" x1="1867.995" y1="2606.869" x2="2372.576" y2="2606.869" xlink:href="#a"/>
+    <linearGradient id="w" x1="1867.995" y1="2401.211" x2="2372.576" y2="2401.211" xlink:href="#a"/>
+    <linearGradient id="x" x1="2037.332" y1="2223.109" x2="2408.886" y2="2223.109" xlink:href="#a"/>
+    <linearGradient id="y" x1="2330.647" y1="1872.029" x2="2677.433" y2="1872.029" xlink:href="#a"/>
+    <linearGradient id="z" x1="2669.332" y1="1956.709" x2="2970.736" y2="1956.709" xlink:href="#a"/>
+    <linearGradient id="aa" x1="2856.209" y1="2188.035" x2="3246.543" y2="2188.035" xlink:href="#a"/>
+    <linearGradient id="ab" x1="2911.299" y1="2504.034" x2="3360.779" y2="2504.034" xlink:href="#a"/>
+    <linearGradient id="ac" x1="2856.198" y1="2820.034" x2="3246.543" y2="2820.034" xlink:href="#a"/>
+    <linearGradient id="ad" x1="2669.343" y1="3051.371" x2="2970.747" y2="3051.371" xlink:href="#a"/>
+    <linearGradient id="ae" x1="2330.647" y1="3136.045" x2="2677.422" y2="3136.045" xlink:href="#a"/>
+    <linearGradient id="af" x1="2037.343" y1="3051.371" x2="2338.748" y2="3051.371" xlink:href="#a"/>
+    <linearGradient id="ag" x1="1761.536" y1="2820.045" x2="2151.871" y2="2820.045" xlink:href="#a"/>
+    <linearGradient id="ah" x1="1647.289" y1="2504.034" x2="2096.77" y2="2504.034" xlink:href="#a"/>
+    <linearGradient id="ai" x1="1761.536" y1="2188.04" x2="2151.881" y2="2188.04" xlink:href="#a"/>
+    <linearGradient id="aj" x1="2037.332" y1="1956.709" x2="2338.737" y2="1956.709" xlink:href="#a"/>
+    <linearGradient id="ak" x1="2073.642" y1="1708.463" x2="2508.085" y2="1708.463" xlink:href="#a"/>
+    <linearGradient id="al" x1="2499.994" y1="1708.463" x2="2934.438" y2="1708.463" xlink:href="#a"/>
+    <linearGradient id="am" x1="2926.336" y1="1921.634" x2="3246.543" y2="1921.634" xlink:href="#a"/>
+    <linearGradient id="an" x1="3132.005" y1="2290.863" x2="3467.238" y2="2290.863" xlink:href="#a"/>
+    <linearGradient id="ao" x1="3131.994" y1="2717.211" x2="3467.227" y2="2717.211" xlink:href="#a"/>
+    <linearGradient id="ap" x1="2926.347" y1="3086.434" x2="3246.543" y2="3086.434" xlink:href="#a"/>
+    <linearGradient id="aq" x1="2499.994" y1="3299.621" x2="2934.438" y2="3299.621" xlink:href="#a"/>
+    <linearGradient id="ar" x1="2073.642" y1="3299.616" x2="2508.085" y2="3299.616" xlink:href="#a"/>
+    <linearGradient id="as" x1="1761.536" y1="3086.445" x2="2081.743" y2="3086.445" xlink:href="#a"/>
+    <linearGradient id="at" x1="1540.841" y1="2717.211" x2="1876.075" y2="2717.211" xlink:href="#a"/>
+    <linearGradient id="au" x1="1540.841" y1="2290.863" x2="1876.085" y2="2290.863" xlink:href="#a"/>
+    <linearGradient id="av" x1="1761.536" y1="1921.64" x2="2081.732" y2="1921.64" xlink:href="#a"/>
+    <linearGradient id="aw" x1="1797.846" y1="1673.389" x2="2251.08" y2="1673.389" xlink:href="#a"/>
+    <linearGradient id="ax" x1="2242.99" y1="1544.886" x2="2765.09" y2="1544.886" xlink:href="#a"/>
+    <linearGradient id="ay" x1="2756.999" y1="1673.389" x2="3210.233" y2="1673.389" xlink:href="#a"/>
+    <linearGradient id="az" x1="3202.143" y1="2024.463" x2="3467.238" y2="2024.463" xlink:href="#a"/>
+    <linearGradient id="ba" x1="3352.7" y1="2504.04" x2="3573.697" y2="2504.04" xlink:href="#a"/>
+    <linearGradient id="bb" x1="3202.143" y1="2983.606" x2="3467.238" y2="2983.606" xlink:href="#a"/>
+    <linearGradient id="bc" x1="2756.999" y1="3334.691" x2="3210.233" y2="3334.691" xlink:href="#a"/>
+    <linearGradient id="bd" x1="2242.99" y1="3463.193" x2="2765.09" y2="3463.193" xlink:href="#a"/>
+    <linearGradient id="be" x1="1797.846" y1="3334.691" x2="2251.08" y2="3334.691" xlink:href="#a"/>
+    <linearGradient id="bf" x1="1540.841" y1="2983.616" x2="1805.936" y2="2983.616" xlink:href="#a"/>
+    <linearGradient id="bg" x1="1434.383" y1="2504.034" x2="1655.39" y2="2504.034" xlink:href="#a"/>
+    <linearGradient id="bh" x1="1540.841" y1="2024.463" x2="1805.936" y2="2024.463" xlink:href="#a"/>
+    <linearGradient id="bi" x1="1540.841" y1="1833.33" x2="1805.936" y2="1833.33" xlink:href="#a"/>
+    <linearGradient id="bj" x1="1691.387" y1="1673.389" x2="1975.284" y2="1673.389" xlink:href="#a"/>
+    <linearGradient id="bk" x1="1967.194" y1="1452.694" x2="2251.091" y2="1452.694" xlink:href="#a"/>
+    <linearGradient id="bl" x1="2242.99" y1="1406.983" x2="2508.085" y2="1406.983" xlink:href="#a"/>
+    <linearGradient id="bm" x1="2499.994" y1="1406.983" x2="2765.09" y2="1406.983" xlink:href="#a"/>
+    <linearGradient id="bn" x1="2756.999" y1="1452.694" x2="3040.885" y2="1452.694" xlink:href="#a"/>
+    <linearGradient id="bo" x1="3032.806" y1="1673.389" x2="3316.692" y2="1673.389" xlink:href="#a"/>
+    <linearGradient id="bp" x1="3202.143" y1="1833.33" x2="3467.238" y2="1833.33" xlink:href="#a"/>
+    <linearGradient id="bq" x1="3422.838" y1="2109.137" x2="3687.933" y2="2109.137" xlink:href="#a"/>
+    <linearGradient id="br" x1="3459.158" y1="2375.537" x2="3743.045" y2="2375.537" xlink:href="#a"/>
+    <linearGradient id="bs" x1="3459.158" y1="2632.542" x2="3743.045" y2="2632.542" xlink:href="#a"/>
+    <linearGradient id="bt" x1="3422.838" y1="2898.937" x2="3687.933" y2="2898.937" xlink:href="#a"/>
+    <linearGradient id="bu" x1="3202.143" y1="3174.738" x2="3467.238" y2="3174.738" xlink:href="#a"/>
+    <linearGradient id="bv" x1="3032.806" y1="3334.691" x2="3316.692" y2="3334.691" xlink:href="#a"/>
+    <linearGradient id="bw" x1="2756.999" y1="3555.386" x2="3040.885" y2="3555.386" xlink:href="#a"/>
+    <linearGradient id="bx" x1="2499.994" y1="3601.096" x2="2765.09" y2="3601.096" xlink:href="#a"/>
+    <linearGradient id="by" x1="2242.99" y1="3601.096" x2="2508.085" y2="3601.096" xlink:href="#a"/>
+    <linearGradient id="bz" x1="1967.183" y1="3555.386" x2="2251.08" y2="3555.386" xlink:href="#a"/>
+    <linearGradient id="ca" x1="1691.387" y1="3334.691" x2="1975.274" y2="3334.691" xlink:href="#a"/>
+    <linearGradient id="cb" x1="1540.841" y1="3174.744" x2="1805.936" y2="3174.744" xlink:href="#a"/>
+    <linearGradient id="cc" x1="1320.146" y1="2898.942" x2="1585.241" y2="2898.942" xlink:href="#a"/>
+    <linearGradient id="cd" x1="1265.035" y1="2632.531" x2="1548.932" y2="2632.531" xlink:href="#a"/>
+    <linearGradient id="ce" x1="1265.035" y1="2375.532" x2="1548.932" y2="2375.532" xlink:href="#a"/>
+    <linearGradient id="cf" x1="1320.146" y1="2109.137" x2="1585.241" y2="2109.137" xlink:href="#a"/>
+    <linearGradient id="cg" x1="2073.653" y1="1296.641" x2="2287.401" y2="1296.641" xlink:href="#a"/>
+    <linearGradient id="ch" x1="2720.69" y1="1296.641" x2="2934.438" y2="1296.641" xlink:href="#a"/>
+    <linearGradient id="ci" x1="3202.143" y1="1620.165" x2="3573.697" y2="1620.165" xlink:href="#a"/>
+    <linearGradient id="cj" x1="3459.148" y1="2180.527" x2="3963.729" y2="2180.527" xlink:href="#a"/>
+    <linearGradient id="ck" x1="3459.148" y1="2827.563" x2="3963.74" y2="2827.563" xlink:href="#a"/>
+    <linearGradient id="cl" x1="3202.132" y1="3387.915" x2="3573.686" y2="3387.915" xlink:href="#a"/>
+    <linearGradient id="cm" x1="2720.679" y1="3711.438" x2="2934.427" y2="3711.438" xlink:href="#a"/>
+    <linearGradient id="cn" x1="2073.642" y1="3711.444" x2="2287.39" y2="3711.444" xlink:href="#a"/>
+    <linearGradient id="co" x1="1434.383" y1="3387.915" x2="1805.926" y2="3387.915" xlink:href="#a"/>
+    <linearGradient id="cp" x1="1044.35" y1="2827.553" x2="1548.932" y2="2827.553" xlink:href="#a"/>
+    <linearGradient id="cq" x1="1044.35" y1="2180.516" x2="1548.932" y2="2180.516" xlink:href="#a"/>
+    <linearGradient id="cr" x1="1434.393" y1="1620.159" x2="1805.947" y2="1620.159" xlink:href="#a"/>
+    <linearGradient id="cs" x1="1434.393" y1="1704.828" x2="1585.252" y2="1704.828" xlink:href="#a"/>
+    <linearGradient id="ct" x1="1434.383" y1="1509.817" x2="1975.284" y2="1509.817" xlink:href="#a"/>
+    <linearGradient id="cu" x1="1967.194" y1="1314.79" x2="2118.053" y2="1314.79" xlink:href="#a"/>
+    <linearGradient id="cv" x1="2109.952" y1="1243.406" x2="2508.085" y2="1243.406" xlink:href="#a"/>
+    <linearGradient id="cw" x1="2499.994" y1="1243.406" x2="2898.128" y2="1243.406" xlink:href="#a"/>
+    <linearGradient id="cx" x1="2890.038" y1="1314.79" x2="3040.885" y2="1314.79" xlink:href="#a"/>
+    <linearGradient id="cy" x1="3032.806" y1="1509.817" x2="3573.697" y2="1509.817" xlink:href="#a"/>
+    <linearGradient id="cz" x1="3422.838" y1="1704.828" x2="3573.686" y2="1704.828" xlink:href="#a"/>
+    <linearGradient id="da" x1="3422.838" y1="2042.613" x2="3963.729" y2="2042.613" xlink:href="#a"/>
+    <linearGradient id="db" x1="3565.606" y1="2309.018" x2="3963.74" y2="2309.018" xlink:href="#a"/>
+    <linearGradient id="dc" x1="3565.606" y1="2699.061" x2="3963.74" y2="2699.061" xlink:href="#a"/>
+    <linearGradient id="dd" x1="3422.838" y1="2965.456" x2="3963.729" y2="2965.456" xlink:href="#a"/>
+    <linearGradient id="de" x1="3422.827" y1="3303.246" x2="3573.686" y2="3303.246" xlink:href="#a"/>
+    <linearGradient id="df" x1="3032.806" y1="3498.262" x2="3573.697" y2="3498.262" xlink:href="#a"/>
+    <linearGradient id="dg" x1="2890.038" y1="3693.283" x2="3040.885" y2="3693.283" xlink:href="#a"/>
+    <linearGradient id="dh" x1="2499.994" y1="3764.673" x2="2898.128" y2="3764.673" xlink:href="#a"/>
+    <linearGradient id="di" x1="2109.952" y1="3764.673" x2="2508.085" y2="3764.673" xlink:href="#a"/>
+    <linearGradient id="dj" x1="1967.183" y1="3693.289" x2="2118.042" y2="3693.289" xlink:href="#a"/>
+    <linearGradient id="dk" x1="1434.372" y1="3498.262" x2="1975.274" y2="3498.262" xlink:href="#a"/>
+    <linearGradient id="dl" x1="1434.393" y1="3303.251" x2="1585.241" y2="3303.251" xlink:href="#a"/>
+    <linearGradient id="dm" x1="1044.35" y1="2965.461" x2="1585.241" y2="2965.461" xlink:href="#a"/>
+    <linearGradient id="dn" x1="1044.34" y1="2699.05" x2="1442.473" y2="2699.05" xlink:href="#a"/>
+    <linearGradient id="do" x1="1044.34" y1="2309.013" x2="1442.473" y2="2309.013" xlink:href="#a"/>
+    <linearGradient id="dp" x1="1044.35" y1="2042.613" x2="1585.241" y2="2042.613" xlink:href="#a"/>
+    <linearGradient id="dq" x1="1710.179" y1="1390.069" x2="2011.583" y2="1390.069" xlink:href="#a"/>
+    <linearGradient id="dr" x1="2330.657" y1="1217.733" x2="2677.433" y2="1217.733" xlink:href="#a"/>
+    <linearGradient id="ds" x1="2996.496" y1="1390.069" x2="3297.89" y2="1390.069" xlink:href="#a"/>
+    <linearGradient id="dt" x1="3422.838" y1="1860.886" x2="3813.183" y2="1860.886" xlink:href="#a"/>
+    <linearGradient id="du" x1="3565.606" y1="2504.045" x2="4015.087" y2="2504.045" xlink:href="#a"/>
+    <linearGradient id="dv" x1="3422.838" y1="3147.188" x2="3813.183" y2="3147.188" xlink:href="#a"/>
+    <linearGradient id="dw" x1="2996.496" y1="3618.011" x2="3297.89" y2="3618.011" xlink:href="#a"/>
+    <linearGradient id="dx" x1="2330.647" y1="3790.347" x2="2677.422" y2="3790.347" xlink:href="#a"/>
+    <linearGradient id="dy" x1="1710.179" y1="3618.011" x2="2011.583" y2="3618.011" xlink:href="#a"/>
+    <linearGradient id="dz" x1="1194.896" y1="3147.188" x2="1585.241" y2="3147.188" xlink:href="#a"/>
+    <linearGradient id="ea" x1="993.003" y1="2504.034" x2="1442.473" y2="2504.034" xlink:href="#a"/>
+    <linearGradient id="eb" x1="1194.907" y1="1860.881" x2="1585.252" y2="1860.881" xlink:href="#a"/>
+    <linearGradient id="ec" x1="1158.597" y1="1594.481" x2="1478.793" y2="1594.481" xlink:href="#a"/>
+    <linearGradient id="ed" x1="1434.383" y1="1318.69" x2="1754.579" y2="1318.69" xlink:href="#a"/>
+    <linearGradient id="ee" x1="1746.499" y1="1123.669" x2="2118.042" y2="1123.669" xlink:href="#a"/>
+    <linearGradient id="ef" x1="2109.952" y1="1022.711" x2="2508.085" y2="1022.711" xlink:href="#a"/>
+    <linearGradient id="eg" x1="2499.994" y1="1022.711" x2="2898.128" y2="1022.711" xlink:href="#a"/>
+    <linearGradient id="eh" x1="2890.038" y1="1123.663" x2="3261.591" y2="1123.663" xlink:href="#a"/>
+    <linearGradient id="ei" x1="3253.501" y1="1318.69" x2="3573.697" y2="1318.69" xlink:href="#a"/>
+    <linearGradient id="ej" x1="3529.286" y1="1594.481" x2="3849.493" y2="1594.481" xlink:href="#a"/>
+    <linearGradient id="ek" x1="3698.634" y1="1932.265" x2="4070.188" y2="1932.265" xlink:href="#a"/>
+    <linearGradient id="el" x1="3786.312" y1="2309.018" x2="4184.435" y2="2309.018" xlink:href="#a"/>
+    <linearGradient id="em" x1="3786.312" y1="2699.061" x2="4184.435" y2="2699.061" xlink:href="#a"/>
+    <linearGradient id="en" x1="3698.634" y1="3075.803" x2="4070.188" y2="3075.803" xlink:href="#a"/>
+    <linearGradient id="eo" x1="3529.286" y1="3413.593" x2="3849.482" y2="3413.593" xlink:href="#a"/>
+    <linearGradient id="ep" x1="3253.501" y1="3689.389" x2="3573.697" y2="3689.389" xlink:href="#a"/>
+    <linearGradient id="eq" x1="2890.038" y1="3884.411" x2="3261.591" y2="3884.411" xlink:href="#a"/>
+    <linearGradient id="er" x1="2499.994" y1="3985.368" x2="2898.128" y2="3985.368" xlink:href="#a"/>
+    <linearGradient id="es" x1="2109.952" y1="3985.368" x2="2508.085" y2="3985.368" xlink:href="#a"/>
+    <linearGradient id="et" x1="1746.488" y1="3884.416" x2="2118.042" y2="3884.416" xlink:href="#a"/>
+    <linearGradient id="eu" x1="1434.372" y1="3689.389" x2="1754.579" y2="3689.389" xlink:href="#a"/>
+    <linearGradient id="ev" x1="1158.587" y1="3413.599" x2="1478.793" y2="3413.599" xlink:href="#a"/>
+    <linearGradient id="ew" x1="937.892" y1="3075.814" x2="1309.445" y2="3075.814" xlink:href="#a"/>
+    <linearGradient id="ex" x1="823.645" y1="2699.05" x2="1221.778" y2="2699.05" xlink:href="#a"/>
+    <linearGradient id="ey" x1="823.645" y1="2309.007" x2="1221.778" y2="2309.007" xlink:href="#a"/>
+    <linearGradient id="ez" x1="937.892" y1="1932.265" x2="1309.445" y2="1932.265" xlink:href="#a"/>
+    <linearGradient id="fa" x1="2720.7" y1="884.803" x2="3155.133" y2="884.803" xlink:href="#a"/>
+    <linearGradient id="fb" x1="3529.308" y1="1318.69" x2="3849.503" y2="1318.69" xlink:href="#a"/>
+    <linearGradient id="fc" x1="3955.649" y1="2070.168" x2="4290.883" y2="2070.168" xlink:href="#a"/>
+    <linearGradient id="fd" x1="3955.66" y1="2937.916" x2="4290.893" y2="2937.916" xlink:href="#a"/>
+    <linearGradient id="fe" x1="3529.286" y1="3689.4" x2="3849.482" y2="3689.4" xlink:href="#a"/>
+    <linearGradient id="ff" x1="2720.69" y1="4123.266" x2="3155.133" y2="4123.266" xlink:href="#a"/>
+    <linearGradient id="fg" x1="1852.947" y1="4123.277" x2="2287.379" y2="4123.277" xlink:href="#a"/>
+    <linearGradient id="fh" x1="1158.576" y1="3689.384" x2="1478.772" y2="3689.384" xlink:href="#a"/>
+    <linearGradient id="fi" x1="717.197" y1="2937.911" x2="1052.43" y2="2937.911" xlink:href="#a"/>
+    <linearGradient id="fj" x1="717.186" y1="2070.158" x2="1052.43" y2="2070.158" xlink:href="#a"/>
+    <linearGradient id="fk" x1="1158.597" y1="1318.674" x2="1478.793" y2="1318.674" xlink:href="#a"/>
+    <linearGradient id="fl" x1="1852.947" y1="884.813" x2="2287.39" y2="884.813" xlink:href="#a"/>
+    <linearGradient id="fm" x1="2242.99" y1="774.46" x2="2508.085" y2="774.46" xlink:href="#a"/>
+    <linearGradient id="fn" x1="2499.994" y1="774.455" x2="2765.09" y2="774.455" xlink:href="#a"/>
+    <linearGradient id="fo" x1="2463.685" y1="721.237" x2="2544.395" y2="721.237" xlink:href="#a"/>
+    <linearGradient id="fp" x1="3147.042" y1="941.937" x2="3368.039" y2="941.937" xlink:href="#a"/>
+    <linearGradient id="fq" x1="3253.501" y1="1070.439" x2="3706.735" y2="1070.439" xlink:href="#a"/>
+    <linearGradient id="fr" x1="3253.501" y1="960.092" x2="3537.387" y2="960.092" xlink:href="#a"/>
+    <linearGradient id="fs" x1="3805.082" y1="1527.961" x2="4070.177" y2="1527.961" xlink:href="#a"/>
+    <linearGradient id="ft" x1="3805.093" y1="1750.533" x2="4327.193" y2="1750.533" xlink:href="#a"/>
+    <linearGradient id="fu" x1="3805.093" y1="1612.635" x2="4290.883" y2="1612.635" xlink:href="#a"/>
+    <linearGradient id="fv" x1="4007.007" y1="2375.537" x2="4460.241" y2="2375.537" xlink:href="#a"/>
+    <linearGradient id="fw" x1="4007.007" y1="2632.542" x2="4460.241" y2="2632.542" xlink:href="#a"/>
+    <linearGradient id="fx" x1="4007.007" y1="2504.04" x2="4566.69" y2="2504.04" xlink:href="#a"/>
+    <linearGradient id="fy" x1="3805.093" y1="3257.535" x2="4327.193" y2="3257.535" xlink:href="#a"/>
+    <linearGradient id="fz" x1="3805.082" y1="3480.118" x2="4070.177" y2="3480.118" xlink:href="#a"/>
+    <linearGradient id="ga" x1="3805.093" y1="3395.444" x2="4290.883" y2="3395.444" xlink:href="#a"/>
+    <linearGradient id="gb" x1="3253.501" y1="3937.629" x2="3706.735" y2="3937.629" xlink:href="#a"/>
+    <linearGradient id="gc" x1="3147.042" y1="4066.143" x2="3368.05" y2="4066.143" xlink:href="#a"/>
+    <linearGradient id="gd" x1="3253.501" y1="4047.977" x2="3537.387" y2="4047.977" xlink:href="#a"/>
+    <linearGradient id="ge" x1="2499.994" y1="4233.624" x2="2765.09" y2="4233.624" xlink:href="#a"/>
+    <linearGradient id="gf" x1="2242.99" y1="4233.624" x2="2508.085" y2="4233.624" xlink:href="#a"/>
+    <linearGradient id="gg" x1="2463.685" y1="4286.843" x2="2544.395" y2="4286.843" xlink:href="#a"/>
+    <linearGradient id="gh" x1="1640.029" y1="4066.143" x2="1861.037" y2="4066.143" xlink:href="#a"/>
+    <linearGradient id="gi" x1="1301.334" y1="3937.64" x2="1754.568" y2="3937.64" xlink:href="#a"/>
+    <linearGradient id="gj" x1="1470.681" y1="4047.988" x2="1754.579" y2="4047.988" xlink:href="#a"/>
+    <linearGradient id="gk" x1="937.902" y1="3480.118" x2="1202.998" y2="3480.118" xlink:href="#a"/>
+    <linearGradient id="gl" x1="680.887" y1="3257.546" x2="1202.987" y2="3257.546" xlink:href="#a"/>
+    <linearGradient id="gm" x1="717.197" y1="3395.444" x2="1202.987" y2="3395.444" xlink:href="#a"/>
+    <linearGradient id="gn" x1="547.838" y1="2375.527" x2="1001.072" y2="2375.527" xlink:href="#a"/>
+    <linearGradient id="go" x1="547.849" y1="2632.542" x2="1001.083" y2="2632.542" xlink:href="#a"/>
+    <linearGradient id="gp" x1="441.39" y1="2504.029" x2="1001.072" y2="2504.029" xlink:href="#a"/>
+    <linearGradient id="gq" x1="680.887" y1="1750.539" x2="1202.987" y2="1750.539" xlink:href="#a"/>
+    <linearGradient id="gr" x1="937.902" y1="1527.961" x2="1202.998" y2="1527.961" xlink:href="#a"/>
+    <linearGradient id="gs" x1="717.197" y1="1612.635" x2="1202.987" y2="1612.635" xlink:href="#a"/>
+    <linearGradient id="gt" x1="1301.344" y1="1070.445" x2="1754.579" y2="1070.445" xlink:href="#a"/>
+    <linearGradient id="gu" x1="1640.04" y1="941.937" x2="1861.037" y2="941.937" xlink:href="#a"/>
+    <linearGradient id="gv" x1="1470.692" y1="960.092" x2="1754.589" y2="960.092" xlink:href="#a"/>
+    <linearGradient id="gw" x1="1746.499" y1="703.082" x2="2030.385" y2="703.082" xlink:href="#a"/>
+    <linearGradient id="gx" x1="1985.985" y1="636.562" x2="2287.39" y2="636.562" xlink:href="#a"/>
+    <linearGradient id="gy" x1="2720.7" y1="636.557" x2="3022.105" y2="636.557" xlink:href="#a"/>
+    <linearGradient id="gz" x1="2977.694" y1="703.076" x2="3261.591" y2="703.076" xlink:href="#a"/>
+    <linearGradient id="ha" x1="3529.297" y1="1070.439" x2="3982.542" y2="1070.439" xlink:href="#a"/>
+    <linearGradient id="hb" x1="3805.103" y1="1252.171" x2="4070.199" y2="1252.171" xlink:href="#a"/>
+    <linearGradient id="hc" x1="4062.097" y1="1888.437" x2="4547.898" y2="1888.437" xlink:href="#a"/>
+    <linearGradient id="hd" x1="4176.334" y1="2136.677" x2="4566.69" y2="2136.677" xlink:href="#a"/>
+    <linearGradient id="he" x1="4176.355" y1="2871.403" x2="4566.7" y2="2871.403" xlink:href="#a"/>
+    <linearGradient id="hf" x1="4062.108" y1="3119.643" x2="4547.909" y2="3119.643" xlink:href="#a"/>
+    <linearGradient id="hg" x1="3805.082" y1="3755.914" x2="4070.177" y2="3755.914" xlink:href="#a"/>
+    <linearGradient id="hh" x1="3529.286" y1="3937.64" x2="3982.52" y2="3937.64" xlink:href="#a"/>
+    <linearGradient id="hi" x1="2977.694" y1="4304.992" x2="3261.591" y2="4304.992" xlink:href="#a"/>
+    <linearGradient id="hj" x1="2720.7" y1="4371.512" x2="3022.105" y2="4371.512" xlink:href="#a"/>
+    <linearGradient id="hk" x1="1985.974" y1="4371.522" x2="2287.379" y2="4371.522" xlink:href="#a"/>
+    <linearGradient id="hl" x1="1746.488" y1="4305.008" x2="2030.385" y2="4305.008" xlink:href="#a"/>
+    <linearGradient id="hm" x1="1025.538" y1="3937.64" x2="1478.772" y2="3937.64" xlink:href="#a"/>
+    <linearGradient id="hn" x1="937.881" y1="3755.903" x2="1202.976" y2="3755.903" xlink:href="#a"/>
+    <linearGradient id="ho" x1="460.181" y1="3119.643" x2="945.982" y2="3119.643" xlink:href="#a"/>
+    <linearGradient id="hp" x1="441.379" y1="2871.386" x2="831.735" y2="2871.386" xlink:href="#a"/>
+    <linearGradient id="hq" x1="441.39" y1="2136.677" x2="831.735" y2="2136.677" xlink:href="#a"/>
+    <linearGradient id="hr" x1="460.181" y1="1888.431" x2="945.971" y2="1888.431" xlink:href="#a"/>
+    <linearGradient id="hs" x1="937.902" y1="1252.16" x2="1202.998" y2="1252.16" xlink:href="#a"/>
+    <linearGradient id="ht" x1="1025.559" y1="1070.428" x2="1478.793" y2="1070.428" xlink:href="#a"/>
+    <linearGradient id="hu" x1="1879.537" y1="454.831" x2="2030.385" y2="454.831" xlink:href="#a"/>
+    <linearGradient id="hv" x1="2977.705" y1="454.825" x2="3128.553" y2="454.825" xlink:href="#a"/>
+    <linearGradient id="hw" x1="3805.103" y1="1003.92" x2="4203.237" y2="1003.92" xlink:href="#a"/>
+    <linearGradient id="hx" x1="4282.803" y1="1954.956" x2="4823.694" y2="1954.956" xlink:href="#a"/>
+    <linearGradient id="hy" x1="4282.803" y1="3053.129" x2="4823.705" y2="3053.129" xlink:href="#a"/>
+    <linearGradient id="hz" x1="3805.093" y1="4004.165" x2="4203.215" y2="4004.165" xlink:href="#a"/>
+    <linearGradient id="ia" x1="2977.694" y1="4553.249" x2="3128.553" y2="4553.249" xlink:href="#a"/>
+    <linearGradient id="ib" x1="1879.526" y1="4553.254" x2="2030.375" y2="4553.254" xlink:href="#a"/>
+    <linearGradient id="ic" x1="804.843" y1="4004.159" x2="1202.976" y2="4004.159" xlink:href="#a"/>
+    <linearGradient id="id" x1="184.385" y1="3053.123" x2="725.276" y2="3053.123" xlink:href="#a"/>
+    <linearGradient id="ie" x1="184.375" y1="1954.945" x2="725.276" y2="1954.945" xlink:href="#a"/>
+    <linearGradient id="if" x1="804.864" y1="1003.909" x2="1202.987" y2="1003.909" xlink:href="#a"/>
+    <linearGradient id="ig" x1="2242.99" y1="498.659" x2="2508.085" y2="498.659" xlink:href="#a"/>
+    <linearGradient id="ih" x1="2500.005" y1="498.659" x2="2765.09" y2="498.659" xlink:href="#a"/>
+    <linearGradient id="ii" x1="3253.501" y1="703.082" x2="3537.387" y2="703.082" xlink:href="#a"/>
+    <linearGradient id="ij" x1="3422.849" y1="831.595" x2="3813.194" y2="831.595" xlink:href="#a"/>
+    <linearGradient id="ik" x1="1194.886" y1="831.595" x2="1585.241" y2="831.595" xlink:href="#a"/>
+    <linearGradient id="il" x1="1470.692" y1="703.087" x2="1754.589" y2="703.087" xlink:href="#a"/>
+    <linearGradient id="im" x1="680.898" y1="1390.053" x2="982.303" y2="1390.053" xlink:href="#a"/>
+    <linearGradient id="in" x1="460.192" y1="1612.635" x2="945.982" y2="1612.635" xlink:href="#a"/>
+    <linearGradient id="io" x1="272.042" y1="2375.527" x2="725.276" y2="2375.527" xlink:href="#a"/>
+    <linearGradient id="ip" x1="272.042" y1="2632.542" x2="725.276" y2="2632.542" xlink:href="#a"/>
+    <linearGradient id="iq" x1="460.192" y1="3395.439" x2="945.982" y2="3395.439" xlink:href="#a"/>
+    <linearGradient id="ir" x1="680.898" y1="3618.021" x2="982.292" y2="3618.021" xlink:href="#a"/>
+    <linearGradient id="is" x1="1194.875" y1="4176.485" x2="1585.231" y2="4176.485" xlink:href="#a"/>
+    <linearGradient id="it" x1="1470.692" y1="4304.998" x2="1754.579" y2="4304.998" xlink:href="#a"/>
+    <linearGradient id="iu" x1="2242.99" y1="4509.42" x2="2508.074" y2="4509.42" xlink:href="#a"/>
+    <linearGradient id="iv" x1="2499.994" y1="4509.42" x2="2765.09" y2="4509.42" xlink:href="#a"/>
+    <linearGradient id="iw" x1="3253.501" y1="4304.992" x2="3537.387" y2="4304.992" xlink:href="#a"/>
+    <linearGradient id="ix" x1="3422.849" y1="4176.485" x2="3813.194" y2="4176.485" xlink:href="#a"/>
+    <linearGradient id="iy" x1="4025.777" y1="3618.016" x2="4327.182" y2="3618.016" xlink:href="#a"/>
+    <linearGradient id="iz" x1="4062.097" y1="3395.439" x2="4547.887" y2="3395.439" xlink:href="#a"/>
+    <linearGradient id="ja" x1="4282.803" y1="2632.542" x2="4736.038" y2="2632.542" xlink:href="#a"/>
+    <linearGradient id="jb" x1="4282.803" y1="2375.537" x2="4736.038" y2="2375.537" xlink:href="#a"/>
+    <linearGradient id="jc" x1="4062.097" y1="1612.635" x2="4547.887" y2="1612.635" xlink:href="#a"/>
+    <linearGradient id="jd" x1="4025.788" y1="1390.053" x2="4327.182" y2="1390.053" xlink:href="#a"/>
+    <linearGradient id="je" x1="1985.985" y1="360.767" x2="2287.39" y2="360.767" xlink:href="#a"/>
+    <linearGradient id="jf" x1="2109.941" y1="250.408" x2="2508.085" y2="250.408" xlink:href="#a"/>
+    <linearGradient id="jg" x1="2500.005" y1="250.408" x2="2898.139" y2="250.408" xlink:href="#a"/>
+    <linearGradient id="jh" x1="2330.647" y1="224.74" x2="2677.422" y2="224.74" xlink:href="#a"/>
+    <linearGradient id="ji" x1="2720.7" y1="360.756" x2="3022.105" y2="360.756" xlink:href="#a"/>
+    <linearGradient id="jj" x1="3084.153" y1="464.226" x2="3430.929" y2="464.226" xlink:href="#a"/>
+    <linearGradient id="jk" x1="3698.645" y1="831.589" x2="4088.99" y2="831.589" xlink:href="#a"/>
+    <linearGradient id="jl" x1="3386.518" y1="454.831" x2="3537.387" y2="454.831" xlink:href="#a"/>
+    <linearGradient id="jm" x1="3529.308" y1="649.863" x2="4070.209" y2="649.863" xlink:href="#a"/>
+    <linearGradient id="jn" x1="3492.976" y1="530.104" x2="3794.381" y2="530.104" xlink:href="#a"/>
+    <linearGradient id="jo" x1="4025.799" y1="1114.273" x2="4327.203" y2="1114.273" xlink:href="#a"/>
+    <linearGradient id="jp" x1="4282.793" y1="1208.321" x2="4433.64" y2="1208.321" xlink:href="#a"/>
+    <linearGradient id="jq" x1="4282.793" y1="1546.127" x2="4823.694" y2="1546.127" xlink:href="#a"/>
+    <linearGradient id="jr" x1="4282.793" y1="1364.374" x2="4673.127" y2="1364.374" xlink:href="#a"/>
+    <linearGradient id="js" x1="4319.113" y1="1750.539" x2="4768.583" y2="1750.539" xlink:href="#a"/>
+    <linearGradient id="jt" x1="4452.14" y1="2136.682" x2="4842.485" y2="2136.682" xlink:href="#a"/>
+    <linearGradient id="ju" x1="4558.61" y1="2309.013" x2="4956.732" y2="2309.013" xlink:href="#a"/>
+    <linearGradient id="jv" x1="4558.61" y1="2699.072" x2="4956.732" y2="2699.072" xlink:href="#a"/>
+    <linearGradient id="jw" x1="4558.61" y1="2504.034" x2="5008.09" y2="2504.034" xlink:href="#a"/>
+    <linearGradient id="jx" x1="4452.151" y1="2871.403" x2="4842.496" y2="2871.403" xlink:href="#a"/>
+    <linearGradient id="jy" x1="4319.124" y1="3257.541" x2="4768.604" y2="3257.541" xlink:href="#a"/>
+    <linearGradient id="jz" x1="4282.793" y1="3461.947" x2="4823.694" y2="3461.947" xlink:href="#a"/>
+    <linearGradient id="ka" x1="4282.782" y1="3799.753" x2="4433.629" y2="3799.753" xlink:href="#a"/>
+    <linearGradient id="kb" x1="4282.793" y1="3643.679" x2="4673.148" y2="3643.679" xlink:href="#a"/>
+    <linearGradient id="kc" x1="4025.777" y1="3893.817" x2="4327.182" y2="3893.817" xlink:href="#a"/>
+    <linearGradient id="kd" x1="3698.634" y1="4176.501" x2="4088.979" y2="4176.501" xlink:href="#a"/>
+    <linearGradient id="ke" x1="3529.308" y1="4358.211" x2="4070.209" y2="4358.211" xlink:href="#a"/>
+    <linearGradient id="kf" x1="3386.518" y1="4553.243" x2="3537.387" y2="4553.243" xlink:href="#a"/>
+    <linearGradient id="kg" x1="3492.998" y1="4477.959" x2="3794.403" y2="4477.959" xlink:href="#a"/>
+    <linearGradient id="kh" x1="3084.153" y1="4543.848" x2="3430.929" y2="4543.848" xlink:href="#a"/>
+    <linearGradient id="ki" x1="2720.7" y1="4647.313" x2="3022.094" y2="4647.313" xlink:href="#a"/>
+    <linearGradient id="kj" x1="2499.994" y1="4757.671" x2="2898.139" y2="4757.671" xlink:href="#a"/>
+    <linearGradient id="kk" x1="2109.941" y1="4757.671" x2="2508.074" y2="4757.671" xlink:href="#a"/>
+    <linearGradient id="kl" x1="2330.657" y1="4783.345" x2="2677.433" y2="4783.345" xlink:href="#a"/>
+    <linearGradient id="km" x1="1985.974" y1="4647.324" x2="2287.379" y2="4647.324" xlink:href="#a"/>
+    <linearGradient id="kn" x1="1577.151" y1="4543.858" x2="1923.927" y2="4543.858" xlink:href="#a"/>
+    <linearGradient id="ko" x1="1470.692" y1="4553.249" x2="1621.551" y2="4553.249" xlink:href="#a"/>
+    <linearGradient id="kp" x1="937.87" y1="4358.211" x2="1478.761" y2="4358.211" xlink:href="#a"/>
+    <linearGradient id="kq" x1="1213.688" y1="4477.976" x2="1515.092" y2="4477.976" xlink:href="#a"/>
+    <linearGradient id="kr" x1="919.079" y1="4176.49" x2="1309.424" y2="4176.49" xlink:href="#a"/>
+    <linearGradient id="ks" x1="680.865" y1="3893.807" x2="982.27" y2="3893.807" xlink:href="#a"/>
+    <linearGradient id="kt" x1="574.439" y1="3799.758" x2="725.287" y2="3799.758" xlink:href="#a"/>
+    <linearGradient id="ku" x1="184.385" y1="3461.952" x2="725.287" y2="3461.952" xlink:href="#a"/>
+    <linearGradient id="kv" x1="334.953" y1="3643.7" x2="725.287" y2="3643.7" xlink:href="#a"/>
+    <linearGradient id="kw" x1="239.497" y1="3257.535" x2="688.967" y2="3257.535" xlink:href="#a"/>
+    <linearGradient id="kx" x1="165.583" y1="2871.381" x2="555.928" y2="2871.381" xlink:href="#a"/>
+    <linearGradient id="ky" x1="165.594" y1="2136.677" x2="555.928" y2="2136.677" xlink:href="#a"/>
+    <linearGradient id="kz" x1="51.347" y1="2309.002" x2="449.47" y2="2309.002" xlink:href="#a"/>
+    <linearGradient id="la" x1="51.347" y1="2699.061" x2="449.47" y2="2699.061" xlink:href="#a"/>
+    <linearGradient id="lb" x1="0" y1="2504.023" x2="449.48" y2="2504.023" xlink:href="#a"/>
+    <linearGradient id="lc" x1="239.486" y1="1750.533" x2="688.967" y2="1750.533" xlink:href="#a"/>
+    <linearGradient id="ld" x1="184.385" y1="1546.127" x2="725.287" y2="1546.127" xlink:href="#a"/>
+    <linearGradient id="le" x1="574.45" y1="1208.321" x2="725.298" y2="1208.321" xlink:href="#a"/>
+    <linearGradient id="lf" x1="334.931" y1="1364.395" x2="725.287" y2="1364.395" xlink:href="#a"/>
+    <linearGradient id="lg" x1="680.898" y1="1114.262" x2="982.303" y2="1114.262" xlink:href="#a"/>
+    <linearGradient id="lh" x1="919.1" y1="831.579" x2="1309.445" y2="831.579" xlink:href="#a"/>
+    <linearGradient id="li" x1="937.881" y1="649.863" x2="1478.772" y2="649.863" xlink:href="#a"/>
+    <linearGradient id="lj" x1="1470.692" y1="454.836" x2="1621.551" y2="454.836" xlink:href="#a"/>
+    <linearGradient id="lk" x1="1213.677" y1="530.115" x2="1515.081" y2="530.115" xlink:href="#a"/>
+    <linearGradient id="ll" x1="1577.151" y1="464.226" x2="1923.937" y2="464.226" xlink:href="#a"/>
+  </defs>
+  <polygon points="5004.026 2504.045 5004.045 2504.03 4783.365 2334.71 4783.345 2334.697 4783.356 2334.69 4952.696 2114 4952.654 2114.032 4952.686 2113.99 4732.016 2283.314 4838.465 2026.35 4838.434 2026.346 4562.651 1990.03 4819.665 1883.57 4819.637 1883.573 4543.891 1919.875 4764.545 1750.54 4543.866 1581.201 4819.646 1617.52 4819.665 1617.52 4562.655 1511.06 4562.645 1511.04 4669.096 1254.03 4669.082 1254.028 4393.295 1217.72 4429.606 941.92 4429.592 941.953 4429.596 941.919 4323.17 1198.831 4286.875 923.15 4286.848 923.161 4286.846 923.149 4029.86 1029.583 4199.205 808.9 4199.181 808.918 4199.196 808.899 3978.51 978.238 4084.965 721.24 3809.185 684.94 4066.175 578.499 4066.09 578.511 4066.166 578.479 3790.356 614.789 3790.355 614.769 3754.035 338.979 3497.042 445.433 3390.585 188.43 3390.594 188.498 3390.566 188.429 3426.88 464.19 3257.555 243.529 3088.216 464.203 3124.515 188.42 3124.501 188.454 3124.505 188.419 3018.062 445.405 2981.765 169.63 2981.746 169.637 2724.76 276.083 2894.105 55.39 2894.081 55.408 2894.095 55.389 2673.405 224.729 2673.385 224.729 2504.045 4.049 2504.035 4.062 2504.025 4.049 2334.704 224.728 2113.995 55.39 2114.009 55.407 2113.985 55.389 2283.325 276.079 2026.355 169.64 2026.335 169.639 1990.03 445.404 1883.585 188.429 1919.895 464.229 1750.555 243.539 1750.545 243.529 1581.21 464.2 1617.525 188.43 1617.496 188.499 1617.505 188.429 1511.045 445.439 1254.035 338.989 1217.725 614.788 941.925 578.479 941.996 578.509 941.925 578.499 1198.894 684.93 923.145 721.229 1029.601 978.229 808.925 808.9 808.935 808.912 808.905 808.889 978.245 1029.58 721.265 923.14 684.946 1198.91 578.505 941.93 578.508 941.951 578.495 941.919 614.795 1217.719 614.795 1217.74 614.785 1217.729 338.975 1254.05 445.435 1511.06 188.425 1617.52 188.454 1617.516 464.19 1581.212 243.534 1750.53 464.205 1919.87 188.415 1883.56 188.442 1883.571 445.425 1990.02 169.635 2026.33 276.081 2283.319 55.395 2113.98 224.735 2334.68 4.045 2504.02 4.065 2504.035 4.045 2504.05 224.725 2673.37 224.745 2673.382 55.395 2894.08 55.437 2894.048 55.405 2894.09 276.075 2724.765 169.625 2981.73 169.657 2981.734 445.44 3018.049 188.425 3124.51 188.454 3124.506 464.199 3088.204 243.545 3257.54 464.224 3426.878 188.445 3390.56 188.425 3390.56 445.435 3497.02 445.445 3497.04 338.995 3754.05 339.009 3754.052 614.795 3790.36 578.485 4066.16 578.499 4066.127 578.494 4066.16 684.92 3809.248 721.215 4084.93 721.243 4084.918 721.244 4084.93 978.23 3978.496 808.885 4199.18 808.909 4199.161 808.895 4199.18 1029.581 4029.841 923.125 4286.84 1198.905 4323.14 941.915 4429.58 942 4429.569 941.925 4429.6 1217.735 4393.29 1217.735 4393.31 1254.056 4669.1 1511.048 4562.647 1617.505 4819.65 1617.496 4819.581 1617.525 4819.65 1581.21 4543.889 1750.535 4764.55 1919.874 4543.877 1883.575 4819.66 1883.589 4819.625 1883.585 4819.66 1990.029 4562.674 2026.325 4838.45 2026.344 4838.442 2283.331 4731.996 2113.985 4952.69 2114.01 4952.671 2113.995 4952.69 2334.686 4783.35 2334.706 4783.35 2504.045 5004.03 2504.055 5004.017 2504.065 5004.03 2673.387 4783.351 2894.095 4952.69 2894.082 4952.672 2894.105 4952.69 2724.765 4732 2981.735 4838.44 2981.755 4838.44 3018.06 4562.676 3124.505 4819.65 3088.195 4543.851 3257.535 4764.54 3257.545 4764.55 3426.88 4543.879 3390.566 4819.65 3390.594 4819.581 3390.585 4819.65 3497.045 4562.64 3754.055 4669.09 3790.365 4393.291 4066.165 4429.6 4066.094 4429.57 4066.166 4429.58 3809.195 4323.15 4084.945 4286.85 3978.489 4029.85 4199.165 4199.18 4199.155 4199.167 4199.186 4199.19 4029.845 3978.5 4286.825 4084.94 4323.144 3809.169 4429.585 4066.15 4429.582 4066.128 4429.596 4066.16 4393.295 3790.36 4393.295 3790.34 4393.305 3790.35 4669.115 3754.03 4562.655 3497.02 4819.665 3390.56 4819.636 3390.564 4543.901 3426.868 4764.556 3257.55 4543.885 3088.21 4819.675 3124.52 4819.649 3124.509 4562.665 3018.06 4838.455 2981.75 4732.01 2724.761 4952.696 2894.1 4783.356 2673.4 5004.045 2504.06 5004.026 2504.045"/>
+  <g>
+    <path d="M2504.04,2092.735l36.309,275.8L2504.04,2504.04l-36.31-135.509Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#a)"/>
+    <path d="M2709.7,2147.836l-106.458,257.005-99.2,99.2,36.309-135.509Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#b)"/>
+    <path d="M2860.243,2298.382l-220.7,169.348-135.508,36.31,99.2-99.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#c)"/>
+    <path d="M2915.344,2504.04l-275.8,36.309L2504.04,2504.04l135.508-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#d)"/>
+    <path d="M2860.243,2709.7l-257-106.458-99.2-99.2,135.508,36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#e)"/>
+    <path d="M2709.7,2860.243l-169.348-220.7L2504.04,2504.04l99.2,99.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#f)"/>
+    <path d="M2504.04,2915.344l-36.31-275.8,36.31-135.508,36.309,135.508Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#g)"/>
+    <path d="M2298.382,2860.243l106.459-257,99.2-99.2-36.31,135.508Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#h)"/>
+    <path d="M2147.836,2709.7l220.7-169.348,135.509-36.309-99.2,99.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#i)"/>
+    <path d="M2092.735,2504.04l275.8-36.31,135.509,36.31-135.509,36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#j)"/>
+    <path d="M2147.836,2298.382l257.005,106.459,99.2,99.2-135.509-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#k)"/>
+    <path d="M2298.382,2147.836l169.348,220.7,36.31,135.509-99.2-99.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#l)"/>
+    <path d="M2334.692,1872.04l169.348,220.684-36.31,275.807-169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#m)"/>
+    <path d="M2673.377,1872.04l36.32,275.8-169.348,220.7-36.309-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#n)"/>
+    <path d="M2966.7,2041.377l-106.459,257.005-257,106.459L2709.7,2147.836Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#o)"/>
+    <path d="M3136.039,2334.692l-220.7,169.348-275.8-36.31,220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#p)"/>
+    <path d="M3136.039,2673.377l-275.8,36.32-220.7-169.348,275.8-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#q)"/>
+    <path d="M2966.7,2966.7,2709.7,2860.243l-106.458-257,257,106.458Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#r)"/>
+    <path d="M2673.377,3136.039l-169.337-220.7,36.309-275.8,169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#s)"/>
+    <path d="M2334.7,3136.039l-36.32-275.8,169.348-220.7,36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#t)"/>
+    <path d="M2041.377,2966.7,2147.836,2709.7l257.005-106.458-106.459,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#u)"/>
+    <path d="M1872.04,2673.377l220.7-169.337,275.8,36.309-220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#v)"/>
+    <path d="M1872.04,2334.692l275.8-36.31,220.7,169.348-275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#w)"/>
+    <path d="M2041.377,2041.377l257.005,106.459,106.459,257.005-257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#x)"/>
+    <path d="M2504.04,1651.334l169.348,220.695-169.348,220.7-169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#y)"/>
+    <path d="M2930.382,1765.582l36.309,275.795-257,106.459-36.309-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#z)"/>
+    <path d="M3242.5,2077.687,3136.05,2334.692l-275.8-36.31L2966.7,2041.377Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#aa)"/>
+    <path d="M3356.734,2504.04l-220.695,169.337-220.7-169.337,220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ab)"/>
+    <path d="M3242.5,2930.381l-275.8,36.31-106.459-257,275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ac)"/>
+    <path d="M2930.393,3242.5,2673.388,3136.05l36.309-275.807L2966.7,2966.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ad)"/>
+    <path d="M2504.04,3356.734,2334.692,3136.05l169.348-220.7,169.337,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ae)"/>
+    <path d="M2077.7,3242.5l-36.31-275.8,257.005-106.459,36.309,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#af)"/>
+    <path d="M1765.581,2930.392l106.448-257,275.8,36.309L2041.377,2966.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ag)"/>
+    <path d="M1651.334,2504.04l220.695-169.348,220.7,169.348-220.7,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ah)"/>
+    <path d="M1765.581,2077.7l275.8-36.31,106.459,256.994-275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ai)"/>
+    <path d="M2077.687,1765.582l257.005,106.458-36.31,275.8-257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#aj)"/>
+    <path d="M2077.687,1765.582l169.348-220.7,257.005,106.458L2334.692,1872.04Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ak)"/>
+    <path d="M2504.04,1651.345l257-106.458,169.349,220.7L2673.388,1872.04Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#al)"/>
+    <path d="M2930.382,1765.582l275.806,36.309,36.31,275.8-275.807-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#am)"/>
+    <path d="M3242.5,2077.687l220.7,169.348L3356.745,2504.04,3136.05,2334.692Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#an)"/>
+    <path d="M3356.734,2504.04l106.448,256.994L3242.5,2930.381l-106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ao)"/>
+    <path d="M3242.5,2930.381l-36.31,275.8-275.8,36.309,36.309-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ap)"/>
+    <path d="M2930.393,3242.5l-169.349,220.7-257-106.459,169.348-220.684Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#aq)"/>
+    <path d="M2504.04,3356.734l-257.005,106.459-169.348-220.7,257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ar)"/>
+    <path d="M2077.7,3242.5l-275.807-36.31-36.31-275.8,275.807,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#as)"/>
+    <path d="M1765.581,2930.381l-220.695-169.337,106.448-257,220.695,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#at)"/>
+    <path d="M1651.345,2504.04l-106.459-257.005,220.695-169.348,106.459,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#au)"/>
+    <path d="M1765.581,2077.7l36.31-275.807,275.8-36.309-36.31,275.806Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#av)"/>
+    <path d="M1801.891,1801.891l169.348-220.7,275.8-36.309-169.337,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#aw)"/>
+    <path d="M2247.035,1544.887l257.005-106.459,257,106.459-257,106.458Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ax)"/>
+    <path d="M2761.044,1544.887l275.8,36.309,169.348,220.7-275.806-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ay)"/>
+    <path d="M3206.188,1801.891l220.695,169.337,36.31,275.807-220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#az)"/>
+    <path d="M3463.193,2247.035l106.459,257.005-106.459,257-106.448-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ba)"/>
+    <path d="M3463.193,2761.034l-36.31,275.806-220.695,169.338,36.31-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bb)"/>
+    <path d="M3206.188,3206.188,3036.84,3426.883l-275.8,36.31,169.349-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bc)"/>
+    <path d="M2761.044,3463.193l-257,106.459-257.005-106.459,257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bd)"/>
+    <path d="M2247.035,3463.193l-275.8-36.31-169.348-220.695,275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#be)"/>
+    <path d="M1801.891,3206.188,1581.2,3036.84l-36.31-275.8,220.695,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bf)"/>
+    <path d="M1544.886,2761.034,1438.428,2504.04l106.458-257.005,106.459,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bg)"/>
+    <path d="M1544.886,2247.035l36.31-275.8,220.7-169.348-36.31,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bh)"/>
+    <path d="M1544.886,1695.432l257.005,106.459-220.7,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bi)"/>
+    <path d="M1695.432,1544.887l275.807,36.309-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bj)"/>
+    <path d="M2077.7,1324.192l169.348,220.695L1971.239,1581.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bk)"/>
+    <path d="M2283.345,1269.08l220.7,169.348-257.005,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bl)"/>
+    <path d="M2724.735,1269.08l36.309,275.807-257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bm)"/>
+    <path d="M2930.393,1324.192l106.447,257-275.8-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bn)"/>
+    <path d="M3312.647,1544.887l-106.459,257-169.337-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bo)"/>
+    <path d="M3463.193,1695.432l-36.31,275.8-220.695-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bp)"/>
+    <path d="M3683.888,2077.687l-220.695,169.348-36.31-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bq)"/>
+    <path d="M3739,2283.345l-169.348,220.7L3463.2,2247.035Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#br)"/>
+    <path d="M3739,2724.735l-275.8,36.309,106.448-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bs)"/>
+    <path d="M3683.888,2930.381,3426.883,3036.84l36.31-275.806Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bt)"/>
+    <path d="M3463.193,3312.636l-257.005-106.448,220.695-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bu)"/>
+    <path d="M3312.647,3463.193l-275.8-36.31,169.337-220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bv)"/>
+    <path d="M2930.393,3683.888l-169.349-220.695,275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bw)"/>
+    <path d="M2724.735,3739l-220.7-169.348,257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bx)"/>
+    <path d="M2283.345,3739l-36.31-275.807,257.005,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#by)"/>
+    <path d="M2077.687,3683.888l-106.459-257.005,275.807,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#bz)"/>
+    <path d="M1695.432,3463.193l106.448-257.005,169.348,220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ca)"/>
+    <path d="M1544.886,3312.647l36.31-275.807,220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cb)"/>
+    <path d="M1324.191,2930.392l220.695-169.348,36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cc)"/>
+    <path d="M1269.08,2724.724l169.348-220.7,106.458,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cd)"/>
+    <path d="M1269.08,2283.345l275.806-36.321L1438.428,2504.04Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ce)"/>
+    <path d="M1324.191,2077.687l257-106.448-36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cf)"/>
+    <path d="M2247.046,1544.887,2077.7,1324.192l36.309-275.8,169.349,220.684Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cg)"/>
+    <path d="M2761.044,1544.887l-36.309-275.807L2894.083,1048.4l36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ch)"/>
+    <path d="M3206.188,1801.891l106.459-257,257.005-106.448-106.459,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ci)"/>
+    <path d="M3463.193,2247.046,3683.888,2077.7l275.8,36.309-220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cj)"/>
+    <path d="M3463.193,2761.044,3739,2724.735l220.7,169.348-275.807,36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ck)"/>
+    <path d="M3206.177,3206.188l257,106.448,106.459,257.005-257.005-106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cl)"/>
+    <path d="M2761.034,3463.193l169.348,220.695-36.31,275.8-169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cm)"/>
+    <path d="M2247.035,3463.193,2283.345,3739,2114,3959.7l-36.31-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cn)"/>
+    <path d="M1801.88,3206.188l-106.448,257.005-257,106.448,106.448-257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#co)"/>
+    <path d="M1544.886,2761.034l-220.695,169.347-275.8-36.309,220.695-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cp)"/>
+    <path d="M1544.886,2247.024l-275.8,36.321L1048.4,2114l275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cq)"/>
+    <path d="M1801.9,1801.891,1544.9,1695.432l-106.458-257,257,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cr)"/>
+    <path d="M1438.439,1438.428l106.458,257,36.31,275.8-106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cs)"/>
+    <path d="M1438.428,1438.439l275.806,36.309L1971.239,1581.2l-275.807-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ct)"/>
+    <path d="M2114.007,1048.385,2077.7,1324.192l-106.459,257,36.31-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cu)"/>
+    <path d="M2114,1048.385l220.7,169.348,169.348,220.7-220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cv)"/>
+    <path d="M2894.083,1048.385,2724.735,1269.08l-220.7,169.348,169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cw)"/>
+    <path d="M2894.083,1048.385l106.448,257L3036.84,1581.2l-106.447-257.015Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cx)"/>
+    <path d="M3569.652,1438.439l-257.005,106.448-275.8,36.309,257.005-106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cy)"/>
+    <path d="M3569.641,1438.428l-36.31,275.8-106.448,257,36.31-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#cz)"/>
+    <path d="M3959.684,2114l-275.8-36.31-257.005-106.459,275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#da)"/>
+    <path d="M3959.7,2114l-169.348,220.7-220.7,169.348L3739,2283.345Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#db)"/>
+    <path d="M3959.7,2894.083,3739,2724.735l-169.348-220.7,220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dc)"/>
+    <path d="M3959.684,2894.072l-257.005,106.459-275.8,36.309,257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dd)"/>
+    <path d="M3569.641,3569.652l-106.459-257.005-36.309-275.807,106.458,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#de)"/>
+    <path d="M3569.652,3569.641l-275.8-36.31-257.005-106.448,275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#df)"/>
+    <path d="M2894.083,3959.684l36.31-275.8,106.447-257.005-36.309,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dg)"/>
+    <path d="M2894.083,3959.7l-220.7-169.348-169.348-220.7L2724.735,3739Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dh)"/>
+    <path d="M2114,3959.7,2283.345,3739l220.7-169.348-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#di)"/>
+    <path d="M2114,3959.7,2007.538,3702.69l-36.31-275.807,106.459,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dj)"/>
+    <path d="M1438.417,3569.641l257.005-106.448,275.806-36.31-257,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dk)"/>
+    <path d="M1438.439,3569.652l36.309-275.8L1581.2,3036.851l-36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dl)"/>
+    <path d="M1048.4,2894.083l275.8,36.309,257,106.448-275.8-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dm)"/>
+    <path d="M1048.385,2894.072l169.348-220.7,220.7-169.348-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dn)"/>
+    <path d="M1438.428,2504.029l-220.7-169.348L1048.385,2114l220.695,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#do)"/>
+    <path d="M1581.2,1971.228l-257,106.459L1048.4,2114l257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dp)"/>
+    <path d="M1750.533,1198.941,2007.538,1305.4l-36.31,275.8-257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dq)"/>
+    <path d="M2504.04,1438.428l-169.338-220.7L2504.04,997.038l169.348,220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dr)"/>
+    <path d="M3036.84,1581.2l-36.3-275.807,256.994-106.448,36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ds)"/>
+    <path d="M3426.883,1971.228l106.448-256.994,275.807,36.3-106.459,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dt)"/>
+    <path d="M3569.652,2504.04l220.7-169.337,220.695,169.337-220.695,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#du)"/>
+    <path d="M3426.883,3036.84l275.8-36.309,106.459,257-275.807,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dv)"/>
+    <path d="M3036.84,3426.883l257,106.448-36.31,275.807-256.994-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dw)"/>
+    <path d="M2504.04,3569.652l169.337,220.7L2504.04,4011.042l-169.348-220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dx)"/>
+    <path d="M1971.228,3426.883l36.31,275.8-257.005,106.459-36.309-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dy)"/>
+    <path d="M1581.2,3036.84l-106.448,257-275.806-36.31,106.458-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#dz)"/>
+    <path d="M1438.428,2504.029l-220.7,169.348L997.049,2504.029l220.684-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ea)"/>
+    <path d="M1581.207,1971.228l-275.8,36.31-106.459-257.005,275.8-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#eb)"/>
+    <path d="M1162.643,1474.737l275.8-36.309,36.309,275.8-275.8,36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ec)"/>
+    <path d="M1474.737,1162.632l275.8,36.309-36.309,275.807-275.8-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ed)"/>
+    <path d="M1856.992,941.937,2114,1048.4l-106.448,257-257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ee)"/>
+    <path d="M2283.345,827.69l220.7,169.348-169.348,220.695L2114,1048.385Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ef)"/>
+    <path d="M2724.735,827.69l169.348,220.695-220.7,169.348L2504.04,997.038Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#eg)"/>
+    <path d="M3151.087,941.937l106.459,257-257,106.448-106.458-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#eh)"/>
+    <path d="M3533.342,1162.632l36.31,275.807-275.8,36.309-36.31-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ei)"/>
+    <path d="M3845.448,1474.737l-36.31,275.8-275.807-36.309,36.31-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ej)"/>
+    <path d="M4066.143,1856.992l-106.459,257-257.005-106.459,106.459-257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ek)"/>
+    <path d="M4180.39,2283.345l-169.338,220.7-220.7-169.348L3959.7,2114Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#el)"/>
+    <path d="M4180.39,2724.735l-220.7,169.348-169.338-220.7,220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#em)"/>
+    <path d="M4066.143,3151.087l-257.005,106.448-106.459-257,257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#en)"/>
+    <path d="M3845.437,3533.342l-275.8,36.31-36.31-275.8,275.8-36.321Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#eo)"/>
+    <path d="M3533.342,3845.448l-275.8-36.31,36.31-275.807,275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ep)"/>
+    <path d="M3151.087,4066.143l-257-106.459,106.458-257.005,257,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#eq)"/>
+    <path d="M2724.735,4180.39l-220.7-169.348,169.348-220.695,220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#er)"/>
+    <path d="M2283.345,4180.39,2114,3959.7l220.7-169.348,169.348,220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#es)"/>
+    <path d="M1856.992,4066.143l-106.459-257.005,257.005-106.448L2114,3959.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#et)"/>
+    <path d="M1474.727,3845.448l-36.31-275.807,275.807-36.31,36.309,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#eu)"/>
+    <path d="M1162.632,3533.342l36.31-275.8,275.806,36.31-36.309,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ev)"/>
+    <path d="M941.937,3151.087l106.459-257,257,106.448-106.458,257.015Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ew)"/>
+    <path d="M827.69,2724.724l169.348-220.7,220.695,169.348-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ex)"/>
+    <path d="M827.69,2283.334l220.695-169.348,169.348,220.706L997.038,2504.029Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ey)"/>
+    <path d="M941.937,1856.992l257.005-106.459L1305.4,2007.538,1048.4,2114Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ez)"/>
+    <path d="M3151.087,941.926l-257,106.448L2724.745,827.69,2981.75,721.231Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fa)"/>
+    <path d="M3845.458,1474.748l-275.8-36.309-36.31-275.807,275.8,36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fb)"/>
+    <path d="M4180.39,2283.345,3959.7,2114l106.448-257,220.695,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fc)"/>
+    <path d="M4066.153,3151.087l-106.448-257,220.7-169.338,106.447,256.994Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fd)"/>
+    <path d="M3533.331,3845.458l36.31-275.806,275.8-36.31-36.31,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fe)"/>
+    <path d="M2724.735,4180.379,2894.083,3959.7l257,106.448-169.348,220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ff)"/>
+    <path d="M1856.992,4066.153l257-106.448L2283.334,4180.4l-257,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fg)"/>
+    <path d="M1162.621,3533.331l275.8,36.31,36.31,275.8-275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fh)"/>
+    <path d="M827.69,2724.735l220.695,169.348-106.448,257-220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fi)"/>
+    <path d="M941.926,1856.981l106.459,257L827.69,2283.334l-106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fj)"/>
+    <path d="M1474.748,1162.621l-36.309,275.8-275.8,36.31,36.309-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fk)"/>
+    <path d="M2283.345,827.69,2114,1048.385l-257-106.448,169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fl)"/>
+    <path d="M2247.035,551.894l220.7,169.337,36.31,275.8-220.7-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fm)"/>
+    <path d="M2761.044,551.883l-36.309,275.8-220.7,169.348,36.309-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fn)"/>
+    <path d="M2504.04,445.435l36.309,275.8L2504.04,997.038l-36.31-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fo)"/>
+    <path d="M3257.546,684.932l106.448,257.005-106.448,257-106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fp)"/>
+    <path d="M3702.69,941.937l-169.337,220.7-275.807,36.309,169.348-220.694Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fq)"/>
+    <path d="M3533.342,721.242,3426.894,978.247l-169.348,220.694,106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fr)"/>
+    <path d="M4066.132,1305.389l-36.31,275.8-220.7,169.348,36.31-275.806Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fs)"/>
+    <path d="M4323.147,1750.533l-257,106.459-257.005-106.459,257.005-106.458Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ft)"/>
+    <path d="M4286.838,1474.737l-220.695,169.348-257.005,106.448,220.7-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fu)"/>
+    <path d="M4456.2,2247.035l-169.348,220.7-275.8,36.31,169.338-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fv)"/>
+    <path d="M4456.2,2761.044l-275.8-36.309-169.349-220.7,275.807,36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fw)"/>
+    <path d="M4562.644,2504.04l-275.8,36.309-275.8-36.309,275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fx)"/>
+    <path d="M4323.147,3257.535l-257,106.459-257.005-106.459,257.005-106.458Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fy)"/>
+    <path d="M4066.132,3702.69l-220.7-169.348-36.31-275.8,220.7,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#fz)"/>
+    <path d="M4286.838,3533.342l-257-106.459-220.7-169.337,257.005,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ga)"/>
+    <path d="M3702.69,4066.132l-275.8-36.31-169.348-220.7,275.807,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gb)"/>
+    <path d="M3257.546,4323.147l-106.459-257,106.459-257.005,106.459,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gc)"/>
+    <path d="M3257.546,3809.127l169.337,220.7,106.459,257.005-169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gd)"/>
+    <path d="M2761.044,4456.2l-220.695-169.348-36.309-275.8,220.7,169.338Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ge)"/>
+    <path d="M2247.035,4456.2l36.31-275.8,220.7-169.348-36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gf)"/>
+    <path d="M2504.04,4011.042l36.309,275.806-36.309,275.8-36.31-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gg)"/>
+    <path d="M1750.533,4323.147l-106.458-257,106.458-257.005,106.459,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gh)"/>
+    <path d="M1305.379,4066.143l169.348-220.7,275.8-36.31-169.338,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gi)"/>
+    <path d="M1750.533,3809.138l-106.458,257.005-169.348,220.695,106.458-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gj)"/>
+    <path d="M941.948,3702.69l36.309-275.8,220.7-169.348-36.309,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gk)"/>
+    <path d="M684.932,3257.546l257.005-106.459,257.005,106.459-257,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gl)"/>
+    <path d="M1198.942,3257.546l-220.7,169.337-257,106.459,220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gm)"/>
+    <path d="M551.883,2247.024l275.807,36.31,169.337,220.7-275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gn)"/>
+    <path d="M551.894,2761.044l169.337-220.695,275.807-36.309-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#go)"/>
+    <path d="M997.027,2504.029l-275.8,36.31-275.8-36.31,275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gp)"/>
+    <path d="M684.932,1750.533l257.005-106.448,257.005,106.448-257,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gq)"/>
+    <path d="M941.948,1305.389l220.7,169.338,36.309,275.806-220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gr)"/>
+    <path d="M1198.942,1750.533l-257-106.458-220.7-169.338,257.005,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gs)"/>
+    <path d="M1305.389,941.948l275.807,36.3,169.337,220.694-275.8-36.3Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gt)"/>
+    <path d="M1750.533,684.932l106.459,257.005-106.459,257-106.448-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gu)"/>
+    <path d="M1750.544,1198.941,1581.2,978.247l-106.459-257,169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gv)"/>
+    <path d="M1919.892,464.226,2026.34,721.231,1856.992,941.937,1750.544,684.921Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gw)"/>
+    <path d="M1990.03,445.435l257,106.459,36.31,275.8-257-106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gx)"/>
+    <path d="M3018.06,445.424l-36.31,275.807L2724.745,827.69l36.31-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gy)"/>
+    <path d="M3088.2,464.226l169.348,220.7L3151.087,941.926l-169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#gz)"/>
+    <path d="M3978.5,978.247l-169.348,220.694-275.807-36.309,169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ha)"/>
+    <path d="M4029.844,1029.594l36.309,275.806-220.695,169.348-36.309-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hb)"/>
+    <path d="M4543.853,1919.881,4286.848,2026.34l-220.7-169.348,257.015-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hc)"/>
+    <path d="M4562.644,1990.02l-106.459,257-275.806,36.31,106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hd)"/>
+    <path d="M4562.655,3018.06l-275.807-36.31L4180.4,2724.745l275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#he)"/>
+    <path d="M4543.864,3088.2l-220.695,169.348-257.016-106.459,220.706-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hf)"/>
+    <path d="M4029.822,3978.486l-220.7-169.348,36.31-275.8,220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hg)"/>
+    <path d="M3978.475,4029.833l-275.8,36.31-169.348-220.7,275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hh)"/>
+    <path d="M3088.2,4543.842l-106.459-256.994,169.348-220.7,106.459,257.015Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hi)"/>
+    <path d="M3018.06,4562.644l-257.005-106.458-36.31-275.807,257.005,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hj)"/>
+    <path d="M1990.02,4562.655l36.309-275.807,257-106.458-36.31,275.806Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hk)"/>
+    <path d="M1919.881,4543.864l-169.348-220.695,106.459-257.016,169.348,220.706Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hl)"/>
+    <path d="M1029.583,4029.833l169.348-220.7,275.8,36.31-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hm)"/>
+    <path d="M978.236,3978.475l-36.31-275.8,220.7-169.348,36.31,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hn)"/>
+    <path d="M464.226,3088.2l257.005-106.459,220.706,169.348L684.921,3257.546Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ho)"/>
+    <path d="M445.424,3018.038l106.459-257,275.807-36.3-106.459,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hp)"/>
+    <path d="M445.435,1990.02l275.8,36.309,106.459,257-275.807-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hq)"/>
+    <path d="M464.226,1919.881l220.7-169.348,257.005,106.459-220.7,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hr)"/>
+    <path d="M978.257,1029.583l220.7,169.348-36.309,275.806-220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hs)"/>
+    <path d="M1029.6,978.236l275.8-36.31,169.348,220.7-275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ht)"/>
+    <path d="M2026.34,721.231l-106.448-257-36.309-275.795,106.447,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hu)"/>
+    <path d="M2981.75,721.231l36.31-275.807,106.448-257L3088.2,464.226Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hv)"/>
+    <path d="M3809.149,1198.941,3978.5,978.247l220.7-169.348-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hw)"/>
+    <path d="M4286.848,2026.34l257.005-106.459,275.8-36.309L4562.644,1990.03Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hx)"/>
+    <path d="M4286.848,2981.75l275.807,36.31,257.005,106.448-275.8-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hy)"/>
+    <path d="M3809.138,3809.149l220.7,169.337,169.337,220.695-220.7-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#hz)"/>
+    <path d="M2981.739,4286.848,3088.2,4543.853l36.31,275.8-106.459-257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ia)"/>
+    <path d="M2026.329,4286.848l-36.309,275.807L1883.572,4819.66l36.309-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ib)"/>
+    <path d="M1198.931,3809.138l-169.348,220.7-220.7,169.348,169.348-220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ic)"/>
+    <path d="M721.231,2981.739l-257,106.459-275.795,36.31,257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#id)"/>
+    <path d="M721.231,2026.329,445.424,1990.02l-257-106.459,275.806,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ie)"/>
+    <path d="M1198.942,1198.931l-220.7-169.348-169.338-220.7,220.7,169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#if)"/>
+    <path d="M2283.345,276.087l220.7,169.337-36.31,275.807-220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ig)"/>
+    <path d="M2724.745,276.087l36.3,275.8L2540.349,721.231l-36.3-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ih)"/>
+    <path d="M3426.883,464.226l106.459,257.005L3364.005,941.937l-106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ii)"/>
+    <path d="M3809.149,684.943,3702.69,941.937l-275.8,36.31,106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ij)"/>
+    <path d="M1198.931,684.943l275.8,36.3L1581.2,978.247l-275.807-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ik)"/>
+    <path d="M1581.2,464.237l169.348,220.7L1644.085,941.937l-169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#il)"/>
+    <path d="M684.943,1198.92l257.005,106.459,36.309,275.806-257-106.458Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#im)"/>
+    <path d="M464.237,1581.2l257-106.459,220.7,169.338-257,106.458Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#in)"/>
+    <path d="M276.087,2283.334l275.8-36.31L721.231,2467.73l-275.807,36.3Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#io)"/>
+    <path d="M276.087,2724.735l169.337-220.7,275.807,36.3-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ip)"/>
+    <path d="M464.237,3426.883l220.7-169.348,257.005,106.47-220.7,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#iq)"/>
+    <path d="M684.943,3809.149l36.3-275.8,257.005-106.459-36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ir)"/>
+    <path d="M1198.92,4323.137l106.459-257,275.806-36.3-106.458,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#is)"/>
+    <path d="M1581.2,4543.853l-106.459-257.005,169.338-220.7,106.458,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#it)"/>
+    <path d="M2283.334,4731.992l-36.3-275.8,220.7-169.348,36.3,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#iu)"/>
+    <path d="M2724.735,4731.992l-220.7-169.337,36.309-275.807L2761.044,4456.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#iv)"/>
+    <path d="M3426.883,4543.842l-169.337-220.695,106.459-257,169.337,220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#iw)"/>
+    <path d="M3809.149,4323.137l-275.8-36.3-106.459-257,275.8,36.3Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ix)"/>
+    <path d="M4323.136,3809.149l-257-106.459-36.31-275.807,257.005,106.47Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#iy)"/>
+    <path d="M4543.842,3426.872l-257,106.47-220.695-169.348,257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#iz)"/>
+    <path d="M4731.992,2724.745l-275.8,36.3-169.348-220.695,275.807-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ja)"/>
+    <path d="M4731.992,2283.334,4562.655,2504.04l-275.807-36.31,169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jb)"/>
+    <path d="M4543.842,1581.2l-220.695,169.337-257-106.458,220.695-169.338Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jc)"/>
+    <path d="M4323.136,1198.92l-36.3,275.807-257,106.458,36.31-275.806Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jd)"/>
+    <path d="M2247.035,551.894l-257-106.459,36.31-275.8,257,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#je)"/>
+    <path d="M2504.04,445.424,2283.334,276.087,2113.986,55.392,2334.692,224.74Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jf)"/>
+    <path d="M2504.051,445.424,2673.4,224.74,2894.093,55.392l-169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jg)"/>
+    <path d="M2504.04,445.435,2334.692,224.74l169.337-220.7,169.348,220.684Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jh)"/>
+    <path d="M2761.055,551.883l-36.31-275.8L2981.75,169.628l36.31,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ji)"/>
+    <path d="M3257.546,684.921,3088.2,464.226l169.348-220.695,169.337,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jj)"/>
+    <path d="M3702.69,941.937l106.459-257,275.8,36.31L3978.5,978.247Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jk)"/>
+    <path d="M3533.342,721.231l-106.459-257-36.32-275.795,106.459,257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jl)"/>
+    <path d="M3533.353,721.242l257-106.448,275.807-36.31-257,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jm)"/>
+    <path d="M3533.342,721.231l-36.32-275.8,257-106.459,36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jn)"/>
+    <path d="M4066.153,1305.4l-36.309-275.806,257-106.448,36.31,275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jo)"/>
+    <path d="M4286.838,1474.727l36.3-275.807L4429.6,941.915l-36.31,275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jp)"/>
+    <path d="M4286.838,1474.737l275.806,36.321,257.005,106.459L4543.842,1581.2Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jq)"/>
+    <path d="M4286.838,1474.727l106.447-257.005,275.8,36.3-106.449,257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jr)"/>
+    <path d="M4323.158,1750.544,4543.853,1581.2l220.684,169.348-220.684,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#js)"/>
+    <path d="M4456.185,2247.024l106.459-256.994,275.8,36.31-106.458,256.994Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jt)"/>
+    <path d="M4562.655,2504.04l169.337-220.706,220.695-169.348-169.337,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ju)"/>
+    <path d="M4562.655,2504.05l220.7,169.349,169.337,220.7-220.695-169.349Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jv)"/>
+    <path d="M4562.655,2504.04l220.684-169.348,220.706,169.337L4783.35,2673.377Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jw)"/>
+    <path d="M4456.2,2761.055l275.8-36.31,106.459,257.005-275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jx)"/>
+    <path d="M4323.169,3257.546,4543.864,3088.2l220.7,169.348-220.7,169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jy)"/>
+    <path d="M4286.838,3533.331l257-106.459,275.807-36.309-257.005,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#jz)"/>
+    <path d="M4286.827,3533.353l106.458,257,36.3,275.8-106.448-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ka)"/>
+    <path d="M4286.838,3533.331l275.806-36.309,106.459,257-275.807,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kb)"/>
+    <path d="M4066.132,3702.69l257,106.448-36.309,275.807-257.005-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kc)"/>
+    <path d="M3702.679,4066.153l275.8-36.309,106.459,257-275.807,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kd)"/>
+    <path d="M3533.353,4286.838l275.807,36.3,257,106.447-275.807-36.3Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ke)"/>
+    <path d="M3533.342,4286.838l-36.32,275.806-106.459,257.005,36.32-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kf)"/>
+    <path d="M3533.353,4286.838l257,106.448-36.3,275.8-257.016-106.447Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kg)"/>
+    <path d="M3257.535,4323.158l169.348,220.684-169.348,220.7-169.337-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kh)"/>
+    <path d="M2761.044,4456.186l257.005,106.458-36.31,275.8-256.994-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ki)"/>
+    <path d="M2504.04,4562.655l220.7,169.337,169.348,220.695-220.7-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kj)"/>
+    <path d="M2504.029,4562.655l-169.348,220.7-220.7,169.337,169.348-220.695Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kk)"/>
+    <path d="M2504.04,4562.655l169.348,220.684-169.337,220.695L2334.7,4783.35Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kl)"/>
+    <path d="M2247.024,4456.2l36.31,275.8-257,106.459-36.309-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#km)"/>
+    <path d="M1750.533,4323.169l169.348,220.695-169.348,220.684L1581.2,4543.864Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kn)"/>
+    <path d="M1474.737,4286.848,1581.2,4543.853l36.31,275.8-106.459-257.005Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ko)"/>
+    <path d="M1474.716,4286.838l-257,106.448-275.8,36.3,257.005-106.447Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kp)"/>
+    <path d="M1474.737,4286.848l36.31,275.8L1254.053,4669.1l-36.32-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kq)"/>
+    <path d="M1305.379,4066.143l-106.448,257-275.807-36.309,106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kr)"/>
+    <path d="M941.915,3702.679l36.31,275.8-257,106.459-36.309-275.8Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ks)"/>
+    <path d="M721.242,3533.353l-36.3,275.8L578.484,4066.164l36.31-275.807Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kt)"/>
+    <path d="M721.242,3533.342l-275.807-36.32-257-106.459,275.806,36.32Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ku)"/>
+    <path d="M721.242,3533.353l-106.448,257L339,3754.048l106.448-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kv)"/>
+    <path d="M684.921,3257.535l-220.7,169.348L243.542,3257.535l220.684-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kw)"/>
+    <path d="M551.883,2761.034l-106.459,257-275.8-36.309,106.459-257Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kx)"/>
+    <path d="M551.883,2247.024l-275.8,36.31-106.448-257,275.8-36.309Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ky)"/>
+    <path d="M445.424,2504.029,224.74,2334.681,55.392,2113.975l220.7,169.359Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#kz)"/>
+    <path d="M445.424,2504.04l-169.337,220.7L55.392,2894.083l169.348-220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#la)"/>
+    <path d="M445.435,2504.029,224.729,2673.366,4.045,2504.018l220.7-169.337Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lb)"/>
+    <path d="M684.921,1750.533l-220.7,169.348L243.531,1750.533l220.7-169.348Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lc)"/>
+    <path d="M721.242,1474.737l-257,106.459-275.806,36.321,257-106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ld)"/>
+    <path d="M721.253,1474.727,614.794,1217.722,578.5,941.915,684.943,1198.92Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#le)"/>
+    <path d="M721.242,1474.737l-275.807,36.321-106.459-257,275.807-36.32Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lf)"/>
+    <path d="M941.948,1305.389l-257-106.458,36.31-275.8,257,106.448Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lg)"/>
+    <path d="M1305.4,941.926l-275.8,36.31-106.458-257,275.806-36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lh)"/>
+    <path d="M1474.727,721.242l-275.8-36.3-257-106.459,275.8,36.31Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#li)"/>
+    <path d="M1474.737,721.242l36.31-275.807,106.459-257L1581.2,464.237Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lj)"/>
+    <path d="M1474.727,721.242,1217.722,614.794l36.31-275.807,257,106.459Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#lk)"/>
+    <path d="M1750.544,684.921,1581.2,464.226l169.348-220.695,169.348,220.7Z" fill="none" stroke-linejoin="round" stroke-width="8.09" stroke="url(#ll)"/>
+  </g>
+</svg>
