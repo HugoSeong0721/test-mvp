@@ -50,7 +50,7 @@
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
 | **한붓 경로 퍼즐** (`plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | **낚시·사냥 시간** (`plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
-| **연비·정비 기록** (`plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
+| **연비·정비 기록** (`fuellog_app/`, `plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 Flutter 1차 완성·테스트 47개 통과·웹 미리보기 `docs/fuel-log-app/`(`?demo=1` 예시). 임시 이름 Glance MPG | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
 
@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 연비 앱 1차: **전부 무료·배너만**(입력 화면 광고 없음, 전면·보상형 없음), CSV 내보내기·가져오기 무료(다른 앱 CSV 도 읽음), 차량 수 제한 없음, iCloud 동기화 없음("폰 바꾸기 전 CSV" 안내) | 기획서 원칙 + 조사: 경쟁 앱 불만이 구독 전환·CSV/백업 유료·동기화로 기록 날아감. 개발 세션 판단 — 기획 파트너 확인 요청(`board/fuel-log.md`) |
 | 2026-10-03 | 사용자 몫 최소화: 테스트까지는 **ASC 신규 앱 1회 등록만**, 그 뒤 TestFlight 초대 메일 → 코드 입력. 초대 자동화는 공용 작업 요청(`board/_shared.md`). AdMob 은 스토어 제출 직전 | 사용자 "그냥 이메일로 테스트 코드 받아 넣어서 해보고 싶은데" |
 | 2026-10-03 | Apple 앱 레코드·AdMob 앱/광고 단위는 사용자 몫으로 남김(자동화 불가 확인). 대신 폰용 할 일 페이지 `docs/todo.html` + 몰아서 처리, AdMob 은 스토어 제출 전까지만 | 사용자 "애플·애드몹 가서 넣는 게 힘든데 너가 못 하니" |
 | 2026-10-03 | 속도계 앱 이름 **Glance Speed: GPS Speedometer**, 번들 ID `com.soulfulfill.speedometer` | 미국 1·2위 검색어(speedometer·gps speedometer)를 이름에 담고 Glance 시리즈. 사용자: 둘 다 추천대로 |

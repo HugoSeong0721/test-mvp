@@ -24,3 +24,28 @@
 ①Fuelly 등 화면·리뷰 확인 → ②테스트 로봇 → ③Flutter(로컬 DB·차트·알림) → ④광고 → ⑤Release iOS → ⑥TestFlight
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
+
+### 2026-10-03 개발 세션 1차 — Flutter 1차 완성 (`fuellog_app/`)
+- **①조사**(보조 에이전트, 검색 스니펫·오픈소스 가져오기 코드 기반 — App Store 페이지는 이 환경에서 못 엶): Fuelly 4.7★ 약 3만(구독 $7.99/년,
+  업그레이드 팝업·예전 결제자 광고·로그인 창·동기화 중복), Drivvo(전면 영상 광고, **CSV·백업 유료**, 차량 수 제한), Simply Auto(동기화 덮어쓰기로
+  8년치 날아간 사례), Road Trip MPG($6.99, 부분·누락 주유 처리로 칭찬). "mileage tracker" 는 세금용 앱(MileIQ) 차지. 정리: `fuellog_app/store/ios-listing.md`.
+- **만든 것** (`fuellog_app/flutter/`): 탭 4개 Log · Charts · Reminders · More.
+  - 주유 한 화면: 날짜·주행거리(또는 트립 미터)·양·단가·총액(**셋 중 둘이면 나머지 자동**)·가득/부분·"기록 빠짐"·메모. 저장 전에 **이번 탱크 연비 미리보기**,
+    평균보다 1.6배 넘게 높으면 "기록 빠짐?" 안내. 주행거리가 다른 날 기록과 앞뒤가 안 맞으면 저장 막음.
+  - 연비 계산: 가득→가득, 부분 주유량은 다음 가득 탱크에 합산, 기록 빠짐이면 그 탱크 건너뜀, 평균 = 전체 거리 ÷ 전체 연료.
+  - 정비·비용 기록(종류 16개 + 직접 입력), **정비 알림**(거리/개월/둘 다, 그 정비를 기록하면 다시 셈, 거리 알림은 내 하루 평균 주행으로 날짜 추정 → 로컬 알림).
+  - 차트: 연비 추이(평균 점선)·달별 비용(연료/정비 쌓은 막대)·단가 추이·숫자 8칸, 3M/6M/1Y/All. 누르면 그 값.
+  - 차량 여러 대(제한 없음), 단위 mi/km·gal/L·MPG/L/100km/km/L, 로드트립 기름값 나누기, **CSV 내보내기·가져오기**(머리글 이름으로 열 맞춤 →
+    Fuelly 웹 형식 `fuelup_date/partial_fuelup/missed_fuelup`, Fuelly 앱 형식 `Type=Gas, Filled Up=Full/Partial, $ 가격`, 트립 거리만 있는 파일, `;`+소수점 쉼표 파일).
+    가져오기 전에 미리보기·단위 고르기·중복 건너뛰기, 기존 기록은 안 건드림.
+  - 저장: 앱 지원 폴더 JSON + 직전 사본(.bak), 깨지면 사본으로 복구. 지우기는 전부 되돌리기(Undo).
+  - 광고: 배너만(탭 화면), **입력 화면엔 없음**, 전면 광고 없음. 지금은 Google 테스트 ID.
+- **테스트 47개 통과**(34초): 엔진 29 + 로봇 18(모든 버튼 — 604번·145종, 3기기 × 라이트/다크 × 글씨 100/135%, 키보드, 잘림·칸 넘침·VoiceOver 칸 수·"버튼인데 못 누름" 검사, 재시작·파일 깨짐 복구). 스크린샷 92장, 검수 페이지 `docs/fuel-log-qa.html`.
+- **로봇·스크린샷이 잡은 버그 6개**: 저장해도 기록 탭이 안 바뀜(const 화면이 저장소를 구독 안 함) · 거리 알림 예상일이 과거라 **알림이 예약조차 안 됨** ·
+  차량 버튼이 VoiceOver 로 못 누름 · 큰 글씨에서 요약·차트 글자·단가 칸 잘림 · ListTile 배경 assert · "961.5 better"(단위 빠짐).
+- **웹 미리보기** https://soulfulfillable.github.io/test-mvp/fuel-log-app/index.html (빈 상태) · `?demo=1`(예시 기록 14개월, 진짜 기록과 따로 저장).
+  헤드리스 크롬 점검 `fuellog_app/qa/web-check.js` 7/7, 콘솔 에러 0.
+- 개인정보처리방침 `docs/fuellog-privacy.html`. 아이콘 `fuellog_app/tool_icon.py`(연료 방울 + 게이지).
+- **확인 못 한 것**: 실제 아이폰 알림 표시(로컬 알림 예약은 FakeNotifier 로만 검사), iOS 빌드(Release iOS 아직 안 돌림 — `share_plus`→`path_provider_foundation` FFI 포함),
+  Fuelly 가 실제로 내보낸 파일(형식은 오픈소스 가져오기 코드로 추정), Drivvo 형식(구역 나뉜 파일 — 미지원).
+- 다음: 이름·번들 ID(사용자 A/B) → 번들 등록 → `Release iOS` 선택지에 추가 → ASC 앱 레코드·AdMob(사용자) → TestFlight.

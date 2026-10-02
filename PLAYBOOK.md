@@ -59,6 +59,13 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 연비 | 주유를 저장해도 기록 탭 숫자가 그대로 — 위에서 `ListenableBuilder` 로 감쌌지만 `const HomeShell()`·`const _Summary()` 는 **같은 const 위젯이라 다시 안 그려짐** | 저장소를 읽는 화면은 **각자 구독**(`build` 를 `ListenableBuilder` 로)하거나 바뀌는 데이터를 인자로 넘긴다. 로봇이 "저장 → 화면 숫자" 를 검사해서 잡았다 |
+| 2026-10-03 | 연비 | 거리 알림의 예상 날짜가 이미 지난 날(기록이 뜸할 때) → `notifyAt` 이 과거라 **알림이 예약조차 안 됨**. 테스트는 통과, **스크린샷의 "about Sep 29"(오늘 Oct 2)** 로 발견 | 예상일은 오늘보다 앞이면 오늘로, 알림은 다음 날 아침. 로봇에 "알림 켠 정비는 전부 미래 시각에 예약됐나" 검사. 고치기 전 실패 확인 |
+| 2026-10-03 | 연비 | `Semantics(button: true, excludeSemantics: true)` 로 감싼 버튼이 VoiceOver 에선 **누르기 동작이 없음**(앱 바 제목에 합쳐짐). 웹 점검 `getByRole('button')` 이 못 찾아서 발견 | `Semantics` 에 `onTap`(+앱 바 안이면 `container: true`). 로봇 `expectButtonsTappable`: 버튼인데 tap 액션 없는 노드 = 실패 (`fuellog_app/flutter/test/robot_test.dart`) |
+| 2026-10-03 | 연비 | 앱 바 제목·탭 글자가 스크린샷에서 검은 네모 → 잘림 검사 오탐. `appBarTheme.titleTextStyle: TextStyle(...)` 처럼 **빈 TextStyle 은 테마 글꼴을 안 이어받는다** | `base.textTheme.titleMedium!.copyWith(...)` 로 만든다 (기기에선 시스템 글꼴로 보여 눈치 못 챔) |
+| 2026-10-03 | 연비 | 큰 글씨(135%)에서 단가 칸 숫자가 1.5px 모자라 잘림 | 입력 칸 폭을 `MediaQuery.textScalerOf` 에 비례(화면 62% 까지). 3칸 요약은 `FittedBox(scaleDown)` |
+| 2026-10-03 | 연비 | `pkill -f "flutter test"`·`pkill -f flutter_tester` 가 **그 글자가 든 내 bash 명령까지 죽여** 뒤 명령이 안 돎 | 멈춘 테스트는 `pkill -9 -x flutter_tester` (프로세스 이름 정확히) |
+| 2026-10-03 | 연비 | 다른 앱 CSV 가져오기 형식을 알 길이 없음(사이트 막힘) | 오픈소스 가져오기 도구 코드(Hammond·LubeLogger)에서 Fuelly 열 이름을 읽었다 → 머리글 별칭으로 맞추고 엔진 테스트에 그 형식 그대로 고정 (`fuellog_app/flutter/lib/core/csv.dart`) |
 | 2026-10-03 | 물때 | 작업 환경에서 NOAA API 가 막힘 (WebFetch 도) | Actions 워크플로로 받아 데이터 브랜치에 커밋 → 그 실제 응답으로 테스트·웹 점검 (`fetch-noaa.yml`) |
 | 2026-10-03 | 물때 | NOAA 관측소 메타데이터(서머타임·시간대)가 수십~천여 곳 틀리거나 빔 | 공공 데이터도 "모든 항목을 화면에 띄우는" 테스트로 훑고, 틀린 건 규칙으로 보정 + 대표값 고정 테스트 |
 | 2026-10-03 | 물때 | 테스트 헬퍼 일괄 치환이 헬퍼 자신을 바꿔 무한 재귀 → flutter_tester 5GB·무응답 | 일괄 치환 뒤 헬퍼 본문 확인. 멈추면 `pkill -9 -f flutter_tester`, 단계 print 로 위치 찾기 |
