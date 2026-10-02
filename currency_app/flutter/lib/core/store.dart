@@ -168,6 +168,15 @@ class AppStore extends ChangeNotifier {
     _commit();
   }
 
+  /// 목록 순서 바꾸기 (onReorderItem: newIndex 는 빼낸 뒤 기준 위치)
+  void moveTarget(int oldIndex, int newIndex) {
+    if (oldIndex == newIndex) return;
+    final list = [...targets];
+    list.insert(newIndex, list.removeAt(oldIndex));
+    targets = list;
+    _commit();
+  }
+
   void setChartTo(String code) {
     chartTo = code;
     _commit();

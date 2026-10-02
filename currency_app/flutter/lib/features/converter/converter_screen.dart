@@ -116,27 +116,35 @@ class _ConverterScreenState extends State<ConverterScreen> {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
+              // 줄을 꾹 눌러 위아래로 끌면 순서가 바뀐다 (기준 통화 줄은 위에 고정)
+              child: ReorderableListView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-                child: Column(
-                  children: [
-                    for (var i = 0; i < s.targets.length; i++) ...[
-                      _TargetRow(
-                        key: _keyFor(s.targets[i]),
-                        currency: currencyByCode[s.targets[i]]!,
-                        base: s.base,
-                        editing: _kbdOpen && s.active == s.targets[i],
-                        amount: s.active == s.targets[i]
-                            ? fmtBuf(s.buf)
-                            : fmtAmount(s.amountIn(s.targets[i])),
-                        onPick: () => _pick(PickMode.replace, index: i),
-                        onAmount: () => _startEdit(s.targets[i]),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    _AddButton(onTap: () => _pick(PickMode.add)),
-                  ],
+                itemCount: s.targets.length,
+                onReorderItem: s.moveTarget,
+                proxyDecorator: (child, _, anim) => AnimatedBuilder(
+                  animation: anim,
+                  builder: (context, child) => Transform.scale(
+                    scale: 1 + .03 * Curves.easeOut.transform(anim.value),
+                    child: Material(color: Colors.transparent, child: child),
+                  ),
+                  child: child,
                 ),
+                itemBuilder: (context, i) => Padding(
+                  key: ValueKey(s.targets[i]),
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _TargetRow(
+                    key: _keyFor(s.targets[i]),
+                    currency: currencyByCode[s.targets[i]]!,
+                    base: s.base,
+                    editing: _kbdOpen && s.active == s.targets[i],
+                    amount: s.active == s.targets[i]
+                        ? fmtBuf(s.buf)
+                        : fmtAmount(s.amountIn(s.targets[i])),
+                    onPick: () => _pick(PickMode.replace, index: i),
+                    onAmount: () => _startEdit(s.targets[i]),
+                  ),
+                ),
+                footer: _AddButton(onTap: () => _pick(PickMode.add)),
               ),
             ),
             if (_kbdOpen)
@@ -229,9 +237,14 @@ class _NameLine extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(currency.name, style: style),
+        Flexible(
+          child: Text(currency.name,
+              maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
+        ),
         if (currency.tz != null)
-          LocalClock(currency.tz!, style: style.copyWith(fontSize: 10)),
+          Flexible(
+            child: LocalClock(currency.tz!, style: style.copyWith(fontSize: 10)),
+          ),
       ],
     );
   }
@@ -290,29 +303,35 @@ class _BaseCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          InkWell(
-            onTap: onPick,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(2, 2, 4, 2),
-              child: Row(
-                children: [
-                  FlagDot(currency),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _CodeLine(currency.code, fontSize: 14),
-                      const SizedBox(height: 1),
-                      _NameLine(currency, fontSize: 11),
-                    ],
-                  ),
-                ],
+          Flexible(
+            flex: 11,
+            child: InkWell(
+              onTap: onPick,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(2, 2, 4, 2),
+                child: Row(
+                  children: [
+                    FlagDot(currency),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _CodeLine(currency.code, fontSize: 14),
+                          const SizedBox(height: 1),
+                          _NameLine(currency, fontSize: 11),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
+            flex: 10,
             child: InkWell(
               onTap: onAmount,
               borderRadius: BorderRadius.circular(8),
@@ -382,29 +401,36 @@ class _TargetRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          InkWell(
-            onTap: onPick,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(2, 2, 4, 2),
-              child: Row(
-                children: [
-                  FlagDot(currency, size: 34),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _CodeLine(currency.code, fontSize: 13.5),
-                      const SizedBox(height: 1),
-                      _NameLine(currency, fontSize: 11),
-                    ],
-                  ),
-                ],
+          // 이름이 길면 줄어들게 — 안 그러면 오른쪽 환율 글자가 화면 밖으로 밀린다
+          Flexible(
+            flex: 11,
+            child: InkWell(
+              onTap: onPick,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(2, 2, 4, 2),
+                child: Row(
+                  children: [
+                    FlagDot(currency, size: 34),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _CodeLine(currency.code, fontSize: 13.5),
+                          const SizedBox(height: 1),
+                          _NameLine(currency, fontSize: 11),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
+            flex: 10,
             child: InkWell(
               onTap: onAmount,
               borderRadius: BorderRadius.circular(10),

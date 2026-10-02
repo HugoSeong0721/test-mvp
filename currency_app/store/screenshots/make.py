@@ -19,10 +19,10 @@ SUB = (154, 164, 178)
 LINE = (36, 44, 54)
 
 SHOTS = [
-    ('IMG_9544.png', '01-convert.png', 'Every currency\nat a glance', 'Type once. Every rate updates instantly.'),
+    ('IMG_9557.png', '01-convert.png', 'Every currency\nat a glance', 'Dollars, euros, Bitcoin & gold — instantly.'),
     ('IMG_9545.png', '02-type-any-row.png', 'Type in any row', 'Edit any currency — the rest follow.'),
-    ('IMG_9543.png', '03-chart.png', 'Real rate history', '1W · 1M · 3M · 1Y with highs and lows.'),
-    ('IMG_9546.png', '04-currencies.png', '20+ currencies,\ncrypto & gold', 'Search by name or code. Works offline.'),
+    ('IMG_9555.png', '03-gold-crypto.png', 'Gold, Bitcoin &\n20+ currencies', 'Search by name or code. Works offline.'),
+    ('IMG_9543.png', '04-chart.png', 'Real rate history', '1W · 1M · 3M · 1Y with highs and lows.'),
 ]
 
 STATUS_BAR = 175  # 원본(1170×2532) 기준 위쪽 상태바 높이

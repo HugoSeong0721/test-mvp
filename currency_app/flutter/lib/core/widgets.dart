@@ -126,6 +126,9 @@ class _LocalClockState extends State<LocalClock> {
     final t = LocalClock.text(widget.tzName);
     if (t.isEmpty) return const SizedBox.shrink();
     return Text(' · $t',
+        maxLines: 1,
+        overflow: TextOverflow.clip,
+        softWrap: false,
         style: (widget.style ?? const TextStyle()).copyWith(
           fontFeatures: tabularNums,
         ));
