@@ -1,7 +1,10 @@
 name: Release iOS (환율 앱 → App Store Connect)
 
 # 맥 없이 App Store Connect 에 빌드를 올린다. 수동 실행 전용(Actions → Run workflow).
-# Xcode 클라우드 서명 + App Store Connect API 키로 인증서·프로파일을 자동으로 만든다.
+# App Store Connect API 키로 배포 인증서·App Store 프로파일을 실행마다 새로 발급해 수동 서명하고,
+# 끝나면 지운다 (.github/scripts/asc_signing.py). 기기 등록이 필요 없다.
+#   - 자동 서명 아카이브는 개발용 프로파일을 요구 → 등록 기기 없으면 실패
+#   - 서명 없이 아카이브 후 export 서명 → Google 광고 SDK 프레임워크가 재서명되지 않아 업로드 거부
 #
 # 필요한 저장소 Secrets (만드는 법: currency_app/flutter/README.md 의 iOS 절)
 #   APPLE_TEAM_ID          developer.apple.com → Account → Membership details 의 Team ID (10자리)
@@ -68,10 +71,54 @@ jobs:
       - name: Generate Flutter build config
         run: flutter build ios --release --config-only --no-codesign --build-number=${{ github.run_number }}
 
-      # 아카이브는 서명 없이 만든다. 자동 서명으로 아카이브하면 개발용 프로파일이 필요하고,
-      # 그건 등록된 기기가 있어야 만들어진다. App Store 배포 서명은 다음 export 단계에서
-      # 클라우드 서명이 한 번에 붙인다 (기기 불필요).
-      - name: Archive (서명 없이)
+      - name: Issue distribution certificate & App Store profile
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -q pyjwt cryptography
+          SIGN_DIR="$RUNNER_TEMP/signing"
+          echo "SIGN_DIR=$SIGN_DIR" >> "$GITHUB_ENV"
+          OUT=$("$RUNNER_TEMP/venv/bin/python" "$GITHUB_WORKSPACE/.github/scripts/asc_signing.py" setup com.soulfulfill.currency "$SIGN_DIR")
+          echo "$OUT"
+          echo "PROFILE_NAME=$(echo "$OUT" | tail -1 | python3 -c 'import json,sys;print(json.load(sys.stdin)["profile_name"])')" >> "$GITHUB_ENV"
+          echo "PROFILE_UUID=$(echo "$OUT" | tail -1 | python3 -c 'import json,sys;print(json.load(sys.stdin)["profile_uuid"])')" >> "$GITHUB_ENV"
+
+      - name: Install certificate & profile
+        run: |
+          KC="$RUNNER_TEMP/ci.keychain-db"
+          security create-keychain -p ci "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p ci "$KC"
+          security import "$SIGN_DIR/dist.p12" -k "$KC" -P ci -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ci "$KC" > /dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v -p codesigning "$KC"
+          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$d"
+            cp "$SIGN_DIR/profile.mobileprovision" "$d/$PROFILE_UUID.mobileprovision"
+          done
+
+      # Runner 타깃만 수동 배포 서명으로 바꾼다 (패키지 타깃에 프로파일을 주면 빌드가 깨진다)
+      - name: Set manual signing on Runner target
+        run: |
+          python3 - <<'EOF'
+          import os, pathlib
+          p = pathlib.Path('ios/Runner.xcodeproj/project.pbxproj')
+          s = p.read_text()
+          anchor = 'PRODUCT_BUNDLE_IDENTIFIER = com.soulfulfill.currency;'
+          add = (anchor +
+                 '\n\t\t\t\tCODE_SIGN_STYLE = Manual;'
+                 f'\n\t\t\t\tDEVELOPMENT_TEAM = {os.environ["TEAM_ID"]};'
+                 f'\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = "{os.environ["PROFILE_NAME"]}";'
+                 '\n\t\t\t\tCODE_SIGN_IDENTITY = "Apple Distribution";'
+                 '\n\t\t\t\t"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";')
+          n = s.count(anchor)
+          assert n == 3, f'Runner 빌드 설정 {n}개 (3개 기대)'
+          s = s.replace(anchor, add).replace('CODE_SIGN_STYLE = Automatic;', 'CODE_SIGN_STYLE = Manual;')
+          p.write_text(s)
+          print('Runner: manual signing,', os.environ['PROFILE_NAME'])
+          EOF
+
+      - name: Archive (배포 서명)
         run: |
           set -o pipefail
           xcodebuild \
@@ -80,10 +127,6 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
             archive | tail -n 80
           test -d "$RUNNER_TEMP/Runner.xcarchive"
 
@@ -97,8 +140,13 @@ jobs:
             <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>upload</string>
             <key>teamID</key><string>$TEAM_ID</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>uploadSymbols</key><true/>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.soulfulfill.currency</key><string>$PROFILE_NAME</string>
+            </dict>
+            <key>uploadSymbols</key><false/>
             <key>manageAppVersionAndBuildNumber</key><false/>
           </dict>
           </plist>
@@ -107,13 +155,19 @@ jobs:
             -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -exportPath "$RUNNER_TEMP/export" \
-            -allowProvisioningUpdates \
             -authenticationKeyPath "$KEY_PATH" \
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER_ID"
           echo "업로드 완료 — App Store Connect → 앱 → TestFlight 에 10~30분 뒤 빌드 ${{ github.run_number }} 가 나타납니다."
 
+      - name: Revoke temporary certificate & profile
+        if: always()
+        run: |
+          [ -x "$RUNNER_TEMP/venv/bin/python" ] || exit 0
+          "$RUNNER_TEMP/venv/bin/python" "$GITHUB_WORKSPACE/.github/scripts/asc_signing.py" cleanup "$SIGN_DIR"
+          security delete-keychain "$RUNNER_TEMP/ci.keychain-db" 2>/dev/null || true
+
       - name: Remove API key
         if: always()
-        run: rm -rf "$RUNNER_TEMP/keys"
+        run: rm -rf "$RUNNER_TEMP/keys" "$RUNNER_TEMP/signing"
         working-directory: .
