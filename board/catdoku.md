@@ -1,16 +1,14 @@
 # Kitty Queens: Cat Sudoku (Catdoku 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 05:40 (KST)
+마지막 갱신: 2026-10-03 06:15 (KST)
 
 ## 지금 상태 (3줄 이내)
-Flutter 앱(`catdoku_app/flutter/`) 1차 완성 + 점검 팀 1차 수정 반영, 테스트 로봇 21개 통과, 웹 미리보기 `docs/catdoku-app/`.
-번들 ID `com.soulfulfill.catdoku` Apple 에 등록 완료(Actions `iOS 번들 ID 등록 · 앱 레코드 확인` 로그로 확인).
-AdMob 실제 ID 3개 반영(배너 `…/8563658282`, 힌트 `…/7250576612`, 이어하기 `…/7933102895`, 앱 `~4704304321`). TestFlight 업로드 진행.
+**TestFlight 빌드 10 업로드 성공**(Release iOS app=catdoku, 2026-10-02 21:07 UTC) → 사용자가 폰 TestFlight 에서 설치·실행 확인.
+ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 테스트 로봇 23개 통과, 점검 팀 2차 수정 반영.
+다음: 사용자 '느낌' 피드백 → 스크린샷·등록 정보 → 심사.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] App Store Connect → 앱 → ＋ → 신규 앱: iOS / `Kitty Queens: Cat Sudoku` / English (U.S.) / 번들 `com.soulfulfill.catdoku` / SKU `catdoku`.
-  이게 없으면 `Release iOS` 업로드가 실패한다 (앱 레코드는 API 로 못 만든다).
-- [사용자] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Kitty Queens) → 광고 단위 3개: 배너 `banner`, 보상형 `rewarded_hint`, 보상형 `rewarded_continue`.
-  앱 ID(`~`) + 단위 ID 3개(`/`) 받으면 `lib/core/ads.dart`·`ios/Runner/Info.plist`(GADApplicationIdentifier) 교체.
+- ✅ [사용자] ASC 앱 레코드 생성 (id 6818637278), ✅ AdMob 앱·광고 단위 3개, ✅ TestFlight 내부 그룹 "me" 설치.
+- [사용자] TestFlight 빌드로 해 보고 '느낌' 피드백 (광고는 누르지 않기).
 - [세션] 점검 워크플로 남은 3명(단계 모드·화면 크기·극단 상황) 결과 반영 → 광고 상황 전담 점검 팀(`?ads=slow|none|early`) 한 번 더.
 - [세션] `Release iOS`(app=catdoku) → TestFlight → 사용자 '느낌' 피드백 → 스크린샷(1290×2796)·`catdoku_app/store/ios-metadata.json` → 심사.
 - 기록: 진행 상세는 `plans/catdoku-app.md` 진행 기록, 스토어 초안·이름 조사 `catdoku_app/store/ios-listing.md`.
@@ -18,6 +16,9 @@ AdMob 실제 ID 3개 반영(배너 `…/8563658282`, 힌트 `…/7250576612`, �
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-02 | "아 테스트앱에서 받아서 열엇어" | TestFlight 빌드 10 설치 확인. 느낌 피드백 대기 |
+| 10-02 | TestFlight 그룹 화면 캡처 + "어떻게 test flight 에서 들어가는거엿지 … 번호누르고 햇던거같은데" | 내부 그룹 → Invite Testers → 초대 메일 "View in TestFlight" → 8자리 Redeem 코드 → TestFlight 앱에서 입력, 이라고 안내 |
+| 10-02 | "그거 뭐엿지 저 앱스토어 커넥트 그거 주소좀" | https://appstoreconnect.apple.com/apps/6818637278/testflight/ios |
 | 10-02 | 보상형 2개 생성 캡처 + "rewarded continue는안보이는데" → "done 눌럿어" | 이름(rewarded_continue)과 광고 형식(Rewarded 카드)이 헷갈림 → 형식은 4번째 Rewarded 카드라고 안내. 힌트 `…/7250576612`, 이어하기 `…/7933102895` 반영 |
 | 10-02 | AdMob 배너 생성 화면 캡처 + "너가 이거보고 기억하면되지않냐 done 누르까" | 앱 ID `ca-app-pub-4724352880074547~4704304321`(Info.plist), 배너 `…/8563658282`(ads.dart) 반영. 보상형 2개는 "Create another ad unit" 으로 이어 만들게 안내 |
 | 10-02 | "오 soulfulfillable이엇던거같애 기억하고 다른애들한테도 나중에 알려놔주라" (AdMob 계정) | `ops/README.md` 계정 표 + `board/_shared.md` "계정" 절에 기록 (게시자 ID `pub-4724352880074547`) |
@@ -41,6 +42,11 @@ AdMob 실제 ID 3개 반영(배너 `…/8563658282`, 힌트 `…/7250576612`, �
 - 퍼즐 난이도: 7×7 첫 판은 "어렵다" 했지만 풀어냄. 너무 쉽게 만들 필요는 없지만 첫 경험은 조심.
 
 ## 다른 세션에 알리는 노하우 (다른 앱에서도 써먹을 것)
+- **새 앱 iOS 출시 순서 (이 세션에서 실제로 된 순서, 총 1시간 안쪽)**: ① `iOS 번들 ID 등록 · 앱 레코드 확인` Actions 로 번들 등록
+  → ② 사용자가 ASC 웹에서 신규 앱(이름·언어·번들·SKU·Full Access) → ③ 같은 Actions 재실행으로 "앱 레코드: 있음" 확인
+  → ④ `Release iOS` (앱 선택) — 서명~업로드 6분 → ⑤ 사용자: TestFlight 내부 그룹 + Invite Testers → 메일 "View in TestFlight" 의 Redeem 코드.
+- **AdMob 안내할 때**: 사용자가 광고 단위 *이름*(rewarded_continue)을 *형식* 목록에서 찾았다 — "형식은 Rewarded 카드(4번째, Rewarded interstitial 아님), 이름은 직접 입력"이라고 분리해서 말할 것.
+  완료 화면 캡처를 받으면 ID 를 읽어 바로 코드에 넣는다(사용자: "너가 이거보고 기억하면되지않냐"). 새 광고 단위는 첫 광고까지 최대 1시간.
 - **Flutter 웹 미리보기 = 폰으로 바로 해 보는 링크.** `flutter create . --platforms web` → `flutter build web --release --base-href /test-mvp/<폴더>/`
   → `build/web` 을 `docs/<폴더>/` 로 복사하되 **`canvaskit/` 폴더는 빼라**(40MB → 3.6MB, 엔진은 gstatic CDN 에서 받음).
   광고 SDK(google_mobile_ads)는 웹 미지원 → `kIsWeb` 이면 가짜 광고(FakeAds)로 갈아끼운다.
