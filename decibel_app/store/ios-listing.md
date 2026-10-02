@@ -1,7 +1,7 @@
 # Glance dB: Decibel Meter — App Store 등록 문구 (초안)
 
 **대상: 미국 App Store. 기본 언어 English (U.S.).** 앱 UI 도 영어.
-이름·번들 ID 는 **사용자 확인 전**이다 (아래 후보). 확정되면 이 파일·`lib/core/theme.dart` 의 `kAppName`·Info.plist 를 같이 고친다.
+**이름 `Glance dB: Decibel Meter`·번들 `com.soulfulfill.decibel` 확정 (사용자, 2026-10-03). 번들 ID Apple 등록 완료.**
 
 ## 검색어 조사 (2026-10-03, 개발 세션)
 
@@ -28,7 +28,7 @@ ASO 도구 공개 요약(ASOTools, Decibel X 키워드) 기준 — 국가·날�
 | 광고형 앱들 | 30초마다 전면 광고 + **광고 소리가 측정을 망침** | 배너만. 측정 중 전면·소리 광고 없음 |
 | 이웃 소음 전용 앱(Noise Log 등) | 증거용 리포트 수요 확인 | 날짜·시각·평균·최대·가장 시끄러운 순간·그래프 한 장 |
 
-## 이름 후보 (사용자 A/B)
+## 이름 후보 (사용자 A/B) → A 선택
 
 | | Name (30) | Subtitle (30) | 이유 |
 |---|---|---|---|
@@ -53,9 +53,9 @@ ASO 도구 공개 요약(ASOTools, Decibel X 키워드) 기준 — 국가·날�
 
 | 항목 | 값 |
 |---|---|
-| Name (30) | 후보 A `Glance dB: Decibel Meter` (확정 전) |
+| Name (30) | `Glance dB: Decibel Meter` (확정) |
 | Subtitle (30) | `Sound Level & Noise Meter` |
-| Bundle ID | `com.soulfulfill.decibel` (확정 전) |
+| Bundle ID | `com.soulfulfill.decibel` (Apple 등록 완료 2026-10-03) |
 | SKU | `decibel` |
 | Primary Language | English (U.S.) |
 | Primary Category | Utilities |
