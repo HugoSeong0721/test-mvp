@@ -154,8 +154,12 @@ def main():
     log(f"  - `{body[:300]!r}`")
     body = get(pred_url("9414290", begin, begin, "h"), "SF hourly 1 day")
     log(f"  - `{body[:200]!r}`")
-    end31 = (today + dt.timedelta(days=30)).strftime("%Y%m%d")
-    body = get(pred_url("9414290", today.strftime("%Y%m%d"), end31, "hilo"), "SF hilo 31 days")
+    # 30-day table (rewarded feature): what the app requests — 1 day back to 31 days ahead
+    m_begin = (today - dt.timedelta(days=1)).strftime("%Y%m%d")
+    m_end = (today + dt.timedelta(days=31)).strftime("%Y%m%d")
+    for sid in ["9414290", "9410068", "1612340"]:
+        body = get(pred_url(sid, m_begin, m_end, "hilo"), f"{sid} hilo 33 days (30-day table)")
+        save(f"fixtures/{sid}_hilo30.json", body)
     # error shapes
     body = get(pred_url("0000000", begin, begin, "hilo"), "bad station id")
     log(f"  - `{body[:300]!r}`")
