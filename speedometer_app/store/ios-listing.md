@@ -1,7 +1,7 @@
 # GPS 속도계 앱 — App Store 등록 정보 초안 (미국, English U.S.)
 
-> 이름은 사용자 선택 대기. 선택되면 이 파일·`lib/app.dart` 의 title·`ios/Runner/Info.plist` 의 CFBundleDisplayName·
-> `docs/speedometer-privacy.html` 제목·설정 화면 문구를 함께 바꾼다.
+> **확정 (2026-10-03, 사용자): 이름 `Glance Speed: GPS Speedometer`, 번들 `com.soulfulfill.speedometer`.** 홈 화면 이름 `Glance Speed`.
+> 부제 `Car HUD, MPH Tracker, Odometer`, 키워드는 아래 A 줄.
 
 ## 경쟁 앱 조사 (2026-10-03, 웹 검색 요약 — apps.apple.com 직접 접속은 이 환경에서 막혀 대략치)
 

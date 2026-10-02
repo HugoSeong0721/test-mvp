@@ -1,6 +1,6 @@
 {
-    "name": "Speedometer",
-    "short_name": "Speedometer",
+    "name": "Glance Speed: GPS Speedometer",
+    "short_name": "Glance Speed",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0B0E13",

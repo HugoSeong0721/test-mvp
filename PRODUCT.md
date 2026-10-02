@@ -44,7 +44,7 @@
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출. v1.1 후보 = 빌드 9(TestFlight): 줄 꾹 눌러 끌기로 순서 변경, 긴 이름 줄 넘침 수정. 스크린샷 v2(금·BTC 첫 장) 준비됨 | 승인 대기 → AdMob 스토어 링크·결제 정보 → v1.1 제출(빌드 9 + 스크린샷 v2, `App Store 등록 정보 채우기`) → 리뷰·수익 확인 |
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
 | **물때 시간** (`plans/tides-app.md`, `board/tides.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
-| **GPS 속도계** (`speedometer_app/`, `plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-03 Flutter 1차 완성·테스트 37개·웹 미리보기 `docs/speedometer-app/`(폰 GPS 로 진짜 속도) | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
+| **Glance Speed: GPS Speedometer** (GPS 속도계, `speedometer_app/`, `plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-03 Flutter 1차 완성·테스트 37개·웹 미리보기 `docs/speedometer-app/`(폰 GPS 로 진짜 속도) | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
@@ -78,6 +78,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 속도계 앱 이름 **Glance Speed: GPS Speedometer**, 번들 ID `com.soulfulfill.speedometer` | 미국 1·2위 검색어(speedometer·gps speedometer)를 이름에 담고 Glance 시리즈. 사용자: 둘 다 추천대로 |
 | 2026-10-03 | 대출 계산기 이름 **Glance: Mortgage Calculator**(부제 Home Loan & Payment Calculator), 번들 ID `com.soulfulfill.mortgage` (Apple 등록 완료) | 미국 검색 1위 "mortgage calculator" 를 이름에 그대로 + Glance FX 시리즈. 사용자: 둘 다 추천안 |
 | 2026-10-02 | 새 분야 8개 조사 → `plans/research-8-fields.md`. 다음 물결 추천: 한붓 경로 퍼즐 → 낚시·사냥 시간 (지금 5개 세션이 TestFlight 가는 걸 보고 시작) | 사용자 "더 앱 낼 분야 조사해놔줘 8개 정도" |
 | 2026-10-03 | 소음 측정기 이름 **Glance dB: Decibel Meter** (부제 Sound Level & Noise Meter), 번들 ID `com.soulfulfill.decibel` 등록 완료 | 사용자: 추천대로 (A — Glance FX 시리즈 형식, 1위 검색어 "decibel meter" 포함) |

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Speedometer</string>
+	<string>Glance Speed</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Speedometer</string>
+	<string>Glance Speed</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -31,7 +31,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Speedometer only uses your location while the app is open on screen. It is never uploaded or shared.</string>
+	<string>Glance Speed only uses your location while the app is open on screen. It is never uploaded or shared.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is used only to measure your speed and trip distance on this iPhone. It is never uploaded or shared.</string>
 	<key>SKAdNetworkItems</key>
