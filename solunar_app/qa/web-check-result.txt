@@ -1,0 +1,56 @@
+PASS  Welcome screen shows
+      📸 01-welcome.png
+PASS  Use My Location → "in Austin, TX", times in CDT (phone time zone)
+PASS  today title
+PASS  score headline
+PASS  now/next card
+PASS  Major period with moon overhead time
+      📸 02-home.png
+PASS  hunting countdown at noon
+PASS  legal light rule text
+      📸 03-home-hunting.png
+PASS  sun & moon card
+PASS  calendar button
+      📸 04-home-bottom.png
+PASS  score sheet opens
+PASS  three score parts shown
+      📸 05-score-sheet.png
+PASS  week strip → Saturday
+      📸 06-saturday.png
+PASS  week strip → back to today
+PASS  unlock dialog
+      📸 07-unlock.png
+PASS  calendar opens after video
+      📸 08-calendar.png
+PASS  calendar day → main screen shows that day
+PASS  Oct 10 is a new moon
+PASS  settings opens
+PASS  after-sunset −5 → 25 min
+PASS  preset 30 / sunset
+      📸 09-settings.png
+PASS  new offsets on the hunting card
+PASS  places screen
+PASS  search "bozeman" finds Bozeman, MT
+      📸 10-search.png
+PASS  Bozeman times in MDT (place zone, not the phone's CDT)
+PASS  saved (star on)
+PASS  places shows saved section
+      📸 11-places-saved.png
+PASS  no network calls besides fonts/engine (0)
+      console errors: 0
+PASS  no console errors (session 1)
+PASS  location not given → message (no endless spinner)
+      📸 12-location-denied.png
+PASS  search start → Duluth
+PASS  no console errors (denied)
+PASS  ?ads=early → stays locked with a message
+PASS  ?ads=none → Loading video…
+PASS  ?ads=none → opens anyway after the wait
+PASS  13-iphone-se.png: home
+      📸 13-iphone-se.png
+PASS  no console errors (13-iphone-se.png)
+PASS  14-pro-max.png: home
+      📸 14-pro-max.png
+PASS  no console errors (14-pro-max.png)
+
+✅ 39 passed, 0 failed

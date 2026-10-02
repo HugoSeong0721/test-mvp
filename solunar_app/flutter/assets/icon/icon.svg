@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B2838"/>
+      <stop offset="0.55" stop-color="#3E5677"/>
+      <stop offset="0.82" stop-color="#E9A35A"/>
+      <stop offset="1" stop-color="#F6C77E"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2E4A5F"/>
+      <stop offset="1" stop-color="#1C2F3E"/>
+    </linearGradient>
+    <mask id="crescent">
+      <rect width="1024" height="1024" fill="black"/>
+      <circle cx="512" cy="300" r="150" fill="white"/>
+      <circle cx="580" cy="258" r="128" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+  <!-- rising sun -->
+  <circle cx="512" cy="760" r="170" fill="#FFD58A"/>
+  <!-- crescent moon -->
+  <circle cx="512" cy="300" r="150" fill="#F5E6B0" mask="url(#crescent)"/>
+  <!-- pine treeline -->
+  <path fill="#14211A" d="M0 760 L40 700 L70 760 L95 640 L130 760 L160 690 L185 760 L210 600 L250 760 L280 700 L300 760
+    L724 760 L745 700 L775 760 L800 610 L840 760 L865 680 L895 760 L920 630 L955 760 L985 700 L1024 760 L1024 800 L0 800 Z"/>
+  <!-- water -->
+  <rect y="800" width="1024" height="224" fill="url(#water)"/>
+  <!-- sun reflection -->
+  <rect x="402" y="830" width="220" height="16" rx="8" fill="#F6C77E" opacity="0.85"/>
+  <rect x="432" y="872" width="160" height="14" rx="7" fill="#F6C77E" opacity="0.6"/>
+  <rect x="462" y="912" width="100" height="12" rx="6" fill="#F6C77E" opacity="0.4"/>
+</svg>
