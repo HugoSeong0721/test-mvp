@@ -1,7 +1,7 @@
 # stations_compact.json
 
 - stations: 3499
-- detail time: 10s
+- detail time: 12s
 - dst true: 2180, false: 62, unknown: 1257
 - timezone combos:
   -  -10 dst=-1: 58
