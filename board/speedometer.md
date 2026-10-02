@@ -4,18 +4,18 @@
 ## 지금 상태 (3줄 이내)
 Flutter 1차 완성(`speedometer_app/flutter/`): 큰 숫자/게이지·HUD·속도 경고·모드 4개·이동 기록. 테스트 37개 통과(엔진 18 + 로봇 19).
 웹 미리보기 https://soulfulfillable.github.io/test-mvp/speedometer-app/index.html — 폰 위치로 **진짜 속도**, `?demo=1` 은 가짜 주행. 광고는 배너만(테스트 ID).
-이름·번들 ID 사용자 확인 대기 → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
+이름 **Glance Speed: GPS Speedometer**·번들 `com.soulfulfill.speedometer` 확정(사용자) → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] 이름 A/B: **A `Glance Speed: GPS Speedometer` (추천 — 1·2위 검색어 speedometer·gps speedometer + Glance 시리즈)** / B `Speedometer: Big MPH & HUD`. 번들 `com.soulfulfill.speedometer`.
 - [사용자] 웹 미리보기를 차에서(조수석) 켜 보고 '느낌' 한마디.
-- [사용자, 이름 정해지면] App Store Connect → 앱 → ＋ 신규 앱: iOS / 이름 / English (U.S.) / 번들 / SKU `speedometer`.
-- [사용자, 이름 정해지면] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록) → 광고 단위 1개: 배너 `banner`.
-- [세션] 번들 등록 Actions → `Release iOS`·`App Store 등록 정보 채우기` 선택지에 speedometer 추가 → 앱 아이콘 → TestFlight.
+- [사용자] App Store Connect → 앱 → ＋ 신규 앱: iOS / `Glance Speed: GPS Speedometer` / English (U.S.) / 번들 `com.soulfulfill.speedometer` / SKU `speedometer`.
+- [사용자] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Glance Speed) → 광고 단위 1개: 배너 `banner`. 앱 ID(`~`)·단위 ID(`/`)를 알려 주면 교체.
+- [세션] ASC 앱 레코드 생기면 `Release iOS`(app=speedometer) → TestFlight → 스크린샷 1290×2796·`speedometer_app/store/ios-metadata.json`.
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | 이름 A/B → "Glance Speed (추천)", 번들 → "speedometer 로 등록 (추천)" | 이름 `Glance Speed: GPS Speedometer`(홈 화면 `Glance Speed`), 번들 `com.soulfulfill.speedometer` 등록 Actions 실행. 앱·방침·웹 제목 반영, `Release iOS` 선택지에 speedometer 추가 |
 | 10-03 | "GPS 속도계 앱 개발 시작해줘. plans/speedometer-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/speedometer.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 이 파일을 단계마다 갱신 |
 
 ## 사용자 성향 — 원하는 것 / 불편해하는 것 (이 앱에서 알게 된 것)

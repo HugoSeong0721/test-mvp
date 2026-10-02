@@ -140,7 +140,7 @@ Future<void> showSettingsSheet(
           ),
           const SizedBox(height: 4),
           const Text(
-            'Version 1.0 · No account, no subscription. Your location never leaves this device.',
+            'Glance Speed 1.0 · No account, no subscription. Your location never leaves this device.',
             style: TextStyle(color: C.muted, fontSize: 12, height: 1.35),
           ),
         ],
