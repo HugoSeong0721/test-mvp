@@ -44,6 +44,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Probe sources
+        run: python3 -u tools/coloring/probe.py
+
       - name: Download from Openclipart
         env:
           TAGS: ${{ inputs.tags }}
