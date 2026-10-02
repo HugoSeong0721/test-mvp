@@ -364,9 +364,13 @@ class _TargetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final fx = Fx.of(context);
     final r = RateService.i;
-    // "1 USD = 1,385 KRW" 방향으로 단위 환율, 같은 방향의 전일 대비
-    final unit = r.convert(1, currency.code, base);
-    final d = r.pairChange(currency.code, base);
+    // "1 EUR = 1.13 USD" 방향이 기본. 1 단위가 0.1 미만인 통화(KRW 등)는 숫자가 길어
+    // 잘리므로 "1 USD = 1,356 KRW" 로 뒤집고, 전일 대비도 같은 방향으로 맞춘다.
+    final unitRaw = r.convert(1, currency.code, base);
+    final flip = unitRaw > 0 && unitRaw < 0.1;
+    final (from, to) = flip ? (base, currency.code) : (currency.code, base);
+    final unit = flip ? 1 / unitRaw : unitRaw;
+    final d = r.pairChange(from, to);
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 11, 14, 11),
       decoration: BoxDecoration(
@@ -430,7 +434,7 @@ class _TargetRow extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          '1 ${currency.code} = ${fmtAmount(unit)} $base · ',
+                          '1 $from = ${fmtAmount(unit)} $to · ',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
