@@ -48,7 +48,7 @@
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
-| **한붓 경로 퍼즐** (`plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
+| **한붓 경로 퍼즐** (`path_puzzle_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
 | **낚시·사냥 시간** (`plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | **연비·정비 기록** (`plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 경로 퍼즐 1차 범위(개발 세션 판단): 오늘의 퍼즐 **6×6**, 벽 없음(규칙 2개), 실패·하트 없음(점수 = 시간), 보상형 = 힌트(정답 길을 다음 숫자까지 그어 줌), 되돌리기·지우기 무료 무제한. 상표 Zip·Flow·Numbrix·Hidato 사용 금지 | 원조 게임 기본 크기 6×6(숫자 평균 10), 캣도쿠 7×7 첫 판 "어렵다" 피드백, 경쟁 앱 불만(힌트가 길을 안 보여 줌·되돌리기 없음·코인) 의 반대. 벽은 TestFlight 느낌 보고 |
 | 2026-10-03 | 물때 앱 이름 **Glance Tides: Tide Chart**, 번들 `com.soulfulfill.tides`, **광고 제거 결제 없음**, **30일 물때표 = 영상 보고 24시간 열기(보상형)**, 기본 7일은 무료 | 사용자 3개 모두 추천안. Glance 시리즈 통일, 결제 정보·심사 부담 없이 빨리 출시, 사용자는 결제보다 보상형 선호 |
 | 2026-10-03 | 다음 물결 3개: 한붓 경로 퍼즐 · 낚시·사냥 시간 · 연비·정비 기록 (성경 통독 체크는 대안으로 대기) | 사용자 "뭐부터 할까 한 세 개". 앞 5개가 1차 완성·캣도쿠 TestFlight 도달 |
 | 2026-10-03 | **앱 고르는 방법 확정: 수요 확인 → 1등 앱 불만 확인 → 그 불만의 반대로 차별화** | 사용자 "수요 확인하고 불만 확인해서 차별화 만드는 게 참 좋아" |
