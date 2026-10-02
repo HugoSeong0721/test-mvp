@@ -4,6 +4,7 @@
 
 | 세션(앱) | 무엇을 | 시작 | 상태 |
 |---|---|---|---|
+| mortgage | `release-ios.yml`·`asc-metadata.yml` 선택지에 mortgage 추가 + BUNDLE_ID 를 `com.soulfulfill.<앱>` 규칙 한 줄로(앱마다 줄 추가 불필요) | 10-03 | 작업 중 |
 
 ## 이미 만들어진 공용 도구 (다시 만들지 말 것)
 
