@@ -425,8 +425,9 @@ void main() {
   });
 
   testWidgets(
-    'no video yet → "Loading video…" → tells the user, line unchanged',
+    'no video yet → "Loading video…" → hint is free, and the user is told',
     (t) async {
+      // 새 AdMob 앱은 출시 전 영상이 거의 없다 — 영상이 없다고 힌트를 막지 않는다 (캣도쿠 TestFlight 교훈)
       final ads = FakeAds(
         result: RewardResult.unavailable,
         ready: false,
@@ -441,13 +442,12 @@ void main() {
       await t.pump(const Duration(seconds: 3));
       await t.pump(const Duration(milliseconds: 500));
       expect(find.text('Loading video…'), findsNothing);
-      expect(
-        find.textContaining('No video available right now'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('this one’s on us'), findsOneWidget);
       expect(ads.shown, [RewardPlacement.hint]);
-      expect(gameOf(t).path.length, 1);
-      expect(gameOf(t).hintsUsed, 0);
+      final g = gameOf(t);
+      expect(g.hintsUsed, 1);
+      expect(g.path.length, greaterThan(1));
+      expect(g.correctPrefix, g.path.length);
       await finish(t);
     },
   );
