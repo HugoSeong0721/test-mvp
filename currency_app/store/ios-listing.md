@@ -11,7 +11,7 @@ App Store Connect → My Apps → 한눈환율 → iOS App 1.0 에 그대로 붙
 |---|---|
 | Name (30자) | `한눈환율` |
 | Subtitle (30자) | `달러·엔·유로 환율 계산기` |
-| Bundle ID | `com.mgseong.currency` |
+| Bundle ID | `com.soulfulfill.currency` |
 | SKU | `somrate` |
 | Primary Category | Finance |
 | Secondary Category | Travel |

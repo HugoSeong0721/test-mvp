@@ -55,7 +55,7 @@ jobs:
             echo "ios/ 가 이미 있어 생성 단계를 건너뜁니다."
             exit 0
           fi
-          flutter create --platforms=ios --org com.mgseong --project-name somrate .
+          flutter create --platforms=ios --org com.soulfulfill --project-name somrate .
 
           # flutter create 가 ios/ 밖에 새로 만들거나 되돌린 파일은 버린다 (.metadata·pubspec.lock 만 유지)
           git ls-files -m | grep -v -e '^\.metadata$' -e '^pubspec\.lock$' | xargs git checkout --

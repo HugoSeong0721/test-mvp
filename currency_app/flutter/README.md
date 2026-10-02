@@ -3,7 +3,7 @@
 웹 프로토타입(`currency_app/currency-app-v1.html`)을 그대로 옮긴 네이티브 앱.
 Google Play에 올리는 건 **이 폴더에서 나온 AAB 파일**이다.
 
-- 패키지 ID: `com.mgseong.currency` — **한 번 Play에 올리면 영구히 못 바꾼다.** 첫 업로드 전에 바꿀 거면
+- 패키지 ID: `com.soulfulfill.currency` — **한 번 Play에 올리면 영구히 못 바꾼다.** 첫 업로드 전에 바꿀 거면
   `android/app/build.gradle.kts` 의 `applicationId`/`namespace`, `android/app/src/main/kotlin/…` 폴더 이름을 같이 바꾼다.
 - 앱 이름(폰에 보이는): `android/app/src/main/AndroidManifest.xml` 의 `android:label`
 - 버전: `pubspec.yaml` 의 `version: 1.0.0+1` — 스토어에 다시 올릴 때마다 `+N` 을 1 올린다.
@@ -116,7 +116,7 @@ AdMob 콘솔의 "Payment setup incomplete" 는 수익이 생기기 전까지는 
 
 ## iOS (App Store)
 
-번들 ID `com.mgseong.currency`, 표시 이름 `한눈환율`. 안드로이드와 같은 Dart 코드를 그대로 쓴다.
+번들 ID `com.soulfulfill.currency`, 표시 이름 `한눈환율`. 안드로이드와 같은 Dart 코드를 그대로 쓴다.
 
 ### CI 가 해 두는 것
 
@@ -130,9 +130,9 @@ AdMob 콘솔의 "Payment setup incomplete" 는 수익이 생기기 전까지는 
 
 한 번만 준비:
 1. **번들 ID 등록** — developer.apple.com/account → Certificates, IDs & Profiles → Identifiers → **+**
-   → App IDs → App → Description `Currency Converter`, Bundle ID **Explicit** `com.mgseong.currency` → Continue → Register.
+   → App IDs → App → Description `Currency Converter`, Bundle ID **Explicit** `com.soulfulfill.currency` → Continue → Register.
 2. **앱 레코드 만들기** — appstoreconnect.apple.com → Apps → **+ → New App**
-   → iOS, 이름 `한눈환율`, 기본 언어 Korean, 번들 ID `com.mgseong.currency`, SKU `somrate`, Full Access.
+   → iOS, 이름 `한눈환율`, 기본 언어 Korean, 번들 ID `com.soulfulfill.currency`, SKU `somrate`, Full Access.
 3. **API 키** — App Store Connect → Users and Access → **Integrations** → App Store Connect API
    → (처음이면 Request Access) → Team Keys **+** → 이름 `github-ci`, Access **Admin** → Generate
    → **Download API Key**(.p8, 한 번만 받을 수 있음). 같은 화면의 **Key ID**, 위쪽 **Issuer ID** 를 적어 둔다.
@@ -164,7 +164,7 @@ Xcode 에서:
    (본인 아이폰을 연결하고 ▶ 로 먼저 실행해 보면 광고 자리까지 확인할 수 있다.)
 
 App Store Connect(appstoreconnect.apple.com)에서:
-1. **My Apps → + → New App** — 이름 `한눈환율`(또는 원하는 이름), 번들 ID `com.mgseong.currency` 선택, SKU 아무거나(`somrate`).
+1. **My Apps → + → New App** — 이름 `한눈환율`(또는 원하는 이름), 번들 ID `com.soulfulfill.currency` 선택, SKU 아무거나(`somrate`).
 2. 업로드된 빌드 선택, 스크린샷(6.7형 iPhone 최소 1장 — 실행한 폰에서 캡처), 설명, 키워드, 지원 URL.
 3. **App Privacy**: 광고 SDK 가 있으므로 "식별자(기기 ID)·사용 데이터 수집 — 제3자 광고 목적" 으로 답한다.
    개인정보처리방침 URL → `https://hugoseong0721.github.io/test-mvp/somrate-privacy.html` (광고 문구 추가 필요).

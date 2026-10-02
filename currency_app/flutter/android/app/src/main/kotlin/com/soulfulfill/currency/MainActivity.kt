@@ -1,4 +1,4 @@
-package com.mgseong.currency
+package com.soulfulfill.currency
 
 import io.flutter.embedding.android.FlutterActivity
 
