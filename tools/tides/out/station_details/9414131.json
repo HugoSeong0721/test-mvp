@@ -1,0 +1,85 @@
+{
+  "count": 1,
+  "units": null,
+  "stations": [
+    {
+      "tidal": true,
+      "greatlakes": false,
+      "shefcode": "",
+      "details": {
+        "id": "9414131",
+        "established": "2010-10-22 00:00:00",
+        "removed": "2011-10-19 00:00:00",
+        "noaachart": "18680",
+        "timemeridian": -120,
+        "timezone": -8.0,
+        "origyear": "2010-11-03 00:00:00",
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/details.json"
+      },
+      "sensors": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/sensors.json"
+      },
+      "floodlevels": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/floodlevels.json"
+      },
+      "datums": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/datums.json"
+      },
+      "supersededdatums": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/supersededdatums.json"
+      },
+      "harmonicConstituents": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/harcon.json"
+      },
+      "benchmarks": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/benchmarks.json"
+      },
+      "tidePredOffsets": {
+        "refStationId": "",
+        "type": "R",
+        "heightOffsetHighTide": null,
+        "heightOffsetLowTide": null,
+        "timeOffsetHighTide": null,
+        "timeOffsetLowTide": null,
+        "heightAdjustedType": "",
+        "self": null
+      },
+      "ofsMapOffsets": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/ofsmapoffsets.json"
+      },
+      "state": "CA",
+      "timezone": "PST",
+      "timezonecorr": -8,
+      "observedst": true,
+      "stormsurge": false,
+      "nearby": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/nearby.json"
+      },
+      "forecast": false,
+      "outlook": false,
+      "HTFhistorical": false,
+      "HTFmonthly": false,
+      "nonNavigational": false,
+      "inundationdb": false,
+      "id": "9414131",
+      "name": "Pillar Point Harbor",
+      "lat": 37.5025,
+      "lng": -122.48217,
+      "affiliations": "USACE",
+      "portscode": null,
+      "products": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/products.json"
+      },
+      "disclaimers": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/disclaimers.json"
+      },
+      "notices": {
+        "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131/notices.json"
+      },
+      "self": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414131.json",
+      "expand": "details,sensors,floodlevels,datums,harcon,tidepredoffsets,ofsmapoffsets,products,disclaimers,notices",
+      "tideType": "Mixed"
+    }
+  ],
+  "self": null
+}
