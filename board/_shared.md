@@ -12,6 +12,13 @@
 - 번들 ID 등록 Actions (Catdoku 세션).
 - AdMob 보상형 광고 처리(대기·실패·중간 닫기): `catdoku_app/` 참고.
 
+## 계정 (어느 계정으로 로그인하나)
+
+- **AdMob = `soulfulfillable` Google 계정** (게시자 ID `pub-4724352880074547`, Currency Exchange 앱이 있는 계정). 사용자 확인 2026-10-02.
+  새 앱의 AdMob 앱·광고 단위도 **반드시 이 계정에** 만든다 — 수익이 한 계정에 모여야 지급 기준액에 빨리 닿고 결제·세금 정보도 한 번만.
+  사용자가 어느 계정인지 헷갈려 하면: AdMob → Settings → Account information → Publisher ID 가 위 값인지 확인하게 한다.
+- Apple 개발자·App Store Connect: 개인 Gmail 로 가입된 개인(Individual) 계정 (`ops/README.md`).
+
 ## 사용자 공통 성향 (여러 세션에서 확인된 것, 기획 파트너가 정리)
 
 - 출퇴근길에 **폰으로** 들어온다 → 질문은 짧게, A/B 로, 추천을 첫 번째에. 링크는 바로 눌러 볼 수 있게(Pages).

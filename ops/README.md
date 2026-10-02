@@ -13,7 +13,7 @@ GitHub(`soulfulfillable`)만 살아 있으면 새 Claude 계정에서 그대로 
 | 루틴(주간 점검 등) | Claude 계정 | **사라짐** | `ops/routines/*.md` 에 일정·프롬프트 원문 보관. 새 세션형 루틴은 저장소 쓰기 권한이 안 붙어서, 기획 파트너 세션을 깨우는 방식으로 돌린다 |
 | Claude 클라우드 환경 설정 | Claude 계정 | **사라짐** | 아래 "새 계정에서 복구" 참고 (특별한 설정 없음) |
 | Apple 개발자·App Store Connect | Apple ID | Claude 와 무관 | ✅ 개인 Gmail 로 가입 (사용자 확인 2026-10-02) |
-| AdMob(광고 수익 입금처) | Google 계정 | Claude 와 무관 | ⚠️ 개인 Gmail 둘 중 하나로 추정, 확인 필요 (admob.google.com 오른쪽 위 프로필) |
+| AdMob(광고 수익 입금처) | Google 계정 | Claude 와 무관 | ✅ **`soulfulfillable` Google 계정** (사용자 확인 2026-10-02 — 이 계정 AdMob 에 Currency Exchange 앱이 있다). 게시자 ID `pub-4724352880074547`. **모든 앱을 이 한 계정에** 만든다(수익·지급 기준액·결제 정보를 한곳에) |
 
 ## 새 Claude 계정에서 복구 (5분)
 
