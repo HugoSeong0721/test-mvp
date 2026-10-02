@@ -1,4 +1,4 @@
-# 연비·정비 기록 앱 — App Store 등록 문구 (초안, 이름은 사용자 결정 대기)
+# Glance MPG: Gas Mileage Log — App Store 등록 문구
 
 **대상: 미국 App Store. 기본 언어 English (U.S.).** 앱 UI 도 영어. 부제·설명·키워드·URL·심사 메모는 `ios-metadata.json` 을
 Actions → **App Store 등록 정보 채우기**(app=fuellog) 로 넣는다. 문구를 고치면 이 파일과 json 을 같이 고친다.
@@ -22,7 +22,7 @@ Actions → **App Store 등록 정보 채우기**(app=fuellog) 로 넣는다. �
 - Fuelly 가 1위인 검색어: gas tracker · mpg tracker · fuel tracker · gas mileage · fuel log · fuel economy.
 - 추정 순서: gas mileage (tracker) ≥ mpg tracker > car maintenance tracker > gas/fuel tracker > mpg calculator > fuel log > gas log.
 
-## 이름 후보 (사용자 A/B 대기)
+## 이름 — **A 로 확정** (사용자 2026-10-03 "A. Glance MPG (추천)", 번들 "fuellog 로 등록 (추천)")
 
 | | 이름 (30) | 부제 (30) | 걸리는 검색어 |
 |---|---|---|---|

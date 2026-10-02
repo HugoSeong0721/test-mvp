@@ -4,17 +4,20 @@
 ## 지금 상태 (3줄 이내)
 Flutter 1차 완성(`fuellog_app/flutter/`): 주유 한 화면(둘 넣으면 셋째 자동·이번 탱크 연비 미리보기)·부분/누락 주유 연비·정비 알림(거리/개월, 로컬 알림)·차트·여러 대·단위·로드트립·CSV 내보내기/가져오기.
 **테스트 47개 통과**(엔진 29 + 로봇 18), 웹 점검 7/7·콘솔 에러 0. 웹 미리보기 https://soulfulfillable.github.io/test-mvp/fuel-log-app/index.html (`?demo=1` 예시 기록).
-이름·번들 ID 사용자 확인 대기(임시 `Glance MPG`, `com.soulfulfill.fuellog` — Apple 미등록) → 번들 등록 → ASC·AdMob(사용자) → TestFlight.
+이름 `Glance MPG: Gas Mileage Log`·번들 `com.soulfulfill.fuellog` 확정(10-03) → **Apple 번들 등록 완료**(Actions run 37077691115 로그 "새로 등록함") → [사용자] ASC 신규 앱 → `Release iOS`(fuellog) → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] 이름 A/B/C (추천 A `Glance MPG: Gas Mileage Log`), 번들 `com.soulfulfill.fuellog`(추천) — `fuellog_app/store/ios-listing.md`.
+- ✅ [사용자] 이름 A `Glance MPG: Gas Mileage Log`, 번들 `com.soulfulfill.fuellog`.
+- [사용자] App Store Connect → 앱 → ＋ 신규 앱: iOS / `Glance MPG: Gas Mileage Log` / English (U.S.) / `com.soulfulfill.fuellog` / SKU `fuellog` / Full Access (값 복사: https://soulfulfillable.github.io/test-mvp/todo.html).
+- [사용자, 스토어 제출 전] AdMob(**soulfulfillable 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Glance MPG) → 광고 단위 **Banner** `banner` → 완료 화면 캡처.
 - [사용자] 웹 미리보기 '느낌' 한마디 (주유 두 번 넣어 보면 MPG 가 나온다).
-- [세션, 이름 정해지면] 번들 등록 Actions → `Release iOS`·`App Store 등록 정보 채우기` 선택지에 `fuellog` 추가 → ASC 앱 레코드·AdMob 안내(클릭 단위) → TestFlight.
+- [세션] ASC 레코드 생기면 → `Release iOS`(app=fuellog) → TestFlight → 스크린샷 1290×2796 → `App Store 등록 정보 채우기`.
 - 검수 증거 페이지: https://soulfulfillable.github.io/test-mvp/fuel-log-qa.html
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | (A/B) 이름 → "A. Glance MPG (추천)", 번들 → "fuellog 로 등록 (추천)" | 이름 `Glance MPG: Gas Mileage Log`, 번들 `com.soulfulfill.fuellog` Apple 등록 Actions 실행, `Release iOS`·`App Store 등록 정보 채우기` 선택지에 `fuellog` 추가, `docs/todo.html` 에 복사용 값 추가 |
 | 10-03 | "연비·정비 기록 앱 개발 시작해줘. plans/fuel-log-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/fuel-log.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 기획서 순서 ①조사 ②테스트 로봇 ③Flutter 까지 1차 완료, 이 파일을 단계마다 갱신 |
 
 ## 사용자 성향 — 원하는 것 / 불편해하는 것 (이 앱에서 알게 된 것)

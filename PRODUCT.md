@@ -50,7 +50,7 @@
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
 | **한붓 경로 퍼즐** (`path_puzzle_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
 | **낚시·사냥 시간** (솔루나, `solunar_app/`, `plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 Flutter 1차 완성·테스트 34개(PyEphem 대조 1,800건+)·웹 미리보기 `docs/solunar-app/`(오프라인 계산, 마을 2만 곳) | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
-| **연비·정비 기록** (`fuellog_app/`, `plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 Flutter 1차 완성·테스트 47개 통과·웹 미리보기 `docs/fuel-log-app/`(`?demo=1` 예시). 임시 이름 Glance MPG | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
+| **Glance MPG: Gas Mileage Log** (연비·정비 기록, `fuellog_app/`, `plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 Flutter 1차 완성·테스트 47개 통과·웹 미리보기 `docs/fuel-log-app/`(`?demo=1` 예시). 번들 `com.soulfulfill.fuellog` | ASC 앱 레코드(사용자) → Release iOS → TestFlight → AdMob(제출 전) |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
 
@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 연비 앱 이름 **Glance MPG: Gas Mileage Log**(부제 Fuel Tracker & Car Maintenance), 번들 `com.soulfulfill.fuellog` | 사용자: 둘 다 추천안. mpg·gas mileage·fuel tracker·car maintenance 검색어가 이름+부제에 다 들어가고 Glance 시리즈. "mileage tracker" 는 세금 앱 차지라 피함 |
 | 2026-10-03 | 연비 앱 1차: **전부 무료·배너만**(입력 화면 광고 없음, 전면·보상형 없음), CSV 내보내기·가져오기 무료(다른 앱 CSV 도 읽음), 차량 수 제한 없음, iCloud 동기화 없음("폰 바꾸기 전 CSV" 안내) | 기획서 원칙 + 조사: 경쟁 앱 불만이 구독 전환·CSV/백업 유료·동기화로 기록 날아감. 개발 세션 판단 — 기획 파트너 확인 요청(`board/fuel-log.md`) |
 | 2026-10-03 | 경로 퍼즐 1차 범위(개발 세션 판단): 오늘의 퍼즐 **6×6**, 벽 없음(규칙 2개), 실패·하트 없음(점수 = 시간), 보상형 = 힌트(정답 길을 다음 숫자까지 그어 줌), 되돌리기·지우기 무료 무제한. 상표 Zip·Flow·Numbrix·Hidato 사용 금지 | 원조 게임 기본 크기 6×6(숫자 평균 10), 캣도쿠 7×7 첫 판 "어렵다" 피드백, 경쟁 앱 불만(힌트가 길을 안 보여 줌·되돌리기 없음·코인) 의 반대. 벽은 TestFlight 느낌 보고 |
 | 2026-10-03 | 사용자 몫 최소화: 테스트까지는 **ASC 신규 앱 1회 등록만**, 그 뒤 TestFlight 초대 메일 → 코드 입력. 초대 자동화는 공용 작업 요청(`board/_shared.md`). AdMob 은 스토어 제출 직전 | 사용자 "그냥 이메일로 테스트 코드 받아 넣어서 해보고 싶은데" |

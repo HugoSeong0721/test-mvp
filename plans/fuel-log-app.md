@@ -18,7 +18,7 @@
 - 기기 저장만 하므로 "폰 바꾸면 CSV/iCloud 백업" 안내를 정직하게.
 
 ## 결정 필요 (개발 세션 → 사용자 A/B)
-- 앱 이름(검색어 조사 후 2~3개), 번들 ID.
+- ✅ 앱 이름 **Glance MPG: Gas Mileage Log**, 번들 ID `com.soulfulfill.fuellog` (사용자 2026-10-03, 둘 다 추천안).
 
 ## 진행 순서
 ①Fuelly 등 화면·리뷰 확인 → ②테스트 로봇 → ③Flutter(로컬 DB·차트·알림) → ④광고 → ⑤Release iOS → ⑥TestFlight
@@ -48,4 +48,5 @@
 - 개인정보처리방침 `docs/fuellog-privacy.html`. 아이콘 `fuellog_app/tool_icon.py`(연료 방울 + 게이지).
 - **확인 못 한 것**: 실제 아이폰 알림 표시(로컬 알림 예약은 FakeNotifier 로만 검사), iOS 빌드(Release iOS 아직 안 돌림 — `share_plus`→`path_provider_foundation` FFI 포함),
   Fuelly 가 실제로 내보낸 파일(형식은 오픈소스 가져오기 코드로 추정), Drivvo 형식(구역 나뉜 파일 — 미지원).
-- 다음: 이름·번들 ID(사용자 A/B) → 번들 등록 → `Release iOS` 선택지에 추가 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
+- 이름·번들 확정 → 번들 등록 완료(Actions 로그 "새로 등록함"), `Release iOS`·`App Store 등록 정보 채우기` 선택지에 `fuellog` 추가.
+- 다음: [사용자] ASC 신규 앱 → `Release iOS`(fuellog) → TestFlight → 스크린샷·등록 정보 → AdMob(제출 전).

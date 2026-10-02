@@ -1,5 +1,5 @@
 {
-  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 이름 A 기준 초안 — 사용자 결정 후 확정. 설명은 ios-listing.md 참고. 스크린샷은 찍은 뒤 screenshots/ 에 넣고 목록을 채운다.",
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 이름 Glance MPG: Gas Mileage Log (사용자 확정 10-03). 설명은 ios-listing.md 참고. 스크린샷은 찍은 뒤 screenshots/ 에 넣고 목록을 채운다.",
   "bundleId": "com.soulfulfill.fuellog",
   "locale": "en-US",
   "subtitle": "Fuel Tracker & Car Maintenance",
