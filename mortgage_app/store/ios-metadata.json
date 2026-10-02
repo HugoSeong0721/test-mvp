@@ -1,0 +1,14 @@
+{
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 설명은 ios-listing.md 참고. 스크린샷은 찍은 뒤 screenshots/ 에 넣고 목록을 채운다.",
+  "bundleId": "com.soulfulfill.mortgage",
+  "locale": "en-US",
+  "subtitle": "Home Loan & Payment Calculator",
+  "privacyPolicyUrl": "https://soulfulfillable.github.io/test-mvp/mortgage-privacy.html",
+  "promotionalText": "See your real monthly mortgage payment with taxes, insurance, HOA and PMI — and how many years an extra $100 a month takes off your loan.",
+  "description": "Your monthly mortgage payment, the moment you type.\n\nGlance is a clean, fast mortgage and loan calculator. No calculate button, no pop-up ads — every number updates as you type.\n\n■ THE WHOLE MONTHLY PAYMENT\nPrincipal and interest plus property tax, home insurance, HOA dues and PMI, with a clear breakdown chart. PMI is added automatically when your down payment is under 20% and drops off when your balance reaches 78% of the home price.\n\n■ PAY OFF YOUR LOAN SOONER\nAdd an extra $50, $100, $200 or any amount each month and see exactly how many years sooner you'll be debt-free and how much interest you'll save — with a balance chart, with and without extra payments.\n\n■ FULL AMORTIZATION SCHEDULE\nEvery payment by year or by month: principal, interest and remaining balance, plus a chart of principal vs. interest paid each year.\n\n■ CAR AND PERSONAL LOANS TOO\nSwitch to Auto for vehicle price, down payment, trade-in and sales tax, or Personal for a simple loan amount, APR and term.\n\n■ MADE FOR IPHONE\n• Down payment and property tax in dollars or percent — change one, the other follows\n• Numbers get commas as you type; a Done bar sits above the keypad\n• Your numbers are saved on your iPhone, for each calculator\n• Works offline. No account. Light and dark mode\n\nEstimates only, not financial advice or an offer of credit. Interest rates in the app are examples — enter the rate from your lender.",
+  "keywords": "amortization,pmi,car,auto,interest,rate,extra,payoff,house,principal,escrow,tax,hoa,piti,schedule",
+  "supportUrl": "https://github.com/soulfulfillable/test-mvp/issues",
+  "reviewNotes": "Mortgage / auto / personal loan payment calculator. No account or login. All calculations run on the device; the app makes no network requests except Google AdMob banner ads.\nThe app does not offer loans, collect financial information or show live interest rates — default rates are labeled as examples the user edits.",
+  "screenshots": [],
+  "screenshotDisplayType": "APP_IPHONE_67"
+}

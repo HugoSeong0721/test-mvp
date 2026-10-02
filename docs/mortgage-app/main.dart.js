@@ -82747,9 +82747,9 @@ return q}catch(r){return p}},
 $S:517}
 A.jl.prototype={}
 A.JP.prototype={
-J(a){return new A.yq(B.Bw,"Glance Mortgage",A.azF(B.af),A.azF(B.ae),!1,null)}}
+J(a){return new A.yq(B.Bw,"Glance: Mortgage Calculator",A.azF(B.af),A.azF(B.ae),!1,null)}}
 A.apF.prototype={
-$1(a){var s=null,r=t.h.a(A.Z(a).c.h(0,A.b3(t.Y))),q=A.b4(s,s,r.f,s,s,s,s,s,s,s,s,14,s,s,s,s,1.45,!0,s,s,s,s,s,s,s,s),p=new A.apG(r),o=A.bm(a,B.dP,t.w).w,n=t.p,m=A.cz(A.c([A.d0(A.b_("Glance Mortgage",s,s,s,s,A.b4(s,s,r.e,s,s,s,s,s,s,s,s,20,s,s,B.h5,s,s,!0,s,s,s,s,s,s,s,s),s,s),1),A.pt(B.Tn,B.Vj,new A.apE(a),s)],n),B.z,B.x),l=r.r
+$1(a){var s=null,r=t.h.a(A.Z(a).c.h(0,A.b3(t.Y))),q=A.b4(s,s,r.f,s,s,s,s,s,s,s,s,14,s,s,s,s,1.45,!0,s,s,s,s,s,s,s,s),p=new A.apG(r),o=A.bm(a,B.dP,t.w).w,n=t.p,m=A.cz(A.c([A.d0(A.b_("Glance: Mortgage Calculator",s,s,s,s,A.b4(s,s,r.e,s,s,s,s,s,s,s,s,20,s,s,B.h5,s,s,!0,s,s,s,s,s,s,s,s),s,s),1),A.pt(B.Tn,B.Vj,new A.apE(a),s)],n),B.z,B.x),l=r.r
 return A.tf(!0,new A.eQ(new A.aa(0,1/0,0,o.a.b*0.85),A.aIk(A.cZ(A.c([m,A.b_("Version 1.0",s,s,s,s,A.b4(s,s,l,s,s,s,s,s,s,s,s,13,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s),p.$1("How it\u2019s calculated"),A.b_("\u2022 Monthly principal & interest uses the standard fixed-rate amortization formula, rounded to the cent like a lender\u2019s schedule.\n\u2022 Property tax and home insurance are yearly amounts divided by 12.\n\u2022 PMI applies when the down payment is under 20% and stops once the balance reaches 78% of the home price (or halfway through the term).\n\u2022 Extra payments go straight to principal, so the payment stays the same and the loan ends sooner.\n\u2022 Car loans add sales tax on the price minus your trade-in.",s,s,s,s,q,s,s),p.$1("Estimates only"),A.b_("Results are estimates for planning and are not financial advice or an offer of credit. Interest rates in the app are examples, not today\u2019s rates \u2014 use the rate from your lender. Your lender\u2019s numbers may differ because of fees, escrow and rounding.",s,s,s,s,q,s,s),p.$1("Privacy"),A.b_("Your numbers stay on this iPhone. Nothing is sent to us. The app shows Google AdMob banner ads.\nhttps://soulfulfillable.github.io/test-mvp/mortgage-privacy.html",s,s,s,s,q,s,s),B.O7,A.b_("\xa9 2026 Soulfulfill",s,s,s,s,A.b4(s,s,l,s,s,s,s,s,s,s,s,12,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s)],n),B.aX,B.Q,B.x),B.Eb),s),!0)},
 $S:149}
 A.apG.prototype={
