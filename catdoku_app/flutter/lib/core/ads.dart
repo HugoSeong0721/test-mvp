@@ -27,10 +27,10 @@ class AdIds {
       ? 'ca-app-pub-4724352880074547/8563658282'
       : 'ca-app-pub-3940256099942544/6300978111';
   static String rewarded(RewardPlacement p) => switch (p) {
-    // 테스트 ID 는 자리 구분이 없어 같은 값. 실제 ID 는 자리마다 다르게.
+    // 자리마다 다른 광고 단위 — AdMob 보고서에서 힌트·이어하기 수익을 나눠 본다.
     RewardPlacement.hint =>
       _ios
-          ? 'ca-app-pub-3940256099942544/1712485313'
+          ? 'ca-app-pub-4724352880074547/7250576612'
           : 'ca-app-pub-3940256099942544/5224354917',
     RewardPlacement.continueGame =>
       _ios
