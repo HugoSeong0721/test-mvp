@@ -126,7 +126,24 @@ AdMob 콘솔의 "Payment setup incomplete" 는 수익이 생기기 전까지는 
 - 서명 없이 릴리스 빌드가 통과하는지 확인한다. Actions 에 올라오는 `somrate-ios-unsigned` 는
   검증용일 뿐 폰에 설치할 수 없다.
 
-### 맥에서 App Store 에 올리기 (Apple Developer 가입 후)
+### 맥 없이 올리기 — `release-ios.yml` (추천)
+
+한 번만 준비:
+1. **번들 ID 등록** — developer.apple.com/account → Certificates, IDs & Profiles → Identifiers → **+**
+   → App IDs → App → Description `Som Rate`, Bundle ID **Explicit** `com.iottie.somrate` → Continue → Register.
+2. **앱 레코드 만들기** — appstoreconnect.apple.com → Apps → **+ → New App**
+   → iOS, 이름 `솜 환율`, 기본 언어 Korean, 번들 ID `com.iottie.somrate`, SKU `somrate`, Full Access.
+3. **API 키** — App Store Connect → Users and Access → **Integrations** → App Store Connect API
+   → (처음이면 Request Access) → Team Keys **+** → 이름 `github-ci`, Access **Admin** → Generate
+   → **Download API Key**(.p8, 한 번만 받을 수 있음). 같은 화면의 **Key ID**, 위쪽 **Issuer ID** 를 적어 둔다.
+4. **Team ID** — developer.apple.com/account → Membership details → Team ID.
+5. GitHub 저장소 → Settings → Secrets and variables → Actions → New repository secret 4개:
+   `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`(.p8 파일을 메모장으로 열어 전체 복사).
+
+올릴 때: Actions → **Release iOS** → Run workflow. 10~20분 뒤 App Store Connect → TestFlight 에
+빌드가 뜨면(처리 10~30분) 버전 화면에서 그 빌드를 고르고 Submit for Review.
+
+### 맥에서 App Store 에 올리기 (맥을 쓸 수 있을 때)
 
 준비: Apple Developer Program 가입($99/년, 본인 Apple ID) · 맥에 Xcode(App Store) · Flutter.
 (플러그인은 Swift Package Manager 로 붙어 CocoaPods 는 필요 없다. `ios/` 는 CI 가 이미 만들어 두었다.)
