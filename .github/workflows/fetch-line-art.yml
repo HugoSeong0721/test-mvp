@@ -1,0 +1,58 @@
+name: Fetch coloring line art
+
+# The dev sandbox cannot reach openclipart.org, so CC0 line-art candidates for
+# the coloring app are downloaded here and committed to the `coloring-line-art`
+# branch (not main, so Pages is not redeployed for raw data).
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: "Comma-separated Openclipart tags"
+        default: "coloring book,coloring page,colouring,line art"
+      max_items:
+        description: "Max items to download"
+        default: "400"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-line-art
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Switch to data branch
+        run: |
+          if git ls-remote --exit-code --heads origin coloring-line-art >/dev/null; then
+            git fetch origin coloring-line-art
+            git checkout -B coloring-line-art origin/coloring-line-art
+            git checkout origin/main -- tools/coloring
+          else
+            git checkout -B coloring-line-art
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download from Openclipart
+        env:
+          TAGS: ${{ inputs.tags }}
+          MAX_ITEMS: ${{ inputs.max_items }}
+        run: python3 tools/coloring/fetch_openclipart.py
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add coloring_app/line_art tools/coloring
+          git commit -m "line art: fetch Openclipart candidates" || echo "nothing new"
+          git push origin coloring-line-art
