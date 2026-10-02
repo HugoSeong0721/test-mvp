@@ -19,7 +19,7 @@ MAX_PAGES = int(os.environ.get("MAX_PAGES", "15"))
 UA = {"User-Agent": "soulfulfill-coloring-fetcher/1.0 (+https://github.com/soulfulfillable/test-mvp)"}
 
 
-DEADLINE = time.time() + int(os.environ.get("TIME_BUDGET", "600"))
+DEADLINE = time.time() + int(os.environ.get("TIME_BUDGET", "2100"))
 
 
 def get(url, binary=False):
@@ -28,7 +28,7 @@ def get(url, binary=False):
         return None
     for attempt in range(2):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
                 print(f"  {r.status} {url}", flush=True)
                 data = r.read()
                 return data if binary else data.decode("utf-8", "replace")

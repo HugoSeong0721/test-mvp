@@ -24,7 +24,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,7 +51,7 @@ jobs:
         env:
           TAGS: ${{ inputs.tags }}
           MAX_ITEMS: ${{ inputs.max_items }}
-        run: timeout 900 python3 -u tools/coloring/fetch_openclipart.py || echo "fetch exited with $?"
+        run: timeout 2200 python3 -u tools/coloring/fetch_openclipart.py || echo "fetch exited with $?"
 
       - name: Commit
         if: always()
