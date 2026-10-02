@@ -30,6 +30,8 @@
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
 
 ### 2026-10-03 개발 세션 1 (①~③ + 웹 미리보기)
+- **이름 `Glance Speed: GPS Speedometer`(홈 화면 `Glance Speed`)·번들 `com.soulfulfill.speedometer` 확정 (사용자, 둘 다 추천안)** → 번들 등록 Actions(로그: "새로 등록함", ASC 앱 레코드는 아직 없음), `Release iOS`·`App Store 등록 정보 채우기` 선택지에 speedometer 추가. 앱 아이콘(직접 그린 게이지 SVG).
+- CI 의 Flutter 3.47.2(Dart 3.13.2)에 맞춰 `pubspec.yaml` sdk 를 `^3.13.2` 로 (3.47.6 으로 만들면 `^3.13.5` 가 들어가 CI 에서 pub get 실패할 수 있음).
 - ① 경쟁 앱 조사 → `speedometer_app/store/ios-listing.md` (불만: 구독 함정·운전 중 전면 광고·정지 시 튀는 숫자·틀린 제한속도). 이름 후보 A/B/C.
 - ③ `speedometer_app/flutter/`: 측정 엔진 `lib/core/engine.dart`(순수 Dart) — 약 1 mph 미만은 0, 최고 속도는 **연속 두 측정의 작은 값**(한 번 튄 값 제외),
   200 mph 넘는 값 버림, 10초 넘은 캐시 위치 버림, 5초 측정 없으면 '--'·"No GPS signal", 오차 25 m 넘으면 "Weak GPS"(숫자 흐리게),

@@ -48,7 +48,7 @@ class _SpeedAppState extends State<SpeedApp> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    title: 'Speedometer',
+    title: 'Glance Speed',
     debugShowCheckedModeBanner: false,
     theme: buildTheme(),
     home: ListenableBuilder(

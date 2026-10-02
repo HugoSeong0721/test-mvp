@@ -69198,7 +69198,7 @@ s.l()
 this.aM()},
 J(a){var s=A.aBH(),r=this.d
 r===$&&A.a()
-return new A.vd(new A.dK(new A.acw(this),null,r,null),"Speedometer",s,!1,null)}}
+return new A.vd(new A.dK(new A.acw(this),null,r,null),"Glance Speed",s,!1,null)}}
 A.acw.prototype={
 $2(a,b){var s=this.a
 if(s.a.d.gEK()){s=s.d
@@ -69677,7 +69677,7 @@ A.afl.prototype={
 $2(a,b){var s,r=null,q=this.a,p=q.b,o=A.kJ(p.hb(p.gbz())),n=new A.afm(q),m=q.e,l=m.a,k=A.ahB(B.Y,B.Ri,q.gRs(),B.Q5,B.Qp,l)
 l=l?1:0.45
 s=t.p
-return new A.nj("Speed Alert","alert-done",A.c([B.jS,k,B.cf,A.vI(A.eH(A.c([n.$3("alert-minus5","\u22125",-5),n.$3("alert-minus","\u22121",-1),A.f0(A.c([A.cL(""+m.b,B.Rh,r,r,r,B.O5,r),A.cL(o,r,r,r,r,B.Pq,r)],s),B.U,B.Q,B.a1),n.$3("alert-plus","+1",1),n.$3("alert-plus5","+5",5)],s),B.U,B.fs,B.a1),l),B.cf,A.ahB(B.Y,B.RA,q.gRN(),B.Qi,B.Qs,p.gxe()),B.jS,B.Q9],s),r)},
+return new A.nj("Speed Alert","alert-done",A.c([B.jS,k,B.cf,A.vI(A.eH(A.c([n.$3("alert-minus5","\u22125",-5),n.$3("alert-minus","\u22121",-1),A.f0(A.c([A.cL(""+m.b,B.Rh,r,r,r,B.O5,r),A.cL(o,r,r,r,r,B.Pq,r)],s),B.U,B.Q,B.a1),n.$3("alert-plus","+1",1),n.$3("alert-plus5","+5",5)],s),B.U,B.fs,B.a1),l),B.cf,A.ahB(B.Y,B.RA,q.gRN(),B.Qj,B.Qs,p.gxe()),B.jS,B.Q9],s),r)},
 $S:173}
 A.afm.prototype={
 $3(a,b,c){var s=null,r=A.awi(s,s,s,s,s,s,s,s,s,s,s,s,B.Y,s,new A.cB(A.eW(14),B.t),B.yF,s,s,s,s)
@@ -69705,7 +69705,7 @@ k.push(B.xa)
 k.push(new A.O5(p,q))
 k.push(B.cf)
 $.aj5()
-k.push(new A.bL(q,60,A.ta(A.fu(B.a7,B.Qc,B.y,q,new A.cl(B.At,q,A.ag3(B.AF,1),q,q,q,B.ae),q,50,q,q,q,q,q,320),q,q),B.Rq))
+k.push(new A.bL(q,60,A.ta(A.fu(B.a7,B.Qd,B.y,q,new A.cl(B.At,q,A.ag3(B.AF,1),q,q,q,B.ae),q,50,q,q,q,q,q,320),q,q),B.Rq))
 return A.ajX(A.aho(B.E,A.n4(!0,A.f0(k,B.U,B.Q,B.a1),B.Y,!0)),m,q,B.f2)},
 $S:467}
 A.NL.prototype={
@@ -69747,7 +69747,7 @@ if(n.a.gOC())B.b.K(l,A.c([B.jQ,A.fu(o,B.Q7,B.y,o,new A.cl(B.cz,o,o,A.eW(4),o,o,B
 return new A.bL(o,30,A.eH(l,B.U,B.c9,B.a1),o)}}
 A.LR.prototype={
 J(a){var s=null,r=B.cz.ol(0.15),q=A.eW(12)
-return A.fu(s,A.eH(A.c([B.CI,B.jQ,B.C7,A.ahE(B.Qe,B.Rl,this.c.gac0(),s)],t.p),B.U,B.Q,B.a1),B.y,s,new A.cl(r,s,s,q,s,s,B.ae),s,s,s,B.BS,B.BN,s,s,s)}}
+return A.fu(s,A.eH(A.c([B.CI,B.jQ,B.C7,A.ahE(B.Qf,B.Rl,this.c.gac0(),s)],t.p),B.U,B.Q,B.a1),B.y,s,new A.cl(r,s,s,q,s,s,B.ae),s,s,s,B.BS,B.BN,s,s,s)}}
 A.I3.prototype={
 J(a){var s,r,q,p,o,n,m,l,k=this,j=null,i=k.c
 i.a.gM9()
@@ -69921,7 +69921,7 @@ return new A.dK(new A.afB(s),null,s,null)},
 $S:172}
 A.afB.prototype={
 $2(a,b){var s=null,r=new A.afC(),q=this.a,p=q.b,o=A.cL("UNITS \xb7 "+A.ah6(p.gbz()).toUpperCase(),s,s,s,s,B.xA,s),n=p.gbz()===B.cL?B.fg:B.fh
-return new A.nj("Settings","settings-done",A.c([B.jR,o,B.cf,r.$1$6("unit",n,p.hb(p.gbz()),new A.afu(),new A.afv(),q.gRS(),t.nk),B.jR,B.Qn,B.cf,r.$1$6("display",B.mo,p.gBv(),new A.afw(),new A.afx(),q.gRB(),t.gT),B.cf,A.ahB(B.Y,B.Rg,q.gRD(),B.Ql,B.Qa,p.gnA()),A.agY(!1,B.Y,s,s,!0,s,s,s,!0,s,B.RD,B.CH,s,s,s,s,new A.afy(a),!1,s,s,s,s,s,s,B.Q6,B.CN,s),A.agY(!1,B.Y,s,s,!0,s,s,s,!0,s,B.Rz,B.CM,s,s,s,s,new A.afz(),!1,s,s,s,s,s,s,B.Qd,B.CL,s),B.jS,B.Qj],t.p),s)},
+return new A.nj("Settings","settings-done",A.c([B.jR,o,B.cf,r.$1$6("unit",n,p.hb(p.gbz()),new A.afu(),new A.afv(),q.gRS(),t.nk),B.jR,B.Qn,B.cf,r.$1$6("display",B.mo,p.gBv(),new A.afw(),new A.afx(),q.gRB(),t.gT),B.cf,A.ahB(B.Y,B.Rg,q.gRD(),B.Ql,B.Qa,p.gnA()),A.agY(!1,B.Y,s,s,!0,s,s,s,!0,s,B.RD,B.CH,s,s,s,s,new A.afy(a),!1,s,s,s,s,s,s,B.Q6,B.CN,s),A.agY(!1,B.Y,s,s,!0,s,s,s,!0,s,B.Rz,B.CM,s,s,s,s,new A.afz(),!1,s,s,s,s,s,s,B.Qe,B.CL,s),B.jS,B.Qb],t.p),s)},
 $S:173}
 A.afC.prototype={
 $1$6(a,b,c,d,a0,a1,a2){var s,r,q,p,o,n,m,l,k,j,i,h,g=null,f=A.eW(12),e=A.c([],t.p)
@@ -70060,16 +70060,16 @@ J(a){return A.aho(null,A.n4(!0,A.Wy(new A.a6b(this)),B.Y,!0))}}
 A.a6b.prototype={
 $2(a,b){var s,r,q=null,p=t.p,o=A.c([B.KX,B.CQ,B.xb,B.Q8,B.KZ],p)
 for(s=0;s<3;++s){r=B.mu[s]
-B.b.K(o,A.c([A.eH(A.c([A.VH(r.a,B.aB,q,26),B.KT,new A.iz(1,B.bZ,A.cL(r.b,q,q,q,q,B.Om,q),q)],p),B.aQ,B.Q,B.a1),B.xb],p))}o.push(B.Qf)
+B.b.K(o,A.c([A.eH(A.c([A.VH(r.a,B.aB,q,26),B.KT,new A.iz(1,B.bZ,A.cL(r.b,q,q,q,q,B.Om,q),q)],p),B.aQ,B.Q,B.a1),B.xb],p))}o.push(B.Qg)
 o.push(B.L_)
-o.push(A.Ua(B.Qg,B.Ro,this.a.c,A.akY(q,q,B.KR,q)))
+o.push(A.Ua(B.Qh,B.Ro,this.a.c,A.akY(q,q,B.KR,q)))
 return A.ahu(new A.ft(new A.aa(0,1/0,b.d-44,1/0),A.f0(o,B.aQ,B.Q,B.a1),q),B.BX)},
 $S:479}
 A.aft.prototype={
 $1(a){var s,r,q=null,p=t.p,o=A.c([],p)
 for(s=0;s<3;++s){r=B.mu[s]
 o.push(new A.cJ(B.BK,A.eH(A.c([A.VH(r.a,B.aB,q,22),B.fY,new A.iz(1,B.bZ,A.cL(r.b,q,q,q,q,B.MB,q),q)],p),B.aQ,B.Q,B.a1),q))}o=A.f0(o,B.U,B.Q,B.br)
-return A.ajW(A.c([A.Ua(B.Qb,B.Rn,new A.afs(a),q)],p),o,B.Qk)},
+return A.ajW(A.c([A.Ua(B.Qc,B.Rn,new A.afs(a),q)],p),o,B.Qk)},
 $S:174}
 A.afs.prototype={
 $0(){A.fc(this.a,!1).lU(null)
@@ -73523,8 +73523,8 @@ B.iG=new A.bm(9,"platformView")
 B.C6=new A.Dz("xyz.luan/audioplayers.global/events")
 B.bZ=new A.DI(0,"tight")
 B.Ov=new A.i(!0,B.cz,null,null,null,null,13,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Qh=new A.bY("Precise Location is off \u2014 speed can\u2019t be measured.",null,B.Ov,null,null,null,null,null)
-B.C7=new A.iz(1,B.bZ,B.Qh,null)
+B.Qi=new A.bY("Precise Location is off \u2014 speed can\u2019t be measured.",null,B.Ov,null,null,null,null,null)
+B.C7=new A.iz(1,B.bZ,B.Qi,null)
 B.C8=new A.uc(null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.C9=new A.ug(null)
 B.bY=new A.m_(0,"none")
@@ -75395,18 +75395,18 @@ B.Q8=new A.bY("Before you drive",null,B.Nx,null,null,null,null,null)
 B.N6=new A.i(!0,B.bd,null,null,null,null,13,null,null,null,null,null,1.35,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Q9=new A.bY("This is your own limit \u2014 the app does not know road speed limits. Always follow posted limits.",null,B.N6,null,null,null,null,null)
 B.Qa=new A.bY("Mirror in HUD mode",null,B.jZ,null,null,null,null,null)
-B.Qb=new A.bY("OK",null,null,null,null,null,null,null)
+B.OO=new A.i(!0,B.bd,null,null,null,null,12,null,null,null,null,null,1.35,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Qb=new A.bY("Glance Speed 1.0 \xb7 No account, no subscription. Your location never leaves this device.",null,B.OO,null,null,null,null,null)
+B.Qc=new A.bY("OK",null,null,null,null,null,null,null)
 B.AQ=new A.w(1,0.3686274509803922,0.40784313725490196,0.47058823529411764,B.f)
 B.Pu=new A.i(!0,B.AQ,null,null,null,null,12,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Qc=new A.bY("Banner ad space (320\xd750)",null,B.Pu,null,null,null,null,null)
-B.Qd=new A.bY("Privacy Policy",null,B.jZ,null,null,null,null,null)
-B.Qe=new A.bY("Fix",null,null,null,null,null,null,null)
+B.Qd=new A.bY("Banner ad space (320\xd750)",null,B.Pu,null,null,null,null,null)
+B.Qe=new A.bY("Privacy Policy",null,B.jZ,null,null,null,null,null)
+B.Qf=new A.bY("Fix",null,null,null,null,null,null,null)
 B.Md=new A.i(!0,B.a4,null,null,null,null,14,null,null,null,null,null,1.35,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Qf=new A.bY("Road speed limits are not shown. Set your own speed alert, and always follow posted limits.",null,B.Md,null,null,null,null,null)
-B.Qg=new A.bY("I Understand \u2014 Allow Location",null,B.k_,null,null,null,null,null)
-B.Qi=new A.bY("Beep + vibration. Off = vibration only.",null,B.k0,null,null,null,null,null)
-B.OO=new A.i(!0,B.bd,null,null,null,null,12,null,null,null,null,null,1.35,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Qj=new A.bY("Version 1.0 \xb7 No account, no subscription. Your location never leaves this device.",null,B.OO,null,null,null,null,null)
+B.Qg=new A.bY("Road speed limits are not shown. Set your own speed alert, and always follow posted limits.",null,B.Md,null,null,null,null,null)
+B.Qh=new A.bY("I Understand \u2014 Allow Location",null,B.k_,null,null,null,null,null)
+B.Qj=new A.bY("Beep + vibration. Off = vibration only.",null,B.k0,null,null,null,null,null)
 B.Qk=new A.bY("Driving safety",null,null,null,null,null,null,null)
 B.Ql=new A.bY("Flip the numbers so they read right on the windshield.",null,B.k0,null,null,null,null,null)
 B.Qm=new A.bY("Done",null,B.k_,null,null,null,null,null)
