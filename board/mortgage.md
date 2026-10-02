@@ -1,26 +1,27 @@
-# 대출 계산기 (mortgage 앱, 가칭 Glance: Mortgage Calculator) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 06:10 (KST)
+# Glance: Mortgage Calculator (대출 계산기, mortgage 앱) — 개발 세션 게시판
+마지막 갱신: 2026-10-03 06:20 (KST)
 
 ## 지금 상태 (3줄 이내)
 Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 세금·보험·HOA·PMI, 추가 상환 시뮬, 상환표(연/월), 차트. 테스트 20개 통과(엔진 10 + 로봇 10).
 웹 미리보기 https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html — 광고는 배너만(Google 테스트 ID).
-이름·번들 ID 사용자 확인 대기 → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
+이름 확정·번들 `com.soulfulfill.mortgage` Apple 등록 완료(Actions 로그 "새로 등록함"). ASC 앱 레코드·AdMob(사용자) 대기 → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] 이름 A/B: **A `Glance: Mortgage Calculator` (추천 — 미국 검색 1위 "mortgage calculator" 그대로 + Glance 시리즈)** / B `Glance Loan Calculator`. 번들 `com.soulfulfill.mortgage`.
+- ✅ [사용자] 이름 A `Glance: Mortgage Calculator`, 번들 `com.soulfulfill.mortgage` → ✅ [세션] 번들 Apple 등록.
+- [사용자] App Store Connect → 앱 → ＋ 신규 앱: iOS / `Glance: Mortgage Calculator` / English (U.S.) / `com.soulfulfill.mortgage` / SKU `mortgage` / Full Access.
+- [사용자] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Glance Mortgage) → 광고 단위 1개: 형식 **Banner**, 이름 `banner`. 완료 화면 캡처 주면 ID 반영.
 - [사용자] 웹 미리보기 써 보고 '느낌' 한마디.
-- [사용자, 이름 정해지면] App Store Connect → 앱 → ＋ 신규 앱: iOS / 이름 / English (U.S.) / 번들 / SKU `mortgage`.
-- [사용자, 이름 정해지면] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록) → 광고 단위 1개: 배너 `banner`.
-- [세션] 번들 등록 Actions → 실제 광고 ID 교체 → `Release iOS`(app=mortgage) → TestFlight → 스크린샷 1290×2796·`ios-metadata.json`.
+- [세션] ASC 레코드 생기면 → `Release iOS`(app=mortgage) → TestFlight → 스크린샷 1290×2796 → `App Store 등록 정보 채우기`(`mortgage_app/store/ios-metadata.json` 준비됨).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | 이름 A/B → "Glance: Mortgage Calculator (추천)", 번들 → "등록 (추천)" | 앱 안 이름·개인정보처리방침·웹 제목·스토어 문구 반영, `ios-metadata.json` 작성, Actions 로 번들 등록 완료 |
 | 10-03 | "대출·주택담보대출 계산기 앱 개발 시작해줘. plans/mortgage-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/mortgage.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 기획서 순서대로 ①조사 ②테스트 로봇 ③개발 ④광고(배너) ⑤워크플로까지. 이 파일을 단계마다 갱신 |
 
 ## 사용자 성향 — 원하는 것 / 불편해하는 것 (이 앱에서 알게 된 것)
 - (Catdoku 게시판에서 배움) 폰으로 바로 해 보는 링크를 먼저 원함 → 웹 미리보기부터 준다. 결정은 추천안을 고른다 → 2지선다 + 추천 이유 한 줄.
-- (이 앱에서는 아직 피드백 전)
+- 이 앱에서도 2지선다 + 추천을 바로 골랐다 (이름·번들 둘 다 추천안).
 
 ## 다른 세션에 알리는 노하우 (다른 앱에서도 써먹을 것)
 - **잘린 글자·칸을 로봇이 자동으로 잡게** (`mortgage_app/flutter/test/robot_test.dart` 의 `expectNoTruncatedText`·`expectNoClippedFields`):

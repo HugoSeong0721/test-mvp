@@ -19,9 +19,9 @@
 - 광고: 배너만. 계산하는 동안 전면 광고 금지. 보상형은 "상환표 PDF/이미지 내보내기" 같은 부가 기능에만 검토.
 - 미국 단위·표기($, 월 납입 관례), 영어 UI, 아이폰 전용·세로.
 
-## 결정 필요 (개발 세션이 사용자에게 A/B 로)
-- 앱 이름: 미국 검색어 조사 후 후보 2~3개 (Glance 시리즈로 묶을지 포함).
-- 번들 ID `com.soulfulfill.<이름>` — Apple 등록 전 확인.
+## 결정 (2026-10-03 사용자 확인)
+- 앱 이름: **Glance: Mortgage Calculator** (부제 Home Loan & Payment Calculator) — Glance 시리즈.
+- 번들 ID `com.soulfulfill.mortgage` — Apple 등록 완료.
 
 ## 진행 순서
 ①경쟁 앱 화면·리뷰 불만 확인 → ②테스트 로봇 → ③Flutter 개발 → ④광고 → ⑤`Release iOS`(앱 선택형)에 추가 → ⑥TestFlight → ⑦스토어
@@ -45,4 +45,5 @@
 - iOS: 아이폰 전용·세로, Info.plist 에 AdMob(테스트)·암호화 없음·SKAdNetwork, 아이콘(`../tool_icon.py` 로 직접 그림).
 - Actions: `Release iOS`·`App Store 등록 정보 채우기` 선택지에 mortgage 추가, 번들 ID 를 `com.soulfulfill.<앱>` 규칙으로 일반화.
 - 개인정보처리방침 `docs/mortgage-privacy.html`.
-- 남은 것: 이름·번들 ID 사용자 확인 → 번들 등록 → ASC 앱 레코드·AdMob 앱(사용자) → 실제 광고 ID → Release iOS → TestFlight → 스크린샷·등록 정보.
+- 이름 **Glance: Mortgage Calculator** · 번들 `com.soulfulfill.mortgage` (사용자 확인, Apple 등록 완료). `mortgage_app/store/ios-metadata.json` 작성.
+- 남은 것: ASC 앱 레코드·AdMob 앱(사용자) → 실제 광고 ID → Release iOS → TestFlight → 스크린샷·등록 정보.

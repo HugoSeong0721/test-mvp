@@ -1,7 +1,7 @@
-# 대출 계산기 — App Store 등록 문구 (초안, 이름 확정 전)
+# Glance: Mortgage Calculator — App Store 등록 문구
 
-**대상: 미국 App Store. 기본 언어 English (U.S.).** 앱 UI 도 영어. 이름이 정해지면 `ios-metadata.json` 을 만들어
-Actions → **App Store 등록 정보 채우기**(app=mortgage) 로 넣는다.
+**대상: 미국 App Store. 기본 언어 English (U.S.).** 앱 UI 도 영어. 부제·설명·키워드·URL·심사 메모는 `ios-metadata.json` 을
+Actions → **App Store 등록 정보 채우기**(app=mortgage) 로 넣는다. 문구를 고치면 이 파일과 json 을 같이 고친다.
 
 ## 시장 조사 요약 (2026-10-03, 검색 스니펫 기반 — App Store 페이지는 이 환경에서 직접 못 열었다)
 
@@ -24,7 +24,7 @@ Actions → **App Store 등록 정보 채우기**(app=mortgage) 로 넣는다.
 검색어 점수(asotools, 국가 미확인): mortgage calculator 59 · car loan calculator 53(경쟁 1) · loan calculator 49 ·
 home loans calculator 48 · mortgage payment calculator 43(경쟁 2).
 
-### 이름 후보 (사용자 결정 대기)
+### 이름 — **A 로 확정** (사용자 2026-10-03 "Glance: Mortgage Calculator (추천)")
 
 | | 이름 (30) | 부제 (30) | 걸리는 검색어 |
 |---|---|---|---|
@@ -45,7 +45,9 @@ amortization,pmi,car,auto,interest,rate,extra,payoff,house,principal,escrow,tax,
 
 | 항목 | 값 |
 |---|---|
-| Bundle ID | `com.soulfulfill.mortgage` (가안 — 사용자 확인 후 등록) |
+| Name (30) | `Glance: Mortgage Calculator` |
+| Subtitle (30) | `Home Loan & Payment Calculator` |
+| Bundle ID | `com.soulfulfill.mortgage` (사용자 확인 2026-10-03) |
 | SKU | `mortgage` |
 | Primary Language | English (U.S.) |
 | Primary Category | Finance |
@@ -55,7 +57,7 @@ amortization,pmi,car,auto,interest,rate,extra,payoff,house,principal,escrow,tax,
 | Privacy Policy | https://soulfulfillable.github.io/test-mvp/mortgage-privacy.html |
 | Copyright | 2026 Soulfulfill |
 
-## Version 1.0 — English (U.S.) (A 기준 초안)
+## Version 1.0 — English (U.S.)
 
 ### Promotional Text (170)
 
@@ -105,5 +107,5 @@ The app does not offer loans, collect financial information or show live interes
 
 ## 할 일
 
-- [ ] 이름 확정 → `ios-metadata.json` 작성 (subtitle·keywords·description·reviewNotes·screenshots)
+- [x] 이름 확정 → `ios-metadata.json` 작성 (스크린샷 목록은 찍은 뒤 채운다)
 - [ ] 스크린샷 6.7형 1290×2796: ① 월 납입액+내역 ② 추가 상환 "Debt-free … sooner" ③ 상환표 ④ 자동차 대출 — 테스트 로봇(iPhone 15 Pro Max 3배)으로 뽑는다
