@@ -98,7 +98,8 @@ class _HudScreenState extends State<HudScreen> {
                                 key: const Key('hud-speed'),
                                 style: style.copyWith(
                                   fontSize: size,
-                                  color: color,
+                                  color: r.ink(color),
+                                  letterSpacing: r.spacing(size),
                                 ),
                               ),
                             ),

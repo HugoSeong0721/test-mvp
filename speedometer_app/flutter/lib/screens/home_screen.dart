@@ -412,6 +412,7 @@ class _TripCard extends StatelessWidget {
         children: [
           Expanded(
             child: StatTile(
+              onRed: c.alert.over,
               label: pace ? 'BEST' : 'MAX',
               value: best == null ? (pace ? '--:--' : '0') : sp(best),
               unit: pace ? '' : u.label.toLowerCase(),
@@ -419,6 +420,7 @@ class _TripCard extends StatelessWidget {
           ),
           Expanded(
             child: StatTile(
+              onRed: c.alert.over,
               label: pace ? 'AVG PACE' : 'AVG',
               value: sp(t.avgMs),
               unit: pace ? '' : u.label.toLowerCase(),
@@ -426,13 +428,18 @@ class _TripCard extends StatelessWidget {
           ),
           Expanded(
             child: StatTile(
+              onRed: c.alert.over,
               label: 'DIST',
               value: formatDistance(t.distance, u),
               unit: u.distLabel,
             ),
           ),
           Expanded(
-            child: StatTile(label: 'TIME', value: formatDuration(t.elapsed)),
+            child: StatTile(
+              onRed: c.alert.over,
+              label: 'TIME',
+              value: formatDuration(t.elapsed),
+            ),
           ),
           IconButton(
             key: const Key('reset'),

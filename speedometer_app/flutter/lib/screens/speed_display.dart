@@ -34,6 +34,11 @@ class Reading {
 
   /// 신호가 약하면 숫자를 흐리게 (숫자는 진짜지만 믿을 만하지 않다는 표시).
   double get opacity => state == GpsState.weak ? 0.55 : 1;
+
+  /// 속도를 모를 때('--') — 큰 글씨에서 두 줄이 붙어 막대처럼 보이지 않게 회색으로 띄워 쓴다.
+  bool get unknown => ms == null;
+  Color ink(Color normal) => unknown ? C.muted : normal;
+  double spacing(double size) => unknown ? size * 0.12 : -2;
 }
 
 /// 디지털 — 아주 큰 숫자 + 단위 (탭하면 단위 전환).
@@ -70,7 +75,11 @@ class DigitalSpeed extends StatelessWidget {
                   child: Text(
                     r.big,
                     key: const Key('speed'),
-                    style: style.copyWith(fontSize: size, color: C.ink),
+                    style: style.copyWith(
+                      fontSize: size,
+                      color: r.ink(C.ink),
+                      letterSpacing: r.spacing(size),
+                    ),
                   ),
                 ),
               ),
@@ -184,7 +193,8 @@ class GaugeSpeed extends StatelessWidget {
                             r.big,
                             key: const Key('speed'),
                             style: TextStyle(
-                              color: C.ink,
+                              color: r.ink(C.ink),
+                              letterSpacing: r.unknown ? side * 0.02 : 0,
                               fontSize: side * 0.2,
                               fontWeight: FontWeight.w700,
                               height: 1,

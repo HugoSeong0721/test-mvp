@@ -104,8 +104,12 @@ class StatTile extends StatelessWidget {
     required this.label,
     required this.value,
     this.unit = '',
+    this.onRed = false,
   });
   final String label, value, unit;
+
+  /// 경고로 빨개진 화면 위 — 회색 글자가 안 보여서 흰색 계열로.
+  final bool onRed;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -117,8 +121,8 @@ class StatTile extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: C.muted,
+          style: TextStyle(
+            color: onRed ? const Color(0xCCFFFFFF) : C.muted,
             fontSize: 11,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.8,
@@ -142,7 +146,10 @@ class StatTile extends StatelessWidget {
                 if (unit.isNotEmpty)
                   TextSpan(
                     text: ' $unit',
-                    style: const TextStyle(color: C.sub, fontSize: 11),
+                    style: TextStyle(
+                      color: onRed ? const Color(0xCCFFFFFF) : C.sub,
+                      fontSize: 11,
+                    ),
                   ),
               ],
             ),

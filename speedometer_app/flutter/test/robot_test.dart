@@ -324,10 +324,7 @@ void main() {
     expect(stat('1.00 mi'), findsOneWidget);
     expect(stat('60 mph'), findsNWidgets(2), reason: 'MAX 60, AVG 60');
     // 1초 시계와 GPS 측정의 위상 차이로 0:59 또는 1:00
-    expect(
-      stat('1:00').evaluate().length + stat('0:59').evaluate().length,
-      1,
-    );
+    expect(stat('1:00').evaluate().length + stat('0:59').evaluate().length, 1);
     await t.pump(const Duration(seconds: 11)); // 10초마다 저장
     await boot(t, keepPrefs: true);
     expect(stat('1.00 mi'), findsOneWidget, reason: '앱을 껐다 켜도 기록 유지');
@@ -335,6 +332,21 @@ void main() {
     await press(t, key('reset-confirm'), 'Reset Confirm');
     expect(stat('0.00 mi'), findsOneWidget);
     expect(stat('0:00'), findsOneWidget);
+  });
+
+  testWidgets('trips are kept per mode (car max never becomes a run pace)', (
+    t,
+  ) async {
+    // 점검 스크린샷에서 발견: 차로 72 mph 달린 뒤 달리기로 바꾸면 BEST 0:50/mi 가 나왔다.
+    await boot(t);
+    await drive(t, 60, 20);
+    await press(t, key('mode-run'), 'Run mode');
+    expect(stat('--:--'), findsNWidgets(2), reason: '달리기 기록은 비어 있어야');
+    expect(stat('0.00 mi'), findsOneWidget);
+    await drive(t, 7.5, 10);
+    expect(stat('8:00'), findsWidgets);
+    await press(t, key('mode-car'), 'Car mode');
+    expect(stat('60 mph'), findsWidgets, reason: '차 기록은 그대로');
   });
 
   testWidgets('units: km/h, boat knots, run pace', (t) async {

@@ -16,7 +16,7 @@ class SpeedController extends ChangeNotifier with WidgetsBindingObserver {
     required this.prefs,
     required this.io,
   }) {
-    engine.trip = prefs.trip;
+    engine.trip = prefs.trip(mode);
     _syncAlert();
   }
 
@@ -112,7 +112,7 @@ class SpeedController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  void _save() => prefs.trip = engine.trip;
+  void _save() => prefs.setTrip(mode, engine.trip);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -194,7 +194,9 @@ class SpeedController extends ChangeNotifier with WidgetsBindingObserver {
 
   void setMode(Mode m) {
     if (m == mode) return;
+    _save();
     prefs.mode = m;
+    engine.trip = prefs.trip(m);
     _syncAlert();
     // 모드마다 iOS 에 알려 주는 이동 종류(차·운동·항해)가 달라 위치 받기를 다시 시작.
     if (running) _sub?.cancel();

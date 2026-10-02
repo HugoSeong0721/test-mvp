@@ -46,8 +46,9 @@ class Prefs {
   bool get hudMirror => _p.getBool('hudMirror') ?? true;
   set hudMirror(bool v) => _p.setBool('hudMirror', v);
 
-  Trip get trip {
-    final raw = _p.getString('trip');
+  /// 이동 기록은 모드마다 따로 — 차로 달린 최고 속도가 달리기 페이스로 넘어가지 않게.
+  Trip trip(Mode m) {
+    final raw = _p.getString('trip_${m.name}');
     if (raw == null) return Trip();
     try {
       return Trip.fromJson(jsonDecode(raw) as Map<String, dynamic>);
@@ -56,5 +57,6 @@ class Prefs {
     }
   }
 
-  set trip(Trip t) => _p.setString('trip', jsonEncode(t.toJson()));
+  void setTrip(Mode m, Trip t) =>
+      _p.setString('trip_${m.name}', jsonEncode(t.toJson()));
 }
