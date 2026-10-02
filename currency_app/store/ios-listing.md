@@ -24,7 +24,7 @@ App Store 검색은 **이름 > 부제 > 키워드 필드** 순으로 가중치�
 
 | 항목 | 값 |
 |---|---|
-| Name (30) | `Glance FX: Currency Converter` (등록 완료 — `Glance:` 는 이미 사용 중이었음) |
+| Name (30) | `Glance FX: Currency Converter` (등록 완료) |
 | Subtitle (30) | `Exchange Rate Money Calculator` |
 | Bundle ID | `com.soulfulfill.currency` |
 | SKU | `currency` |
