@@ -59,5 +59,9 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 소음 | 화면 켜짐(wakelock) 같은 플러그인 호출을 `await` 했더니 위젯 테스트에서 응답이 안 와 **그 뒤 자동 저장이 통째로 안 돎** (실기기에서도 응답 지연 시 같은 위험) | 부가 기능 플랫폼 호출은 기다리지 말고 `.catchError` 로 흘려보내고, 저장·상태 변경을 먼저 한다 |
+| 2026-10-03 | 소음 | 긴 `ListView` 아래쪽 입력칸은 키보드가 뜨며 화면이 줄면 목록에서 빠져(dispose) 포커스가 날아감 | 입력칸은 화면 위쪽에 두거나 `SingleChildScrollView`. 로봇 테스트에서 `viewInsets` 로 키보드를 흉내 내 잡았다 |
+| 2026-10-03 | 소음 | `SizedBox(height)` 안 `Row` 의 `Expanded(ColoredBox)` 막대가 높이 0 으로 안 보임 — 테스트는 통과, **스크린샷에서만** 보임 | `crossAxisAlignment: stretch`. 웹 빌드 스크린샷을 화면마다 직접 본다 → 찾으면 높이 검사 테스트 추가(고치기 전 실패 확인) |
+| 2026-10-03 | 소음 | 마이크 앱을 헤드리스로 점검할 방법 | 크롬 `--use-fake-device-for-media-stream --use-fake-ui-for-media-stream` + `grantPermissions(['microphone'])` 이면 진짜 getUserMedia 경로를 탄다. 거부는 `--deny-permission-prompts`. `decibel_app/qa/web-check.js` |
 | 2026-10-02 | 공통 | 새 세션형 루틴은 저장소 쓰기 권한이 안 붙어 푸시 403 | 루틴은 저장소가 붙은 세션을 깨우는 방식으로 |
 | 2026-10 | 환율 | iOS 서명 두 번 실패 (자동 서명·무서명 아카이브) | 위 2장의 API 수동 서명 방식 |
