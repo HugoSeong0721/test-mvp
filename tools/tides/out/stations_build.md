@@ -1,0 +1,248 @@
+# stations_compact.json
+
+- stations: 3499
+- detail time: 10s
+- dst true: 2180, false: 62, unknown: 1257
+- timezone combos:
+  -  -10 dst=-1: 58
+  -  -11 dst=-1: 27
+  -  -4 dst=-1: 22
+  -  -5 dst=-1: 589
+  -  -5 dst=1: 2
+  -  -6 dst=-1: 80
+  -  -6 dst=0: 1
+  -  -7 dst=-1: 5
+  -  -7 dst=1: 1
+  -  -8 dst=-1: 162
+  -  -9 dst=-1: 260
+  -  -9 dst=1: 6
+  -  10 dst=-1: 15
+  -  12 dst=-1: 34
+  -  13 dst=-1: 1
+  -  9 dst=-1: 4
+  - AKST -11 dst=1: 1
+  - AKST -9 dst=1: 282
+  - AST -4 dst=0: 33
+  - AST -4 dst=1: 31
+  - CST -5 dst=1: 10
+  - CST -6 dst=0: 1
+  - CST -6 dst=1: 228
+  - ChST 10 dst=0: 4
+  - EST -5 dst=0: 2
+  - EST -5 dst=1: 1322
+  - EST -6 dst=1: 1
+  - G 7 dst=0: 1
+  - GMT -9 dst=1: 1
+  - HAST -10 dst=0: 14
+  - HAST -10 dst=1: 8
+  - HAST -9 dst=1: 5
+  - JST 9 dst=1: 1
+  - NT -11 dst=0: 1
+  - NZST 12 dst=0: 3
+  - PST -8 dst=1: 274
+  - PST -9 dst=1: 1
+  - SST -11 dst=0: 2
+  - SST -11 dst=1: 3
+  - SST -9 dst=1: 2
+  - ZP6 6 dst=1: 1
+- failures:
+  - 1610367 Nonopapa, Niihau Island: None
+  - 1611401 Waimea Bay: None
+  - 1611443 Hanamaulu Bay: None
+  - 1611683 Hanalei Bay: None
+  - 1612301 Hanauma Bay: None
+  - 1612376 Waimanalo: None
+  - 1612482 Waianae: None
+  - 1613077 Kamalo Harbor: None
+  - 1613155 Pukoo Harbor: None
+  - 1613226 Kolo: None
+  - 1615202 Makena: None
+  - 1615395 Hana: None
+  - 1616696 Kuheia Bay: None
+  - 1617277 Mahukona: None
+  - 1617846 Kailua Kona: None
+  - 1618021 Napoopoo, Kealakekua Bay: None
+  - 1618578 Honuapo: None
+  - 1619222 East Island, French Frigate Shoals: None
+  - 1619645 Laysan Island: None
+  - 1814060 Christmas Island: None
+  - 1841275 MALAKAL HARBOR: None
+  - 1841281 Koror: None
+  - 8218361 Kumeon Bay, B.C.: None
+  - 8218362 Haystack Island, B.C.: None
+  - 8218447 Wales Island (Cannery), Pearse Canal: None
+  - 8218617 Mill Bay, Nass River, B.C.: None
+  - 8410875 Birch Islands: None
+  - 8411411 Stone Island, Machias Bay: None
+  - 8411467 Machiasport, Machias River: None
+  - 8411696 Shoppee Point, Englishman Bay: None
+  - 8411801 Steele Harbor Island: None
+  - 8412568 Green Island, Petit Manan Bar: None
+  - 8412932 Prospect Harbor: None
+  - 8413079 Winter Harbor, Frenchman Bay: None
+  - 8413564 Southwest Harbor: None
+  - 8413651 Bass Harbor: None
+  - 8413857 Burnt Coat Harbor, Swans Island: None
+  - 8414112 Blue Hill Harbor: None
+  - 8414168 Center Harbor: None
+  - 8414288 Isle Au Haut: None
+  - 8414348 Stonington, Deer Isle: None
+  - 8414424 Little Deer Isle: None
+  - 8414581 Gross Point, Eastern Channel: None
+  - 8414672 Castine: None
+  - 8414776 Vinalhaven, Vinalhaven Island: None
+  - 8414876 Matinicus Harbor, Wheaton Island: None
+  - 8415809 Tenants Harbor: None
+  - 8415867 Otis Cove: None
+  - 8415933 Port Clyde: None
+  - 8416028 Burnt Island, Georges Islands: None
+  - 8416092 Monhegan Island: None
+  - 8416141 Friendship Harbor: None
+  - 8416224 Waldoboro: None
+  - 8416232 Jones Neck: None
+  - 8416381 Muscongus Harbor, Muscongus Sound: None
+  - 8416501 New Harbor, Muscongus Bay: None
+  - 8416581 Pemaquid Harbor, Johns Bay: None
+  - 8416608 Newcastle: None
+  - 8416721 East Boothbay: None
+  - 8416796 Damariscove Harbor, Damariscove Island: None
+  - 8416804 Sheepscot (below rapids): None
+  - 8416828 Boothbay Harbor: None
+  - 8416908 Southport, Townsend Gut: None
+  - 8416928 Cross River entrance: None
+  - 8416961 Back River: None
+  - 8416968 Isle of Springs: None
+  - 8417067 Robinhood, Sasanoa River: None
+  - 8417127 Mill Point, Sasanoa River: None
+  - 8417221 Phippsburg: None
+  - 8417271 Sturgeon Island, Merrymeeting Bay: None
+  - 8417367 Howard Point, New Meadows River: None
+  - 8417377 Androscoggin River entrance: None
+  - 8417387 Cundy Harbor, New Meadows River: None
+  - 8417391 Bowdoinham, Cathance River: None
+  - 8417527 Brunswick, Androscoggin River: None
+  - 8417553 Wilson Cove, Middle Bay: None
+  - 8417647 South Harpswell, Potts Harbor: None
+  - 8417801 South Freeport: None
+  - 8417911 Vaill Island: None
+  - 8418001 Peak Island: None
+  - 8418137 Presumpscot River Bridge: None
+  - 8418175 Back Cove: None
+  - 8418557 Old Orchard Beach: None
+  - 8418772 Cape Porpoise: None
+  - 8419518 York Harbor: None
+  - 8419807 Kittery Point: None
+  - 8419997 Salmon Falls River: None
+  - 8421897 Dover Point: None
+  - 8422687 Squamscott River RR. Bridge: None
+  - 8423745 Portsmouth: None
+  - 8424601 Jaffrey Point: None
+  - 8427031 Gosport Harbor, Isles of Shoals: None
+  - 8429489 Hampton Harbor: None
+  - 8443838 Charlestown, Charles River entrance: None
+  - 8444012 Deer Island (south end): None
+  - 8444312 Moon Head: None
+  - 8444351 Hull: None
+  - 8444488 Neponset, Neponset River: None
+  - 8444601 Nantasket Beach, Weir River: None
+  - 8444662 Crow Point, Hingham Harbor entrance: None
+  - 8444762 Cohasset Harbor (White Head): None
+  - 8444775 Hingham: None
+  - 8445425 Damons Point, North River: None
+  - 8446613 Wellfleet: None
+  - 8447291 Pleasant Bay: None
+  - 8447335 Barnstable Harbor, Beach Point: None
+  - 8447436 Georges Shoal, Texas Tower: None
+  - 8447525 Dennisport: None
+  - 8447675 Cotuit Highlands: None
+  - 8447742 Poponesset Island, Poponesset Bay: None
+  - 8447791 Hix Bridge, East Branch: None
+  - 8447865 Falmouth Heights: None
+  - 8447939 Little Harbor: None
+  - 8447941 Uncatena Island (south side): None
+  - 8447975 Westport Harbor: None
+  - 8448325 Cedar Tree Neck: None
+  - 8448566 Great Point: None
+  - 8448683 Wasque Point, Chappaquiddick Island: None
+  - 8448733 Gay Head: None
+  - 8448817 Muskeget Island, north side: None
+  - 8448942 Squibnocket Point: None
+  - 8449062 Eel Point: None
+  - 8449287 Nomans Land: None
+  - 8451929 Bristol, Bristol Harbor: None
+  - 8453611 Pawtucket, Seekonk River: None
+  - 8462723 Saybrook Jetty: None
+  - 8462752 Saybrook Point: None
+  - 8462925 Essex: None
+  - 8463155 Hadlyme: None
+  - 8463409 Westbrook, Duck Island Roads: None
+  - 8463582 Haddam: None
+  - 8464041 Madison: None
+  - 8464464 Hartford: None
+  - 8464687 Sachem Head: None
+  - 8469549 Cos Cob Harbor: None
+  - 8510502 Montauk Harbor entrance: None
+  - 8510884 Little Gull Island: None
+  - 8511779 Noyack Bay: None
+  - 8512053 Hashamomuck Beach: None
+  - 8512114 Southold: None
+  - 8512328 New Suffolk: None
+  - 8514421 Mount Sinai Harbor: None
+  - 8514594 Port Jefferson Harbor entrance: None
+  - 8514783 Great River, Connetquot River: None
+  - 8514961 West Fire Island: None
+  - 8515014 Fire Island Light: None
+  - 8515228 Democrat Point, Fire Island Inlet: None
+  - 8515336 Oak Beach: None
+  - 8515421 Babylon: None
+  - 8515764 Gilgo Heading: None
+  - 8515864 Amityville: None
+  - 8516055 Biltmore Shores, South Oyster Bay: None
+  - 8516201 Oyster Bay Harbor: None
+  - 8516211 Bellmore, Bellmore Creek: None
+  - 8516221 Cuba Island: None
+  - 8516225 Deep Creek Meadow: None
+  - 8516315 Neds Creek: None
+  - 8516385 Jones Inlet (Point Lookout): None
+  - 8516411 Freeport, Baldwin Bay: None
+  - 8516601 Long Beach (Inside): None
+  - 8516745 Woodmere, Brosewere Bay: None
+  - 8516925 Motts Basin: None
+  - 8516999 J.F.K. International Airport: None
+  - 8517381 Canarsie: None
+  - 8517394 Barren Island, Rockaway Inlet: None
+  - 8517519 Mill Basin: None
+  - 8517531 Plumb Beach Channel: None
+  - 8517673 Hunters Point, Newtown Creek: None
+  - 8517741 Coney Island: None
+  - 8517942 Fort Hamilton, The Narrows: None
+  - 8518635 North Brother Island: None
+  - 8518919 Tarrytown: None
+  - 8518935 Newburgh: None
+  - 8518939 New Hamburg: None
+  - 8518945 Poughkeepsie: None
+  - 8518949 Peekskill: None
+  - 8518964 Tivoli: None
+  - 8518974 Hudson: None
+  - 8518989 Castleton: None
+  - 8518993 Kingston: None
+  - 8519112 St. George, Staten Island: None
+  - 8519726 Princes Bay: None
+  - 8530505 Edgewater, N.J.: None
+  - 8530884 Port Newark Terminal: None
+  - 8531095 Carteret: None
+  - 8534296 Seven Island, Newmans Thorofare: None
+  - 8538752 Pavonia, Cooper River, RR. bridge, N.J.: None
+  - 8538824 Hainesport, South Branch: None
+  - 8543925 Penrose Avenue Bridge: None
+  - 8545120 Market Street Bridge: None
+  - 8547333 Cornwells Heights, Pa.: None
+  - 8550658 Millside, RR. bridge: None
+  - 8551973 St. Georges, Delaware: None
+  - 8552125 Summit Bridge, Delaware: None
+  - 8553069 Taylors Bridge, Blackbird Creek, Del.: None
+  - 8553501 Woodland Beach, Del.: None
+  - 8554038 Leipsic, Leipsic River: None
+  - 8571072 Ape Hole Creek, Pocomoke Sound: None
+  - 8571097 Shelltown: None
+  - 8571201 Long Point, Big Annemessex River: None
