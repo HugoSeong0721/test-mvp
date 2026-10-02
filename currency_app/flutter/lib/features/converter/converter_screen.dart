@@ -81,6 +81,8 @@ class _ConverterScreenState extends State<ConverterScreen> {
         } else {
           s.replaceTarget(index!, code);
         }
+      case PickMode.chart:
+        break; // 변환 화면에서는 쓰지 않는다
     }
   }
 
