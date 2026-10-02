@@ -48,6 +48,9 @@
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
+| **한붓 경로 퍼즐** (`plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
+| **낚시·사냥 시간** (`plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
+| **연비·정비 기록** (`plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
 
@@ -78,6 +81,8 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 다음 물결 3개: 한붓 경로 퍼즐 · 낚시·사냥 시간 · 연비·정비 기록 (성경 통독 체크는 대안으로 대기) | 사용자 "뭐부터 할까 한 세 개". 앞 5개가 1차 완성·캣도쿠 TestFlight 도달 |
+| 2026-10-03 | **앱 고르는 방법 확정: 수요 확인 → 1등 앱 불만 확인 → 그 불만의 반대로 차별화** | 사용자 "수요 확인하고 불만 확인해서 차별화 만드는 게 참 좋아" |
 | 2026-10-03 | 대출 계산기 이름 **Glance: Mortgage Calculator**(부제 Home Loan & Payment Calculator), 번들 ID `com.soulfulfill.mortgage` (Apple 등록 완료) | 미국 검색 1위 "mortgage calculator" 를 이름에 그대로 + Glance FX 시리즈. 사용자: 둘 다 추천안 |
 | 2026-10-02 | 새 분야 8개 조사 → `plans/research-8-fields.md`. 다음 물결 추천: 한붓 경로 퍼즐 → 낚시·사냥 시간 (지금 5개 세션이 TestFlight 가는 걸 보고 시작) | 사용자 "더 앱 낼 분야 조사해놔줘 8개 정도" |
 | 2026-10-03 | 소음 측정기 이름 **Glance dB: Decibel Meter** (부제 Sound Level & Noise Meter), 번들 ID `com.soulfulfill.decibel` 등록 완료 | 사용자: 추천대로 (A — Glance FX 시리즈 형식, 1위 검색어 "decibel meter" 포함) |
@@ -102,6 +107,8 @@
 | 2026-08 | Paper Route·피아노 계열 폐기 | 소재 자체가 재미없음 (`CLAUDE.md` 폐기 목록) |
 
 ## 6. 배운 것 (앱이 바뀌어도 통하는 것)
+
+- **앱 고르는 공식 (사용자가 좋아함)**: ①수요 = 1등 앱 평가 수·검색량 ②1등 앱 리뷰 불만(광고 과다·구독 함정·방치) ③그 불만의 정반대(전부 무료·배너만·쓰는 순간 방해 안 함)가 우리 차별점. 아이폰 기본 기능과 겹치면 제외.
 
 - **한눈에 읽혀야 한다.** 설명을 읽어야 이해되는 건 실패했다 (침술의 달인, Cats vs Dogs v1).
 - **실행을 세 번 바꿔도 안 되면 소재 문제다** (Paper Route).
