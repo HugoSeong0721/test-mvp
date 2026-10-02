@@ -59,6 +59,13 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 연비 | 주유를 저장해도 기록 탭 숫자가 그대로 — 위에서 `ListenableBuilder` 로 감쌌지만 `const HomeShell()`·`const _Summary()` 는 **같은 const 위젯이라 다시 안 그려짐** | 저장소를 읽는 화면은 **각자 구독**(`build` 를 `ListenableBuilder` 로)하거나 바뀌는 데이터를 인자로 넘긴다. 로봇이 "저장 → 화면 숫자" 를 검사해서 잡았다 |
+| 2026-10-03 | 연비 | 거리 알림의 예상 날짜가 이미 지난 날(기록이 뜸할 때) → `notifyAt` 이 과거라 **알림이 예약조차 안 됨**. 테스트는 통과, **스크린샷의 "about Sep 29"(오늘 Oct 2)** 로 발견 | 예상일은 오늘보다 앞이면 오늘로, 알림은 다음 날 아침. 로봇에 "알림 켠 정비는 전부 미래 시각에 예약됐나" 검사. 고치기 전 실패 확인 |
+| 2026-10-03 | 연비 | `Semantics(button: true, excludeSemantics: true)` 로 감싼 버튼이 VoiceOver 에선 **누르기 동작이 없음**(앱 바 제목에 합쳐짐). 웹 점검 `getByRole('button')` 이 못 찾아서 발견 | `Semantics` 에 `onTap`(+앱 바 안이면 `container: true`). 로봇 `expectButtonsTappable`: 버튼인데 tap 액션 없는 노드 = 실패 (`fuellog_app/flutter/test/robot_test.dart`) |
+| 2026-10-03 | 연비 | 앱 바 제목·탭 글자가 스크린샷에서 검은 네모 → 잘림 검사 오탐. `appBarTheme.titleTextStyle: TextStyle(...)` 처럼 **빈 TextStyle 은 테마 글꼴을 안 이어받는다** | `base.textTheme.titleMedium!.copyWith(...)` 로 만든다 (기기에선 시스템 글꼴로 보여 눈치 못 챔) |
+| 2026-10-03 | 연비 | 큰 글씨(135%)에서 단가 칸 숫자가 1.5px 모자라 잘림 | 입력 칸 폭을 `MediaQuery.textScalerOf` 에 비례(화면 62% 까지). 3칸 요약은 `FittedBox(scaleDown)` |
+| 2026-10-03 | 연비 | `pkill -f "flutter test"`·`pkill -f flutter_tester` 가 **그 글자가 든 내 bash 명령까지 죽여** 뒤 명령이 안 돎 | 멈춘 테스트는 `pkill -9 -x flutter_tester` (프로세스 이름 정확히) |
+| 2026-10-03 | 연비 | 다른 앱 CSV 가져오기 형식을 알 길이 없음(사이트 막힘) | 오픈소스 가져오기 도구 코드(Hammond·LubeLogger)에서 Fuelly 열 이름을 읽었다 → 머리글 별칭으로 맞추고 엔진 테스트에 그 형식 그대로 고정 (`fuellog_app/flutter/lib/core/csv.dart`) |
 | 2026-10-03 | 캣도쿠(Kitty Queens) | TestFlight 에서 "No video available" 연속 — 새 AdMob 앱은 스토어 출시·링크 전 광고 재고가 거의 없고, 그 사이 틀린 고양이로 막다른 판에 갇힘 | 보상형 광고가 **안 오면 보상을 그냥 준다**(중간 닫기만 안 줌). 막다른 상태는 화면에 이유 표시. 출시 뒤 AdMob 에 스토어 링크 연결 |
 | 2026-10-03 | 캣도쿠 | 점검 팀 426회 누름에서 가장 많이 나온 버그 = **연타**: 다음 레벨 연타로 레벨 건너뛰기·저장 중단, 새 판에 엉뚱한 고양이, 반칙 칸 연타로 하트 3개, 마지막 칸 연타로 승리 패널 버튼이 눌림, 힌트 연타로 창 즉시 닫힘 | 결과 패널은 0.9~1.1초 뒤에, 새 판·반칙·창 닫힘 뒤 0.45~0.7초 입력 잠금(**Timer 로** — DateTime.now 는 위젯 테스트 가짜 시계에서 안 풀림), "다음 단계"는 저장값에서 계산, 확인 창 `barrierDismissible:false`. 로봇에 연타 테스트 |
 | 2026-10-03 | 캣도쿠 | 뒤로 갔다 오면 홈 카드 숫자가 옛 값 — `await Navigator.push` 뒤 setState 는 다음 화면 dispose 저장보다 먼저 돈다(`pushReplacement` 도 같음) | 홈은 저장소(ChangeNotifier)를 구독해 다시 그린다. 자정 넘김은 앱 복귀 + 주기 확인 |
