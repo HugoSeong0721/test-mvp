@@ -107,7 +107,7 @@ AdMob 을 붙이는 순간 "광고 ID 수집"으로 답이 바뀌니 그때 다�
 
 | 플랫폼 | AdMob 앱 | 앱 ID | 배너 단위 ID |
 |---|---|---|---|
-| iOS | Currency Exchange (mg.seong0721 계정) | `ca-app-pub-4724352880074547~5579610172` (ios/Runner/Info.plist) | `ca-app-pub-4724352880074547/2514463130` |
+| iOS | Currency Exchange (개인 AdMob 계정) | `ca-app-pub-4724352880074547~5579610172` (ios/Runner/Info.plist) | `ca-app-pub-4724352880074547/2514463130` |
 | Android | **아직 미등록** — Google 테스트 ID 사용 중 | AndroidManifest.xml `APPLICATION_ID` | `ads.dart` |
 
 안드로이드에 실제 광고를 내려면 AdMob 에서 Android 앱을 하나 더 만들고 위 두 곳의 테스트 ID 를 교체한다.
