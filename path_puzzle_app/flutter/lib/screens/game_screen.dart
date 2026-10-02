@@ -188,8 +188,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     final msg = switch (r) {
       RewardResult.rewarded => null,
       RewardResult.closedEarly => 'Watch the whole video to get your hint.',
-      RewardResult.unavailable =>
-        'No video available right now. Check your connection and try again.',
+      // 새 AdMob 앱은 출시 전까지 영상 재고가 거의 없다 → 영상이 없다고 막지 않고 그냥 준다 (캣도쿠 TestFlight 에서 사용자가 막힘)
+      RewardResult.unavailable => 'No video right now — this one’s on us 🎁',
     };
     if (msg != null) {
       ScaffoldMessenger.of(context)
@@ -201,7 +201,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
           ),
         );
     }
-    return r == RewardResult.rewarded;
+    return r != RewardResult.closedEarly;
   }
 
   Future<void> _hint() async {
