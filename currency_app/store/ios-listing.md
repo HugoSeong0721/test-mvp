@@ -3,6 +3,9 @@
 **대상: 미국 App Store. 기본 언어 English (U.S.).** 앱 UI 도 영어.
 App Store Connect → Apps → Glance → iOS App 1.0 에 그대로 붙여넣는다.
 
+**API 로 자동 입력:** 부제·설명·키워드·홍보 문구·URL·스크린샷·빌드·심사 메모는 `ios-metadata.json` 을
+Actions → **App Store 등록 정보 채우기** 로 넣는다. 문구를 고치면 이 파일과 json 을 같이 고친다.
+
 ## 키워드 전략 (ASO)
 
 App Store 검색은 **이름 > 부제 > 키워드 필드** 순으로 가중치를 준다. 세 칸에 같은 단어를 반복하면
