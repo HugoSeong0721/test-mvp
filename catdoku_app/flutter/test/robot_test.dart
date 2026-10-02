@@ -286,14 +286,81 @@ void main() {
     await finish(t);
   });
 
-  testWidgets('no video available → tells the user, game continues', (t) async {
-    await boot(t, prefs: {'seenHowTo': true}, ads: FakeAds(reward: false));
-    await press(t, find.text('Play'), 'Home: Today Play');
-    await press(t, find.byKey(const Key('hint')), 'Hint');
-    await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
-    expect(find.textContaining('No video right now'), findsOneWidget);
-    expect(gameOf(t).cats, 0);
-    expect(gameOf(t).status, GameStatus.playing);
+  testWidgets(
+    'no video yet → "Loading video…" → tells the user, game continues',
+    (t) async {
+      final ads = FakeAds(
+        result: RewardResult.unavailable,
+        ready: false,
+        delay: const Duration(seconds: 3),
+      );
+      await boot(t, prefs: {'seenHowTo': true}, ads: ads);
+      await press(t, find.text('Play'), 'Home: Today Play');
+      await press(t, find.byKey(const Key('hint')), 'Hint');
+      await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
+      expect(find.text('Loading video…'), findsOneWidget);
+      await t.pump(const Duration(seconds: 3));
+      await t.pump(const Duration(milliseconds: 500));
+      expect(find.text('Loading video…'), findsNothing);
+      expect(
+        find.textContaining('No video available right now'),
+        findsOneWidget,
+      );
+      expect(ads.shown, [RewardPlacement.hint]);
+      expect(gameOf(t).cats, 0);
+      expect(gameOf(t).status, GameStatus.playing);
+      await finish(t);
+    },
+  );
+
+  testWidgets('closing the video early gives no reward and says why', (
+    t,
+  ) async {
+    final ads = FakeAds(result: RewardResult.closedEarly);
+    await boot(t, prefs: {'seenHowTo': true}, ads: ads);
+    await press(t, find.text('Start'), 'Home: Level Start');
+    final g = gameOf(t);
+    await tapCell(t, 0, g.puzzle.solution[0]);
+    while (g.status == GameStatus.playing) {
+      final bad = conflictCell(g);
+      await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
+    }
+    await t.pump(const Duration(milliseconds: 300));
+    await press(t, find.byKey(const Key('continue')), 'Lost: Watch video +3');
+    expect(ads.shown, [RewardPlacement.continueGame]);
+    expect(
+      g.status,
+      GameStatus.lost,
+      reason: 'no reward → still out of hearts',
+    );
+    expect(find.textContaining('Watch the whole video'), findsOneWidget);
+    expect(find.text('💔 Out of hearts!'), findsOneWidget);
+    // 다시 보고 끝까지 보면 이어진다
+    ads.result = RewardResult.rewarded;
+    await press(t, find.byKey(const Key('continue')), 'Lost: Watch video +3');
+    expect(g.status, GameStatus.playing);
+    expect(g.hearts, 3);
+    await finish(t);
+  });
+
+  testWidgets('double-tapping a video button shows only one video', (t) async {
+    final ads = FakeAds(delay: const Duration(seconds: 1));
+    await boot(t, prefs: {'seenHowTo': true}, ads: ads);
+    await press(t, find.text('Start'), 'Home: Level Start');
+    final g = gameOf(t);
+    await tapCell(t, 0, g.puzzle.solution[0]);
+    while (g.status == GameStatus.playing) {
+      final bad = conflictCell(g);
+      await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
+    }
+    await t.pump(const Duration(milliseconds: 300));
+    await t.tap(find.byKey(const Key('continue')));
+    await t.pump(const Duration(milliseconds: 50));
+    await t.tap(find.byKey(const Key('continue')), warnIfMissed: false);
+    pressed.add('Lost: Watch video +3 (double tap)');
+    await t.pump(const Duration(seconds: 2));
+    expect(ads.rewardedShown, 1);
+    expect(g.hearts, 3);
     await finish(t);
   });
 

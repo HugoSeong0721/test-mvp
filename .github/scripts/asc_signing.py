@@ -3,6 +3,7 @@
 
   asc_signing.py setup   <bundle_id> <workdir>   → 키·CSR 생성, 배포 인증서·App Store 프로파일 발급
   asc_signing.py cleanup <workdir>               → 이번 실행에서 만든 프로파일·인증서 삭제
+  asc_signing.py register <bundle_id> <name>     → 번들 ID 등록(없을 때만) + App Store Connect 앱 레코드 확인
 
 기기 등록 없이 App Store 배포 서명을 하기 위한 것. 인증서 개수 제한(계정당 수 개)이 있어서
 실행마다 새로 만들고 끝나면 반드시 지운다. 환경변수 KEY_ID, ISSUER_ID, KEY_PATH 필요.
@@ -103,10 +104,29 @@ def cleanup(wd):
         print('인증서 삭제')
 
 
+def register(bundle_id, name):
+    # 번들 ID 는 한 번 등록하면 바꿀 수 없다 — 사용자 확인을 받은 값만 넣는다.
+    found = call('GET', f'/bundleIds?filter[identifier]={bundle_id}&limit=50')['data']
+    if any(b['attributes']['identifier'] == bundle_id for b in found):
+        print(f'번들 ID {bundle_id}: 이미 등록됨')
+    else:
+        call('POST', '/bundleIds', {'data': {'type': 'bundleIds', 'attributes': {
+            'identifier': bundle_id, 'name': name, 'platform': 'IOS'}}})
+        print(f'번들 ID {bundle_id}: 새로 등록함 ({name})')
+    apps = call('GET', f'/apps?filter[bundleId]={bundle_id}')['data']
+    if apps:
+        print(f'App Store Connect 앱 레코드: 있음 — {apps[0]["attributes"]["name"]} (id {apps[0]["id"]})')
+    else:
+        print('App Store Connect 앱 레코드: 아직 없음 — appstoreconnect.apple.com → 앱 → ＋ → 신규 앱 에서 만든다 '
+              '(API 로는 앱 레코드를 만들 수 없다). 만들기 전에는 Release iOS 업로드가 실패한다.')
+
+
 if __name__ == '__main__':
     if sys.argv[1] == 'setup':
         setup(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == 'cleanup':
         cleanup(sys.argv[2])
+    elif sys.argv[1] == 'register':
+        register(sys.argv[2], sys.argv[3])
     else:
-        sys.exit('usage: asc_signing.py setup <bundle_id> <workdir> | cleanup <workdir>')
+        sys.exit('usage: asc_signing.py setup <bundle_id> <workdir> | cleanup <workdir> | register <bundle_id> <name>')

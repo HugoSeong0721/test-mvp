@@ -43,7 +43,7 @@
 |---|---|---|
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출. v1.1 후보 = 빌드 9(TestFlight): 줄 꾹 눌러 끌기로 순서 변경, 긴 이름 줄 넘침 수정. 스크린샷 v2(금·BTC 첫 장) 준비됨 | 승인 대기 → AdMob 스토어 링크·결제 정보 → v1.1 제출(빌드 9 + 스크린샷 v2, `App Store 등록 정보 채우기`) → 리뷰·수익 확인 |
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
-| **Catdoku 앱** (`plans/catdoku-app.md`) | 2026-10-02 다음 앱으로 결정, 기획서 작성 | 개발 세션 시작 → 테스트 로봇 → Flutter 이식 → TestFlight |
+| **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
 
@@ -66,6 +66,9 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-02 | Catdoku 앱 이름 **Kitty Queens: Cat Sudoku**, 번들 ID `com.soulfulfill.catdoku`, 게임 양 A(오늘의 퍼즐+무한 단계), 출시 진행 | "Catdoku" 는 스토어에 동명 앱 다수. 사용자: 추천대로, "내볼까" |
+| 2026-10-02 | Catdoku 보상형 광고 자리 = 힌트·하트 다 잃었을 때 이어하기 (영상 보면 알려 주고 보상) | 사용자 "하트 다 쓰거나 힌트로 비디오(광고) 보면 알려주고" |
+| 2026-10-02 | Catdoku 웹 미리보기 첫 느낌: "어렵다, 그래도 했네" (7×7 오늘의 퍼즐) | 첫 판 난이도 기록 — 처음 사용자는 5×5 단계부터 권할지 TestFlight 때 다시 본다 |
 | 2026-10-02 | 색칠 앱 보류, 언제든 재개 가능하게 정리(`plans/coloring-app.md`) | CC0 선화 38장 변환 결과 칸 0~24개(목표 60~100), 그림마다 사람 확인 필요. 사용자 "나한테 안 맞는 걸 수도, 보류하자" |
 | 2026-10-02 | 환율 앱: 통화 줄을 꾹 눌러 끌어 순서 바꾸기 추가(빌드 9) | 사용자 "위아래 마음대로 드래그 안 돼" |
 | 2026-10-02 | 유틸 앱 시장조사 (3분야 병렬) → `plans/utility-research.md`. 방향: "가끔 필요하고 손 안 가는 앱, 분야 다양하게" | 사용자 "currency 같은 게 손이 덜 갔다" |

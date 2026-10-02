@@ -1,11 +1,11 @@
 {
-    "name": "catdoku",
-    "short_name": "catdoku",
+    "name": "Kitty Queens",
+    "short_name": "Kitty Queens",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Kitty Queens: Cat Sudoku",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

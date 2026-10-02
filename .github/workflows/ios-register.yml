@@ -1,0 +1,46 @@
+name: iOS 번들 ID 등록 · 앱 레코드 확인
+
+# 새 앱을 올리기 전에 한 번 돌린다. 번들 ID 가 없으면 developer.apple.com 에 등록하고,
+# App Store Connect 에 앱 레코드가 있는지 알려 준다 (앱 레코드는 API 로 못 만들어 사람이 만든다).
+# 번들 ID 는 등록하면 바꿀 수 없다 — 사용자에게 확인받은 값만 넣는다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bundle_id:
+        description: "번들 ID (예: com.soulfulfill.catdoku)"
+        required: true
+      name:
+        description: "developer.apple.com 에 표시될 이름 (예: Kitty Queens)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    env:
+      KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write API key
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s\n' "$KEY_P8" > "$RUNNER_TEMP/keys/AuthKey.p8"
+          echo "KEY_PATH=$RUNNER_TEMP/keys/AuthKey.p8" >> "$GITHUB_ENV"
+
+      - name: Register bundle ID & check app record
+        env:
+          BUNDLE_ID: ${{ inputs.bundle_id }}
+          APP_NAME: ${{ inputs.name }}
+        run: |
+          python3 -m pip install -q pyjwt cryptography
+          python3 .github/scripts/asc_signing.py register "$BUNDLE_ID" "$APP_NAME" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"

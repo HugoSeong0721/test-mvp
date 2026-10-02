@@ -54,12 +54,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text('🐱', style: TextStyle(fontSize: 38)),
                       const SizedBox(width: 8),
                       const Expanded(
-                        child: Text(
-                          'Catdoku',
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.w900,
-                            color: C.ink,
+                        child: FittedBox(
+                          alignment: Alignment.centerLeft,
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'Kitty Queens',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: C.ink,
+                            ),
                           ),
                         ),
                       ),

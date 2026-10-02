@@ -115,21 +115,36 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     setState(_newGame);
   }
 
-  Future<bool> _watchVideo() async {
+  /// 영상이 아직 안 받아져서 기다리는 중 (화면에 "Loading video…").
+  bool _waitingVideo = false;
+
+  Future<bool> _watchVideo(RewardPlacement placement) async {
     if (_busyAd) return false;
     _busyAd = true;
     game.pauseClock();
-    final ok = await Ads.i.showRewarded();
+    if (!Ads.i.isReady(placement)) setState(() => _waitingVideo = true);
+    final r = await Ads.i.showRewarded(placement);
     _busyAd = false;
+    if (!mounted) return false;
+    setState(() => _waitingVideo = false);
     game.resumeClock();
-    if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No video right now. Please try again in a moment.'),
-        ),
-      );
+    final msg = switch (r) {
+      RewardResult.rewarded => null,
+      RewardResult.closedEarly => 'Watch the whole video to get your reward.',
+      RewardResult.unavailable =>
+        'No video available right now. Check your connection and try again.',
+    };
+    if (msg != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            key: const Key('ad-message'),
+            content: Text(msg, style: const TextStyle(fontSize: 17)),
+          ),
+        );
     }
-    return ok;
+    return r == RewardResult.rewarded;
   }
 
   Future<void> _hint() async {
@@ -159,11 +174,15 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         ],
       ),
     );
-    if (yes == true && await _watchVideo()) game.applyHint();
+    if (yes == true && await _watchVideo(RewardPlacement.hint)) {
+      game.applyHint();
+    }
   }
 
   Future<void> _continue() async {
-    if (await _watchVideo()) game.continueWithHearts();
+    if (await _watchVideo(RewardPlacement.continueGame)) {
+      game.continueWithHearts();
+    }
   }
 
   @override
@@ -249,6 +268,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             ),
             if (game.status == GameStatus.won && _wonTime != null) _winPanel(),
             if (game.status == GameStatus.lost) _lostPanel(),
+            if (_waitingVideo) _loadingVideo(),
           ],
         ),
       ),
@@ -497,6 +517,29 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     );
     return _panel(kids);
   }
+
+  Widget _loadingVideo() => Positioned.fill(
+    child: Container(
+      key: const Key('loading-video'),
+      color: const Color(0x88000000),
+      alignment: Alignment.center,
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(color: Colors.white),
+          SizedBox(height: 16),
+          Text(
+            'Loading video…',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   Widget _lostPanel() => _panel([
     const Text(

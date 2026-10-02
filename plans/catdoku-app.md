@@ -32,3 +32,15 @@
 → ⑤`Release iOS` 일반화(앱 폴더·번들 ID 입력) → ⑥TestFlight → 사용자 '느낌' 피드백 → ⑦스토어 등록
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
+
+### 2026-10-02 개발 세션 1
+- 웹판 점검: 직접 찍은 ✕ 를 지우려 다시 탭하면 고양이 시도로 처리돼 하트 손실(재현) → 앱은 🐱/✕ 팔레트 + ✕ 끌어 칠하기.
+- `catdoku_app/flutter/`: 퍼즐 엔진(`lib/core/puzzle.dart`, xorshift32 시드라 iOS·웹 같은 판, 유일해 보정 생성기 9×9 ≤60ms),
+  오늘의 퍼즐(7×7, 기기 현지 날짜, 실패해도 시계 이어짐, 연속 기록) + 단계(1-3:5×5, 4-10:6×6, 11-25:7×7, 26-50:8×8, 51+:9×9).
+- 광고: 배너 + 보상형 2자리(힌트, 이어하기 ❤️+3 판 유지). 영상 미도착 시 최대 8초 "Loading video…", 중간에 닫으면 보상 없음 안내,
+  실패 시 10→120초 백오프 재로딩. **지금은 Google 테스트 ID** — AdMob 앱 만들면 `lib/core/ads.dart`·Info.plist·AndroidManifest 교체.
+- 테스트 로봇 `test/robot_test.dart` (17개 통과): 모든 버튼, 3개 기기 크기, 9×9, 한글 노출, 광고 지연/없음/중간 닫기/두 번 탭.
+- 웹 미리보기 `docs/catdoku-app/` (`?ads=slow|none|early` 로 광고 상황 흉내). 빌드: `flutter build web --release --base-href /test-mvp/catdoku-app/` 후 canvaskit 폴더는 빼고 복사(CDN 사용).
+- 이름 **Kitty Queens: Cat Sudoku**, 번들 `com.soulfulfill.catdoku` (사용자 확인). 스토어 초안 `catdoku_app/store/ios-listing.md`, 방침 `docs/catdoku-privacy.html`.
+- Actions: `Release iOS`·`App Store 등록 정보 채우기` 에 앱 선택(currency/catdoku), `iOS 번들 ID 등록 · 앱 레코드 확인` 추가.
+- 남은 것: ASC 앱 레코드(사용자), AdMob 앱·광고 단위 3개(사용자) → 실제 ID 교체 → Release iOS(catdoku) → TestFlight.
