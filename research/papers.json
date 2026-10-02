@@ -3975,5 +3975,46 @@
       "TCM clinical decision support syndrome differentiation"
     ],
     "first_seen": "2026-09-30"
+  },
+  {
+    "id": "doi:10.1111/jcmm.71371",
+    "title": "Traditional Chinese Medicine Formulas in Delaying Aging: From Theoretical Foundations to Molecular Mechanisms and Translational Perspectives.",
+    "authors": [
+      "Jin C",
+      "Du D",
+      "Yu X",
+      "Ji X",
+      "Zhang X",
+      "Li A",
+      "Zu S",
+      "Qu B",
+      "Zhao D",
+      "Wu D",
+      "Liu M."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1111/jcmm.71371",
+    "abstract": "Aging is a systemic decline in physiological integrity, driving chronic diseases such as neurodegeneration, cardiovascular disorders, and metabolic syndromes. Rapid global population aging urgently demands effective interventions. Traditional Chinese medicine (TCM) formulas, characterized by multi-component, multi-target, and multi-pathway synergy, offer a promising paradigm for delaying aging. This review systematically integrates recent advances in TCM formula-based anti-aging research, bridging classical TCM gerontology with the 14 modern hallmarks of aging. We categorize representative formulas into four mechanistic groups targeting mitochondrial homeostasis and autophagy, cellular senescence and inflammatory microenvironment, stem cell maintenance and epigenetic reprogramming, and gut microbiota and systemic metabolism, and explore their holistic efficacy, key bioactive constituents, and multi-component synergy. In terms of methodological innovations, we introduced network pharmacology combined with AI-driven target screening and proteomic aging clocks to assess biological age. We discussed challenges in chemical complexity, mechanistic completeness, and clinical translation, and proposed a roadmap for development. This review establishes an integrative model that integrates TCM principles with modern aging biology, offering insights for translational research toward healthy longevity.",
+    "matched_queries": [
+      "TCM body constitution classification machine learning"
+    ],
+    "first_seen": "2026-10-02"
+  },
+  {
+    "id": "doi:10.1097/md.0000000000050810",
+    "title": "Clinical efficacy of integrated traditional Chinese and Western medicine in patients with coronary artery disease.",
+    "authors": [
+      "Chai Z",
+      "Huo H."
+    ],
+    "year": "2026",
+    "source": "Europe PMC",
+    "url": "https://doi.org/10.1097/md.0000000000050810",
+    "abstract": "Coronary artery disease (CAD) remains a major cause of morbidity and mortality worldwide. Although guideline-directed Western medical therapy improves cardiovascular outcomes, residual symptoms remain common. Integrated traditional Chinese and Western medicine is frequently used as an adjunctive strategy in China, but its real-world, short-term clinical associations require further characterization. This retrospective observational study included 215 patients with CAD treated between January 2022 and December 2024, including 106 patients receiving conventional Western medical therapy alone and 109 receiving adjunctive traditional Chinese medicine based on syndrome differentiation. Symptom status, laboratory parameters, overall clinical response, and documented adverse events were compared between groups. Because treatment allocation was nonrandom and the analyses were unadjusted for potential confounders, all between-group findings were interpreted as associations. No statistically significant differences were observed in the measured baseline demographic, clinical, or laboratory characteristics between the 2 groups. After treatment, the integrated-treatment group had lower rates of residual chest pain, chest tightness, and fatigue and greater changes in total cholesterol, triglycerides, low-density lipoprotein cholesterol, high-density lipoprotein cholesterol, fibrinogen, and D-dimer. The observed overall clinical response rate was higher in the integrated-treatment group (90.8% vs 76.4%, P = .004). Documented adverse-event incidence did not differ significantly between groups. In this retrospective real-world cohort, adjunctive traditional Chinese medicine was associated with greater short-term improvement in selected symptoms and laboratory parameters and a higher observed clinical response rate, without a detectable increase in documented short-term adverse events. These unadjusted observational findings are exploratory, do not establish causal superiority or improved cardiovascular prognosis, and are insufficient by themselves to modify current guideline-directed CAD practice.",
+    "matched_queries": [
+      "TCM clinical decision support syndrome differentiation"
+    ],
+    "first_seen": "2026-10-02"
   }
 ]
