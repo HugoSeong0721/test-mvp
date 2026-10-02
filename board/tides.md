@@ -1,15 +1,19 @@
 # 물때 시간 (tides 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 06:35 (KST)
+마지막 갱신: 2026-10-03 06:50 (KST)
 
 ## 지금 상태 (3줄 이내)
-Flutter 1차 완성(`tides_app/flutter/`): 내 위치→가장 가까운 관측소, 오늘 곡선·Rising/Falling·다음 만조/간조, 7일 표, 일출일몰·달, 즐겨찾기·검색, ft/m, 오프라인 캐시. 테스트 31개 통과(엔진 21 + 로봇 10), 웹 클릭 점검 30/30.
-웹 미리보기 https://soulfulfillable.github.io/test-mvp/tides-app/index.html — 폰에서 **NOAA 실제 예보**를 바로 받는다(NOAA 가 CORS 허용). 광고는 배너만(테스트 ID).
-이름·번들 ID·결제 여부 사용자 확인 대기 → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
+Flutter 1차 완성(`tides_app/flutter/`) + **보상형 30일 물때표**(영상 1편 → 24시간). 테스트 34개 통과(엔진 21 + 로봇 13), 웹 클릭 점검 34/34 + 스크린샷 11장.
+웹 미리보기 https://soulfulfillable.github.io/test-mvp/tides-app/index.html — 폰에서 NOAA 실제 예보. 광고는 테스트 ID(웹은 가짜 광고, `?ads=slow|none|early`).
+이름 `Glance Tides: Tide Chart`·번들 `com.soulfulfill.tides` **Apple 등록 완료**, 아이콘·스토어 문구 초안 완료. ASC 앱 레코드·AdMob(사용자) 대기 → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- ✅ [사용자] 이름 `Glance Tides: Tide Chart`, 번들 `com.soulfulfill.tides`, 결제 없음, 30일 표 보상형 (10-03).
-- [사용자] 웹 미리보기를 바닷가 근처 아니어도 한 번 열어 보고 '느낌' 한마디.
-- [세션] 결정 나면: 번들 등록 Actions → `Release iOS` 선택지에 `tides` 추가 → 아이콘 → 스토어 문구(`tides_app/store/`).
+- [사용자] App Store Connect → 앱 → ＋ → 신규 앱: 플랫폼 iOS / 이름 `Glance Tides: Tide Chart` / 기본 언어 English (U.S.) /
+  번들 ID `com.soulfulfill.tides` 선택 / SKU `tides` / 사용자 액세스 Full Access → 생성. (없으면 `Release iOS` 업로드가 실패한다)
+- [사용자] AdMob(**`soulfulfillable` 계정**, 게시자 `pub-4724352880074547`) → 앱 → 앱 추가 → iOS / "아니요(스토어 미등록)" / 앱 이름 `Glance Tides` →
+  광고 단위 2개: ① **Banner** 이름 `banner` ② **Rewarded** 이름 `rewarded_30day` (보상 설정 기본값). 앱 ID(`~`)·단위 ID 2개(`/`) 화면 캡처 주면 반영.
+- [세션] ID 받으면 `lib/core/ads.dart`·Info.plist·AndroidManifest 교체 → `Release iOS`(app=tides) → TestFlight → 사용자 '느낌' → 스크린샷 6장(1290×2796) → `App Store 등록 정보 채우기`.
+- [사용자, 선택] 웹 미리보기 '느낌' 한마디.
+- 확인 못 한 것: iOS 실제 빌드(맥에서 첫 컴파일은 `Release iOS` 때), 실기기 위치 권한 창, 실제 AdMob 영상(지금은 테스트·가짜 광고).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |

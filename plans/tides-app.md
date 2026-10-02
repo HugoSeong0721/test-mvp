@@ -29,6 +29,14 @@
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
 
+### 2026-10-03 개발 세션 1 (이어서)
+- 사용자 결정: 이름 **Glance Tides: Tide Chart**, 번들 `com.soulfulfill.tides`(Apple 등록 완료), 광고 제거 결제 없음, 30일 표 = 보상형.
+- **30일 물때표**: 홈 7일 표 아래 "Next 30 days" 카드 → 영상 끝까지 보면 24시간 열림(모든 관측소) → NOAA 32일 hilo(약 6KB) + 날마다 일출일몰·달.
+  중간에 닫음 → 안 열림 안내, 영상 없음 → 최대 8초 "Loading…" 뒤 안내, 두 번 탭해도 영상 한 번, 신호 없음 → No data + Try again(가짜 표 없음).
+- 아이콘(`assets/icon/icon.svg` → 1024 PNG, 조석 곡선 + 초승달), 스토어 문구·메타데이터 초안 `tides_app/store/`, `Release iOS`·`App Store 등록 정보 채우기` 에 `tides` 추가.
+- 테스트 34개(엔진 21 + 로봇 13) + 웹 클릭 점검 34/34.
+- 남은 것: ASC 앱 레코드·AdMob 앱/광고 단위 2개(사용자) → 실제 ID 교체 → Release iOS(tides) → TestFlight → 스크린샷 → 심사.
+
 ### 2026-10-03 개발 세션 1
 - NOAA 점검(작업 환경에서 NOAA 가 막혀 Actions `Fetch NOAA tides data` 로): 관측소 **3,499곳**(기준 R 1,256 / 보조 S 2,243), 목록 2MB·418ms,
   예보 65~300ms, **CORS `*`**(웹 미리보기에서도 폰이 NOAA 직접 호출). 보조 관측소는 6분 예보가 없다(hilo 만) → 곡선은 코사인 보간 + "estimated" 표기.
