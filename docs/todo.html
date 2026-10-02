@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>내가 할 일</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e3e1dc;--acc:#2f6fed;--ok:#1f9d55}
+@media (prefers-color-scheme:dark){:root{--bg:#121214;--card:#1c1c1f;--ink:#f2f2f4;--sub:#a0a0a8;--line:#2c2c31;--acc:#6b9bff;--ok:#3ccf7c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;padding:16px 16px 48px}
+h1{font-size:22px;margin:4px 0 4px}
+p.lead{color:var(--sub);margin:0 0 16px;font-size:14px}
+h2{font-size:17px;margin:24px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.card h3{margin:0 0 8px;font-size:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.k{color:var(--sub);font-size:13px;flex:0 0 72px}
+.v{flex:1;font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all}
+button{border:1px solid var(--line);background:transparent;color:var(--acc);border-radius:8px;padding:6px 10px;font-size:13px}
+button.done{color:var(--ok);border-color:var(--ok)}
+label.chk{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px}
+ol{padding-left:20px;margin:6px 0}
+li{margin:4px 0}
+.note{font-size:13px;color:var(--sub)}
+</style>
+</head>
+<body>
+<h1>내가 할 일 (Apple · AdMob)</h1>
+<p class="lead">Apple 이 앱 등록을 API로 막아 둬서 이 두 가지만 직접 하시면 돼요. 나머지(번들 등록·업로드·스토어 문구·스크린샷)는 세션이 자동으로 해요. 값은 <b>복사</b> 눌러서 붙여 넣기.</p>
+
+<h2>① App Store Connect — 신규 앱 (앱마다 1~2분)</h2>
+<p class="note">appstoreconnect.apple.com → 앱 → ＋ → 신규 앱. 플랫폼 <b>iOS</b>, 기본 언어 <b>English (U.S.)</b>, 사용자 액세스 <b>Full Access</b>. 이름·번들·SKU 만 아래 값으로.</p>
+<div id="asc"></div>
+
+<h2>② AdMob — 앱 + 배너 광고 단위 (앱마다 2분)</h2>
+<p class="note">admob.google.com (<b>soulfulfillable</b> 계정) → 앱 → 앱 추가 → iOS → "스토어에 등록되지 않음" → 이름 입력 → 광고 단위 추가 → <b>형식은 "배너(Banner)" 카드</b>, 이름은 <code>banner</code> 직접 입력.<br>
+다 만든 뒤 <b>AdMob 앱 목록·광고 단위 화면을 캡처해서 각 세션에 붙여 넣으면</b> 세션이 ID를 읽어 넣어요.<br>
+급하지 않아요 — TestFlight 까지는 테스트 광고로 돌고, <b>스토어 제출 전에만</b> 있으면 돼요.</p>
+<div id="admob"></div>
+
+<p class="note" style="margin-top:24px">체크 표시는 이 폰에만 저장돼요. 새 앱이 생기면 기획 파트너가 이 페이지에 추가합니다.</p>
+
+<script>
+const apps=[
+ {id:'mortgage',name:'Glance: Mortgage Calculator',bundle:'com.soulfulfill.mortgage',sku:'mortgage',admob:'Glance Mortgage'},
+ {id:'decibel',name:'Glance dB: Decibel Meter',bundle:'com.soulfulfill.decibel',sku:'decibel',admob:'Glance dB'},
+ {id:'speedometer',name:'Glance Speed: GPS Speedometer',bundle:'com.soulfulfill.speedometer',sku:'speedometer',admob:'Glance Speed'},
+ {id:'tides',name:'Glance Tides: Tide Chart',bundle:'com.soulfulfill.tides',sku:'tides',admob:'Glance Tides',note:'번들 등록이 끝나야 목록에 떠요 — 물때 세션이 "번들 등록 완료" 하면 그때.'}
+];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function row(k,v){return `<div class="row"><span class="k">${k}</span><span class="v">${v}</span><button data-copy="${v}">복사</button></div>`}
+function card(a,kind){
+  const key='todo-'+kind+'-'+a.id, done=store.get(key)==='1';
+  const body=kind==='asc'
+    ? row('이름',a.name)+row('번들 ID',a.bundle)+row('SKU',a.sku)
+    : row('앱 이름',a.admob)+row('광고 단위','banner');
+  return `<div class="card"><h3>${a.name}</h3>${body}${a.note&&kind==='asc'?`<p class="note">${a.note}</p>`:''}
+  <label class="chk"><input type="checkbox" data-key="${key}" ${done?'checked':''}> 했어요</label></div>`;
+}
+document.getElementById('asc').innerHTML=apps.map(a=>card(a,'asc')).join('');
+document.getElementById('admob').innerHTML=apps.map(a=>card(a,'admob')).join('');
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-copy]'); if(!b)return;
+  const t=b.dataset.copy;
+  const fin=()=>{b.textContent='복사됨';b.classList.add('done');setTimeout(()=>{b.textContent='복사';b.classList.remove('done')},1200)};
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(fin,fin);else fin();
+});
+document.addEventListener('change',e=>{const c=e.target.closest('input[data-key]');if(c)store.set(c.dataset.key,c.checked?'1':'0')});
+</script>
+</body>
+</html>

@@ -20,6 +20,12 @@
   사용자가 어느 계정인지 헷갈려 하면: AdMob → Settings → Account information → Publisher ID 가 위 값인지 확인하게 한다.
 - Apple 개발자·App Store Connect: 개인 Gmail 로 가입된 개인(Individual) 계정 (`ops/README.md`).
 
+## 사용자 할 일 모음 페이지
+
+- **https://soulfulfillable.github.io/test-mvp/todo.html** — Apple 앱 레코드·AdMob 처럼 사용자만 할 수 있는 일을 앱별로 복사 버튼과 함께 모아 둔 폰용 페이지 (`docs/todo.html`).
+- 개발 세션은 사용자에게 콘솔 작업을 부탁할 때 **이 페이지의 `apps` 목록에 자기 앱 값(이름·번들·SKU·AdMob 이름)을 추가**하고 링크를 준다. 끝난 앱은 빼도 된다.
+- 자동화 불가 확인(2026-10-03): ASC API 는 앱 생성(POST /v1/apps) 자체를 막음. AdMob API 의 앱·광고 단위 생성은 관리형(managed) 계정 전용 제한 접근.
+
 ## 사용자 공통 성향 (여러 세션에서 확인된 것, 기획 파트너가 정리)
 
 - 출퇴근길에 **폰으로** 들어온다 → 질문은 짧게, A/B 로, 추천을 첫 번째에. 링크는 바로 눌러 볼 수 있게(Pages).
