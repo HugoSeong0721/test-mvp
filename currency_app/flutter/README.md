@@ -75,7 +75,7 @@ android/                          안드로이드 프로젝트 (flutter create �
    - 앱 아이콘 512×512 → `currency_app/store/icon-512.png`
    - 피처 그래픽 1024×500, 스크린샷 최소 2장 (폰에서 캡처)
 4. **Monitor and improve → Policy and programs → App content** 에서 필수 항목 채우기
-   - 개인정보처리방침 URL → `https://hugoseong0721.github.io/test-mvp/somrate-privacy.html`
+   - 개인정보처리방침 URL → `https://soulfulfillable.github.io/test-mvp/somrate-privacy.html`
    - 광고: **예** (AdMob 배너 — 아래 "광고" 절)
    - 데이터 안전(Data safety): 아래 초안 참고
    - 콘텐츠 등급 설문: 유틸리티, 폭력·도박 등 전부 아니오 → 전체이용가
@@ -167,7 +167,7 @@ App Store Connect(appstoreconnect.apple.com)에서:
 1. **My Apps → + → New App** — 이름 `한눈환율`(또는 원하는 이름), 번들 ID `com.soulfulfill.currency` 선택, SKU 아무거나(`somrate`).
 2. 업로드된 빌드 선택, 스크린샷(6.7형 iPhone 최소 1장 — 실행한 폰에서 캡처), 설명, 키워드, 지원 URL.
 3. **App Privacy**: 광고 SDK 가 있으므로 "식별자(기기 ID)·사용 데이터 수집 — 제3자 광고 목적" 으로 답한다.
-   개인정보처리방침 URL → `https://hugoseong0721.github.io/test-mvp/somrate-privacy.html` (광고 문구 추가 필요).
+   개인정보처리방침 URL → `https://soulfulfillable.github.io/test-mvp/somrate-privacy.html` (광고 문구 추가 필요).
 4. 연령 등급 설문 전부 "없음" → 4+. 가격 무료.
 5. **Submit for Review**. 보통 1~2일.
 

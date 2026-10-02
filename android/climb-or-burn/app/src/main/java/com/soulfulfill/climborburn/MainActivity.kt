@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
         /** 웹에서 게임이 열려 있는 주소. 공유 링크는 이쪽을 가리켜야 상대가 열 수 있다. */
         private const val PLAY_URL =
-            "https://hugoseong0721.github.io/test-mvp/firechase.html"
+            "https://soulfulfillable.github.io/test-mvp/firechase.html"
 
         /**
          * WebView 에는 navigator.share 가 없어서 게임의 공유 버튼이 수동 복사로 떨어진다.

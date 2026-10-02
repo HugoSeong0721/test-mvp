@@ -6,8 +6,8 @@ Web-first MVP for an acupuncture clinic portal and patient workflow.
 
 | Use | Link |
 |---|---|
-| Practitioner portal | https://hugoseong0721.github.io/test-mvp/#/clinic |
-| Patient / beta portal | https://hugoseong0721.github.io/test-mvp/#/patient |
+| Practitioner portal | https://soulfulfillable.github.io/test-mvp/#/clinic |
+| Patient / beta portal | https://soulfulfillable.github.io/test-mvp/#/patient |
 
 ## Current Login Flow
 
@@ -40,7 +40,7 @@ Scheduling and booking confirmation are intentionally removed from the primary U
 
 See [`MVP_UI_AUDIT.md`](MVP_UI_AUDIT.md) for the current full-screen map, connection map, deferred feature list, and rebuild checklist.
 
-For a visual storyboard, open [`docs/mvp-ui-flow-board.html`](docs/mvp-ui-flow-board.html). On GitHub Pages, use [`/test-mvp/mvp-ui-flow-board.html`](https://hugoseong0721.github.io/test-mvp/mvp-ui-flow-board.html). A static preview is kept at [`docs/mvp-ui-flow-storyboard-preview.png`](docs/mvp-ui-flow-storyboard-preview.png).
+For a visual storyboard, open [`docs/mvp-ui-flow-board.html`](docs/mvp-ui-flow-board.html). On GitHub Pages, use [`/test-mvp/mvp-ui-flow-board.html`](https://soulfulfillable.github.io/test-mvp/mvp-ui-flow-board.html). A static preview is kept at [`docs/mvp-ui-flow-storyboard-preview.png`](docs/mvp-ui-flow-storyboard-preview.png).
 
 Keep these for a later database-backed phase:
 
@@ -117,13 +117,13 @@ Suggested outreach workflow:
 
 ## Repository
 
-- GitHub: `https://github.com/HugoSeong0721/test-mvp.git`
+- GitHub: `https://github.com/soulfulfillable/test-mvp.git`
 - Deployment: GitHub Pages served from the `docs/` folder
 
 ## Local Development
 
 ```bash
-git clone https://github.com/HugoSeong0721/test-mvp.git
+git clone https://github.com/soulfulfillable/test-mvp.git
 cd test-mvp
 flutter pub get
 flutter run -d chrome

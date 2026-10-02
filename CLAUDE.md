@@ -5,7 +5,7 @@
 - **한국어로 답변한다.**
 - **매 답변 마지막에 바로 눌러서 플레이/확인할 수 있는 링크를 붙인다.** 매번, 예외 없이.
 - 링크는 **GitHub Pages 주소**로 준다. claude.ai 아티팩트 링크는 사파리에서 바로 열기 불편하므로 쓰지 않는다.
-  - 형식: `https://hugoseong0721.github.io/test-mvp/<파일명>.html`
+  - 형식: `https://soulfulfillable.github.io/test-mvp/<파일명>.html`
   - githack, htmlpreview 같은 우회 서비스는 쓰지 않는다. 브랜치 이름에 슬래시(`claude/...`)가 들어가면
     경로 파싱이 깨져서 링크가 동작하지 않는다.
 

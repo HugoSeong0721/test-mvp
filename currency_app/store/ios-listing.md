@@ -70,13 +70,13 @@ App Store Connect → My Apps → 한눈환율 → iOS App 1.0 에 그대로 붙
 ### Support URL
 
 ```
-https://github.com/HugoSeong0721/test-mvp/issues
+https://github.com/soulfulfillable/test-mvp/issues
 ```
 
 ### Privacy Policy URL
 
 ```
-https://hugoseong0721.github.io/test-mvp/somrate-privacy.html
+https://soulfulfillable.github.io/test-mvp/somrate-privacy.html
 ```
 
 ### What's New (1.0)

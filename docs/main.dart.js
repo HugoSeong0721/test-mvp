@@ -29597,7 +29597,7 @@ n=new A.K(c,new A.a8J(),p).qQ(0)
 p=$.eV().bG("mail")
 i=A.b([i],t.s)
 m=t.N
-l=A.aa(["subject","[Test MVP] Today checklist reminder","text","Hello "+f+",\n\nToday is "+b+". Please check your visit prep items for today:\n\n"+o+"\n\nOpen your intake checklist:\nhttps://hugoseong0721.github.io/test-mvp/#/intake\n","html","<p>Hello <strong>"+f+"</strong>,</p>\n<p>Today is <strong>"+b+"</strong>. Please check your visit prep items for today:</p>\n<ul>"+n+'</ul>\n<p><a href="https://hugoseong0721.github.io/test-mvp/#/intake">Open your intake checklist</a></p>\n'],m,m)
+l=A.aa(["subject","[Test MVP] Today checklist reminder","text","Hello "+f+",\n\nToday is "+b+". Please check your visit prep items for today:\n\n"+o+"\n\nOpen your intake checklist:\nhttps://soulfulfillable.github.io/test-mvp/#/intake\n","html","<p>Hello <strong>"+f+"</strong>,</p>\n<p>Today is <strong>"+b+"</strong>. Please check your visit prep items for today:</p>\n<ul>"+n+'</ul>\n<p><a href="https://soulfulfillable.github.io/test-mvp/#/intake">Open your intake checklist</a></p>\n'],m,m)
 k=A.aa(["type","daily_checklist_reminder","patientId",e,"clinicId",a,"patientName",f,"dateLabel",b,"missingItems",c,"queuedBy","patient_intake_screen"],m,t.K)
 j=$.h2().eB()
 s=3
@@ -29621,7 +29621,7 @@ if(h)l=""
 else l="<p><strong>Requested Questions</strong></p>\n<ul>"+(f.length===0?"<li>No requested questions</li>":new A.K(f,new A.a8s(),A.N(f).i("K<1,j>")).qQ(0))+"</ul>\n"
 f=$.eV().bG("mail")
 e=A.b([B.c.J(d)],t.s)
-k=A.aa(["subject",n,"text","Hello "+a0+",\n\n"+o+"\n\nScheduled visit time: "+a1+"\nLast visit date: "+b+"\n\n"+m+"\nPractitioner note:\n"+p+"\n\nPortal link:\nhttps://hugoseong0721.github.io/test-mvp/\n\nFirst app password: Daisy\nAfter that, choose Friend Beta Sign Up / Login or log in with your existing account.\n","html","<p>Hello <strong>"+a0+"</strong>,</p>\n<p>"+o+"</p>\n<p>\nScheduled visit time: <strong>"+a1+"</strong><br/>\nLast visit date: <strong>"+b+"</strong>\n</p>\n"+l+"\n<p><strong>Practitioner Note</strong><br/>"+p+'</p>\n<p>\n<a href="https://hugoseong0721.github.io/test-mvp/">Open the portal here</a>\n</p>\n<p>\nFirst app password: <strong>Daisy</strong><br/>\nAfter that, choose Friend Beta Sign Up / Login or log in with your existing account.\n</p>\n'],g,g)
+k=A.aa(["subject",n,"text","Hello "+a0+",\n\n"+o+"\n\nScheduled visit time: "+a1+"\nLast visit date: "+b+"\n\n"+m+"\nPractitioner note:\n"+p+"\n\nPortal link:\nhttps://soulfulfillable.github.io/test-mvp/\n\nFirst app password: Daisy\nAfter that, choose Friend Beta Sign Up / Login or log in with your existing account.\n","html","<p>Hello <strong>"+a0+"</strong>,</p>\n<p>"+o+"</p>\n<p>\nScheduled visit time: <strong>"+a1+"</strong><br/>\nLast visit date: <strong>"+b+"</strong>\n</p>\n"+l+"\n<p><strong>Practitioner Note</strong><br/>"+p+'</p>\n<p>\n<a href="https://soulfulfillable.github.io/test-mvp/">Open the portal here</a>\n</p>\n<p>\nFirst app password: <strong>Daisy</strong><br/>\nAfter that, choose Friend Beta Sign Up / Login or log in with your existing account.\n</p>\n'],g,g)
 j=A.aa(["type",h?"practitioner_note_notification":"answer_request_notification","patientName",a0,"queuedBy","practitioner_dashboard"],g,g)
 i=$.h2().eB()
 s=2

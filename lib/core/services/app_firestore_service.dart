@@ -694,7 +694,7 @@ Email: <strong>$emailLine</strong>
 
     final textItems = missingItems.map((item) => '- $item').join('\n');
     final htmlItems = missingItems.map((item) => '<li>$item</li>').join();
-    const appLink = 'https://hugoseong0721.github.io/test-mvp/#/intake';
+    const appLink = 'https://soulfulfillable.github.io/test-mvp/#/intake';
 
     await _db.collection('mail').add({
       'to': [patientEmail.trim()],
@@ -758,7 +758,7 @@ $appLink
               ? 'No note text was added'
               : 'No additional note'
         : note.trim();
-    const appLink = 'https://hugoseong0721.github.io/test-mvp/';
+    const appLink = 'https://soulfulfillable.github.io/test-mvp/';
     final introLine = isNote
         ? 'Your practitioner sent you a portal note.'
         : 'Your practitioner has requested pre-visit intake answers.';

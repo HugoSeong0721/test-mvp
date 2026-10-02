@@ -118,7 +118,7 @@ class _PractitionerDashboardScreenState
   /// Public "Pattern Finder" preview URL a patient can scan on arrival to run
   /// the guided intake themselves before the consultation.
   static const String _patientIntakeUrl =
-      'https://hugoseong0721.github.io/test-mvp/pattern-finder-preview.html';
+      'https://soulfulfillable.github.io/test-mvp/pattern-finder-preview.html';
 
   /// Records the practitioner's confirmed syndrome against the app's
   /// prediction — the feedback loop that lets the rules improve over time.

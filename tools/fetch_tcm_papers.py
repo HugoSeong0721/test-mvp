@@ -47,7 +47,7 @@ REQUEST_DELAY = 1.0
 TIMEOUT = 30
 # A contact email helps API providers reach you about heavy usage; harmless if
 # left as-is. Europe PMC and arXiv both recommend a descriptive User-Agent.
-USER_AGENT = "test-mvp-tcm-paper-collector/1.0 (https://github.com/HugoSeong0721/test-mvp)"
+USER_AGENT = "test-mvp-tcm-paper-collector/1.0 (https://github.com/soulfulfillable/test-mvp)"
 
 # Default search queries covering the three research directions described in
 # ADAPTIVE_TCM_INQUIRY_NOTES.md. You can override/extend these by editing
