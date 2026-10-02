@@ -24,6 +24,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,9 +48,10 @@ jobs:
         env:
           TAGS: ${{ inputs.tags }}
           MAX_ITEMS: ${{ inputs.max_items }}
-        run: python3 tools/coloring/fetch_openclipart.py
+        run: timeout 900 python3 -u tools/coloring/fetch_openclipart.py || echo "fetch exited with $?"
 
       - name: Commit
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
