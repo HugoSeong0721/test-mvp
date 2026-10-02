@@ -59,6 +59,10 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 속도계 | 차로 달린 최고 속도가 달리기 모드로 넘어가 "BEST 0:50/mi" — 테스트는 통과, **웹 스크린샷에서만** 보임 | 단위·의미가 다른 모드는 기록을 따로 저장. 스크린샷을 화면마다 직접 보고, 찾으면 고치기 전 코드에서 실패하는 테스트부터 |
+| 2026-10-03 | 속도계 | 잘린 글자 검사를 테스트 기본 글꼴(Ahem)로 돌려 오탐 6건 | SDK Roboto 를 `FontLoader` 로 넣고 재면 진짜 잘림만 남는다. 버튼 글자는 '…' 대신 `FittedBox(scaleDown)` |
+| 2026-10-03 | 속도계 | 위젯 테스트에서 가짜 GPS 이벤트 직후 화면이 한 박자 늦음 | 스트림 이벤트 뒤엔 `pump(Duration.zero)` (그냥 `pump()` 는 프레임이 없으면 안 그림). 시간은 `package:clock` |
+| 2026-10-03 | 속도계 | 큰 글씨(135%) + iPhone SE 에서 아래 시트가 넘쳐 Done 이 화면 밖 | 시트는 제목 줄 오른쪽에 Done, 내용은 스크롤. 로봇의 `press()` 가 버튼이 화면 안·안 가려졌는지 hit test 로 확인 |
 | 2026-10-03 | 대출 | 숫자 칸이 좁아 "18.75 %"·비싼 집의 "Principal & interest" 가 잘림 — 기본값·한 기기 테스트는 통과 | 로봇에 **잘림 자동 검사**(`RenderParagraph.didExceedMaxLines`, `RenderEditable` 글자 폭 > 칸 폭)를 넣고 큰 값·3개 기기로 돈다 (`mortgage_app/flutter/test/robot_test.dart`) |
 | 2026-10-03 | 대출 | `Semantics(textField: true)` 로 TextField 를 감쌌더니 VoiceOver 에 입력 칸이 두 개씩 생김 (웹 접근성 트리 덤프로 발견) | `MergeSemantics` 로 합치고, 로봇에서 화면 읽기 입력 칸 수 == 실제 칸 수 검사 |
 | 2026-10-03 | 대출 | 위젯 테스트 스크린샷이 3배 확대된 일부만 / 차트 글씨가 네모 | 루트 레이어를 `physicalSize` 로 찍고 SDK Roboto 를 `FontLoader` 로 넣기, `TextPainter` 에 테마 글꼴 전달 |
