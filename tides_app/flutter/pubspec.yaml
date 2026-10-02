@@ -96,3 +96,17 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# 앱 아이콘 생성: dart run flutter_launcher_icons
+# 원본은 assets/icon/icon.svg 를 Playwright 로 렌더한 assets/icon/icon-1024.png (이모지·남의 그림 안 씀)
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true   # App Store 는 알파 채널이 있는 아이콘을 거부한다
+  image_path: "assets/icon/icon-1024.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon/icon-1024.png"
+    background_color: "#0B3A66"
+    theme_color: "#1677C9"

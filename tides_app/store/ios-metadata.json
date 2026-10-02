@@ -1,0 +1,14 @@
+{
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 원문은 ios-listing.md. 스크린샷은 TestFlight 빌드로 찍은 뒤 채운다.",
+  "bundleId": "com.soulfulfill.tides",
+  "locale": "en-US",
+  "subtitle": "Tides Near Me & Tide Times",
+  "privacyPolicyUrl": "https://soulfulfillable.github.io/test-mvp/tides-privacy.html",
+  "promotionalText": "Tide times and tide charts for 3,499 NOAA stations. No full-screen ads — see the tide the moment you open the app, even with no signal at the beach.",
+  "description": "Open the app, see the tide. No 30-second ads.\n\nGlance Tides finds the NOAA tide station nearest you and shows exactly what the water is doing right now — rising or falling, how high it is, and when the next high and low tide come.\n\nTODAY AT A GLANCE\n• Big Rising / Falling indicator with the height right now\n• Next high and low tide with countdown\n• Smooth 24-hour tide chart — drag across it to read any time\n• Sunrise and sunset shading, moon phase\n\n7 DAYS FREE, 30 DAYS WHEN YOU NEED IT\n• Highs and lows for the whole week, always free\n• Planning a fishing trip? Watch one short video to open the 30-day tide table for 24 hours\n\nOFFICIAL NOAA PREDICTIONS\n• 3,499 NOAA CO-OPS stations: every US coast, Alaska, Hawaii, Puerto Rico, Guam and more\n• Heights in feet or meters above MLLW, times in the station's local time\n• Search by beach, city, state or station ID, or save favorites\n\nWORKS AT THE BEACH\n• Predictions are saved on your phone, so they still show with weak or no signal\n• Your location is used only on your phone to find the nearest station — never sent anywhere\n\nNo account. No subscription. One small banner ad.\n\nTide predictions are astronomical and do not include wind, storms or river flow. Not for navigation.",
+  "keywords": "high,low,noaa,fishing,beach,surf,moon,sunrise,ocean,boating,kayak,clam,table,forecast,coast",
+  "supportUrl": "https://github.com/soulfulfillable/test-mvp/issues",
+  "reviewNotes": "Tide predictions come from NOAA CO-OPS public API (api.tidesandcurrents.noaa.gov, no key). Location (\"When In Use\") is used once on-device to pick the nearest station; it is not stored or sent — you can also search stations without location. Ads: AdMob banner, and one optional rewarded video that opens a 30-day tide table for 24 hours (7-day tides are always free). No login required.",
+  "screenshots": [],
+  "screenshotDisplayType": "APP_IPHONE_67"
+}
