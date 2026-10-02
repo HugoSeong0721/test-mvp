@@ -1,12 +1,17 @@
-name: App Store 등록 정보 채우기 (환율 앱)
+name: App Store 등록 정보 채우기 (앱 선택)
 
-# currency_app/store/ios-metadata.json 과 스크린샷을 App Store Connect 의 편집 중인 버전에 넣는다.
+# <앱>_app/store/ios-metadata.json 과 <앱>_app/store/screenshots 를 App Store Connect 의 편집 중인 버전에 넣는다.
 # 수동 실행 전용. 같은 Secrets(ASC_KEY_ID/ASC_ISSUER_ID/ASC_KEY_P8) 를 쓴다.
 # App Privacy 설문·심사 연락처·저작권·Submit for Review 는 API 가 없거나 사람이 정할 값이라 직접 한다.
 
 on:
   workflow_dispatch:
     inputs:
+      app:
+        description: "채울 앱"
+        type: choice
+        options: [currency, catdoku]
+        default: currency
       build:
         description: "연결할 빌드 번호 (latest = 처리 완료된 최신)"
         default: latest
@@ -34,8 +39,8 @@ jobs:
       - name: Fill App Store Connect
         run: |
           python3 -m pip install -q pyjwt cryptography
-          python3 .github/scripts/asc_metadata.py currency_app/store/ios-metadata.json \
-            currency_app/store/screenshots "${{ inputs.build }}"
+          python3 .github/scripts/asc_metadata.py ${{ inputs.app }}_app/store/ios-metadata.json \
+            ${{ inputs.app }}_app/store/screenshots "${{ inputs.build }}"
 
       - name: Remove API key
         if: always()

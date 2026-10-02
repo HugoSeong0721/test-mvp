@@ -1,4 +1,4 @@
-name: Release iOS (환율 앱 → App Store Connect)
+name: Release iOS (앱 선택 → App Store Connect)
 
 # 맥 없이 App Store Connect 에 빌드를 올린다. 수동 실행 전용(Actions → Run workflow).
 # App Store Connect API 키로 배포 인증서·App Store 프로파일을 실행마다 새로 발급해 수동 서명하고,
@@ -12,10 +12,19 @@ name: Release iOS (환율 앱 → App Store Connect)
 #   ASC_ISSUER_ID          같은 화면 위쪽의 Issuer ID (UUID)
 #   ASC_KEY_P8             내려받은 AuthKey_XXXX.p8 파일 내용 전체 (BEGIN/END 줄 포함)
 #
-# 빌드 번호는 실행 번호(run_number)를 써서 올릴 때마다 자동으로 커진다.
+# 빌드 번호는 실행 번호(run_number)를 써서 올릴 때마다 자동으로 커진다 (앱이 달라도 계속 커져서 문제없다).
+#
+# 앱 추가: 아래 options 에 이름을 넣고 APP_DIR/BUNDLE_ID 매핑에 한 줄씩 더한다.
+#   폴더는 <이름>_app/flutter, 번들 ID 는 developer.apple.com 에 먼저 등록돼 있어야 한다.
 
 on:
   workflow_dispatch:
+    inputs:
+      app:
+        description: "올릴 앱"
+        type: choice
+        options: [currency, catdoku]
+        default: currency
 
 permissions:
   contents: read
@@ -29,8 +38,9 @@ jobs:
     runs-on: macos-latest
     defaults:
       run:
-        working-directory: currency_app/flutter
+        working-directory: ${{ inputs.app }}_app/flutter
     env:
+      BUNDLE_ID: ${{ inputs.app == 'catdoku' && 'com.soulfulfill.catdoku' || 'com.soulfulfill.currency' }}
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -77,7 +87,7 @@ jobs:
           "$RUNNER_TEMP/venv/bin/pip" install -q pyjwt cryptography
           SIGN_DIR="$RUNNER_TEMP/signing"
           echo "SIGN_DIR=$SIGN_DIR" >> "$GITHUB_ENV"
-          OUT=$("$RUNNER_TEMP/venv/bin/python" "$GITHUB_WORKSPACE/.github/scripts/asc_signing.py" setup com.soulfulfill.currency "$SIGN_DIR")
+          OUT=$("$RUNNER_TEMP/venv/bin/python" "$GITHUB_WORKSPACE/.github/scripts/asc_signing.py" setup "$BUNDLE_ID" "$SIGN_DIR")
           echo "$OUT"
           echo "PROFILE_NAME=$(echo "$OUT" | tail -1 | python3 -c 'import json,sys;print(json.load(sys.stdin)["profile_name"])')" >> "$GITHUB_ENV"
           echo "PROFILE_UUID=$(echo "$OUT" | tail -1 | python3 -c 'import json,sys;print(json.load(sys.stdin)["profile_uuid"])')" >> "$GITHUB_ENV"
@@ -104,7 +114,7 @@ jobs:
           import os, pathlib
           p = pathlib.Path('ios/Runner.xcodeproj/project.pbxproj')
           s = p.read_text()
-          anchor = 'PRODUCT_BUNDLE_IDENTIFIER = com.soulfulfill.currency;'
+          anchor = f'PRODUCT_BUNDLE_IDENTIFIER = {os.environ["BUNDLE_ID"]};'
           add = (anchor +
                  '\n\t\t\t\tCODE_SIGN_STYLE = Manual;'
                  f'\n\t\t\t\tDEVELOPMENT_TEAM = {os.environ["TEAM_ID"]};'
@@ -144,7 +154,7 @@ jobs:
             <key>signingCertificate</key><string>Apple Distribution</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>com.soulfulfill.currency</key><string>$PROFILE_NAME</string>
+              <key>$BUNDLE_ID</key><string>$PROFILE_NAME</string>
             </dict>
             <key>uploadSymbols</key><false/>
             <key>manageAppVersionAndBuildNumber</key><false/>
