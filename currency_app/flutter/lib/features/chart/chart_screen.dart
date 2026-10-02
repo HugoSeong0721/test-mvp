@@ -8,8 +8,7 @@ import '../../core/store.dart';
 import '../../core/theme.dart';
 import '../../core/widgets.dart';
 
-/// 기간별 환율 추이. 실제 과거 데이터 API가 붙기 전까지는 현재 환율에서
-/// 거슬러 올라가는 결정적(시드 고정) 랜덤워크로 모양만 보여준다.
+/// 기간별 실제 환율 추이 (RateService.history — 날짜별 공개 환율 파일).
 class ChartScreen extends StatefulWidget {
   const ChartScreen({super.key});
 
@@ -21,15 +20,10 @@ class _ChartScreenState extends State<ChartScreen> {
   String _period = '1M';
   bool _inverted = false;
 
-  static const _periods = [
-    ('1D', '1일'),
-    ('1W', '1주'),
-    ('1M', '1개월'),
-    ('3M', '3개월'),
-    ('1Y', '1년'),
-  ];
-  static const _points = {'1D': 24, '1W': 28, '1M': 30, '3M': 45, '1Y': 52};
-  static const _vol = {'1D': .002, '1W': .004, '1M': .006, '3M': .008, '1Y': .012};
+  static const _periods = ['1W', '1M', '3M', '1Y'];
+
+  String? _key;
+  Future<List<(DateTime, double)>>? _future;
 
   (String, String) _pair() {
     final s = AppStore.i;
@@ -40,18 +34,13 @@ class _ChartScreenState extends State<ChartScreen> {
     return _inverted ? (to, s.base) : (s.base, to);
   }
 
-  List<double> _series(String from, String to) {
-    final n = _points[_period]!;
-    final end = RateService.i.convert(1, from, to);
-    final rnd = _Mulberry32(_hashSeed('$from$to$_period'));
-    final vol = _vol[_period]!;
-    var v = end;
-    final out = <double>[end];
-    for (var i = 1; i < n; i++) {
-      v = v * (1 + (rnd.next() - .5) * 2 * vol);
-      out.insert(0, v);
+  Future<List<(DateTime, double)>> _historyFor(String a, String b) {
+    final key = '$a$b$_period${RateService.i.date}';
+    if (key != _key) {
+      _key = key;
+      _future = RateService.i.history(a, b, _period);
     }
-    return out;
+    return _future!;
   }
 
   @override
@@ -63,11 +52,17 @@ class _ChartScreenState extends State<ChartScreen> {
         final (a, b) = _pair();
         final r = RateService.i;
         final rate = r.convert(1, a, b);
-        final data = _series(a, b);
-        final min = data.reduce(math.min);
-        final max = data.reduce(math.max);
-        final pchg = (data.last - data.first) / data.first * 100;
+
+        return FutureBuilder<List<(DateTime, double)>>(
+          future: _historyFor(a, b),
+          builder: (context, snap) {
+        final data = [for (final (_, v) in snap.data ?? const <(DateTime, double)>[]) v];
+        final hasData = data.length >= 2;
+        final min = hasData ? data.reduce(math.min) : 0.0;
+        final max = hasData ? data.reduce(math.max) : 0.0;
+        final pchg = hasData ? (data.last - data.first) / data.first * 100 : 0.0;
         final col = pchg >= 0 ? fx.pos : fx.neg;
+        final loading = snap.connectionState != ConnectionState.done;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 12),
@@ -124,7 +119,7 @@ class _ChartScreenState extends State<ChartScreen> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Text('1 $a 기준 · 전일 대비 ',
+                        Text('1 $a · vs. yesterday ',
                             style: TextStyle(fontSize: 12.5, color: fx.text2)),
                         ChangeText(r.pairChange(a, b), fontSize: 12.5),
                       ],
@@ -136,7 +131,7 @@ class _ChartScreenState extends State<ChartScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                 child: Row(
                   children: [
-                    for (final (k, label) in _periods)
+                    for (final k in _periods)
                       Expanded(
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
@@ -149,7 +144,7 @@ class _ChartScreenState extends State<ChartScreen> {
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text(label,
+                            child: Text(k,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 12.5,
@@ -167,52 +162,50 @@ class _ChartScreenState extends State<ChartScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: AspectRatio(
                   aspectRatio: 360 / 190,
-                  child: CustomPaint(
-                    painter: _ChartPainter(
-                      data: data,
-                      color: col,
-                      gridColor: fx.text.withValues(alpha: .07),
-                      labelColor: fx.text.withValues(alpha: .45),
-                    ),
-                  ),
+                  child: hasData
+                      ? CustomPaint(
+                          painter: _ChartPainter(
+                            data: data,
+                            color: col,
+                            gridColor: fx.text.withValues(alpha: .07),
+                            labelColor: fx.text.withValues(alpha: .45),
+                          ),
+                        )
+                      : Center(
+                          child: loading
+                              ? SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: fx.accent))
+                              : Text('Chart needs an internet connection',
+                                  style: TextStyle(
+                                      fontSize: 13, color: fx.muted)),
+                        ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
                 child: Row(
                   children: [
-                    _Stat('최고', fmtAmount(max)),
+                    _Stat('High', hasData ? fmtAmount(max) : '—'),
                     const SizedBox(width: 8),
-                    _Stat('최저', fmtAmount(min)),
+                    _Stat('Low', hasData ? fmtAmount(min) : '—'),
                     const SizedBox(width: 8),
                     _Stat(
-                      '기간 변동',
-                      '${pchg >= 0 ? '+' : ''}${pchg.toStringAsFixed(2)}%',
-                      color: col,
+                      'Change',
+                      hasData
+                          ? '${pchg >= 0 ? '+' : ''}${pchg.toStringAsFixed(2)}%'
+                          : '—',
+                      color: hasData ? col : null,
                     ),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
-                child: OutlinedButton.icon(
-                  onPressed: () =>
-                      showToast(context, '실제 앱에서 푸시 알림으로 제공 예정'),
-                  icon: Icon(Icons.notifications_none, size: 15, color: fx.accent),
-                  label: const Text('목표 환율 도달 시 알림 받기',
-                      style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: fx.text2,
-                    minimumSize: const Size.fromHeight(46),
-                    side: BorderSide(color: fx.line),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
-              ),
             ],
           ),
+        );
+          },
         );
       },
     );
@@ -320,8 +313,8 @@ class _ChartPainter extends CustomPainter {
       Paint()..color = color,
     );
 
-    _label(canvas, '최저 ${fmtAmount(min)}', Offset(p, h - 8), false);
-    _label(canvas, '최고 ${fmtAmount(max)}', Offset(w - p, h - 8), true);
+    _label(canvas, 'Low ${fmtAmount(min)}', Offset(p, h - 8), false);
+    _label(canvas, 'High ${fmtAmount(max)}', Offset(w - p, h - 8), true);
   }
 
   void _label(Canvas canvas, String text, Offset at, bool alignRight) {
@@ -342,29 +335,4 @@ class _ChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ChartPainter old) =>
       old.data != data || old.color != color;
-}
-
-// 웹 프로토타입과 같은 결정적 랜덤워크 — 같은 통화쌍·기간이면 늘 같은 모양.
-int _hashSeed(String s) {
-  var h = 2166136261;
-  for (final cu in s.codeUnits) {
-    h ^= cu;
-    h = (h * 16777619) & 0xFFFFFFFF;
-  }
-  return h;
-}
-
-class _Mulberry32 {
-  _Mulberry32(this._a);
-  int _a;
-
-  static int _imul(int x, int y) =>
-      ((x & 0xFFFFFFFF) * (y & 0xFFFFFFFF)) & 0xFFFFFFFF;
-
-  double next() {
-    _a = (_a + 0x6D2B79F5) & 0xFFFFFFFF;
-    var t = _imul(_a ^ (_a >>> 15), 1 | _a);
-    t = ((t + _imul(t ^ (t >>> 7), 61 | t)) ^ t) & 0xFFFFFFFF;
-    return ((t ^ (t >>> 14)) & 0xFFFFFFFF) / 4294967296;
-  }
 }

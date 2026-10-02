@@ -63,7 +63,7 @@ jobs:
 
           PLIST=ios/Runner/Info.plist
           PB=/usr/libexec/PlistBuddy
-          $PB -c "Set :CFBundleDisplayName 한눈환율" "$PLIST"
+          $PB -c "Set :CFBundleDisplayName Glance" "$PLIST"
           $PB -c "Add :GADApplicationIdentifier string $ADMOB_IOS_APP_ID" "$PLIST"
           # SKAdNetwork — iOS 14+ 에서 광고 성과 측정에 필요 (Google 네트워크 ID)
           $PB -c "Add :SKAdNetworkItems array" "$PLIST"

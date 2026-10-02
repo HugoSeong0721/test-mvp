@@ -3,7 +3,7 @@
          여기(릴리스에도 적용되는 main)에 명시하지 않으면 출시 빌드에서 환율이 안 온다. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="한눈환율"
+        android:label="Glance"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -52,35 +52,35 @@ class Currency {
 }
 
 const currencies = <Currency>[
-  Currency(code: 'USD', name: '미국 달러', group: CurrencyGroup.fiat, flag: '🇺🇸', snapshotRate: 1, snapshotChange: 0, tz: 'America/New_York'),
-  Currency(code: 'KRW', name: '대한민국 원', group: CurrencyGroup.fiat, flag: '🇰🇷', snapshotRate: 1385.20, snapshotChange: 0.32, tz: 'Asia/Seoul'),
-  Currency(code: 'EUR', name: '유로', group: CurrencyGroup.fiat, flag: '🇪🇺', snapshotRate: 0.8633, snapshotChange: -0.18, tz: 'Europe/Berlin'),
-  Currency(code: 'JPY', name: '일본 엔', group: CurrencyGroup.fiat, flag: '🇯🇵', snapshotRate: 148.03, snapshotChange: 0.24, tz: 'Asia/Tokyo'),
-  Currency(code: 'GBP', name: '영국 파운드', group: CurrencyGroup.fiat, flag: '🇬🇧', snapshotRate: 0.7444, snapshotChange: -0.09, tz: 'Europe/London'),
-  Currency(code: 'CNY', name: '중국 위안', group: CurrencyGroup.fiat, flag: '🇨🇳', snapshotRate: 7.163, snapshotChange: 0.05, tz: 'Asia/Shanghai'),
-  Currency(code: 'HKD', name: '홍콩 달러', group: CurrencyGroup.fiat, flag: '🇭🇰', snapshotRate: 7.821, snapshotChange: 0.01, tz: 'Asia/Hong_Kong'),
-  Currency(code: 'TWD', name: '대만 달러', group: CurrencyGroup.fiat, flag: '🇹🇼', snapshotRate: 29.91, snapshotChange: 0.12, tz: 'Asia/Taipei'),
-  Currency(code: 'SGD', name: '싱가포르 달러', group: CurrencyGroup.fiat, flag: '🇸🇬', snapshotRate: 1.284, snapshotChange: -0.06, tz: 'Asia/Singapore'),
-  Currency(code: 'THB', name: '태국 바트', group: CurrencyGroup.fiat, flag: '🇹🇭', snapshotRate: 32.41, snapshotChange: 0.21, tz: 'Asia/Bangkok'),
-  Currency(code: 'VND', name: '베트남 동', group: CurrencyGroup.fiat, flag: '🇻🇳', snapshotRate: 26150, snapshotChange: 0.08, tz: 'Asia/Ho_Chi_Minh'),
-  Currency(code: 'PHP', name: '필리핀 페소', group: CurrencyGroup.fiat, flag: '🇵🇭', snapshotRate: 57.20, snapshotChange: 0.15, tz: 'Asia/Manila'),
-  Currency(code: 'AUD', name: '호주 달러', group: CurrencyGroup.fiat, flag: '🇦🇺', snapshotRate: 1.5452, snapshotChange: -0.31, tz: 'Australia/Sydney'),
-  Currency(code: 'CAD', name: '캐나다 달러', group: CurrencyGroup.fiat, flag: '🇨🇦', snapshotRate: 1.3742, snapshotChange: 0.11, tz: 'America/Toronto'),
-  Currency(code: 'CHF', name: '스위스 프랑', group: CurrencyGroup.fiat, flag: '🇨🇭', snapshotRate: 0.7962, snapshotChange: -0.22, tz: 'Europe/Zurich'),
-  Currency(code: 'INR', name: '인도 루피', group: CurrencyGroup.fiat, flag: '🇮🇳', snapshotRate: 87.54, snapshotChange: 0.04, tz: 'Asia/Kolkata'),
-  Currency(code: 'KGS', name: '키르기스스탄 솜', group: CurrencyGroup.fiat, flag: '🇰🇬', snapshotRate: 87.45, snapshotChange: 0.07, keywords: '키르기즈 키르기스탄 솜 kyrgyz kyrgyzstan som', tz: 'Asia/Bishkek'),
-  Currency(code: 'RUB', name: '러시아 루블', group: CurrencyGroup.fiat, flag: '🇷🇺', snapshotRate: 79.60, snapshotChange: -0.11, keywords: '루블 ruble russia', tz: 'Europe/Moscow'),
-  Currency(code: 'KZT', name: '카자흐스탄 텡게', group: CurrencyGroup.fiat, flag: '🇰🇿', snapshotRate: 527.40, snapshotChange: 0.18, keywords: '텡게 tenge kazakh', tz: 'Asia/Almaty'),
-  Currency(code: 'UZS', name: '우즈베키스탄 숨', group: CurrencyGroup.fiat, flag: '🇺🇿', snapshotRate: 12420, snapshotChange: 0.09, keywords: '숨 sum soum uzbek', tz: 'Asia/Tashkent'),
-  Currency(code: 'MXN', name: '멕시코 페소', group: CurrencyGroup.fiat, flag: '🇲🇽', snapshotRate: 18.62, snapshotChange: -0.14, tz: 'America/Mexico_City'),
-  Currency(code: 'BRL', name: '브라질 헤알', group: CurrencyGroup.fiat, flag: '🇧🇷', snapshotRate: 5.423, snapshotChange: 0.19, tz: 'America/Sao_Paulo'),
-  Currency(code: 'BTC', name: '비트코인', group: CurrencyGroup.crypto, badge: '₿', badgeStyle: 'cr', snapshotRate: 1 / 89420, snapshotChange: -1.42),
-  Currency(code: 'ETH', name: '이더리움', group: CurrencyGroup.crypto, badge: 'Ξ', badgeStyle: 'cr', snapshotRate: 1 / 4210, snapshotChange: -2.05),
-  Currency(code: 'DOGE', name: '도지코인', group: CurrencyGroup.crypto, badge: 'Ð', badgeStyle: 'cr', snapshotRate: 1 / 0.213, snapshotChange: 3.10),
-  Currency(code: 'XAU', name: '금 (트로이온스)', group: CurrencyGroup.metal, badge: 'Au', badgeStyle: 'au', snapshotRate: 1 / 3392, snapshotChange: 0.45),
-  Currency(code: 'XAG', name: '은 (트로이온스)', group: CurrencyGroup.metal, badge: 'Ag', badgeStyle: 'ag', snapshotRate: 1 / 38.2, snapshotChange: 0.62),
-  Currency(code: 'XPT', name: '백금 (트로이온스)', group: CurrencyGroup.metal, badge: 'Pt', badgeStyle: 'pm', snapshotRate: 1 / 1310, snapshotChange: -0.12),
-  Currency(code: 'XPD', name: '팔라듐 (트로이온스)', group: CurrencyGroup.metal, badge: 'Pd', badgeStyle: 'pm', snapshotRate: 1 / 1125, snapshotChange: 0.08),
+  Currency(code: 'USD', name: 'US Dollar', keywords: 'dollar usa america', group: CurrencyGroup.fiat, flag: '🇺🇸', snapshotRate: 1, snapshotChange: 0, tz: 'America/New_York'),
+  Currency(code: 'KRW', name: 'South Korean Won', keywords: 'won korea', group: CurrencyGroup.fiat, flag: '🇰🇷', snapshotRate: 1385.20, snapshotChange: 0.32, tz: 'Asia/Seoul'),
+  Currency(code: 'EUR', name: 'Euro', keywords: 'europe', group: CurrencyGroup.fiat, flag: '🇪🇺', snapshotRate: 0.8633, snapshotChange: -0.18, tz: 'Europe/Berlin'),
+  Currency(code: 'JPY', name: 'Japanese Yen', keywords: 'yen japan', group: CurrencyGroup.fiat, flag: '🇯🇵', snapshotRate: 148.03, snapshotChange: 0.24, tz: 'Asia/Tokyo'),
+  Currency(code: 'GBP', name: 'British Pound', keywords: 'pound sterling uk britain england', group: CurrencyGroup.fiat, flag: '🇬🇧', snapshotRate: 0.7444, snapshotChange: -0.09, tz: 'Europe/London'),
+  Currency(code: 'CNY', name: 'Chinese Yuan', keywords: 'yuan renminbi rmb china', group: CurrencyGroup.fiat, flag: '🇨🇳', snapshotRate: 7.163, snapshotChange: 0.05, tz: 'Asia/Shanghai'),
+  Currency(code: 'HKD', name: 'Hong Kong Dollar', group: CurrencyGroup.fiat, flag: '🇭🇰', snapshotRate: 7.821, snapshotChange: 0.01, tz: 'Asia/Hong_Kong'),
+  Currency(code: 'TWD', name: 'Taiwan Dollar', keywords: 'taiwan ntd', group: CurrencyGroup.fiat, flag: '🇹🇼', snapshotRate: 29.91, snapshotChange: 0.12, tz: 'Asia/Taipei'),
+  Currency(code: 'SGD', name: 'Singapore Dollar', group: CurrencyGroup.fiat, flag: '🇸🇬', snapshotRate: 1.284, snapshotChange: -0.06, tz: 'Asia/Singapore'),
+  Currency(code: 'THB', name: 'Thai Baht', keywords: 'baht thailand', group: CurrencyGroup.fiat, flag: '🇹🇭', snapshotRate: 32.41, snapshotChange: 0.21, tz: 'Asia/Bangkok'),
+  Currency(code: 'VND', name: 'Vietnamese Dong', keywords: 'dong vietnam', group: CurrencyGroup.fiat, flag: '🇻🇳', snapshotRate: 26150, snapshotChange: 0.08, tz: 'Asia/Ho_Chi_Minh'),
+  Currency(code: 'PHP', name: 'Philippine Peso', keywords: 'peso philippines', group: CurrencyGroup.fiat, flag: '🇵🇭', snapshotRate: 57.20, snapshotChange: 0.15, tz: 'Asia/Manila'),
+  Currency(code: 'AUD', name: 'Australian Dollar', keywords: 'australia aussie', group: CurrencyGroup.fiat, flag: '🇦🇺', snapshotRate: 1.5452, snapshotChange: -0.31, tz: 'Australia/Sydney'),
+  Currency(code: 'CAD', name: 'Canadian Dollar', keywords: 'canada loonie', group: CurrencyGroup.fiat, flag: '🇨🇦', snapshotRate: 1.3742, snapshotChange: 0.11, tz: 'America/Toronto'),
+  Currency(code: 'CHF', name: 'Swiss Franc', keywords: 'franc switzerland', group: CurrencyGroup.fiat, flag: '🇨🇭', snapshotRate: 0.7962, snapshotChange: -0.22, tz: 'Europe/Zurich'),
+  Currency(code: 'INR', name: 'Indian Rupee', keywords: 'rupee india', group: CurrencyGroup.fiat, flag: '🇮🇳', snapshotRate: 87.54, snapshotChange: 0.04, tz: 'Asia/Kolkata'),
+  Currency(code: 'KGS', name: 'Kyrgyzstani Som', group: CurrencyGroup.fiat, flag: '🇰🇬', snapshotRate: 87.45, snapshotChange: 0.07, keywords: 'som kyrgyz kyrgyzstan', tz: 'Asia/Bishkek'),
+  Currency(code: 'RUB', name: 'Russian Ruble', group: CurrencyGroup.fiat, flag: '🇷🇺', snapshotRate: 79.60, snapshotChange: -0.11, keywords: 'ruble rouble russia', tz: 'Europe/Moscow'),
+  Currency(code: 'KZT', name: 'Kazakhstani Tenge', group: CurrencyGroup.fiat, flag: '🇰🇿', snapshotRate: 527.40, snapshotChange: 0.18, keywords: 'tenge kazakh', tz: 'Asia/Almaty'),
+  Currency(code: 'UZS', name: 'Uzbekistani Som', group: CurrencyGroup.fiat, flag: '🇺🇿', snapshotRate: 12420, snapshotChange: 0.09, keywords: 'sum soum uzbek', tz: 'Asia/Tashkent'),
+  Currency(code: 'MXN', name: 'Mexican Peso', keywords: 'peso mexico', group: CurrencyGroup.fiat, flag: '🇲🇽', snapshotRate: 18.62, snapshotChange: -0.14, tz: 'America/Mexico_City'),
+  Currency(code: 'BRL', name: 'Brazilian Real', keywords: 'real brazil', group: CurrencyGroup.fiat, flag: '🇧🇷', snapshotRate: 5.423, snapshotChange: 0.19, tz: 'America/Sao_Paulo'),
+  Currency(code: 'BTC', name: 'Bitcoin', keywords: 'btc crypto', group: CurrencyGroup.crypto, badge: '₿', badgeStyle: 'cr', snapshotRate: 1 / 89420, snapshotChange: -1.42),
+  Currency(code: 'ETH', name: 'Ethereum', keywords: 'eth ether crypto', group: CurrencyGroup.crypto, badge: 'Ξ', badgeStyle: 'cr', snapshotRate: 1 / 4210, snapshotChange: -2.05),
+  Currency(code: 'DOGE', name: 'Dogecoin', keywords: 'doge crypto', group: CurrencyGroup.crypto, badge: 'Ð', badgeStyle: 'cr', snapshotRate: 1 / 0.213, snapshotChange: 3.10),
+  Currency(code: 'XAU', name: 'Gold (troy oz)', keywords: 'gold ounce', group: CurrencyGroup.metal, badge: 'Au', badgeStyle: 'au', snapshotRate: 1 / 3392, snapshotChange: 0.45),
+  Currency(code: 'XAG', name: 'Silver (troy oz)', keywords: 'silver ounce', group: CurrencyGroup.metal, badge: 'Ag', badgeStyle: 'ag', snapshotRate: 1 / 38.2, snapshotChange: 0.62),
+  Currency(code: 'XPT', name: 'Platinum (troy oz)', keywords: 'platinum ounce', group: CurrencyGroup.metal, badge: 'Pt', badgeStyle: 'pm', snapshotRate: 1 / 1310, snapshotChange: -0.12),
+  Currency(code: 'XPD', name: 'Palladium (troy oz)', keywords: 'palladium ounce', group: CurrencyGroup.metal, badge: 'Pd', badgeStyle: 'pm', snapshotRate: 1 / 1125, snapshotChange: 0.08),
 ];
 
 final Map<String, Currency> currencyByCode = {
@@ -88,10 +88,10 @@ final Map<String, Currency> currencyByCode = {
 };
 
 const groupLabels = {
-  CurrencyGroup.fiat: '법정통화',
-  CurrencyGroup.crypto: '암호화폐',
-  CurrencyGroup.metal: '귀금속',
+  CurrencyGroup.fiat: 'Currencies',
+  CurrencyGroup.crypto: 'Crypto',
+  CurrencyGroup.metal: 'Precious metals',
 };
 
 /// 온보딩 첫 화면에 타일로 보여줄 "많이 쓰는 통화"
-const popularCodes = ['USD', 'KRW', 'EUR', 'JPY', 'CNY', 'GBP'];
+const popularCodes = ['USD', 'EUR', 'GBP', 'CAD', 'MXN', 'JPY'];

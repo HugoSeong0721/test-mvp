@@ -41,7 +41,7 @@ class _AdBannerState extends State<AdBanner> {
         onAdLoaded: (_) => setState(() => _loaded = true),
         onAdFailedToLoad: (ad, err) {
           ad.dispose();
-          debugPrint('배너 광고 로드 실패: $err');
+          debugPrint('Banner ad failed to load: $err');
         },
       ),
     )..load();

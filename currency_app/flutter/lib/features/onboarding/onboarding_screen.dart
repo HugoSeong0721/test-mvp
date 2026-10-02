@@ -47,7 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             color: fx.accentInk)),
                   ),
                   const SizedBox(height: 18),
-                  Text('어떤 통화를 기준으로\n쓰시겠어요?',
+                  Text('Which currency\ndo you use most?',
                       style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w700,
@@ -55,7 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           letterSpacing: -.5,
                           color: fx.text)),
                   const SizedBox(height: 9),
-                  Text('고른 통화가 맨 위에 고정돼요.\n내 돈을 넣으면 다른 나라 돈으로 바로 환산됩니다.',
+                  Text('It stays pinned at the top.\nType an amount and see it in every other currency.',
                       style: TextStyle(
                           fontSize: 13.5, height: 1.55, color: fx.text2)),
                 ],
@@ -67,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   const Padding(
                     padding: EdgeInsets.fromLTRB(4, 0, 4, 10),
-                    child: Eyebrow('많이 쓰는 통화'),
+                    child: Eyebrow('Popular'),
                   ),
                   GridView.count(
                     crossAxisCount: 2,
@@ -91,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Expanded(child: Divider(color: fx.line, height: 1)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('또는 검색해서 고르기',
+                          child: Text('Or search all currencies',
                               style: TextStyle(fontSize: 11, color: fx.muted)),
                         ),
                         Expanded(child: Divider(color: fx.line, height: 1)),
@@ -108,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               width: double.infinity,
               color: fx.appBg,
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
-              child: Text('나중에 앱에서 언제든 바꿀 수 있어요',
+              child: Text('You can change this anytime',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 11.5, color: fx.muted)),
             ),

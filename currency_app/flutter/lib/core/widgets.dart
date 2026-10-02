@@ -91,7 +91,7 @@ class LocalClock extends StatefulWidget {
       final here = DateTime(now.year, now.month, now.day);
       final thereDay = DateTime(there.year, there.month, there.day);
       final diff = thereDay.difference(here).inDays;
-      final prefix = diff > 0 ? '내일 ' : diff < 0 ? '어제 ' : '';
+      final prefix = diff > 0 ? '+1d ' : diff < 0 ? '−1d ' : '';
       final hh = there.hour.toString().padLeft(2, '0');
       final mm = there.minute.toString().padLeft(2, '0');
       return '$prefix$hh:$mm';

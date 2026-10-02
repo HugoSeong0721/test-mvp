@@ -17,16 +17,16 @@ Future<void> main() async {
   // 환율은 기다리지 않는다 — 스냅샷으로 먼저 그리고 도착하면 갈아끼운다
   RateService.i.load();
   initAds();
-  runApp(const SomRateApp());
+  runApp(const GlanceApp());
 }
 
-class SomRateApp extends StatelessWidget {
-  const SomRateApp({super.key});
+class GlanceApp extends StatelessWidget {
+  const GlanceApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '한눈환율',
+      title: 'Glance',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Fx.light, Brightness.light),
       darkTheme: buildTheme(Fx.dark, Brightness.dark),
@@ -112,8 +112,8 @@ class _TabBar extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
           child: Row(
             children: [
-              _tab(context, 0, Icons.swap_horiz_rounded, '변환'),
-              _tab(context, 1, Icons.show_chart_rounded, '차트'),
+              _tab(context, 0, Icons.swap_horiz_rounded, 'Convert'),
+              _tab(context, 1, Icons.show_chart_rounded, 'Chart'),
             ],
           ),
         ),

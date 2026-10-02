@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'currencies.dart';
@@ -47,23 +48,24 @@ class RateService extends ChangeNotifier {
       (change[to] ?? 0) - (change[from] ?? 0);
 
   String get statusLabel => switch (status) {
-        RateStatus.live => '실시간',
-        RateStatus.cache => '최근 저장',
-        RateStatus.offline => '오프라인 기준값',
+        RateStatus.live => 'Live',
+        RateStatus.cache => 'Saved',
+        RateStatus.offline => 'Offline',
         RateStatus.loading => '',
       };
 
-  /// 헤더 배지 글자: "08.22 · 실시간"
+  /// 헤더 배지 글자: "Oct 2 · Live"
   String get stampText {
-    if (status == RateStatus.loading) return '환율 불러오는 중…';
-    final md = date.length >= 10 ? date.substring(5).replaceAll('-', '.') : date;
+    if (status == RateStatus.loading) return 'Loading rates…';
+    final d = DateTime.tryParse(date);
+    final md = d == null ? date : DateFormat('MMM d', 'en_US').format(d);
     return '$md · $statusLabel';
   }
 
   String get statusHelp => switch (status) {
-        RateStatus.live => '방금 받아온 실시간 환율이에요',
-        RateStatus.cache => '마지막으로 받아둔 환율 — 인터넷 연결 후 자동 갱신',
-        _ => '오프라인 기준값 — 인터넷에 연결되면 자동으로 최신 환율로 바뀝니다',
+        RateStatus.live => 'Live rates, just updated',
+        RateStatus.cache => 'Last saved rates — refreshes when you are back online',
+        _ => 'Built-in offline rates — refreshes once you are online',
       };
 
   Future<void> load() async {
@@ -100,6 +102,85 @@ class RateService extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  // ---- 과거 환율 (차트) ----
+  // 날짜별 파일은 바뀌지 않으므로 받은 날은 기기에 저장해 두고 다시 받지 않는다.
+  static const _histKey = 'fx-hist-v1';
+  final Map<String, Map<String, double>> _hist = {};
+  bool _histLoaded = false;
+
+  /// 기간별 (날짜 수, 간격일). 일 단위 데이터만 있어 1일 차트는 없다.
+  static const historyPlan = {
+    '1W': (8, 1),
+    '1M': (31, 1),
+    '3M': (31, 3),
+    '1Y': (27, 14),
+  };
+
+  /// from→to 의 실제 과거 환율 [(날짜, 값)]. 못 받은 날은 건너뛴다.
+  Future<List<(DateTime, double)>> history(
+      String from, String to, String period) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!_histLoaded) {
+      _histLoaded = true;
+      try {
+        final raw = prefs.getString(_histKey);
+        if (raw != null) {
+          final j = jsonDecode(raw) as Map<String, dynamic>;
+          for (final e in j.entries) {
+            if (e.value is Map) _hist[e.key] = _toDoubles(e.value as Map);
+          }
+        }
+      } catch (_) {}
+    }
+
+    final (n, step) = historyPlan[period]!;
+    final end = DateTime.tryParse(date) ?? DateTime.now().toUtc();
+    final days = [
+      for (var i = n - 1; i >= 0; i--)
+        DateTime.utc(end.year, end.month, end.day - i * step)
+            .toIso8601String()
+            .substring(0, 10),
+    ];
+
+    final missing = days.where((d) => !_hist.containsKey(d)).toList();
+    var added = false;
+    for (var i = 0; i < missing.length; i += 8) {
+      final batch = missing.skip(i).take(8);
+      final got = await Future.wait(batch.map((d) async {
+        try {
+          return (d, (await _fetchDay(d)).rates);
+        } catch (_) {
+          return (d, null);
+        }
+      }));
+      for (final (d, rates) in got) {
+        if (rates == null) continue;
+        _hist[d] = {
+          for (final c in currencies)
+            if (rates[c.code.toLowerCase()] != null)
+              c.code: rates[c.code.toLowerCase()]!,
+        };
+        added = true;
+      }
+    }
+    if (added) {
+      final keep = (_hist.keys.toList()..sort()).reversed.take(400).toSet();
+      _hist.removeWhere((k, _) => !keep.contains(k));
+      try {
+        await prefs.setString(_histKey, jsonEncode(_hist));
+      } catch (_) {}
+    }
+
+    final out = <(DateTime, double)>[];
+    for (final d in days) {
+      final r = _hist[d];
+      final f = r?[from], t = r?[to];
+      if (f == null || t == null || f <= 0) continue;
+      out.add((DateTime.parse(d), t / f));
+    }
+    return out;
   }
 
   /// API에 없는 통화는 스냅샷 값을 그대로 둔다 — 부분 실패에도 화면이 깨지지 않게.

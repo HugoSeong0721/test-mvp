@@ -19,12 +19,12 @@ class AppStore extends ChangeNotifier {
 
   static const _key = 'fx-app-v1';
 
-  String base = 'KRW';
-  String buf = '10000';
-  List<String> targets = ['USD', 'JPY', 'EUR'];
-  String active = 'KRW';
+  String base = 'USD';
+  String buf = '100';
+  List<String> targets = ['EUR', 'GBP', 'MXN'];
+  String active = 'USD';
   String chartTo = 'USD';
-  List<String> recents = ['USD', 'JPY'];
+  List<String> recents = ['EUR', 'GBP'];
 
   /// 첫 실행 온보딩(기준 통화 선택)을 마쳤는지
   bool onboarded = false;
@@ -170,7 +170,7 @@ class AppStore extends ChangeNotifier {
   /// 온보딩에서 고른 통화를 기준으로 올리고, 비교 통화는 겹치지 않게 2개 채운다.
   void completeOnboarding(String code) {
     base = code;
-    targets = ['USD', 'EUR', 'JPY', 'KRW'].where((x) => x != code).take(3).toList();
+    targets = ['EUR', 'GBP', 'USD', 'MXN'].where((x) => x != code).take(3).toList();
     active = code;
     buf = '1000';
     chartTo = targets.first;

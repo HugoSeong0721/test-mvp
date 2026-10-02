@@ -74,7 +74,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
         s.setBase(code);
       case PickMode.add:
         s.addTarget(code);
-        showToast(context, '$code 추가됨');
+        showToast(context, '$code added');
       case PickMode.replace:
         if (code == kRemoveResult) {
           s.removeTarget(index!);
@@ -98,7 +98,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
               padding: const EdgeInsets.fromLTRB(24, 2, 24, 7),
               child: const Align(
                 alignment: Alignment.centerLeft,
-                child: Eyebrow('내 돈 · 기준 금액'),
+                child: Eyebrow('Amount'),
               ),
             ),
             Padding(
@@ -139,7 +139,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
             ),
             if (_kbdOpen)
               Keypad(
-                hint: '${s.active} 입력 중 · ⌫ 길게 누르면 전체 지우기',
+                hint: 'Typing ${s.active} · hold ⌫ to clear',
                 onDigit: s.typeDigit,
                 onDot: s.typeDot,
                 onBackspace: s.backspace,
@@ -171,13 +171,13 @@ class _Header extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('환율',
+                Text('Glance',
                     style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: fx.text)),
                 const SizedBox(height: 2),
-                const Eyebrow('Currency'),
+                const Eyebrow('Currency Converter'),
               ],
             ),
           ),
@@ -489,7 +489,7 @@ class _AddButton extends StatelessWidget {
                         height: 1)),
               ),
               const SizedBox(width: 8),
-              Text('국가 추가',
+              Text('Add currency',
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

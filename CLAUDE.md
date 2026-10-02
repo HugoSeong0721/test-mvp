@@ -9,6 +9,24 @@
   - githack, htmlpreview 같은 우회 서비스는 쓰지 않는다. 브랜치 이름에 슬래시(`claude/...`)가 들어가면
     경로 파싱이 깨져서 링크가 동작하지 않는다.
 
+## 개인 프로젝트 — 회사·실명 노출 금지 (절대)
+
+이 리포는 **개인 프로젝트**다.
+- **사용자 회사명(회사 이메일 도메인 이름)은 어디에도 쓰지 않는다** — 코드, 번들/패키지 ID, 문서, 커밋 메시지,
+  스토어 문구, 이 파일 포함 전부.
+- 사용자 영문 별칭(옛 GitHub 아이디 앞부분), 실명, 회사 이메일도 앱·스토어·공개 페이지에 넣지 않는다. 브랜드/ID 는 `soulfulfill`
+  (GitHub 아이디 `soulfulfillable`, 번들 ID 접두 `com.soulfulfill.`).
+- 회사 관련 내용이 들어갈 것 같으면 **작업을 멈추고 사용자에게 먼저 확인한다.**
+
+## 환율 앱 (Glance: Currency Converter) — 출시 방침
+
+- **미국 App Store 대상, 앱 UI·스토어 문구 전부 영어.** 기본 언어 English (U.S.).
+- 기본 통화도 미국 사용자 기준(USD 기준 + EUR·GBP·MXN, 인기 USD·EUR·GBP·CAD·MXN·JPY).
+- 이름·부제·키워드는 **미국 검색량이 가장 큰 검색어** 기준으로 정한다 (`currency_app/store/ios-listing.md`).
+- 번들 ID `com.soulfulfill.currency` (Apple 에 등록 완료, 변경 불가).
+- 화면에 보이는 숫자는 진짜여야 한다 — 차트는 실제 과거 환율(`RateService.history`), 가짜 데이터·
+  "제공 예정" 버튼 금지 (심사 거절 사유이자 사용자 기만).
+
 ## GitHub Pages
 
 `.github/workflows/deploy-pages.yml`이 `docs/` 폴더를 Pages로 배포한다.

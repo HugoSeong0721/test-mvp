@@ -59,6 +59,9 @@ jobs:
       - name: Analyze
         run: flutter analyze --no-fatal-infos
 
+      - name: Test
+        run: flutter test
+
       - name: Restore upload keystore
         if: env.KEYSTORE_B64 != ''
         env:

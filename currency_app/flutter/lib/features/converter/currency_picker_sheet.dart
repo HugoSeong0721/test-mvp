@@ -44,9 +44,9 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
   String get _title {
     final s = AppStore.i;
     return switch (widget.mode) {
-      PickMode.base => '기준 통화 변경',
-      PickMode.add => '변환 국가 추가',
-      PickMode.replace => '${s.targets[widget.replaceIndex!]} → 다른 통화로 교체',
+      PickMode.base => 'Change base currency',
+      PickMode.add => 'Add currency',
+      PickMode.replace => 'Replace ${s.targets[widget.replaceIndex!]}',
     };
   }
 
@@ -97,7 +97,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('닫기',
+                  child: Text('Close',
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -126,7 +126,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                         borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Text(
-                    '− ${s.targets[widget.replaceIndex!]} 목록에서 제거',
+                    '− Remove ${s.targets[widget.replaceIndex!]}',
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w700),
                   ),
@@ -160,7 +160,7 @@ class CurrencySearchField extends StatelessWidget {
       autocorrect: false,
       style: TextStyle(fontSize: 14, color: fx.text),
       decoration: InputDecoration(
-        hintText: '통화명 또는 코드 검색',
+        hintText: 'Search currency or code',
         hintStyle: TextStyle(color: fx.muted),
         prefixIcon: Icon(Icons.search, size: 18, color: fx.muted),
         filled: true,
@@ -207,7 +207,7 @@ class CurrencyList extends StatelessWidget {
           .whereType<Currency>()
           .toList();
       if (rec.isNotEmpty) {
-        children.add(_group('최근 사용'));
+        children.add(_group('Recent'));
         children.addAll(rec.map(_row));
       }
     }
@@ -225,7 +225,7 @@ class CurrencyList extends StatelessWidget {
     if (!any) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 30),
-        child: Text('검색 결과가 없어요',
+        child: Text('No matches',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13, color: fx.muted)),
       );

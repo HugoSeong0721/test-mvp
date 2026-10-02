@@ -54,7 +54,7 @@ class Keypad extends StatelessWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text('완료',
+                child: const Text('Done',
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               ),
             ],
