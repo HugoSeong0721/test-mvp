@@ -19,7 +19,7 @@ class Board extends StatefulWidget {
 class _BoardState extends State<Board> with TickerProviderStateMixin {
   late final AnimationController _bad = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 900),
+    duration: const Duration(milliseconds: 1300),
   );
   late final AnimationController _shake = AnimationController(
     vsync: this,
@@ -100,6 +100,7 @@ class _BoardState extends State<Board> with TickerProviderStateMixin {
   }
 
   void _down(Offset p, double size) {
+    if (g.inputBlocked) return;
     final cell = _cellAt(p, size);
     if (cell == null) return;
     final before = g.cats;
@@ -217,7 +218,7 @@ class _BoardState extends State<Board> with TickerProviderStateMixin {
               fontSize: cs * 0.36,
               height: 1,
               fontWeight: FontWeight.w800,
-              color: Colors.white.withValues(alpha: 0.55),
+              color: C.ink.withValues(alpha: 0.42),
             ),
           );
         }
@@ -303,9 +304,17 @@ class _BoardPainter extends CustomPainter {
     // 위반 번쩍임
     final v = g.lastViolation;
     if (v != null && badOn) {
-      final p = Paint()..color = Color.fromRGBO(230, 40, 40, 0.6 * (1 - bad));
+      // 녹색·노랑 위에서도 빨강으로 읽히게: 진한 채움 + 굵은 빨간 테두리
+      final a = (1 - bad).clamp(0.0, 1.0);
+      final p = Paint()..color = Color.fromRGBO(220, 20, 20, 0.78 * a);
+      final edge = Paint()
+        ..color = Color.fromRGBO(170, 0, 0, a)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4;
       for (final (r, c) in [...v.culprits, (v.r, v.c)]) {
-        canvas.drawRect(Rect.fromLTWH(c * cs, r * cs, cs, cs), p);
+        final rect = Rect.fromLTWH(c * cs, r * cs, cs, cs);
+        canvas.drawRect(rect, p);
+        canvas.drawRect(rect.deflate(2), edge);
       }
     }
   }

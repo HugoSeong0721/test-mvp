@@ -53,12 +53,38 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       levelNo: level,
       carried: daily && !practice ? AppStore.i.carriedTime(day) : 0,
     );
+    final saved = _boardKey == null ? null : AppStore.i.loadBoard(_boardKey!);
+    if (saved != null) game.restore(saved);
+    _showLost = game.status == GameStatus.lost;
     game.addListener(_onGame);
   }
 
+  /// 하던 판을 저장하는 자리. 오늘 퍼즐 연습판은 저장하지 않는다.
+  String? get _boardKey => daily
+      ? (practice ? null : AppStore.dailyBoardKey(day))
+      : AppStore.levelBoardKey(level);
+
+  /// 마지막 하트를 잃은 칸이 빨갛게 번쩍이는 걸 보여 준 뒤에 패널을 띄운다.
+  bool _showLost = false;
+  Timer? _lostTimer;
+
   void _onGame() {
-    if (game.status == GameStatus.won) _onWin();
-    if (game.status == GameStatus.lost) _saveCarry();
+    if (game.status == GameStatus.won) {
+      _onWin();
+    } else {
+      final k = _boardKey;
+      if (k != null) AppStore.i.saveBoard(k, game.snapshot());
+      _saveCarry();
+    }
+    if (game.status == GameStatus.lost && !_showLost && _lostTimer == null) {
+      _lostTimer = Timer(const Duration(milliseconds: 1100), () {
+        _lostTimer = null;
+        if (mounted && game.status == GameStatus.lost) {
+          setState(() => _showLost = true);
+        }
+      });
+    }
+    if (game.status != GameStatus.lost) _showLost = false;
     if (mounted) setState(() {});
   }
 
@@ -100,6 +126,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     _saveCarry();
     WidgetsBinding.instance.removeObserver(this);
     _tick?.cancel();
+    _lostTimer?.cancel();
     game.removeListener(_onGame);
     game.dispose();
     super.dispose();
@@ -107,6 +134,10 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   void _restart({bool next = false}) {
     _saveCarry();
+    final k = _boardKey;
+    if (k != null && !next) AppStore.i.clearBoard(k);
+    _lostTimer?.cancel();
+    _lostTimer = null;
     game.removeListener(_onGame);
     game.dispose();
     if (next) level++;
@@ -128,6 +159,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     if (!mounted) return false;
     setState(() => _waitingVideo = false);
     game.resumeClock();
+    game.blockInput();
     final msg = switch (r) {
       RewardResult.rewarded => null,
       RewardResult.closedEarly => 'Watch the whole video to get your reward.',
@@ -159,7 +191,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         ),
         content: const Text(
           'Watch a short video and we’ll put one cat in the right spot '
-          '(or move a cat that’s in the wrong place).',
+          '(and clear any cats in the wrong place).',
           style: TextStyle(fontSize: 17, color: C.sub),
         ),
         actions: [
@@ -174,6 +206,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         ],
       ),
     );
+    game.blockInput();
     if (yes == true && await _watchVideo(RewardPlacement.hint)) {
       game.applyHint();
     }
@@ -267,7 +300,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               ],
             ),
             if (game.status == GameStatus.won && _wonTime != null) _winPanel(),
-            if (game.status == GameStatus.lost) _lostPanel(),
+            if (game.status == GameStatus.lost && _showLost) _lostPanel(),
             if (_waitingVideo) _loadingVideo(),
           ],
         ),
@@ -286,9 +319,10 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         var color = C.red;
         if (game.eventSeq > 0 && t < 1) {
           if (game.lastEventIsHint) {
-            msg = game.lastHintRemoved
-                ? '💡 That cat was in the wrong spot'
-                : '💡 Here’s a cat in the right spot!';
+            final k = game.lastHintRemoved;
+            msg = k == 0
+                ? '💡 Here’s a cat in the right spot!'
+                : '💡 Cleared $k wrong cat${k == 1 ? '' : 's'} + 1 right cat!';
             color = C.green;
           } else if (v != null) {
             msg = '💔 ${v.reason}';
@@ -297,13 +331,16 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         if (msg != null) {
           return Opacity(
             opacity: t < 0.8 ? 1 : (1 - t) / 0.2,
-            child: Text(
-              msg,
-              key: const Key('event'),
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w900,
-                color: color,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                msg,
+                key: const Key('event'),
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                  color: color,
+                ),
               ),
             ),
           );

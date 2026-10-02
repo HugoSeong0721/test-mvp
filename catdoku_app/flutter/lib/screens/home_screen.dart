@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../core/ads.dart';
@@ -15,10 +17,39 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  // 홈은 저장소가 바뀔 때마다 다시 그린다 (뒤로 가기·Play Levels 로 돌아와도 숫자가 늦지 않게).
+  // 날짜가 바뀌면(자정, 다음 날 아침 다시 열기) 오늘 퍼즐 카드를 새로 그린다.
+  String _day = AppStore.i.todayKey;
+  Timer? _dayCheck;
+
+  void _refresh() {
+    if (mounted) setState(() => _day = AppStore.i.todayKey);
+  }
+
+  void _checkDay() {
+    if (AppStore.i.todayKey != _day) _refresh();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refresh();
+  }
+
+  @override
+  void dispose() {
+    AppStore.i.removeListener(_refresh);
+    WidgetsBinding.instance.removeObserver(this);
+    _dayCheck?.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    AppStore.i.addListener(_refresh);
+    WidgetsBinding.instance.addObserver(this);
+    _dayCheck = Timer.periodic(const Duration(seconds: 20), (_) => _checkDay());
     if (!AppStore.i.seenHowTo) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
@@ -30,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _open(Widget screen) async {
     await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-    if (mounted) setState(() {});
+    _refresh();
   }
 
   @override
@@ -135,7 +166,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
-                        'Best streak ${s.bestStreak} · ${s.dailyTotal} daily puzzles solved',
+                        'Best streak ${s.bestStreak} · ${s.dailyTotal} daily '
+                        '${s.dailyTotal == 1 ? 'puzzle' : 'puzzles'} solved',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 15, color: C.muted),
                       ),

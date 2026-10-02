@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../core/puzzle.dart';
@@ -50,8 +52,8 @@ class Game extends ChangeNotifier {
   (int, int)? lastHint;
   int hintSeq = 0;
 
-  /// 힌트가 잘못 놓인 고양이를 치웠으면 true (놓았으면 false).
-  bool lastHintRemoved = false;
+  /// 힌트가 함께 치운 잘못 놓인 고양이 수.
+  int lastHintRemoved = 0;
 
   /// 화면 상태줄에 띄울 마지막 사건 (위반 또는 힌트). 번호가 바뀌면 다시 띄운다.
   int eventSeq = 0;
@@ -129,7 +131,12 @@ class Game extends ChangeNotifier {
       violationSeq++;
       eventSeq++;
       lastEventIsHint = false;
-      lastViolation = Violation(r, c, conf.first.$3, [
+      // 두 규칙을 한 번에 어기면 둘 다 알려 준다
+      final reasons = <String>[];
+      for (final f in conf) {
+        if (!reasons.contains(f.$3)) reasons.add(f.$3);
+      }
+      lastViolation = Violation(r, c, reasons.join(' '), [
         for (final f in conf) (f.$1, f.$2),
       ]);
       if (hearts <= 0) {
@@ -211,37 +218,83 @@ class Game extends ChangeNotifier {
     _watch.stop();
   }
 
-  /// 힌트(보상형 광고 뒤): 엉뚱한 자리에 있는 고양이가 있으면 먼저 치워 주고,
-  /// 없으면 아직 고양이가 없는 구역 하나의 정답 칸에 고양이를 놓는다.
+  /// 힌트(보상형 광고 뒤): 엉뚱한 자리에 있는 고양이를 모두 치우고,
+  /// 정답 칸 하나에 고양이를 놓는다. 영상을 봤는데 고양이가 줄기만 하는 일이 없게.
   void applyHint() {
     if (status != GameStatus.playing) return;
     hintsUsed++;
     hintSeq++;
     eventSeq++;
     lastEventIsHint = true;
+    var removed = 0;
     for (var r = 0; r < n; r++) {
       for (var c = 0; c < n; c++) {
         if (cells[r][c] == Mark.cat && !puzzle.isSolutionCell(r, c)) {
           _removeCat(r, c);
-          lastHint = (r, c);
-          lastHintRemoved = true;
-          notifyListeners();
-          return;
+          removed++;
         }
       }
     }
+    lastHintRemoved = removed;
     for (var r = 0; r < n; r++) {
       final c = puzzle.solution[r];
       if (cells[r][c] != Mark.cat) {
-        if (cells[r][c] == Mark.cross) cells[r][c] = Mark.empty;
+        cells[r][c] = Mark.empty;
         _placeCat(r, c);
         lastHint = (r, c);
-        lastHintRemoved = false;
         if (cats == n) _end(GameStatus.won);
-        notifyListeners();
-        return;
+        break;
       }
     }
+    notifyListeners();
+  }
+
+  // ── 입력 잠깐 막기 ──
+  // 창 버튼을 두 번 누르면 두 번째 탭이 창 아래 판에 떨어져 고양이가 놓였다 (어르신은 두 번 누르기 쉽다).
+  bool _blocked = false;
+  Timer? _blockTimer;
+  bool get inputBlocked => _blocked;
+  void blockInput([Duration d = const Duration(milliseconds: 450)]) {
+    _blocked = true;
+    _blockTimer?.cancel();
+    _blockTimer = Timer(d, () => _blocked = false);
+  }
+
+  // ── 저장/복원 ── 뒤로 갔다 와도 판이 그대로 남게.
+  Map<String, Object> snapshot() => {
+    'n': n,
+    'cats': [
+      for (var r = 0; r < n; r++)
+        for (var c = 0; c < n; c++)
+          if (cells[r][c] == Mark.cat) r * n + c,
+    ],
+    'marks': [
+      for (var r = 0; r < n; r++)
+        for (var c = 0; c < n; c++)
+          if (cells[r][c] == Mark.cross) r * n + c,
+    ],
+    'hearts': hearts,
+  };
+
+  void restore(Map<String, dynamic> s) {
+    if (s['n'] != n) return;
+    for (final p in (s['marks'] as List).cast<int>()) {
+      cells[p ~/ n][p % n] = Mark.cross;
+    }
+    for (final p in (s['cats'] as List).cast<int>()) {
+      final r = p ~/ n, c = p % n;
+      if (conflictsWith(r, c).isEmpty) {
+        cells[r][c] = Mark.empty;
+        _placeCat(r, c);
+      }
+    }
+    hearts = (s['hearts'] as int).clamp(0, maxHearts);
+    if (hearts == 0) {
+      _end(GameStatus.lost);
+    } else if (cats == n) {
+      _end(GameStatus.won);
+    }
+    notifyListeners();
   }
 
   /// 하트를 다 잃은 뒤 영상을 보면 판을 그대로 두고 하트를 채워 계속한다.
@@ -265,6 +318,7 @@ class Game extends ChangeNotifier {
 
   @override
   void dispose() {
+    _blockTimer?.cancel();
     _watch.stop();
     super.dispose();
   }

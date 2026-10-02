@@ -193,7 +193,7 @@ void main() {
         bad = conflictCell(g);
         await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
       }
-      await t.pump(const Duration(milliseconds: 300));
+      await t.pump(const Duration(milliseconds: 1300));
       expect(find.text('💔 Out of hearts!'), findsOneWidget);
       await press(t, find.byKey(const Key('continue')), 'Lost: Watch video +3');
       expect(g.status, GameStatus.playing);
@@ -236,7 +236,7 @@ void main() {
       final bad = conflictCell(g);
       await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
     }
-    await t.pump(const Duration(milliseconds: 300));
+    await t.pump(const Duration(milliseconds: 1300));
     await press(t, find.byKey(const Key('restart')), 'Lost: Start over');
     g = gameOf(t);
     expect(g.hearts, 3);
@@ -257,7 +257,7 @@ void main() {
       final bad = conflictCell(g);
       await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
     }
-    await t.pump(const Duration(milliseconds: 300));
+    await t.pump(const Duration(milliseconds: 1300));
     await press(t, find.byKey(const Key('home')), 'Lost: Home');
     expect(find.text('Today’s Puzzle'), findsOneWidget);
     await finish(t);
@@ -281,8 +281,12 @@ void main() {
     expect(g.cats, 1);
     await press(t, find.byKey(const Key('hint')), 'Hint');
     await press(t, find.text('▶ Watch video'), 'Hint dialog: Watch video');
-    expect(g.cats, 0);
-    expect(find.text('💡 That cat was in the wrong spot'), findsOneWidget);
+    // 잘못 놓인 고양이는 치우고, 맞는 자리에 하나 놓는다 (영상 보고 손해 보는 일 없게)
+    expect(g.cats, 1);
+    expect(g.cells[wrong.$1][wrong.$2], isNot(Mark.cat));
+    expect(g.lastHint, isNotNull);
+    expect(g.puzzle.isSolutionCell(g.lastHint!.$1, g.lastHint!.$2), isTrue);
+    expect(find.text('💡 Cleared 1 wrong cat + 1 right cat!'), findsOneWidget);
     await finish(t);
   });
 
@@ -325,7 +329,7 @@ void main() {
       final bad = conflictCell(g);
       await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
     }
-    await t.pump(const Duration(milliseconds: 300));
+    await t.pump(const Duration(milliseconds: 1300));
     await press(t, find.byKey(const Key('continue')), 'Lost: Watch video +3');
     expect(ads.shown, [RewardPlacement.continueGame]);
     expect(
@@ -353,7 +357,7 @@ void main() {
       final bad = conflictCell(g);
       await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
     }
-    await t.pump(const Duration(milliseconds: 300));
+    await t.pump(const Duration(milliseconds: 1300));
     await t.tap(find.byKey(const Key('continue')));
     await t.pump(const Duration(milliseconds: 50));
     await t.tap(find.byKey(const Key('continue')), warnIfMissed: false);
@@ -363,6 +367,109 @@ void main() {
     expect(g.hearts, 3);
     await finish(t);
   });
+
+  testWidgets(
+    'Back keeps the board; leaving while out of hearts does not refill them',
+    (t) async {
+      await boot(t, prefs: {'seenHowTo': true});
+      await press(t, find.text('Play'), 'Home: Today Play');
+      var g = gameOf(t);
+      final s0 = g.puzzle.solution[0];
+      await tapCell(t, 0, s0);
+      await press(t, find.byKey(const Key('brush-mark')), 'Mark brush');
+      await tapCell(t, 6, 0);
+      await press(t, find.byKey(const Key('brush-cat')), 'Cat brush');
+      final bad = conflictCell(g);
+      await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
+      expect(g.hearts, 2);
+      await press(t, find.byKey(const Key('back')), 'Game: Back');
+      await press(t, find.text('Play'), 'Home: Today Play');
+      g = gameOf(t);
+      expect(g.cells[0][s0], Mark.cat, reason: 'cat kept');
+      expect(g.cells[6][0], Mark.cross, reason: 'mark kept');
+      expect(g.hearts, 2, reason: 'hearts kept');
+      expect(find.text('🐱 1 of 7 cats placed'), findsOneWidget);
+      // 하트를 다 잃고 나갔다 오면 그대로 '하트 없음'
+      while (g.status == GameStatus.playing) {
+        final b = conflictCell(g);
+        await tapCell(t, b.$1, b.$2, label: 'cell(conflict)');
+      }
+      // 마지막 반칙의 빨간 표시를 먼저 보여 주고 패널은 조금 뒤에
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.text('💔 Out of hearts!'), findsNothing);
+      await t.pump(const Duration(milliseconds: 1000));
+      expect(find.text('💔 Out of hearts!'), findsOneWidget);
+      await press(t, find.byKey(const Key('home')), 'Lost: Home');
+      await press(t, find.text('Play'), 'Home: Today Play');
+      expect(gameOf(t).status, GameStatus.lost);
+      expect(find.text('💔 Out of hearts!'), findsOneWidget);
+      // Start over 는 판을 비운다
+      await press(t, find.byKey(const Key('restart')), 'Lost: Start over');
+      expect(gameOf(t).cats, 0);
+      expect(gameOf(t).hearts, 3);
+      await press(t, find.byKey(const Key('back')), 'Game: Back');
+      await press(t, find.text('Play'), 'Home: Today Play');
+      expect(gameOf(t).cats, 0);
+      await finish(t);
+    },
+  );
+
+  testWidgets('home is never stale: Play Levels → clear → Home shows Level 2', (
+    t,
+  ) async {
+    await boot(t, prefs: {'seenHowTo': true});
+    await press(t, find.text('Play'), 'Home: Today Play');
+    await solveRest(t);
+    await press(t, find.byKey(const Key('to-levels')), 'Won: Play Levels');
+    await solveRest(t);
+    expect(find.text('🎉 Level 1 cleared!'), findsOneWidget);
+    await press(t, find.byKey(const Key('home')), 'Won: Home');
+    expect(find.text('Level 2'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+    expect(find.textContaining('1 daily puzzle solved'), findsOneWidget);
+    await finish(t);
+  });
+
+  testWidgets('home rolls over to the new day while open', (t) async {
+    await boot(
+      t,
+      prefs: {
+        'seenHowTo': true,
+        'dailySolved_20261002': 40,
+        'streak': 1,
+        'streakDay': '20261002',
+      },
+    );
+    expect(find.textContaining('Solved in 0:40'), findsOneWidget);
+    expect(find.text('Play again'), findsOneWidget);
+    AppStore.i.clock = () => DateTime(2026, 10, 3, 0, 1);
+    await t.pump(const Duration(seconds: 21));
+    expect(find.textContaining('Solved in'), findsNothing);
+    expect(find.text('Play'), findsOneWidget);
+    expect(find.textContaining('Sat, Oct 3'), findsOneWidget);
+    await finish(t);
+  });
+
+  testWidgets(
+    'a second tap after closing the hint dialog does not hit the board',
+    (t) async {
+      await boot(t, prefs: {'seenHowTo': true});
+      await press(t, find.text('Play'), 'Home: Today Play');
+      final g = gameOf(t);
+      await t.tap(find.byKey(const Key('hint')));
+      await t.pump(const Duration(milliseconds: 400));
+      final btn = t.getCenter(find.text('Not now'));
+      await t.tapAt(btn);
+      await t.pump(const Duration(milliseconds: 80));
+      await t.tapAt(btn); // 두 번째 탭이 판 위로 떨어진다
+      await t.pump(const Duration(milliseconds: 50));
+      pressed.add('Hint dialog: Not now (double tap)');
+      expect(g.cats, 0);
+      expect(g.hearts, 3);
+      await t.pump(const Duration(seconds: 1));
+      await finish(t);
+    },
+  );
 
   testWidgets('daily clock carries over after losing', (t) async {
     await boot(t, prefs: {'seenHowTo': true, 'dailyCarry_20261002': 75});
@@ -420,7 +527,7 @@ void main() {
         final bad = conflictCell(g2);
         await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
       }
-      await t.pump(const Duration(milliseconds: 300));
+      await t.pump(const Duration(milliseconds: 1300));
       expect(
         t.getRect(find.byKey(const Key('panel'))).bottom <= size.height,
         isTrue,

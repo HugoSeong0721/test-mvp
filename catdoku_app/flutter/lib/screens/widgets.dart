@@ -60,6 +60,7 @@ class RuleChips extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: shadow,
         ),
+        alignment: Alignment.center,
         child: Text(
           t,
           textAlign: TextAlign.center,
@@ -72,14 +73,18 @@ class RuleChips extends StatelessWidget {
         ),
       ),
     );
-    return Row(
-      children: [
-        chip('1 cat\nper color'),
-        const SizedBox(width: 6),
-        chip('1 cat per\nrow & column'),
-        const SizedBox(width: 6),
-        chip('Cats\ncan’t touch'),
-      ],
+    // 좁은 화면에서 한 칩만 세 줄로 접혀도 셋의 높이가 같게
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          chip('1 cat\nper color'),
+          const SizedBox(width: 6),
+          chip('1 cat per\nrow & column'),
+          const SizedBox(width: 6),
+          chip('Cats\ncan’t touch'),
+        ],
+      ),
     );
   }
 }
