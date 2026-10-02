@@ -140,8 +140,13 @@ AdMob 콘솔의 "Payment setup incomplete" 는 수익이 생기기 전까지는 
 5. GitHub 저장소 → Settings → Secrets and variables → Actions → New repository secret 4개:
    `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`(.p8 파일을 메모장으로 열어 전체 복사).
 
-올릴 때: Actions → **Release iOS** → Run workflow. 10~20분 뒤 App Store Connect → TestFlight 에
+올릴 때: Actions → **Release iOS** → Run workflow (약 5분). App Store Connect → TestFlight 에
 빌드가 뜨면(처리 10~30분) 버전 화면에서 그 빌드를 고르고 Submit for Review.
+
+서명 방식: 실행마다 API 로 임시 배포 인증서·App Store 프로파일을 만들어 Runner 타깃만 수동 서명으로
+아카이브하고, 끝나면 둘 다 지운다(`.github/scripts/asc_signing.py`). 자동 서명은 등록 기기가 없으면
+개발용 프로파일을 못 만들고, 서명 없이 아카이브하면 Google 광고 SDK 프레임워크가 재서명되지 않아
+업로드가 거부된다(90035) — 둘 다 실제로 겪은 실패라 이 방식으로 정했다.
 
 ### 맥에서 App Store 에 올리기 (맥을 쓸 수 있을 때)
 
