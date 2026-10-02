@@ -19,24 +19,22 @@ enum RewardResult {
   unavailable,
 }
 
-/// AdMob 광고 단위 ID.
-/// 아직 AdMob 에 Kitty Queens 앱을 만들지 않아 Google 공식 **테스트 ID** 를 쓴다.
-/// 콘솔에서 앱·광고 단위를 만들면 여기와 ios/Runner/Info.plist 의 GADApplicationIdentifier,
-/// android/app/src/main/AndroidManifest.xml 의 APPLICATION_ID 를 함께 바꾼다.
+/// AdMob 광고 단위 ID — `soulfulfillable` 계정의 "Kitty Queens" iOS 앱 (앱 ID 는 ios/Runner/Info.plist).
+/// 안드로이드는 AdMob 앱을 아직 안 만들어 Google 공식 테스트 ID.
 class AdIds {
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
   static String get banner => _ios
-      ? 'ca-app-pub-3940256099942544/2934735716'
+      ? 'ca-app-pub-4724352880074547/8563658282'
       : 'ca-app-pub-3940256099942544/6300978111';
   static String rewarded(RewardPlacement p) => switch (p) {
-    // 테스트 ID 는 자리 구분이 없어 같은 값. 실제 ID 는 자리마다 다르게.
+    // 자리마다 다른 광고 단위 — AdMob 보고서에서 힌트·이어하기 수익을 나눠 본다.
     RewardPlacement.hint =>
       _ios
-          ? 'ca-app-pub-3940256099942544/1712485313'
+          ? 'ca-app-pub-4724352880074547/7250576612'
           : 'ca-app-pub-3940256099942544/5224354917',
     RewardPlacement.continueGame =>
       _ios
-          ? 'ca-app-pub-3940256099942544/1712485313'
+          ? 'ca-app-pub-4724352880074547/7933102895'
           : 'ca-app-pub-3940256099942544/5224354917',
   };
 }

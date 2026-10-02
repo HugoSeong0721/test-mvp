@@ -274,6 +274,7 @@ class Game extends ChangeNotifier {
           if (cells[r][c] == Mark.cross) r * n + c,
     ],
     'hearts': hearts,
+    'secs': seconds,
   };
 
   void restore(Map<String, dynamic> s) {

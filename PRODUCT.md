@@ -45,8 +45,8 @@
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
 | **물때 시간** (`plans/tides-app.md`, `board/tides.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
 | **GPS 속도계** (`plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-02 개발 세션 시작 대기 | 이름·번들 ID 결정 → 개발 → TestFlight |
-| **대출 계산기** (`plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-02 개발 세션 시작 | 이름·번들 ID 결정 → 개발 → TestFlight |
-| **소음 측정기** (`plans/decibel-app.md`, `board/decibel.md`) | 2026-10-02 개발 세션 시작 | 이름·번들 ID 결정 → 개발 → TestFlight |
+| **대출 계산기** (`mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/` | 이름·번들 ID 결정 → 번들 등록·ASC 앱 레코드·AdMob(사용자) → TestFlight |
+| **소음 측정기** (가칭 Glance dB, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정) | 이름·번들 ID 결정 → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight(보정값 실기기 확인) |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |

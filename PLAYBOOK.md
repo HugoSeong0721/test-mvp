@@ -59,5 +59,13 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 대출 | 숫자 칸이 좁아 "18.75 %"·비싼 집의 "Principal & interest" 가 잘림 — 기본값·한 기기 테스트는 통과 | 로봇에 **잘림 자동 검사**(`RenderParagraph.didExceedMaxLines`, `RenderEditable` 글자 폭 > 칸 폭)를 넣고 큰 값·3개 기기로 돈다 (`mortgage_app/flutter/test/robot_test.dart`) |
+| 2026-10-03 | 대출 | `Semantics(textField: true)` 로 TextField 를 감쌌더니 VoiceOver 에 입력 칸이 두 개씩 생김 (웹 접근성 트리 덤프로 발견) | `MergeSemantics` 로 합치고, 로봇에서 화면 읽기 입력 칸 수 == 실제 칸 수 검사 |
+| 2026-10-03 | 대출 | 위젯 테스트 스크린샷이 3배 확대된 일부만 / 차트 글씨가 네모 | 루트 레이어를 `physicalSize` 로 찍고 SDK Roboto 를 `FontLoader` 로 넣기, `TextPainter` 에 테마 글꼴 전달 |
+| 2026-10-03 | 대출 | Playwright `proxy` bypass 가 localhost 에 안 먹어 로컬 미리보기가 405 | `--proxy-server=https=<프록시>` 로 https 만 프록시. gstatic 은 `page.route` 로 로컬 canvaskit |
+| 2026-10-03 | 소음 | 화면 켜짐(wakelock) 같은 플러그인 호출을 `await` 했더니 위젯 테스트에서 응답이 안 와 **그 뒤 자동 저장이 통째로 안 돎** (실기기에서도 응답 지연 시 같은 위험) | 부가 기능 플랫폼 호출은 기다리지 말고 `.catchError` 로 흘려보내고, 저장·상태 변경을 먼저 한다 |
+| 2026-10-03 | 소음 | 긴 `ListView` 아래쪽 입력칸은 키보드가 뜨며 화면이 줄면 목록에서 빠져(dispose) 포커스가 날아감 | 입력칸은 화면 위쪽에 두거나 `SingleChildScrollView`. 로봇 테스트에서 `viewInsets` 로 키보드를 흉내 내 잡았다 |
+| 2026-10-03 | 소음 | `SizedBox(height)` 안 `Row` 의 `Expanded(ColoredBox)` 막대가 높이 0 으로 안 보임 — 테스트는 통과, **스크린샷에서만** 보임 | `crossAxisAlignment: stretch`. 웹 빌드 스크린샷을 화면마다 직접 본다 → 찾으면 높이 검사 테스트 추가(고치기 전 실패 확인) |
+| 2026-10-03 | 소음 | 마이크 앱을 헤드리스로 점검할 방법 | 크롬 `--use-fake-device-for-media-stream --use-fake-ui-for-media-stream` + `grantPermissions(['microphone'])` 이면 진짜 getUserMedia 경로를 탄다. 거부는 `--deny-permission-prompts`. `decibel_app/qa/web-check.js` |
 | 2026-10-02 | 공통 | 새 세션형 루틴은 저장소 쓰기 권한이 안 붙어 푸시 403 | 루틴은 저장소가 붙은 세션을 깨우는 방식으로 |
 | 2026-10 | 환율 | iOS 서명 두 번 실패 (자동 서명·무서명 아카이브) | 위 2장의 API 수동 서명 방식 |

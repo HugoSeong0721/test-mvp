@@ -471,6 +471,71 @@ void main() {
     },
   );
 
+  testWidgets(
+    'double-tapping Next Level / Start over: no skipped level, no stray cat',
+    (t) async {
+      await boot(t, prefs: {'seenHowTo': true});
+      await press(t, find.text('Start'), 'Home: Level Start');
+      await solveRest(t);
+      final next = t.getCenter(find.byKey(const Key('next')));
+      await t.tapAt(next);
+      await t.pump(const Duration(milliseconds: 40));
+      await t.tapAt(next); // 두 번째 탭
+      await t.pump(const Duration(milliseconds: 40));
+      await t.tapAt(next); // 세 번째 탭
+      pressed.add('Won: Next Level (triple tap)');
+      await t.pump(const Duration(seconds: 1));
+      expect(find.text('Level 2'), findsOneWidget, reason: 'no level skipped');
+      var g = gameOf(t);
+      expect(g.cats, 0, reason: 'no stray cat from the extra taps');
+      // 하트를 다 잃고 Start over 를 두 번
+      await tapCell(t, 0, g.puzzle.solution[0]);
+      while (g.status == GameStatus.playing) {
+        final bad = conflictCell(g);
+        await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
+      }
+      await t.pump(const Duration(milliseconds: 1300));
+      final again = t.getCenter(find.byKey(const Key('restart')));
+      await t.tapAt(again);
+      await t.pump(const Duration(milliseconds: 60));
+      await t.tapAt(again);
+      pressed.add('Lost: Start over (double tap)');
+      await t.pump(const Duration(seconds: 1));
+      g = gameOf(t);
+      expect(g.cats, 0);
+      expect(g.hearts, 3);
+      // 패널이 떠 있을 때 뒤의 붓·뒤로 버튼은 눌리지 않는다
+      await tapCell(t, 0, g.puzzle.solution[0]);
+      while (g.status == GameStatus.playing) {
+        final bad = conflictCell(g);
+        await tapCell(t, bad.$1, bad.$2, label: 'cell(conflict)');
+      }
+      await t.pump(const Duration(milliseconds: 1300));
+      await t.tap(find.byKey(const Key('brush-mark')), warnIfMissed: false);
+      await t.pump();
+      expect(
+        g.brush,
+        Brush.cat,
+        reason: 'brush behind the panel must not change',
+      );
+      await finish(t);
+    },
+  );
+
+  testWidgets('double-tapping Hint still leaves the dialog open', (t) async {
+    await boot(t, prefs: {'seenHowTo': true});
+    await press(t, find.text('Play'), 'Home: Today Play');
+    final h = t.getCenter(find.byKey(const Key('hint')));
+    await t.tapAt(h);
+    await t.pump(const Duration(milliseconds: 60));
+    await t.tapAt(h);
+    pressed.add('Hint (double tap)');
+    await t.pump(const Duration(milliseconds: 500));
+    expect(find.text('Need a hint?'), findsOneWidget);
+    await press(t, find.text('Not now'), 'Hint dialog: Not now');
+    await finish(t);
+  });
+
   testWidgets('daily clock carries over after losing', (t) async {
     await boot(t, prefs: {'seenHowTo': true, 'dailyCarry_20261002': 75});
     expect(find.textContaining('1:15 so far'), findsOneWidget);

@@ -1,15 +1,15 @@
 # Kitty Queens: Cat Sudoku (Catdoku 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 05:17 (KST)
+마지막 갱신: 2026-10-03 05:40 (KST)
 
 ## 지금 상태 (3줄 이내)
 Flutter 앱(`catdoku_app/flutter/`) 1차 완성 + 점검 팀 1차 수정 반영, 테스트 로봇 21개 통과, 웹 미리보기 `docs/catdoku-app/`.
 번들 ID `com.soulfulfill.catdoku` Apple 에 등록 완료(Actions `iOS 번들 ID 등록 · 앱 레코드 확인` 로그로 확인).
-광고는 아직 Google 테스트 ID — ASC 앱 레코드·AdMob 앱을 사용자가 만들면 TestFlight 로.
+AdMob 실제 ID 3개 반영(배너 `…/8563658282`, 힌트 `…/7250576612`, 이어하기 `…/7933102895`, 앱 `~4704304321`). TestFlight 업로드 진행.
 
 ## 다음 할 일 / 사용자에게 받을 것
 - [사용자] App Store Connect → 앱 → ＋ → 신규 앱: iOS / `Kitty Queens: Cat Sudoku` / English (U.S.) / 번들 `com.soulfulfill.catdoku` / SKU `catdoku`.
   이게 없으면 `Release iOS` 업로드가 실패한다 (앱 레코드는 API 로 못 만든다).
-- [사용자] AdMob → 앱 추가(iOS, 스토어 미등록, 이름 Kitty Queens) → 광고 단위 3개: 배너 `banner`, 보상형 `rewarded_hint`, 보상형 `rewarded_continue`.
+- [사용자] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Kitty Queens) → 광고 단위 3개: 배너 `banner`, 보상형 `rewarded_hint`, 보상형 `rewarded_continue`.
   앱 ID(`~`) + 단위 ID 3개(`/`) 받으면 `lib/core/ads.dart`·`ios/Runner/Info.plist`(GADApplicationIdentifier) 교체.
 - [세션] 점검 워크플로 남은 3명(단계 모드·화면 크기·극단 상황) 결과 반영 → 광고 상황 전담 점검 팀(`?ads=slow|none|early`) 한 번 더.
 - [세션] `Release iOS`(app=catdoku) → TestFlight → 사용자 '느낌' 피드백 → 스크린샷(1290×2796)·`catdoku_app/store/ios-metadata.json` → 심사.
@@ -18,6 +18,10 @@ Flutter 앱(`catdoku_app/flutter/`) 1차 완성 + 점검 팀 1차 수정 반영,
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-02 | 보상형 2개 생성 캡처 + "rewarded continue는안보이는데" → "done 눌럿어" | 이름(rewarded_continue)과 광고 형식(Rewarded 카드)이 헷갈림 → 형식은 4번째 Rewarded 카드라고 안내. 힌트 `…/7250576612`, 이어하기 `…/7933102895` 반영 |
+| 10-02 | AdMob 배너 생성 화면 캡처 + "너가 이거보고 기억하면되지않냐 done 누르까" | 앱 ID `ca-app-pub-4724352880074547~4704304321`(Info.plist), 배너 `…/8563658282`(ads.dart) 반영. 보상형 2개는 "Create another ad unit" 으로 이어 만들게 안내 |
+| 10-02 | "오 soulfulfillable이엇던거같애 기억하고 다른애들한테도 나중에 알려놔주라" (AdMob 계정) | `ops/README.md` 계정 표 + `board/_shared.md` "계정" 절에 기록 (게시자 ID `pub-4724352880074547`) |
+| 10-02 | ASC 신규 앱 화면 캡처 + "일단 여기는 이렇게하면되지?" | iOS / Kitty Queens: Cat Sudoku / English (U.S.) / com.soulfulfill.catdoku / SKU catdoku / Full Access — 맞다고 확인, Create 안내 |
 | 10-02 | "이제부터 세션끼리 board/ 게시판으로 공유해" | 이 파일 작성 |
 | 10-02 | "그래 뭐 내가 해야하는거잇으면 알려줘" | 사용자 할 일은 위 "다음 할 일"에 [사용자] 로 클릭 단위로 적어 둠 |
 | 10-02 | "와 어렵다 아그래도 했네 오케이 내볼까" | 7×7 오늘의 퍼즐이 첫 판으로 어려움 → `PRODUCT.md` 결정 로그에 기록, 처음 사용자에게 5×5 단계부터 권할지 TestFlight 때 재검토. 출시 진행 |

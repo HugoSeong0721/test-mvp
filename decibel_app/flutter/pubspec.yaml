@@ -1,0 +1,41 @@
+name: decibel
+description: "Glance dB — free decibel meter (sound level, noise reports)."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  audio_session: ^0.2.4
+  flutter:
+    sdk: flutter
+  google_mobile_ads: ^9.1.0
+  record: ^7.1.1
+  share_plus: ^13.3.1
+  shared_preferences: ^2.5.5
+  url_launcher: ^6.3.3
+  wakelock_plus: ^1.8.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+# 앱 아이콘 생성: dart run flutter_launcher_icons
+# 원본은 assets/icon/icon-1024.png (assets/icon/icon.svg 를 Playwright 로 렌더)
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true   # App Store 는 알파 채널이 있는 아이콘을 거부한다
+  image_path: "assets/icon/icon-1024.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon/icon-1024.png"
+    background_color: "#0E131C"
+    theme_color: "#0E131C"
