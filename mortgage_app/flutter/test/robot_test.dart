@@ -339,7 +339,7 @@ void main() {
     );
     expect(find.textContaining(money(e.interestSaved)), findsOneWidget);
     await toTop(t);
-    expect(find.text('+ \$200 extra toward principal'), findsOneWidget);
+    expect(find.text('+ \$200/mo extra toward principal'), findsOneWidget);
     await shot(t, '05_extra_200');
     for (final v in [50.0, 100.0, 500.0]) {
       await pressKey(t, 'extra-$v', 'Extra chip +\$${v.round()}');

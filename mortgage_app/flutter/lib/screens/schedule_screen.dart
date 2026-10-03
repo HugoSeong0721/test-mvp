@@ -29,7 +29,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final tk = Tk.of(context);
     final r = widget.result;
     final years = r.yearly;
-    final hasExtra = r.input.extraMonthly > 0;
+    final hasExtra = r.input.hasExtras;
     final payoff = r.payoff!;
     final colStyle = TextStyle(
       fontSize: 12,
@@ -79,7 +79,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
-                          'Includes ${money(r.input.extraMonthly)}/mo extra — '
+                          'Includes your extra payments — '
                           '${r.months} payments instead of ${widget.base!.months}.',
                           style: TextStyle(fontSize: 12, color: tk.accent),
                         ),

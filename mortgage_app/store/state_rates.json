@@ -1,0 +1,363 @@
+{
+ "propertyTaxSource": "Tax Foundation, 'Property Taxes by State and County, 2026' \u2014 effective property tax rate on owner-occupied housing value, 2024 data (Census ACS). https://taxfoundation.org/data/all/state/property-taxes-by-state-county/",
+ "salesTaxSource": "Tax Foundation, 'State and Local Sales Tax Rates, 2026' (as of Jan 1, 2026; midyear 2026 update reports no state-rate changes). https://taxfoundation.org/data/all/state/sales-tax-rates/",
+ "states": [
+  {
+   "code": "AL",
+   "name": "Alabama",
+   "propertyTax": 0.37,
+   "salesTax": 4.0,
+   "avgLocalSalesTax": 5.46
+  },
+  {
+   "code": "AK",
+   "name": "Alaska",
+   "propertyTax": 0.94,
+   "salesTax": 0,
+   "avgLocalSalesTax": 1.82
+  },
+  {
+   "code": "AZ",
+   "name": "Arizona",
+   "propertyTax": 0.48,
+   "salesTax": 5.6,
+   "avgLocalSalesTax": 2.92
+  },
+  {
+   "code": "AR",
+   "name": "Arkansas",
+   "propertyTax": 0.56,
+   "salesTax": 6.5,
+   "avgLocalSalesTax": 2.96
+  },
+  {
+   "code": "CA",
+   "name": "California",
+   "propertyTax": 0.7,
+   "salesTax": 7.25,
+   "avgLocalSalesTax": 1.74
+  },
+  {
+   "code": "CO",
+   "name": "Colorado",
+   "propertyTax": 0.5,
+   "salesTax": 2.9,
+   "avgLocalSalesTax": 4.99
+  },
+  {
+   "code": "CT",
+   "name": "Connecticut",
+   "propertyTax": 1.54,
+   "salesTax": 6.35,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "DE",
+   "name": "Delaware",
+   "propertyTax": 0.54,
+   "salesTax": 0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "DC",
+   "name": "District of Columbia",
+   "propertyTax": 0.6,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "FL",
+   "name": "Florida",
+   "propertyTax": 0.78,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0.98
+  },
+  {
+   "code": "GA",
+   "name": "Georgia",
+   "propertyTax": 0.79,
+   "salesTax": 4.0,
+   "avgLocalSalesTax": 3.49
+  },
+  {
+   "code": "HI",
+   "name": "Hawaii",
+   "propertyTax": 0.29,
+   "salesTax": 4.0,
+   "avgLocalSalesTax": 0.5
+  },
+  {
+   "code": "ID",
+   "name": "Idaho",
+   "propertyTax": 0.5,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0.03
+  },
+  {
+   "code": "IL",
+   "name": "Illinois",
+   "propertyTax": 1.88,
+   "salesTax": 6.25,
+   "avgLocalSalesTax": 2.71
+  },
+  {
+   "code": "IN",
+   "name": "Indiana",
+   "propertyTax": 0.76,
+   "salesTax": 7.0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "IA",
+   "name": "Iowa",
+   "propertyTax": 1.33,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0.94
+  },
+  {
+   "code": "KS",
+   "name": "Kansas",
+   "propertyTax": 1.21,
+   "salesTax": 6.5,
+   "avgLocalSalesTax": 2.19
+  },
+  {
+   "code": "KY",
+   "name": "Kentucky",
+   "propertyTax": 0.74,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "LA",
+   "name": "Louisiana",
+   "propertyTax": 0.55,
+   "salesTax": 5.0,
+   "avgLocalSalesTax": 5.11
+  },
+  {
+   "code": "ME",
+   "name": "Maine",
+   "propertyTax": 0.98,
+   "salesTax": 5.5,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "MD",
+   "name": "Maryland",
+   "propertyTax": 0.92,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "MA",
+   "name": "Massachusetts",
+   "propertyTax": 1.0,
+   "salesTax": 6.25,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "MI",
+   "name": "Michigan",
+   "propertyTax": 1.19,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "MN",
+   "name": "Minnesota",
+   "propertyTax": 1.0,
+   "salesTax": 6.875,
+   "avgLocalSalesTax": 1.26
+  },
+  {
+   "code": "MS",
+   "name": "Mississippi",
+   "propertyTax": 0.58,
+   "salesTax": 7.0,
+   "avgLocalSalesTax": 0.06
+  },
+  {
+   "code": "MO",
+   "name": "Missouri",
+   "propertyTax": 0.89,
+   "salesTax": 4.225,
+   "avgLocalSalesTax": 4.22
+  },
+  {
+   "code": "MT",
+   "name": "Montana",
+   "propertyTax": 0.61,
+   "salesTax": 0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "NE",
+   "name": "Nebraska",
+   "propertyTax": 1.44,
+   "salesTax": 5.5,
+   "avgLocalSalesTax": 1.48
+  },
+  {
+   "code": "NV",
+   "name": "Nevada",
+   "propertyTax": 0.5,
+   "salesTax": 6.85,
+   "avgLocalSalesTax": 1.39
+  },
+  {
+   "code": "NH",
+   "name": "New Hampshire",
+   "propertyTax": 1.5,
+   "salesTax": 0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "NJ",
+   "name": "New Jersey",
+   "propertyTax": 1.88,
+   "salesTax": 6.625,
+   "avgLocalSalesTax": -0.02
+  },
+  {
+   "code": "NM",
+   "name": "New Mexico",
+   "propertyTax": 0.63,
+   "salesTax": 4.875,
+   "avgLocalSalesTax": 2.79
+  },
+  {
+   "code": "NY",
+   "name": "New York",
+   "propertyTax": 1.3,
+   "salesTax": 4.0,
+   "avgLocalSalesTax": 4.54
+  },
+  {
+   "code": "NC",
+   "name": "North Carolina",
+   "propertyTax": 0.66,
+   "salesTax": 4.75,
+   "avgLocalSalesTax": 2.25
+  },
+  {
+   "code": "ND",
+   "name": "North Dakota",
+   "propertyTax": 0.92,
+   "salesTax": 5.0,
+   "avgLocalSalesTax": 2.09
+  },
+  {
+   "code": "OH",
+   "name": "Ohio",
+   "propertyTax": 1.36,
+   "salesTax": 5.75,
+   "avgLocalSalesTax": 1.54
+  },
+  {
+   "code": "OK",
+   "name": "Oklahoma",
+   "propertyTax": 0.79,
+   "salesTax": 4.5,
+   "avgLocalSalesTax": 4.56
+  },
+  {
+   "code": "OR",
+   "name": "Oregon",
+   "propertyTax": 0.81,
+   "salesTax": 0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "PA",
+   "name": "Pennsylvania",
+   "propertyTax": 1.26,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0.34
+  },
+  {
+   "code": "RI",
+   "name": "Rhode Island",
+   "propertyTax": 1.12,
+   "salesTax": 7.0,
+   "avgLocalSalesTax": 0
+  },
+  {
+   "code": "SC",
+   "name": "South Carolina",
+   "propertyTax": 0.49,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 1.49
+  },
+  {
+   "code": "SD",
+   "name": "South Dakota",
+   "propertyTax": 1.0,
+   "salesTax": 4.2,
+   "avgLocalSalesTax": 1.91
+  },
+  {
+   "code": "TN",
+   "name": "Tennessee",
+   "propertyTax": 0.52,
+   "salesTax": 7.0,
+   "avgLocalSalesTax": 2.61
+  },
+  {
+   "code": "TX",
+   "name": "Texas",
+   "propertyTax": 1.4,
+   "salesTax": 6.25,
+   "avgLocalSalesTax": 1.95
+  },
+  {
+   "code": "UT",
+   "name": "Utah",
+   "propertyTax": 0.48,
+   "salesTax": 6.1,
+   "avgLocalSalesTax": 1.32
+  },
+  {
+   "code": "VT",
+   "name": "Vermont",
+   "propertyTax": 1.51,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0.39
+  },
+  {
+   "code": "VA",
+   "name": "Virginia",
+   "propertyTax": 0.78,
+   "salesTax": 5.3,
+   "avgLocalSalesTax": 0.47
+  },
+  {
+   "code": "WA",
+   "name": "Washington",
+   "propertyTax": 0.75,
+   "salesTax": 6.5,
+   "avgLocalSalesTax": 3.01
+  },
+  {
+   "code": "WV",
+   "name": "West Virginia",
+   "propertyTax": 0.51,
+   "salesTax": 6.0,
+   "avgLocalSalesTax": 0.59
+  },
+  {
+   "code": "WI",
+   "name": "Wisconsin",
+   "propertyTax": 1.32,
+   "salesTax": 5.0,
+   "avgLocalSalesTax": 0.72
+  },
+  {
+   "code": "WY",
+   "name": "Wyoming",
+   "propertyTax": 0.53,
+   "salesTax": 4.0,
+   "avgLocalSalesTax": 1.56
+  }
+ ]
+}

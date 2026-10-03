@@ -2,9 +2,9 @@
 마지막 갱신: 2026-10-03 06:20 (KST)
 
 ## 지금 상태 (3줄 이내)
-빌드 22(종류 전환 스크롤 버그 수정판) 업로드 + `App Store 등록 정보 채우기` 성공: 부제·설명·키워드·스크린샷 5장·빌드 22·심사 메모 입력됨 (버전 1.0 PREPARE_FOR_SUBMISSION).
-남은 것은 사용자 클릭: 저작권·카테고리·App Privacy·연령 등급·가격/판매국(EU 제외)·심사 연락처 → 심사 제출.
-웹 미리보기 https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html
+1.0(빌드 22) 등록 정보 입력 완료 → 사용자 심사 제출 단계. **1.1 개발 완료**: 주(50+DC) 선택 → 재산세·판매세 자동(Tax Foundation 2026), 추가 상환 시작 달·한 번 갚기·격주 납부.
+테스트 32개 통과(엔진 15 + 로봇·1.1 로봇). 1.1 TestFlight 업로드 진행 — 1.0 승인 뒤 새 버전으로 제출.
+웹 미리보기(1.1) https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html
 
 ## 다음 할 일 / 사용자에게 받을 것
 - ✅ [사용자] 이름 A `Glance: Mortgage Calculator`, 번들 `com.soulfulfill.mortgage` → ✅ [세션] 번들 Apple 등록.
@@ -36,6 +36,7 @@
   화면의 모든 `RenderParagraph.didExceedMaxLines`(… 로 잘림) + 모든 `RenderEditable` 의 `getMaxIntrinsicWidth` > 칸 폭(입력 숫자 잘림)을 검사.
   "18.75 %" 가 "18.7" 로, 비싼 집에서 "Principal & intere…" 로 잘리던 걸 잡았고, 고치기 전 코드에서 실패하는 것도 확인. **큰 값($2.5M)·3개 기기로 돌릴 것** — 작은 값·한 기기에선 안 보였다.
 - **ListView 자식을 조건부로 바꿀 때 같은 Key 를 가진 카드가 남아 있으면** 옛 위치째 재사용돼 `jumpTo(0)` 이 중간(380px)에서 멈춘다 → 바뀌는 목록 자체에 `ValueKey(모드)`.
+- **주별 세율 같은 공공 데이터**: 이 환경은 taxfoundation.org·census.gov 직접 열기가 막혀 있다. 조사 에이전트가 사이트 한정 검색 요약 + 같은 표를 재배포한 npm 패키지(`us-property-tax-data`)로 교차 확인했다. 원본 표는 `mortgage_app/store/state_rates.json` 에 출처와 같이 둔다.
 - **VoiceOver 칸 중복**: `Semantics(textField: true)` 로 `TextField` 를 감싸면 입력 칸이 두 개로 읽힌다 → `MergeSemantics` + 앞뒤 글자 `ExcludeSemantics`.
   로봇: `find.semantics.byPredicate((n) => n.flagsCollection.isTextField)` 개수 == `EditableText` 개수.
 - **숫자 키패드엔 완료 키가 없다** → 키보드 위 Done 막대(이전/다음 칸 포함). `FocusScope.nextFocus()` 는 다음 마이크로태스크에 반영돼서

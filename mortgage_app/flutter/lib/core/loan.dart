@@ -17,6 +17,12 @@ class LoanInput {
     this.hoaMonthly = 0,
     this.pmiRate = 0,
     this.extraMonthly = 0,
+    this.extraFromYear = 0,
+    this.extraFromMonth = 0,
+    this.lumpSum = 0,
+    this.lumpYear = 0,
+    this.lumpMonth = 0,
+    this.biweekly = false,
   });
 
   /// 집값·차값. 개인 대출이면 빌리는 돈 자체.
@@ -40,9 +46,23 @@ class LoanInput {
   /// 매달 원금에 더 내는 돈.
   final double extraMonthly;
 
+  /// 매달 추가 상환을 시작하는 달 (0 이면 첫 납입부터).
+  final int extraFromYear, extraFromMonth;
+
+  /// 한 번 크게 갚는 돈과 그 달 (0 이면 없음).
+  final double lumpSum;
+  final int lumpYear, lumpMonth;
+
+  /// 격주 납부 — 2주마다 반씩 내면 1년에 26번 = 13달치. 대부분의 미국 대출사처럼
+  /// 모아서 달마다 원금에 넣는다고 보고, 매달 원리금의 1/12 을 더 내는 것으로 계산한다.
+  final bool biweekly;
+
+  bool get hasExtras => extraMonthly > 0 || lumpSum > 0 || biweekly;
+
   double get loanAmount => math.max(0, price - down);
 
-  LoanInput withExtra(double extra) => LoanInput(
+  /// 추가 상환을 모두 뺀 같은 대출 (비교 기준).
+  LoanInput withoutExtras() => LoanInput(
     price: price,
     down: down,
     rate: rate,
@@ -53,7 +73,6 @@ class LoanInput {
     insuranceYearly: insuranceYearly,
     hoaMonthly: hoaMonthly,
     pmiRate: pmiRate,
-    extraMonthly: extra,
   );
 }
 
@@ -179,6 +198,13 @@ LoanResult calculate(LoanInput input) {
   final i = input.rate.clamp(0, 100) / 1200;
   final pi = _cents(monthlyPayment(p0, input.rate.clamp(0, 100), n));
   final extra = math.max(0.0, input.extraMonthly);
+  final biweeklyExtra = input.biweekly ? _cents(pi / 12) : 0.0;
+  final extraFrom = input.extraFromYear > 0
+      ? input.extraFromYear * 12 + input.extraFromMonth - 1
+      : 0;
+  final lumpAt = input.lumpSum > 0 && input.lumpYear > 0
+      ? input.lumpYear * 12 + input.lumpMonth - 1
+      : -1;
   final pmiApplies =
       input.pmiRate > 0 &&
       input.price > 0 &&
@@ -201,7 +227,11 @@ LoanResult calculate(LoanInput input) {
     } else {
       principal = _cents(pi - interest);
     }
-    final ex = _cents(math.min(extra, bal - principal));
+    final now = y * 12 + m - 1;
+    var want = biweeklyExtra;
+    if (now >= extraFrom) want += extra;
+    if (now == lumpAt) want += input.lumpSum;
+    final ex = _cents(math.min(want, bal - principal));
     bal = _cents(bal - principal - ex);
     totalInterest += interest;
     totalPmi += pmi;
@@ -243,4 +273,4 @@ class ExtraEffect {
 }
 
 ExtraEffect extraEffect(LoanInput input) =>
-    ExtraEffect(calculate(input.withExtra(0)), calculate(input));
+    ExtraEffect(calculate(input.withoutExtras()), calculate(input));

@@ -24,6 +24,13 @@ class Scenario {
     this.extra = 0,
     this.tradeIn = 0,
     this.salesTax = 0,
+    this.stateCode,
+    this.extraFromYear = 0,
+    this.extraFromMonth = 0,
+    this.lump = 0,
+    this.lumpYear = 0,
+    this.lumpMonth = 0,
+    this.biweekly = false,
   });
 
   final LoanKind kind;
@@ -53,6 +60,19 @@ class Scenario {
   /// 자동차: 보상 판매 차값(달러), 판매세 %. 판매세는 (차값 − 보상 판매)에 붙는다 — 대부분 주의 방식.
   double tradeIn;
   double salesTax;
+
+  /// 고른 주 (없으면 null). 고르면 재산세율·판매세율이 채워지고, 그 뒤 직접 고칠 수 있다.
+  String? stateCode;
+
+  /// 매달 추가 상환 시작 달 (0 = 첫 납입부터).
+  int extraFromYear, extraFromMonth;
+
+  /// 한 번 크게 갚기 (0 = 없음).
+  double lump;
+  int lumpYear, lumpMonth;
+
+  /// 격주 납부.
+  bool biweekly;
 
   bool get hasDown => kind != LoanKind.personal;
   bool get hasFees => kind == LoanKind.mortgage;
@@ -108,6 +128,12 @@ class Scenario {
     hoaMonthly: hasFees ? hoa : 0,
     pmiRate: hasFees ? pmiRate : 0,
     extraMonthly: extra,
+    extraFromYear: extraFromYear,
+    extraFromMonth: extraFromMonth,
+    lumpSum: lump,
+    lumpYear: lumpYear,
+    lumpMonth: lumpMonth,
+    biweekly: biweekly,
   );
 
   Map<String, Object> toJson() => {
@@ -126,6 +152,13 @@ class Scenario {
     'extra': extra,
     'tradeIn': tradeIn,
     'salesTax': salesTax,
+    'stateCode': ?stateCode,
+    'extraFromYear': extraFromYear,
+    'extraFromMonth': extraFromMonth,
+    'lump': lump,
+    'lumpYear': lumpYear,
+    'lumpMonth': lumpMonth,
+    'biweekly': biweekly,
   };
 
   /// 저장된 값이 깨졌으면 기본값으로 돌아간다.
@@ -162,6 +195,20 @@ class Scenario {
       extra: n('extra', d.extra),
       tradeIn: n('tradeIn', d.tradeIn),
       salesTax: n('salesTax', d.salesTax),
+      stateCode: j['stateCode'] is String ? j['stateCode'] as String : null,
+      extraFromYear: j['extraFromYear'] is int ? j['extraFromYear'] as int : 0,
+      extraFromMonth:
+          (j['extraFromMonth'] is int ? j['extraFromMonth'] as int : 0).clamp(
+            0,
+            12,
+          ),
+      lump: n('lump', 0),
+      lumpYear: j['lumpYear'] is int ? j['lumpYear'] as int : 0,
+      lumpMonth: (j['lumpMonth'] is int ? j['lumpMonth'] as int : 0).clamp(
+        0,
+        12,
+      ),
+      biweekly: b('biweekly', false),
     );
   }
 

@@ -163,4 +163,78 @@ void main() {
     expect(over.loanAmount, 0);
     expect(over.isEmpty, isTrue);
   });
+
+  group('1.1 extras (start month, one-time, bi-weekly)', () {
+    LoanInput base({
+      double extra = 0,
+      int fromY = 0,
+      int fromM = 0,
+      double lump = 0,
+      int lumpY = 0,
+      int lumpM = 0,
+      bool bi = false,
+    }) => LoanInput(
+      price: 320000,
+      rate: 6.5,
+      termMonths: 360,
+      startYear: 2026,
+      startMonth: 11,
+      extraMonthly: extra,
+      extraFromYear: fromY,
+      extraFromMonth: fromM,
+      lumpSum: lump,
+      lumpYear: lumpY,
+      lumpMonth: lumpM,
+      biweekly: bi,
+    );
+    // 값은 따로 짠 파이썬 계산(센트 반올림 같은 방식)과 맞춘 것
+
+    test('bi-weekly = 1/12 payment extra each month', () {
+      final r = calculate(base(bi: true));
+      expect(r.months, 290);
+      expect(r.totalInterest, closeTo(315068.57, 0.01));
+      expect(r.schedule.first.extra, 168.55);
+    });
+
+    test('monthly extra starts in the chosen month', () {
+      final r = calculate(base(extra: 200, fromY: 2031, fromM: 11));
+      expect(r.months, 303);
+      expect(r.totalInterest, closeTo(340123.61, 0.01));
+      final before = r.schedule.where(
+        (p) => p.year * 12 + p.month < 2031 * 12 + 11,
+      );
+      expect(before.every((p) => p.extra == 0), isTrue);
+      expect(r.schedule[60].extra, 200); // 61회차 = Nov 2031
+    });
+
+    test('one-time payment lands only in its month', () {
+      final r = calculate(base(lump: 10000, lumpY: 2027, lumpM: 10));
+      expect(r.months, 331);
+      expect(r.totalInterest, closeTo(357603.67, 0.01));
+      expect(r.schedule.where((p) => p.extra > 0).single.n, 12);
+    });
+
+    test('all three together, and the effect compares to no extras', () {
+      final input = base(
+        extra: 200,
+        fromY: 2031,
+        fromM: 11,
+        lump: 10000,
+        lumpY: 2027,
+        lumpM: 10,
+        bi: true,
+      );
+      final e = extraEffect(input);
+      expect(e.withExtra.months, 241);
+      expect(e.withExtra.totalInterest, closeTo(252372.22, 0.01));
+      expect(e.base.months, 360);
+      expect(e.withExtra.schedule.last.balance, 0);
+    });
+
+    test('a one-time payment bigger than the balance just pays it off', () {
+      final r = calculate(base(lump: 9999999, lumpY: 2027, lumpM: 1));
+      expect(r.months, 3);
+      expect(r.schedule.last.balance, 0);
+    });
+  });
 }

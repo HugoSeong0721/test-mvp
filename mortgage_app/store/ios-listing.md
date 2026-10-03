@@ -109,3 +109,13 @@ The app does not offer loans, collect financial information or show live interes
 
 - [x] 이름 확정 → `ios-metadata.json` 작성 (스크린샷 목록은 찍은 뒤 채운다)
 - [ ] 스크린샷 6.7형 1290×2796: ① 월 납입액+내역 ② 추가 상환 "Debt-free … sooner" ③ 상환표 ④ 자동차 대출 — 테스트 로봇(iPhone 15 Pro Max 3배)으로 뽑는다
+
+## Version 1.1 — What's New (1.0 승인 뒤 새 버전 만들 때 붙여넣기)
+
+```
+• Choose your state to fill in its average property tax rate (or sales tax for car loans). You can still edit the rate for your county.
+• Start extra payments in a later month.
+• Add a one-time payment, like a bonus or tax refund.
+• Bi-weekly option: pay half every 2 weeks and see how much sooner you're debt-free.
+```
+- 주별 세율 출처: Tax Foundation 2026 (`mortgage_app/store/state_rates.json`). 설명(Description) ■ PAY OFF 절에 위 3가지를 한 줄씩 추가할 것.

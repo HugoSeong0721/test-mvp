@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../core/ads.dart';
 import '../core/format.dart';
 import '../core/loan.dart';
+import '../core/states.dart';
 import '../core/store.dart';
 import '../core/theme.dart';
 import '../widgets/charts.dart';
@@ -61,8 +62,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final keyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
     final input = s.toInput();
     final valid = s.loanAmount > 0 && s.termMonths > 0;
-    final res = calculate(valid ? input : input.withExtra(0));
-    final effect = valid && s.extra > 0 ? extraEffect(input) : null;
+    final res = calculate(valid ? input : input.withoutExtras());
+    final effect = valid && input.hasExtras ? extraEffect(input) : null;
 
     return Scaffold(
       backgroundColor: tk.bg,
@@ -258,9 +259,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 onChanged: (v) => update((s) => s.tradeIn = v),
               ),
             ),
+            _stateRow(tk, forSales: true),
             FieldRow(
               label: 'Sales tax',
-              hint: 'On price minus trade-in',
+              hint: _salesHint(),
               child: NumField(
                 key: const Key('f-salestax'),
                 semanticLabel: 'Sales tax percent',
@@ -410,9 +412,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     padding: const EdgeInsets.only(right: 8, bottom: 12),
                     child: Column(
                       children: [
+                        _stateRow(tk, forSales: false),
                         FieldRow(
                           label: 'Property tax',
-                          hint: 'Per year',
+                          hint: _taxHint(),
                           fieldWidth: 206,
                           child: Row(
                             children: [
@@ -632,11 +635,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             monthYear(base.payoff!.$1, base.payoff!.$2),
             key: const Key('payoff'),
           ),
-          if (s.extra > 0)
+          if (e != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                'Without extra payments. With ${money(s.extra)}/mo extra: '
+                'Without extra payments. With your extra payments: '
                 '${monthYear(payoff.$1, payoff.$2)}.',
                 style: TextStyle(fontSize: 12, color: tk.muted),
               ),
@@ -686,6 +689,93 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   update((s) => s.extra = s.extra == v ? 0 : v);
                 },
               ),
+            ),
+          ),
+          if (s.extra > 0)
+            FieldRow(
+              label: 'Starting',
+              hint: 'Month the extra begins',
+              child: _PickerButton(
+                key: const Key('f-extra-from'),
+                text: s.extraFromYear == 0
+                    ? monthYear(s.startYear, s.startMonth)
+                    : monthYear(s.extraFromYear, s.extraFromMonth),
+                onTap: () => _pickLoanMonth(
+                  'Extra payments start',
+                  s.extraFromYear == 0 ? s.startYear : s.extraFromYear,
+                  s.extraFromYear == 0 ? s.startMonth : s.extraFromMonth,
+                  (y, m) => update((s) {
+                    s.extraFromYear = y;
+                    s.extraFromMonth = m;
+                  }),
+                ),
+              ),
+            ),
+          FieldRow(
+            label: 'One-time payment',
+            hint: 'Bonus, tax refund…',
+            child: NumField(
+              key: const Key('f-lump'),
+              semanticLabel: 'One-time extra payment',
+              prefix: '\$',
+              max: 99999999,
+              value: s.lump,
+              onChanged: (v) => update((s) {
+                s.lump = v;
+                if (s.lumpYear == 0) {
+                  // 기본은 1년 뒤 같은 달
+                  s.lumpYear = s.startYear + 1;
+                  s.lumpMonth = s.startMonth;
+                }
+              }),
+            ),
+          ),
+          if (s.lump > 0)
+            FieldRow(
+              label: 'Paid in',
+              child: _PickerButton(
+                key: const Key('f-lump-when'),
+                text: monthYear(s.lumpYear, s.lumpMonth),
+                onTap: () => _pickLoanMonth(
+                  'One-time payment',
+                  s.lumpYear,
+                  s.lumpMonth,
+                  (y, m) => update((s) {
+                    s.lumpYear = y;
+                    s.lumpMonth = m;
+                  }),
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Pay every 2 weeks',
+                        style: TextStyle(fontSize: 15, color: tk.text),
+                      ),
+                      Text(
+                        'Half a payment every 2 weeks = 13 payments a year',
+                        style: TextStyle(fontSize: 12, color: tk.muted),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  key: const Key('f-biweekly'),
+                  value: s.biweekly,
+                  activeTrackColor: tk.accent,
+                  onChanged: (v) {
+                    unfocus();
+                    update((s) => s.biweekly = v);
+                  },
+                ),
+              ],
             ),
           ),
           if (saved) ...[
@@ -841,6 +931,69 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     ),
   );
 
+  String _taxHint() {
+    final st = stateByCode(s.stateCode);
+    if (st != null && s.taxIsPercent && s.tax == st.propertyTax) {
+      return '${st.name} average · per year';
+    }
+    return 'Per year';
+  }
+
+  String _salesHint() {
+    final st = stateByCode(s.stateCode);
+    if (st != null && s.salesTax == st.combinedSalesTax) {
+      return '${st.name} state + avg. local';
+    }
+    return 'On price minus trade-in';
+  }
+
+  /// 주 고르기 — 집이면 재산세율, 자동차면 판매세율을 채운다.
+  Widget _stateRow(Tk tk, {required bool forSales}) {
+    final st = stateByCode(s.stateCode);
+    return FieldRow(
+      label: 'State',
+      hint: forSales ? 'Fills in sales tax' : 'Fills in property tax',
+      child: _PickerButton(
+        key: const Key('f-state'),
+        text: st?.name ?? 'Choose',
+        onTap: () async {
+          unfocus();
+          final picked = await pickState(context, s.stateCode);
+          if (picked == null) return;
+          update((s) {
+            s.stateCode = picked.code;
+            if (forSales) {
+              s.salesTax = picked.combinedSalesTax;
+            } else {
+              s.tax = picked.propertyTax;
+              s.taxIsPercent = true;
+            }
+          });
+        },
+      ),
+    );
+  }
+
+  Future<void> _pickLoanMonth(
+    String title,
+    int year,
+    int month,
+    void Function(int y, int m) onPicked,
+  ) async {
+    unfocus();
+    final endYear = s.startYear + (s.termMonths / 12).ceil();
+    final picked = await pickMonth(
+      context,
+      year,
+      month,
+      store.clock().year,
+      title: title,
+      first: s.startYear,
+      last: endYear,
+    );
+    if (picked != null) onPicked(picked.$1, picked.$2);
+  }
+
   Widget _footer(Tk tk) => Padding(
     padding: const EdgeInsets.only(top: 4),
     child: Column(
@@ -980,9 +1133,9 @@ class _ResultCard extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: big,
                   ),
-                  if (s.extra > 0 && valid)
+                  if (s.toInput().hasExtras && valid)
                     Text(
-                      '+ ${money(s.extra)} extra toward principal',
+                      _extraLine(s, res),
                       style: TextStyle(
                         fontSize: 13,
                         color: tk.accent,
@@ -1075,10 +1228,13 @@ Future<(int, int)?> pickMonth(
   BuildContext context,
   int year,
   int month,
-  int thisYear,
-) {
-  final first = thisYear - 40, last = thisYear + 10;
-  var y = year.clamp(first, last), m = month;
+  int thisYear, {
+  String title = 'First payment',
+  int? first,
+  int? last,
+}) {
+  final lo = first ?? thisYear - 40, hi = last ?? thisYear + 10;
+  var y = year.clamp(lo, hi), m = month;
   return showModalBottomSheet<(int, int)>(
     context: context,
     backgroundColor: Tk.of(context).surface,
@@ -1097,7 +1253,7 @@ Future<(int, int)?> pickMonth(
                 children: [
                   Expanded(
                     child: Text(
-                      'First payment',
+                      title,
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -1146,11 +1302,11 @@ Future<(int, int)?> pickMonth(
                       key: const Key('year-wheel'),
                       itemExtent: 36,
                       scrollController: FixedExtentScrollController(
-                        initialItem: y - first,
+                        initialItem: y - lo,
                       ),
-                      onSelectedItemChanged: (i) => y = first + i,
+                      onSelectedItemChanged: (i) => y = lo + i,
                       children: [
-                        for (var k = first; k <= last; k++)
+                        for (var k = lo; k <= hi; k++)
                           Center(
                             child: Text('$k', style: TextStyle(color: tk.text)),
                           ),
@@ -1161,6 +1317,103 @@ Future<(int, int)?> pickMonth(
               ),
             ),
           ],
+        ),
+      );
+    },
+  );
+}
+
+/// 위 카드의 추가 상환 한 줄.
+String _extraLine(Scenario s, LoanResult res) {
+  final parts = <String>[
+    if (s.extra > 0) '${money(s.extra)}/mo',
+    if (s.biweekly) 'bi-weekly',
+    if (s.lump > 0) '${money(s.lump)} once',
+  ];
+  return '+ ${parts.join(' · ')} extra toward principal';
+}
+
+/// 주 고르기 시트 — 이름과 재산세·판매세 추정치를 같이 보여 준다.
+Future<UsState?> pickState(BuildContext context, String? current) {
+  return showModalBottomSheet<UsState>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Tk.of(context).surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (c) {
+      final tk = Tk.of(c);
+      final cur = usStates.indexWhere((x) => x.code == current);
+      return SafeArea(
+        child: SizedBox(
+          height: MediaQuery.sizeOf(c).height * 0.8,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Choose your state',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: tk.text,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      key: const Key('state-close'),
+                      onPressed: () => Navigator.pop(c),
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Text(
+                  'State averages (Tax Foundation 2026). Your county may differ — you can edit the rate.',
+                  style: TextStyle(fontSize: 12, color: tk.muted),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  key: const Key('state-list'),
+                  controller: ScrollController(
+                    initialScrollOffset: cur > 3 ? (cur - 3) * 56.0 : 0,
+                  ),
+                  itemCount: usStates.length,
+                  itemExtent: 56,
+                  itemBuilder: (c, k) {
+                    final st = usStates[k];
+                    final sel = st.code == current;
+                    return ListTile(
+                      key: Key('state-${st.code}'),
+                      selected: sel,
+                      selectedColor: tk.accent,
+                      title: Text(
+                        st.name,
+                        style: TextStyle(
+                          fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Property tax ${trimNum(st.propertyTax, 3)}% · Sales tax ${trimNum(st.combinedSalesTax, 3)}%',
+                        style: TextStyle(fontSize: 12, color: tk.muted),
+                      ),
+                      trailing: sel
+                          ? Icon(Icons.check_rounded, color: tk.accent)
+                          : null,
+                      onTap: () => Navigator.pop(c, st),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       );
     },
