@@ -42,4 +42,49 @@ void main() {
     await AppStore.i.load();
     expect(AppStore.i.targets, ['GBP', 'MXN', 'EUR']);
   });
+
+  testWidgets('top (base) row can be dragged down, and a row dragged to the top becomes base', (t) async {
+    tzdata.initializeTimeZones();
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    SharedPreferences.setMockInitialValues({
+      'fx-app-v1': '{"base":"USD","buf":"100","targets":["EUR","GBP","MXN"],"active":"USD","onboarded":true}',
+    });
+    await AppStore.i.load();
+    await t.pumpWidget(const GlanceApp());
+    await t.pumpAndSettle(const Duration(milliseconds: 100), EnginePhase.sendSemanticsUpdate, const Duration(seconds: 3));
+
+    Future<void> drag(String fromName, String toName, double extra) async {
+      final from = t.getCenter(find.text(fromName, findRichText: true).first);
+      final to = t.getCenter(find.text(toName, findRichText: true).first);
+      final g = await t.startGesture(from);
+      await t.pump(const Duration(milliseconds: 600));
+      for (var i = 1; i <= 12; i++) {
+        await g.moveTo(Offset(from.dx, from.dy + (to.dy - from.dy + extra) * i / 12));
+        await t.pump(const Duration(milliseconds: 30));
+      }
+      await g.up();
+      await t.pumpAndSettle(const Duration(milliseconds: 100), EnginePhase.sendSemanticsUpdate, const Duration(seconds: 3));
+    }
+
+    // 맨 위 USD 를 GBP 아래로 → EUR 가 기준 통화, USD 는 목록 안으로
+    await drag('US Dollar', 'British Pound', 0);
+    expect(AppStore.i.base, 'EUR');
+    expect(AppStore.i.targets, ['GBP', 'USD', 'MXN']);
+    expect(t.takeException(), isNull);
+
+    // MXN 을 맨 위로 → MXN 이 기준 통화
+    await drag('Mexican Peso', 'Euro', -60);
+    expect(AppStore.i.base, 'MXN');
+    expect(AppStore.i.targets, ['EUR', 'GBP', 'USD']);
+
+    // 금액은 그대로 이어져야 한다 (입력하던 통화의 금액 유지)
+    expect(AppStore.i.active, 'USD');
+    expect(AppStore.i.buf, '100');
+
+    await AppStore.i.load();
+    expect(AppStore.i.base, 'MXN');
+    expect(AppStore.i.targets, ['EUR', 'GBP', 'USD']);
+  });
 }

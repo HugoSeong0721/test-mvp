@@ -11,7 +11,7 @@ import 'keypad.dart';
 
 /// 변환 화면.
 ///
-/// 맨 위에 기준 통화·금액이 고정되고, 아래 여러 국가가 동시에 변환된다.
+/// 맨 위 줄이 기준 통화·금액이고, 아래 여러 국가가 동시에 변환된다. 맨 위 줄도 끌어서 옮길 수 있다.
 /// 어느 행이든 금액을 누르면 그 통화로 입력할 수 있고 나머지 전부가 따라 바뀐다.
 class ConverterScreen extends StatefulWidget {
   const ConverterScreen({super.key});
@@ -38,7 +38,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _revealActiveRow() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final s = AppStore.i;
-      if (!s.targets.contains(s.active)) return; // 기준 행은 항상 보인다
       final ctx = _rowKeys[s.active]?.currentContext;
       if (ctx == null) return;
       Scrollable.ensureVisible(
@@ -96,31 +95,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
         return Column(
           children: [
             _Header(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 2, 24, 7),
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Eyebrow('Amount'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _BaseCard(
-                currency: base,
-                editing: _kbdOpen && s.active == s.base,
-                amount: s.active == s.base
-                    ? fmtBuf(s.buf)
-                    : fmtAmount(s.amountIn(s.base)),
-                onPick: () => _pick(PickMode.base),
-                onAmount: () => _startEdit(s.base),
-              ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(24, 2, 24, 7),
+              child: Align(
+                  alignment: Alignment.centerLeft, child: Eyebrow('Amount')),
             ),
             Expanded(
-              // 줄을 꾹 눌러 위아래로 끌면 순서가 바뀐다 (기준 통화 줄은 위에 고정)
+              // 어느 줄이든 꾹 눌러 위아래로 끌면 순서가 바뀐다. 맨 위로 온 통화가 기준 통화.
               child: ReorderableListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-                itemCount: s.targets.length,
-                onReorderItem: s.moveTarget,
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                itemCount: s.targets.length + 1,
+                onReorderItem: s.moveRow,
                 proxyDecorator: (child, _, anim) => AnimatedBuilder(
                   animation: anim,
                   builder: (context, child) => Transform.scale(
@@ -129,21 +114,40 @@ class _ConverterScreenState extends State<ConverterScreen> {
                   ),
                   child: child,
                 ),
-                itemBuilder: (context, i) => Padding(
-                  key: ValueKey(s.targets[i]),
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: _TargetRow(
-                    key: _keyFor(s.targets[i]),
-                    currency: currencyByCode[s.targets[i]]!,
-                    base: s.base,
-                    editing: _kbdOpen && s.active == s.targets[i],
-                    amount: s.active == s.targets[i]
-                        ? fmtBuf(s.buf)
-                        : fmtAmount(s.amountIn(s.targets[i])),
-                    onPick: () => _pick(PickMode.replace, index: i),
-                    onAmount: () => _startEdit(s.targets[i]),
-                  ),
-                ),
+                itemBuilder: (context, i) {
+                  if (i == 0) {
+                    return Padding(
+                      key: ValueKey(s.base),
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _BaseCard(
+                        key: _keyFor(s.base),
+                        currency: base,
+                        editing: _kbdOpen && s.active == s.base,
+                        amount: s.active == s.base
+                            ? fmtBuf(s.buf)
+                            : fmtAmount(s.amountIn(s.base)),
+                        onPick: () => _pick(PickMode.base),
+                        onAmount: () => _startEdit(s.base),
+                      ),
+                    );
+                  }
+                  final code = s.targets[i - 1];
+                  return Padding(
+                    key: ValueKey(code),
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _TargetRow(
+                      key: _keyFor(code),
+                      currency: currencyByCode[code]!,
+                      base: s.base,
+                      editing: _kbdOpen && s.active == code,
+                      amount: s.active == code
+                          ? fmtBuf(s.buf)
+                          : fmtAmount(s.amountIn(code)),
+                      onPick: () => _pick(PickMode.replace, index: i - 1),
+                      onAmount: () => _startEdit(code),
+                    ),
+                  );
+                },
                 footer: _AddButton(onTap: () => _pick(PickMode.add)),
               ),
             ),
@@ -277,6 +281,7 @@ class _CodeLine extends StatelessWidget {
 
 class _BaseCard extends StatelessWidget {
   const _BaseCard({
+    super.key,
     required this.currency,
     required this.editing,
     required this.amount,

@@ -168,12 +168,15 @@ class AppStore extends ChangeNotifier {
     _commit();
   }
 
-  /// 목록 순서 바꾸기 (onReorderItem: newIndex 는 빼낸 뒤 기준 위치)
-  void moveTarget(int oldIndex, int newIndex) {
+  /// 기준 통화(맨 위)를 포함한 전체 줄 순서 바꾸기. 맨 위로 온 통화가 기준 통화가 된다.
+  /// (onReorderItem 규칙: newIndex 는 빼낸 뒤 기준 위치)
+  void moveRow(int oldIndex, int newIndex) {
     if (oldIndex == newIndex) return;
-    final list = [...targets];
+    final list = [base, ...targets];
     list.insert(newIndex, list.removeAt(oldIndex));
-    targets = list;
+    base = list.first;
+    targets = list.sublist(1);
+    if (chartTo == base) chartTo = targets.isNotEmpty ? targets.first : 'USD';
     _commit();
   }
 
