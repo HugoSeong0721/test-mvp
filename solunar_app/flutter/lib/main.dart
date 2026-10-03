@@ -35,7 +35,7 @@ class SolunarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      MaterialApp(title: 'Solunar', debugShowCheckedModeBanner: false, theme: buildTheme(), home: const _Root());
+      MaterialApp(title: 'Glance Solunar', debugShowCheckedModeBanner: false, theme: buildTheme(), home: const _Root());
 }
 
 /// Welcome until a place is chosen, then the main screen. Follows the store,

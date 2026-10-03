@@ -1,0 +1,14 @@
+{
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 원문·근거는 ios-listing.md. 스크린샷은 TestFlight 빌드로 찍은 뒤 채운다.",
+  "bundleId": "com.soulfulfill.solunar",
+  "locale": "en-US",
+  "subtitle": "Hunting Times & Moon Phases",
+  "privacyPolicyUrl": "https://soulfulfillable.github.io/test-mvp/solunar-privacy.html",
+  "promotionalText": "Free solunar fishing & hunting times — no subscription. Today's score, Major and Minor periods, and a big legal shooting light countdown. Works with no signal.",
+  "description": "Free solunar fishing & hunting times. No subscription, no paywall.\n\nGlance Solunar works out the classic solunar periods for exactly where you are, so you can plan your morning on the water or your evening in the stand at a glance.\n\nTODAY AT A GLANCE\n• A 0–100 day score with a plain \"How is this scored?\" breakdown — no black box\n• Major periods (moon overhead and underfoot) and Minor periods (moonrise and moonset)\n• \"Major period now — 34m left\" or \"Next: Minor period, starts in 1h 10m\"\n• A 24-hour bar showing daylight, night and every period\n\nLEGAL SHOOTING LIGHT\n• Big countdown: \"Shooting light ends in 2h 05m\"\n• Set minutes before sunrise and after sunset to match your state and species\n• Quick set: 30 min / 30 min, 30 min / sunset, sunrise / sunset\n\nSUN & MOON\n• Sunrise, sunset, moonrise, moonset, moon phase and how full it is\n• Next full moon and next new moon\n\nPLAN AHEAD\n• Today and the next 7 days, always free\n• Watch one short video to open the 30-day calendar for 24 hours\n\nWORKS ANYWHERE, EVEN WITH NO SIGNAL\n• Everything is worked out on your phone from the positions of the sun and moon\n• Use your location, or search 20,000 US and Canadian towns offline\n• Save your lake, lease or deer stand\n\nHonest by design: solunar times are a guide based on sun and moon cycles, not a promise of fish or game. Weather, water temperature and pressure matter too. Shooting hours are set by each state — always check your current regulations.",
+  "keywords": "forecast,calendar,tables,deer,bass,duck,bite,shooting,light,sunrise,sunset,moonrise,major,minor",
+  "supportUrl": "https://github.com/soulfulfillable/test-mvp/issues",
+  "reviewNotes": "All times are calculated on the device from astronomical formulas (sun: NOAA solar equations; moon: Meeus, Astronomical Algorithms); the app makes no network requests except Google AdMob. Location (\"When In Use\") is used on-device to calculate times for the user's spot and is never sent anywhere. Users can instead search a bundled list of US/Canadian towns (GeoNames, CC BY 4.0). The 30-day calendar opens for 24 hours after an optional rewarded video; if no video is available it opens anyway. Shooting light is a user-set offset from sunrise/sunset with a notice to check state regulations.",
+  "screenshots": [],
+  "screenshotDisplayType": "APP_IPHONE_67"
+}

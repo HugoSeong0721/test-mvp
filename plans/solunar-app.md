@@ -18,7 +18,7 @@
 - 영어 UI, 아이폰 전용·세로.
 
 ## 결정 필요 (개발 세션 → 사용자 A/B)
-- 앱 이름(검색어 조사 후 2~3개, Glance 시리즈 여부), 번들 ID.
+- ✅ 앱 이름 **Glance Solunar: Fishing Times** (부제 Hunting Times & Moon Phases), 번들 `com.soulfulfill.solunar` — 사용자 추천안 선택, Apple 등록 완료 (2026-10-03).
 
 ## 진행 순서
 ①경쟁 앱 화면·리뷰 확인 → ②계산 엔진 + 검증(공개 솔루나 표와 몇 날짜 대조) → ③테스트 로봇 → ④Flutter → ⑤광고 → ⑥Release iOS → ⑦TestFlight
@@ -39,5 +39,6 @@
 - ④Flutter 앱 한 화면(점수·지금/다음·24시간 막대·구간 목록·사냥 카드·해/달·30일 달력 버튼) + 장소·설정·달력 화면. 아이콘은 SVG 직접 그림. 아이폰 전용·세로, 위치 권한 문구.
 - ⑤광고: 배너 + 보상형(30일 달력 24시간) — 아직 Google 테스트 ID. 영상이 안 오면 8초 뒤 그냥 열어 줌.
 - 웹 미리보기 `docs/solunar-app/` + 클릭 점검 39/39(`solunar_app/qa/web-check.js`), 개인정보처리방침 `docs/solunar-privacy.html`.
-- 남은 것: 이름·번들(사용자) → 번들 등록 → `Release iOS` 에 solunar 추가 → ASC 앱 레코드·AdMob(사용자) → TestFlight → 스토어 문구·스크린샷.
+- 이름·번들 확정(사용자 A) → 번들 Apple 등록 완료, `Release iOS`·`App Store 등록 정보 채우기` 선택지에 solunar 추가, 스토어 문구 `store/ios-metadata.json`, todo 페이지 추가.
+- 남은 것: ASC 앱 레코드·AdMob(사용자) → `Release iOS`(solunar) → TestFlight → 실제 광고 ID → 스크린샷 → 심사.
 

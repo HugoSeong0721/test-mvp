@@ -86866,7 +86866,7 @@ return s==null?new A.px($.nS()):new A.px(s)},
 $S:537}
 A.NY.prototype={
 I(a){var s=A.uP(null,A.axT(B.ad,null,B.bT,B.bT,B.js),B.js,!0)
-return new A.zq(B.a1v,"Solunar",s.akt(B.Bl,s.ok.aiJ(B.aX,B.aX)),!1,null)}}
+return new A.zq(B.a1v,"Glance Solunar",s.akt(B.Bl,s.ok.aiJ(B.aX,B.aX)),!1,null)}}
 A.UL.prototype={
 I(a){return new A.fG(new A.aoQ(),null,$.dj(),null)}}
 A.aoQ.prototype={

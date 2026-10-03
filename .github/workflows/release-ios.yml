@@ -24,7 +24,7 @@ on:
       app:
         description: "올릴 앱"
         type: choice
-        options: [currency, catdoku, mortgage, decibel, speedometer, tides, fuellog]
+        options: [currency, catdoku, mortgage, decibel, speedometer, tides, fuellog, solunar]
         default: currency
 
 permissions:

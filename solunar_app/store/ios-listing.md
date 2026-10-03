@@ -1,6 +1,7 @@
 # 낚시·사냥 시간 (솔루나) — App Store 등록 문구 초안
 
-**대상: 미국 App Store. 기본 언어 English (U.S.).** 이름은 사용자 확인 전 — 확정되면 이 파일과 `ios-metadata.json` 을 같이 만든다.
+**대상: 미국 App Store. 기본 언어 English (U.S.).** 이름 확정(2026-10-03, 사용자 A 선택): **`Glance Solunar: Fishing Times`**, 부제 `Hunting Times & Moon Phases`,
+번들 `com.soulfulfill.solunar`, SKU `solunar`, 홈 화면 이름 `Solunar`("Glance Solunar" 14자는 아이콘 아래에서 잘릴 수 있어서). API 로 넣는 값은 `ios-metadata.json`.
 
 ## 경쟁 앱 조사 (2026-10-03, 웹 검색 요약 — App Store 직접 접속은 작업 환경에서 막힘, 평점·가격은 등록 때 다시 확인)
 
@@ -24,7 +25,7 @@ GPS 대신 마을 검색(2만 곳, 오프라인)과 저장한 곳.
 
 | | 이름 (30자) | 부제 (30자) |
 |---|---|---|
-| A (추천) | `Glance Solunar: Fishing Times` (29) | `Hunting Times & Moon Phases` (27) |
+| **A (추천, 선택됨)** | `Glance Solunar: Fishing Times` (29) | `Hunting Times & Moon Phases` (27) |
 | B | `Glance Moon: Fishing & Hunting` (30) | `Solunar Times & Shooting Light` (30) |
 | C | `Solunar Day: Fish & Hunt Times` (30) | `Fishing Forecast & Moon Phase` (29) |
 

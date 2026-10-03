@@ -1,24 +1,27 @@
-# 낚시·사냥 시간 (solunar 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 07:40 (KST)
+# Glance Solunar: Fishing Times (낚시·사냥 시간, solunar 앱) — 개발 세션 게시판
+마지막 갱신: 2026-10-03 21:15 (KST)
 
 ## 지금 상태 (3줄 이내)
 Flutter 1차 완성(`solunar_app/flutter/`): 오늘 점수(0~100)·Major/Minor 구간·24시간 막대·지금/다음 구간·사냥 허용 시간 카운트다운·해/달·7일 띠·30일 달력(영상 보고 24시간)·장소 검색(미국·캐나다 2만 곳, 오프라인)·저장한 곳.
 테스트 34개 통과(엔진 22: PyEphem 대조 1,800건+·공개 솔루나 표 3곳 2분 이내 / 로봇 12), 웹 클릭 점검 39/39. 웹 미리보기 https://soulfulfillable.github.io/test-mvp/solunar-app/index.html
-이름·번들 ID 사용자 확인 대기 → 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight.
+이름 `Glance Solunar: Fishing Times` 확정, **번들 `com.soulfulfill.solunar` Apple 등록 완료**(Actions run 37121872573). ASC 앱 레코드·AdMob(사용자) 대기 → `Release iOS`(solunar) → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] 이름 A/B: **A `Glance Solunar: Fishing Times` (추천)** / B `Glance Moon: Fishing & Hunting` / C `Solunar Day: Fish & Hunt Times`. 번들 `com.soulfulfill.solunar`.
-- [사용자] 웹 미리보기 열어 보고 '느낌' 한마디 (위치 허용하면 지금 있는 곳 기준).
-- [세션, 이름 정해지면] 번들 등록 Actions → `Release iOS`·`App Store 등록 정보 채우기` 선택지에 solunar 추가 → ASC 앱 레코드·AdMob(배너 + 보상형 1개) 안내 → TestFlight.
+- ✅ [사용자] 이름 A `Glance Solunar: Fishing Times`, 번들 `com.soulfulfill.solunar` (10-03) → ✅ [세션] Apple 번들 등록 ("새로 등록함").
+- [사용자] App Store Connect 신규 앱: iOS / `Glance Solunar: Fishing Times` / English (U.S.) / `com.soulfulfill.solunar` / SKU `solunar` / Full Access. 복사 버튼: https://soulfulfillable.github.io/test-mvp/todo.html
+- [사용자] AdMob(**soulfulfillable 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 `Glance Solunar`) → 광고 단위 2개: **Banner 카드** 이름 `banner`, **Rewarded 카드(4번째)** 이름 `rewarded_calendar`. 완료 화면 캡처 주면 ID 반영.
+- [사용자] 웹 미리보기 '느낌' 한마디.
+- [세션] 앱 레코드 생기면 → `Release iOS`(solunar, 선택지 추가해 둠) → TestFlight → 스크린샷 1290×2796 → `App Store 등록 정보 채우기`(`solunar_app/store/ios-metadata.json` 준비됨).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | (A/B) 이름 → "Glance Solunar: Fishing Times (추천)", 번들 → "solunar 로 등록 (추천)" | 이름·부제 확정, Actions 로 번들 등록(새로 등록함), 홈 화면 이름 `Solunar`, 스토어 문구 `ios-metadata.json`, `Release iOS`·`App Store 등록 정보 채우기` 선택지에 solunar 추가, todo 페이지에 추가 |
 | 10-03 | "낚시·사냥 시간(솔루나) 앱 개발 시작해줘. plans/solunar-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어 (특히 board/tides.md — 일출일몰·달 계산 재사용). 네 게시판은 board/solunar.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 물때 앱 일출일몰·위상 코드 재사용 + 달 위치·월출월몰·남중 새로 만듦. 이 파일을 단계마다 갱신 |
 
 ## 사용자 성향 — 원하는 것 / 불편해하는 것 (이 앱에서 알게 된 것)
 - (다른 게시판에서 배움) 폰으로 바로 해 보는 링크를 먼저 원함 → 웹 미리보기부터. 결정은 추천안 + 이유 한 줄. 이름은 Glance 시리즈로 통일되는 중.
-- (이 앱) 아직 피드백 없음.
+- (이 앱) 이름·번들 둘 다 추천안을 바로 골랐다 (다른 앱들과 같음).
 
 ## 다른 세션에 알리는 노하우 (다른 앱에서도 써먹을 것)
 - **물때 세션에: 월출·월몰·달 남중/북중이 생겼다** → `solunar_app/flutter/lib/core/astro.dart` 의 `moonEvents(start, end, lat, lng)` (Meeus 47장 달 위치 + USNO 정의).
@@ -35,6 +38,9 @@ Flutter 1차 완성(`solunar_app/flutter/`): 오늘 점수(0~100)·Major/Minor �
 - **시간대**: GPS 지점은 폰 시간대(`flutter_timezone`), 검색한 마을은 그 마을 시간대 — 다른 주를 볼 때 그곳 시각으로 보여 준다(Bozeman 은 MDT).
 - **복사해 온 문구 확인**: 물때 앱 `location.dart` 를 가져왔더니 "search for a station" 이 남아 있었다(웹 스크린샷에서 발견) → 로봇에 "station 글자 없음" 검사를 넣었다.
 - 이 작업 환경에서 WebFetch 는 대부분 막히지만 **WebSearch 는 된다** — 경쟁 앱 평점·리뷰 불만은 백그라운드 조사 에이전트에게 WebSearch 로 맡기면 15분 안에 나온다.
+
+- **todo 페이지 광고 단위가 2개 이상인 앱**: `docs/todo.html` 의 `apps` 항목에 `units:[['광고 단위 1 · Banner 카드','banner'],['광고 단위 2 · Rewarded 카드','rewarded_calendar']]` 처럼 넣으면 줄마다 복사 버튼이 생긴다 (없으면 기존대로 banner 한 줄).
+- 홈 화면 아이콘 아래 이름은 12자 안팎에서 잘린다 → "Glance Solunar"(14자) 대신 `Solunar`. 스토어 이름은 따로라 검색에는 영향 없음.
 
 ## 다른 세션·기획 파트너에게 묻고 싶은 것
 - 기획 파트너: 30일 달력 보상형에서 **영상이 없을 때(오프라인·광고 재고 없음)는 그냥 열어 준다**(8초 기다린 뒤). 사용자 탓이 아닌데 막는 건 1등 앱 불만과 같은 결이라 판단. 괜찮은지?
