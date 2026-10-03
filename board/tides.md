@@ -7,17 +7,15 @@ Flutter 1차 완성(`tides_app/flutter/`) + **보상형 30일 물때표**(영상
 이름 `Glance Tides: Tide Chart`·번들 `com.soulfulfill.tides` **Apple 등록 완료**, 아이콘·스토어 문구 초안 완료. ASC 앱 레코드·AdMob(사용자) 대기 → TestFlight.
 
 ## 다음 할 일 / 사용자에게 받을 것
-- [사용자] App Store Connect → 앱 → ＋ → 신규 앱: 플랫폼 iOS / 이름 `Glance Tides: Tide Chart` / 기본 언어 English (U.S.) /
-  번들 ID `com.soulfulfill.tides` 선택 / SKU `tides` / 사용자 액세스 Full Access → 생성. (없으면 `Release iOS` 업로드가 실패한다)
-- [사용자] AdMob(**`soulfulfillable` 계정**, 게시자 `pub-4724352880074547`) → 앱 → 앱 추가 → iOS / "아니요(스토어 미등록)" / 앱 이름 `Glance Tides` →
-  광고 단위 2개: ① **Banner** 이름 `banner` ② **Rewarded** 이름 `rewarded_30day` (보상 설정 기본값). 앱 ID(`~`)·단위 ID 2개(`/`) 화면 캡처 주면 반영.
-- [세션] ID 받으면 `lib/core/ads.dart`·Info.plist·AndroidManifest 교체 → `Release iOS`(app=tides) → TestFlight → 사용자 '느낌' → 스크린샷 6장(1290×2796) → `App Store 등록 정보 채우기`.
+- ✅ [사용자] ASC 앱 레코드 생성 (10-03), AdMob 앱 + 배너·보상형 단위 → ✅ [세션] 실제 ID 반영 (iOS. 안드로이드는 테스트 ID 유지).
+- [세션] `Release iOS`(app=tides) → TestFlight → 사용자 '느낌' → 스크린샷 6장(1290×2796) → `App Store 등록 정보 채우기`.
 - [사용자, 선택] 웹 미리보기 '느낌' 한마디.
 - 확인 못 한 것: iOS 실제 빌드(맥에서 첫 컴파일은 `Release iOS` 때), 실기기 위치 권한 창, 실제 AdMob 영상(지금은 테스트·가짜 광고).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | (AdMob 캡처 2장) "배너는됏고 리워드는 저렇게위에꺼는비우는거지 체크박스" → 보상형 완료 캡처, "App Store Connect 이거도 해놧어" | Partner bidding 은 비움이 맞다고 답함. 앱 ID `~3021266571`, 배너 `/9191837537`, 보상형 `/4912847027` 반영 → `Release iOS`(tides) 실행 |
 | 10-03 | (A/B) 이름 "Glance Tides (추천)" / 결제 "넣지 않음 (추천)" / 30일 표 보상형 "넣음 (추천)" | 이름 `Glance Tides: Tide Chart`, 번들 `com.soulfulfill.tides` 등록 실행, 결제 없음, 30일 표 영상 보고 24시간 열기 개발 |
 | 10-03 | "물때 시간(Tides) 앱 개발 시작해줘. plans/tides-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/tides.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 이 파일을 단계마다 갱신 |
 
