@@ -2,9 +2,9 @@
 마지막 갱신: 2026-10-03 06:20 (KST)
 
 ## 지금 상태 (3줄 이내)
-Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 세금·보험·HOA·PMI, 추가 상환 시뮬, 상환표(연/월), 차트. 테스트 20개 통과(엔진 10 + 로봇 10).
-웹 미리보기 https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html — 광고는 배너만(Google 테스트 ID).
-번들 등록·ASC 앱 레코드·AdMob 실제 ID 완료. **`Release iOS` 업로드 성공 (빌드 18)** → TestFlight 처리·내부 테스터 설치 대기.
+빌드 22(종류 전환 스크롤 버그 수정판) 업로드 + `App Store 등록 정보 채우기` 성공: 부제·설명·키워드·스크린샷 5장·빌드 22·심사 메모 입력됨 (버전 1.0 PREPARE_FOR_SUBMISSION).
+남은 것은 사용자 클릭: 저작권·카테고리·App Privacy·연령 등급·가격/판매국(EU 제외)·심사 연락처 → 심사 제출.
+웹 미리보기 https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html
 
 ## 다음 할 일 / 사용자에게 받을 것
 - ✅ [사용자] 이름 A `Glance: Mortgage Calculator`, 번들 `com.soulfulfill.mortgage` → ✅ [세션] 번들 Apple 등록.

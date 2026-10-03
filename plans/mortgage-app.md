@@ -47,4 +47,6 @@
 - 개인정보처리방침 `docs/mortgage-privacy.html`.
 - 이름 **Glance: Mortgage Calculator** · 번들 `com.soulfulfill.mortgage` (사용자 확인, Apple 등록 완료). `mortgage_app/store/ios-metadata.json` 작성.
 - ASC 앱 레코드(사용자), AdMob iOS 앱 `~9582805496`·배너 `/4605810985` 반영, `Release iOS` 빌드 18 업로드 성공.
-- 남은 것: TestFlight 설치·느낌 피드백 → 스크린샷 1290×2796 → `App Store 등록 정보 채우기` → 심사.
+- 사용자 실기기 확인(빌드 18) "괜찮은 것 같다" → 출시 진행. 스크린샷 만들다 종류 전환 스크롤 버그 발견·수정(테스트 추가) → 빌드 22.
+- 스토어 스크린샷 5장(`mortgage_app/store/screenshots/`, `test/store_shots_test.dart` + `make.js`), `App Store 등록 정보 채우기`(빌드 22) 전부 ✓.
+- 남은 것: 사용자가 ASC 에서 저작권·카테고리·App Privacy·연령 등급·가격/판매국·심사 제출.
