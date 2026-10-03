@@ -1,0 +1,40 @@
+name: Fetch Census county property tax (mortgage)
+
+# 대출 계산기의 카운티별 재산세율. 개발 환경에서 api.census.gov 가 막혀 있어 여기서 받아
+# `mortgage-census-data` 브랜치에 커밋한다 (main 에 안 넣어 Pages 재배포 없음).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Switch to data branch
+        run: |
+          if git ls-remote --exit-code --heads origin mortgage-census-data >/dev/null; then
+            git fetch origin mortgage-census-data
+            git checkout -B mortgage-census-data origin/mortgage-census-data
+            git checkout "$GITHUB_SHA" -- tools/mortgage
+          else
+            git checkout -B mortgage-census-data
+          fi
+
+      - name: Fetch ACS county data
+        run: python3 -u tools/mortgage/fetch_census_counties.py | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/mortgage
+          git commit -m "mortgage: Census ACS county property tax snapshot" || echo "nothing new"
+          git push origin mortgage-census-data
