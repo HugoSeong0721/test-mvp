@@ -1,10 +1,10 @@
 # Kitty Queens: Cat Sudoku (Catdoku 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 07:30 (KST)
+마지막 갱신: 2026-10-03 09:40 (KST)
 
 ## 지금 상태 (3줄 이내)
-**TestFlight 빌드 10 업로드 성공**(Release iOS app=catdoku, 2026-10-02 21:07 UTC) → 사용자가 폰 TestFlight 에서 설치·실행 확인.
-ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 테스트 로봇 23개 통과, 점검 팀 2차 수정 반영.
-다음: 사용자 '느낌' 피드백 → 스크린샷·등록 정보 → 심사.
+TestFlight 빌드 12까지 설치. 이번에 **단계 목록 화면 + 1~30 무료 → 20단계마다 영상 또는 $1.99 전부 열기(배너 제거)** 추가 → 빌드 13.
+결제 상품 `com.soulfulfill.catdoku.unlockall` 은 Actions `iOS 앱 내 구입 상품 만들기` 로 생성. 판매엔 사용자의 유료 앱 계약(은행·세금) 필요.
+테스트 로봇 32개 통과.
 
 ## 다음 할 일 / 사용자에게 받을 것
 - ✅ [사용자] ASC 앱 레코드 생성 (id 6818637278), ✅ AdMob 앱·광고 단위 3개, ✅ TestFlight 내부 그룹 "me" 설치.
@@ -16,6 +16,7 @@ ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | "내가 깼던 이전거로 돌아가거나 앞으로 몇개나 남았는지 볼수는 없나? 그리고 한 20개정도씩이나 … 1.99 이렇게 돈 내기 … 결제하면 또 얼마만큼 열리고" → A/B "영상 or $1.99 (추천)" | 단계 목록 화면(✓ 깬 단계 다시 하기, n/500, 잠긴 묶음 🔒), 1~30 무료 → 20단계마다 영상 1개 또는 $1.99 전부+배너 제거, Restore purchase. 결제 상품은 API 로 생성 |
 | 10-03 | 폰 캡처(Level 3, 4/5 고양이, 남은 칸 전부 ✕, "No video available right now") + "이거지금만 안되는거겟지?" | 새 광고 단위(최대 1시간)·AdMob 새 앱 검토(출시·스토어 링크 전엔 광고 적음) 때문 → **영상이 없으면 보상을 그냥 준다**("this one’s on us 🎁"). 캡처는 틀린 고양이로 막다른 길 → "🤔 No spot left — move a cat or try 💡 Hint" 표시 추가. 빌드 12 |
 | 10-02 | (점검 워크플로 완료: 5명 426회 누름, 46건 보고 → 재현 검증 46건) | 남은 주요 2건(마지막 칸 연타로 승리 패널 건너뜀, 반칙 칸 연타로 하트 여러 개) + 깨진 저장 회색 화면 + Mark 붓 고양이 삭제·끌어 지우기 수정 → 빌드 11 |
 | 10-02 | "아 테스트앱에서 받아서 열엇어" | TestFlight 빌드 10 설치 확인. 느낌 피드백 대기 |
@@ -49,6 +50,9 @@ ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 
   → ④ `Release iOS` (앱 선택) — 서명~업로드 6분 → ⑤ 사용자: TestFlight 내부 그룹 + Invite Testers → 메일 "View in TestFlight" 의 Redeem 코드.
 - **보상형 광고는 '영상 없음'을 막힘으로 만들지 마라**: 새 AdMob 앱은 스토어 출시·링크 전까지 광고 재고가 거의 없다(TestFlight 에서 "No video" 연속).
   영상이 안 오면 보상을 그냥 주고(중간에 닫은 경우만 안 줌), 막다른 상태(더 놓을 칸 없음)는 화면에 이유를 띄운다.
+- **앱 내 구입(IAP)은 API 로 만들 수 있다**: `.github/scripts/asc_iap.py` + Actions `iOS 앱 내 구입 상품 만들기` (상품·현지화·가격 USD·판매국·심사 스크린샷).
+  사람이 꼭 해야 하는 건 ASC → 비즈니스 → **유료 앱 계약(은행·세금)** 뿐. 첫 IAP 는 앱 새 버전과 함께 심사. 앱에는 Restore purchase 버튼 필수.
+  Flutter 는 `in_app_purchase` — 테스트·웹은 FakePurchases 로 바꿔 끼워 결제/취소/복원 흐름을 로봇이 누른다.
 - **AdMob 안내할 때**: 사용자가 광고 단위 *이름*(rewarded_continue)을 *형식* 목록에서 찾았다 — "형식은 Rewarded 카드(4번째, Rewarded interstitial 아님), 이름은 직접 입력"이라고 분리해서 말할 것.
   완료 화면 캡처를 받으면 ID 를 읽어 바로 코드에 넣는다(사용자: "너가 이거보고 기억하면되지않냐"). 새 광고 단위는 첫 광고까지 최대 1시간.
 - **Flutter 웹 미리보기 = 폰으로 바로 해 보는 링크.** `flutter create . --platforms web` → `flutter build web --release --base-href /test-mvp/<폴더>/`
