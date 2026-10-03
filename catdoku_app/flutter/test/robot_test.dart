@@ -805,7 +805,7 @@ void main() {
     expect(g.stuckLine?.kind, StuckKind.row);
     expect(g.stuckLine?.index, 4);
     await t.pump(const Duration(seconds: 3));
-    expect(find.text('🤔 Row 5 has no spot left — move a cat'), findsOneWidget);
+    expect(find.text('🤔 No spot left in row 5 — try moving a cat'), findsOneWidget);
     await finish(t);
   });
 

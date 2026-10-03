@@ -409,12 +409,12 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
           return FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              '🤔 $where has no spot left — move a cat',
+              '🤔 No spot left in ${where.toLowerCase()} — try moving a cat',
               key: const Key('stuck'),
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: C.red,
+                color: C.sub,
               ),
             ),
           );
