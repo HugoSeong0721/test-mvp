@@ -17,17 +17,16 @@ enum RewardResult {
   unavailable,
 }
 
-/// AdMob 광고 단위 ID.
-/// 아직 AdMob 에 이 앱을 만들지 않아 Google 공식 **테스트 ID** 를 쓴다.
-/// 콘솔에서 앱·광고 단위를 만들면 여기와 ios/Runner/Info.plist 의 GADApplicationIdentifier,
-/// android/app/src/main/AndroidManifest.xml 의 APPLICATION_ID 를 함께 바꾼다.
+/// AdMob 광고 단위 ID — `soulfulfillable` AdMob 계정의 iOS 앱 "Glance Tides"
+/// (앱 ID ca-app-pub-4724352880074547~3021266571 → ios/Runner/Info.plist 의 GADApplicationIdentifier).
+/// 단위: `banner`, `rewarded_30day`. 안드로이드는 출시 전이라 Google 테스트 ID.
 class AdIds {
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
   static String get banner => _ios
-      ? 'ca-app-pub-3940256099942544/2934735716'
+      ? 'ca-app-pub-4724352880074547/9191837537'
       : 'ca-app-pub-3940256099942544/6300978111';
   static String get rewardedMonth => _ios
-      ? 'ca-app-pub-3940256099942544/1712485313'
+      ? 'ca-app-pub-4724352880074547/4912847027'
       : 'ca-app-pub-3940256099942544/5224354917';
 }
 

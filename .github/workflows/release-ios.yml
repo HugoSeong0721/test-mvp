@@ -24,7 +24,7 @@ on:
       app:
         description: "올릴 앱"
         type: choice
-        options: [currency, catdoku, mortgage, decibel, speedometer, tides, kittypath]
+        options: [currency, catdoku, mortgage, decibel, speedometer, tides, fuellog, kittypath]
         default: currency
 
 permissions:

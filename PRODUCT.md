@@ -43,14 +43,14 @@
 |---|---|---|
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출. v1.1 후보 = 빌드 9(TestFlight): 줄 꾹 눌러 끌기로 순서 변경, 긴 이름 줄 넘침 수정. 스크린샷 v2(금·BTC 첫 장) 준비됨 | 승인 대기 → AdMob 스토어 링크·결제 정보 → v1.1 제출(빌드 9 + 스크린샷 v2, `App Store 등록 정보 채우기`) → 리뷰·수익 확인 |
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
-| **Glance Tides: Tide Chart** (물때, `tides_app/`, `plans/tides-app.md`, `board/tides.md`) | 2026-10-03 Flutter 1차 완성·테스트 31개·웹 미리보기 `docs/tides-app/`. 번들 `com.soulfulfill.tides` | 보상형 30일 표 → ASC 앱 레코드·AdMob(사용자) → TestFlight |
+| **Glance Tides: Tide Chart** (물때, `tides_app/`, `plans/tides-app.md`, `board/tides.md`) | 2026-10-03 Flutter 1차 완성·테스트 31개·웹 미리보기 `docs/tides-app/`. 번들 `com.soulfulfill.tides` | TestFlight 빌드 21 업로드(10-03) → 사용자 느낌 → 스크린샷 → 심사 |
 | **Glance Speed: GPS Speedometer** (GPS 속도계, `speedometer_app/`, `plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-03 Flutter 1차 완성·테스트 37개·웹 미리보기 `docs/speedometer-app/`(폰 GPS 로 진짜 속도). 번들 `com.soulfulfill.speedometer` | 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight |
-| **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
-| **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
+| **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | 빌드 22·등록 정보·스크린샷 입력 완료 (사용자 "괜찮은 것 같다, 앱으로 내자") | 사용자: App Privacy·연령·가격 → 심사 제출 → 승인 후 AdMob 스토어 연결 |
+| **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 TestFlight 빌드 19 업로드. 테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). AdMob 배너 실제 ID | 사용자 TestFlight 느낌 → 보정값(+94) 실기기 확인 → 스크린샷·등록 정보 → 심사 |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
-| **한붓 경로 퍼즐** (`kittypath_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
-| **낚시·사냥 시간** (`plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
-| **연비·정비 기록** (`plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
+| **Kitty Path: Number Puzzle** (한붓 경로 퍼즐, `kittypath_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 36개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 번들 `com.soulfulfill.kittypath` Apple 등록 완료 | 아이콘·스토어 문구 → ASC 앱 레코드(사용자) → Release iOS → TestFlight → AdMob(제출 전) |
+| **낚시·사냥 시간** (솔루나, `solunar_app/`, `plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 Flutter 1차 완성·테스트 34개(PyEphem 대조 1,800건+)·웹 미리보기 `docs/solunar-app/`(오프라인 계산, 마을 2만 곳) | 이름·번들 ID(사용자) → 번들 등록 → ASC 앱 레코드·AdMob → TestFlight |
+| **Glance MPG: Gas Mileage Log** (연비·정비 기록, `fuellog_app/`, `plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 Flutter 1차 완성·테스트 47개 통과·웹 미리보기 `docs/fuel-log-app/`(`?demo=1` 예시). 번들 `com.soulfulfill.fuellog` | ASC 앱 레코드(사용자) → Release iOS → TestFlight → AdMob(제출 전) |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
 | 한의학(clinic) 앱 (`lib/`, `android/`) | 보류 | 재개 여부 미정 |
 
@@ -81,6 +81,13 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 경로 퍼즐 이름 **Kitty Path: Number Puzzle** (부제 Daily One Line Logic Game), 번들 `com.soulfulfill.kittypath` Apple 등록 완료 | 사용자: 둘 다 추천안. Kitty Queens 와 고양이 시리즈, 검색어 number puzzle·daily·one line·logic. "Zip" 은 LinkedIn 상표 출원이라 제외 |
+| 2026-10-03 | Glance Mortgage 추가 상환: **구간 여러 개(언제~언제 얼마) 안 넣음**. 1.1 에 시작 달·한 번 크게 갚기·격주 납부 3가지만 | 폰 입력 부담·핵심 한 줄이 흐려짐·기능 많은 경쟁 앱(Karl's 평가 124개)이 평가를 못 받음. 사용자 "세분화하는거 넣지말자" + 3가지 선택 |
+| 2026-10-03 | Glance Mortgage: 1.0 은 지금대로 심사 제출, **1.1 에 주(50+DC) 선택** → 재산세율(집)·판매세율(자동차) 자동 입력. 카운티는 데이터가 방대해 보류(% 직접 입력 유지) | 사용자 "state, county 별로 텍스가 다르잖아" → A/B 둘 다 추천안 |
+| 2026-10-03 | Kitty Queens v1.0(빌드 16) 심사 제출: 무료·148개국(EU 제외)·4+, IAP Unlock All Levels $1.99. 이메일 수집·판매는 안 함(구독은 v1.1 선택형 아이디어) | 사용자 "느낌 확인했어", 유료 앱 계약·W-9 완료 |
+| 2026-10-03 | Kitty Queens 수익 구조: 단계 1~30 무료 → 20단계 묶음마다 **영상 1개로 열기** 또는 **$1.99 한 번(전부 500단계 + 배너 제거)**. 오늘의 퍼즐은 매일 무료. 단계 목록 화면(깬 단계 다시 하기·남은 개수) | 사용자: "깼던 이전 거로 돌아가거나 몇 개 남았는지 볼 수 없나", "20개 정도씩 뒤에 1.99 결제" → A/B 에서 "영상 or $1.99 (추천)" 선택 |
+| 2026-10-03 | 연비 앱 이름 **Glance MPG: Gas Mileage Log**(부제 Fuel Tracker & Car Maintenance), 번들 `com.soulfulfill.fuellog` | 사용자: 둘 다 추천안. mpg·gas mileage·fuel tracker·car maintenance 검색어가 이름+부제에 다 들어가고 Glance 시리즈. "mileage tracker" 는 세금 앱 차지라 피함 |
+| 2026-10-03 | 연비 앱 1차: **전부 무료·배너만**(입력 화면 광고 없음, 전면·보상형 없음), CSV 내보내기·가져오기 무료(다른 앱 CSV 도 읽음), 차량 수 제한 없음, iCloud 동기화 없음("폰 바꾸기 전 CSV" 안내) | 기획서 원칙 + 조사: 경쟁 앱 불만이 구독 전환·CSV/백업 유료·동기화로 기록 날아감. 개발 세션 판단 — 기획 파트너 확인 요청(`board/fuel-log.md`) |
 | 2026-10-03 | 경로 퍼즐 1차 범위(개발 세션 판단): 오늘의 퍼즐 **6×6**, 벽 없음(규칙 2개), 실패·하트 없음(점수 = 시간), 보상형 = 힌트(정답 길을 다음 숫자까지 그어 줌), 되돌리기·지우기 무료 무제한. 상표 Zip·Flow·Numbrix·Hidato 사용 금지 | 원조 게임 기본 크기 6×6(숫자 평균 10), 캣도쿠 7×7 첫 판 "어렵다" 피드백, 경쟁 앱 불만(힌트가 길을 안 보여 줌·되돌리기 없음·코인) 의 반대. 벽은 TestFlight 느낌 보고 |
 | 2026-10-03 | 사용자 몫 최소화: 테스트까지는 **ASC 신규 앱 1회 등록만**, 그 뒤 TestFlight 초대 메일 → 코드 입력. 초대 자동화는 공용 작업 요청(`board/_shared.md`). AdMob 은 스토어 제출 직전 | 사용자 "그냥 이메일로 테스트 코드 받아 넣어서 해보고 싶은데" |
 | 2026-10-03 | Apple 앱 레코드·AdMob 앱/광고 단위는 사용자 몫으로 남김(자동화 불가 확인). 대신 폰용 할 일 페이지 `docs/todo.html` + 몰아서 처리, AdMob 은 스토어 제출 전까지만 | 사용자 "애플·애드몹 가서 넣는 게 힘든데 너가 못 하니" |
@@ -98,6 +105,8 @@
 | 2026-10-02 | Catdoku 보상형 광고 자리 = 힌트·하트 다 잃었을 때 이어하기 (영상 보면 알려 주고 보상) | 사용자 "하트 다 쓰거나 힌트로 비디오(광고) 보면 알려주고" |
 | 2026-10-02 | Catdoku 웹 미리보기 첫 느낌: "어렵다, 그래도 했네" (7×7 오늘의 퍼즐) | 첫 판 난이도 기록 — 처음 사용자는 5×5 단계부터 권할지 TestFlight 때 다시 본다 |
 | 2026-10-02 | 색칠 앱 보류, 언제든 재개 가능하게 정리(`plans/coloring-app.md`) | CC0 선화 38장 변환 결과 칸 0~24개(목표 60~100), 그림마다 사람 확인 필요. 사용자 "나한테 안 맞는 걸 수도, 보류하자" |
+| 2026-10-03 | 환율 앱 v1.0 1차 반려(2.1 Information Needed — 새 계정 정보 요청). 빌드 9 + 스크린샷 v2 로 교체하고, 실기기 녹화 + 답장(`currency_app/store/review/2026-10-03-reply.md`)으로 재제출 | 앱 결함이 아니라 새 개발자 계정 확인 절차. 다음 앱도 첫 제출 때 같은 정보(녹화·목적·외부 서비스)를 Notes 에 미리 넣는다 |
+| 2026-10-03 | 환율 앱 **빌드 9 로 재제출 → Waiting for Review**. 맨 위 줄 끌기는 빌드 15 로 업로드만 하고 다음 업데이트(1.0.1)로 | 답장·녹화가 빌드 9 기준이라 일치시킴. 재제출 순서: 답장 Send(첨부 확인) → 버전 화면 Update Review → "Newer Build Available" 경고는 Submit |
 | 2026-10-02 | 환율 앱: 통화 줄을 꾹 눌러 끌어 순서 바꾸기 추가(빌드 9) | 사용자 "위아래 마음대로 드래그 안 돼" |
 | 2026-10-02 | 유틸 앱 시장조사 (3분야 병렬) → `plans/utility-research.md`. 방향: "가끔 필요하고 손 안 가는 앱, 분야 다양하게" | 사용자 "currency 같은 게 손이 덜 갔다" |
 | 2026-10-02 | 다음 앱 = Catdoku 앱화. 이 세션(🧭 기획 파트너)은 기획만, 개발은 새 세션. 개발 세션은 `PLAYBOOK.md` 에 시행착오를 쌓는다 | 사용자 "캣도쿠 해보자, 여기선 기획만" |

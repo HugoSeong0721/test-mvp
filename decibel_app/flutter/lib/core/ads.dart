@@ -2,16 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-/// AdMob 광고 단위 ID.
-/// 아직 AdMob 에 이 앱을 만들지 않아 Google 공식 **테스트 ID** 를 쓴다.
-/// 콘솔에서 앱·광고 단위를 만들면 여기와 ios/Runner/Info.plist 의 GADApplicationIdentifier,
-/// android/app/src/main/AndroidManifest.xml 의 APPLICATION_ID 를 함께 바꾼다.
+/// AdMob 광고 단위 ID (soulfulfillable 계정, 게시자 pub-4724352880074547).
+/// iOS = 실제 ID (앱 Glance dB, 배너 단위 `banner`, 2026-10-03 사용자 생성).
+/// 안드로이드는 AdMob 앱을 아직 안 만들어 Google 공식 **테스트 ID** 그대로 (출시 대상 아님).
+/// 앱 ID 는 ios/Runner/Info.plist 의 GADApplicationIdentifier 와 짝이다.
 ///
 /// 방침(기획서): 배너만. 측정 중 전면 광고 금지 — 광고 소리가 측정을 망친다는 경쟁 앱 리뷰가 있다.
 class AdIds {
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
   static String get banner => _ios
-      ? 'ca-app-pub-3940256099942544/2934735716'
+      ? 'ca-app-pub-4724352880074547/4222667601'
       : 'ca-app-pub-3940256099942544/6300978111';
 }
 

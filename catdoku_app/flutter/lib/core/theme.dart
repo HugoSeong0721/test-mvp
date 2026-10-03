@@ -23,6 +23,19 @@ class C {
     Color(0xFFF0915A),
     Color(0xFFB9A58C),
   ];
+
+  /// 구역 색 이름 — "The Pink color has no spot left" 처럼 말로 짚을 때.
+  static const regionNames = [
+    'teal',
+    'blue',
+    'plum',
+    'green',
+    'yellow',
+    'pink',
+    'purple',
+    'orange',
+    'tan',
+  ];
 }
 
 ThemeData buildTheme() => ThemeData(

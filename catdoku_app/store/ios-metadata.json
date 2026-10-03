@@ -1,0 +1,20 @@
+{
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 초안·이름 조사는 ios-listing.md.",
+  "bundleId": "com.soulfulfill.catdoku",
+  "locale": "en-US",
+  "subtitle": "Daily Queens Logic Puzzle",
+  "privacyPolicyUrl": "https://soulfulfillable.github.io/test-mvp/catdoku-privacy.html",
+  "promotionalText": "Place one cat in every color — a cozy logic puzzle with a new board every day and 500 levels from 5×5 to 9×9.",
+  "description": "Place one cat in every color — that's it!\n\nKitty Queens is a cozy logic puzzle with three simple rules:\n• Each color gets exactly 1 cat\n• Each row and each column gets 1 cat\n• Cats can't touch — not even corners\n\nEvery puzzle has exactly one solution, and you can always reach it by logic — no guessing.\n\n■ A NEW PUZZLE EVERY DAY\nToday's Puzzle is the same for everyone. Solve it daily to keep your streak going.\n\n■ 500 LEVELS\nStart with quick 5×5 boards and work up to brain-bending 9×9. Replay any level you've solved and see how many are left.\n\n■ EASY ON THE EYES AND FINGERS\nBig squares, clear colors with bold borders, and the rules always on screen. Pick Cat or Mark, then tap. Drag to mark many squares at once.\n\n■ FRIENDLY HELP\nBreak a rule and the app shows you why. Stuck? It tells you which row or color has no spot left. Watch a short video for a hint or 3 more hearts.\n\n■ PLAY ANYWHERE\nWorks offline — perfect for the bus, the subway or a coffee break. No account, no sign-in.\n\nLevels 1–30 are free. Unlock more levels by watching a short video, or get all 500 levels and remove banner ads with a one-time purchase.",
+  "keywords": "catdoku,meow,kitty,star battle,brain,daily,puzzle game,cats,queens game,sudoku cat,logic,zen",
+  "supportUrl": "https://github.com/soulfulfillable/test-mvp/issues",
+  "reviewNotes": "Logic puzzle game (Queens / Star Battle style). No account or login.\n\nHow to play: place one cat in every color region, one per row and column; cats cannot touch, even diagonally. Pick 'Cat' or 'Mark' at the bottom, then tap a square.\n\nModes: Today's Puzzle (one new board per day, same for everyone) and Levels (500 levels, 5x5 to 9x9). Levels 1-30 are free. Each further pack of 20 levels unlocks by watching one rewarded video, or the non-consumable in-app purchase 'Unlock All Levels' (com.soulfulfill.catdoku.unlockall, $1.99) unlocks all 500 levels and removes banner ads. To reach it quickly: Home > 'All levels' — the unlock box sits above the first locked pack. 'Restore purchase' is at the bottom of that screen.\n\nAds: Google AdMob banner + optional rewarded videos (hint, +3 hearts after losing, unlock 20 levels). If no video is available, the reward is granted anyway. The app does not request tracking permission.\n\nNo backend server; puzzles are generated on the device. English only.",
+  "screenshots": [
+    "01-play.png",
+    "02-levels-grow.png",
+    "03-daily.png",
+    "04-solved.png",
+    "05-all-levels.png"
+  ],
+  "screenshotDisplayType": "APP_IPHONE_67"
+}

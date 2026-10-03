@@ -1,5 +1,5 @@
 {
-  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 설명은 ios-listing.md 참고. 스크린샷은 찍은 뒤 screenshots/ 에 넣고 목록을 채운다.",
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 설명은 ios-listing.md 참고. 스크린샷은 mortgage_app/flutter 에서 flutter test test/store_shots_test.dart → node ../store/screenshots/make.js",
   "bundleId": "com.soulfulfill.mortgage",
   "locale": "en-US",
   "subtitle": "Home Loan & Payment Calculator",
@@ -9,6 +9,12 @@
   "keywords": "amortization,pmi,car,auto,interest,rate,extra,payoff,house,principal,escrow,tax,hoa,piti,schedule",
   "supportUrl": "https://github.com/soulfulfillable/test-mvp/issues",
   "reviewNotes": "Mortgage / auto / personal loan payment calculator. No account or login. All calculations run on the device; the app makes no network requests except Google AdMob banner ads.\nThe app does not offer loans, collect financial information or show live interest rates — default rates are labeled as examples the user edits.",
-  "screenshots": [],
+  "screenshots": [
+    "01-payment.png",
+    "02-pay-extra.png",
+    "03-breakdown.png",
+    "04-schedule.png",
+    "05-auto-personal.png"
+  ],
   "screenshotDisplayType": "APP_IPHONE_67"
 }

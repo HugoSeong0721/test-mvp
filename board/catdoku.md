@@ -1,12 +1,13 @@
 # Kitty Queens: Cat Sudoku (Catdoku 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 07:30 (KST)
+마지막 갱신: 2026-10-03 (KST) — v1.0 심사 제출
 
 ## 지금 상태 (3줄 이내)
-**TestFlight 빌드 10 업로드 성공**(Release iOS app=catdoku, 2026-10-02 21:07 UTC) → 사용자가 폰 TestFlight 에서 설치·실행 확인.
-ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 테스트 로봇 23개 통과, 점검 팀 2차 수정 반영.
-다음: 사용자 '느낌' 피드백 → 스크린샷·등록 정보 → 심사.
+**2026-10-03 v1.0(빌드 16) 심사 제출** — 148개국(EU 27 제외), 무료, 4+, Games/Puzzle·Board. 결제 상품 Unlock All Levels($1.99).
+등록 정보·스크린샷 5장은 Actions 로 입력(`catdoku_app/store/`). 유료 앱 계약·W-9·은행 Active.
+다음: 심사 결과 → 출시 후 AdMob 앱에 스토어 링크 연결.
 
 ## 다음 할 일 / 사용자에게 받을 것
+- [v1.1 아이디어, 사용자 관심] 뉴스레터 구독: "Get new puzzles & apps first" 선택형 이메일 칸(로그인 없음) → 무료 뉴스레터 서비스, 모든 앱 공용 목록. 이메일 판매는 안 됨(Apple 규칙·주 개인정보법)으로 안내함. 넣을 때 개인정보처리방침·App Privacy(Email) 갱신.
 - ✅ [사용자] ASC 앱 레코드 생성 (id 6818637278), ✅ AdMob 앱·광고 단위 3개, ✅ TestFlight 내부 그룹 "me" 설치.
 - [사용자] TestFlight 빌드로 해 보고 '느낌' 피드백 (광고는 누르지 않기).
 - [세션] 점검 워크플로 남은 3명(단계 모드·화면 크기·극단 상황) 결과 반영 → 광고 상황 전담 점검 팀(`?ads=slow|none|early`) 한 번 더.
@@ -16,6 +17,12 @@ ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | 막다른 판 캡처 + "너무 요란하게 안된다고하는데,, 그냥 이 전전 버전인가가 나앟던거같은데" | 빨간 테두리·빨간 글씨 제거 → 차분한 갈색 한 줄 "🤔 No spot left in row 3 — try moving a cat"(줄 이름만 유지). v1.1 에 반영(1.0 은 심사 중) |
+| 10-03 | "submit 눌렀어" (재제출) | 첫 제출에 IAP 가 빠져 있어 심사 취소 → IAP Add for Review → 같은 Draft Submission 에 1.0 추가 → 함께 제출. **교훈: 첫 IAP 는 버전 Add for Review 전에 IAP 페이지에서 먼저 Add for Review**(버전 페이지에 IAP 고르는 칸이 이제 없음) |
+| 10-03 | "submit for review했어" | v1.0 빌드 16 심사 제출. 연령 등급은 Advertising 만 YES → 4+, EU 27 제외, Made for Kids 안 함(광고 제한) |
+| 10-03 | "1.99는 다음에하자", "느낌은 확인했어" | 결제 시험은 미룸, 출시 진행 |
+| 10-03 | 폰 캡처(Level 11, 고양이 3마리, 위쪽에 빈칸 남음, "No spot left") + "스팟 남아잇는데 안남아잇다고나오네" | 계산은 맞았다(5·7번째 줄이 전부 막힘). 하지만 '어디가' 막혔는지 안 보여 틀린 말로 읽힘 → "Row 5 has no spot left — move a cat" 처럼 막힌 줄/열/색을 짚고, 판에 빨간 테두리. 캡처 판을 그대로 재현하는 테스트 추가. 빌드 14 |
+| 10-03 | "내가 깼던 이전거로 돌아가거나 앞으로 몇개나 남았는지 볼수는 없나? 그리고 한 20개정도씩이나 … 1.99 이렇게 돈 내기 … 결제하면 또 얼마만큼 열리고" → A/B "영상 or $1.99 (추천)" | 단계 목록 화면(✓ 깬 단계 다시 하기, n/500, 잠긴 묶음 🔒), 1~30 무료 → 20단계마다 영상 1개 또는 $1.99 전부+배너 제거, Restore purchase. 결제 상품은 API 로 생성 |
 | 10-03 | 폰 캡처(Level 3, 4/5 고양이, 남은 칸 전부 ✕, "No video available right now") + "이거지금만 안되는거겟지?" | 새 광고 단위(최대 1시간)·AdMob 새 앱 검토(출시·스토어 링크 전엔 광고 적음) 때문 → **영상이 없으면 보상을 그냥 준다**("this one’s on us 🎁"). 캡처는 틀린 고양이로 막다른 길 → "🤔 No spot left — move a cat or try 💡 Hint" 표시 추가. 빌드 12 |
 | 10-02 | (점검 워크플로 완료: 5명 426회 누름, 46건 보고 → 재현 검증 46건) | 남은 주요 2건(마지막 칸 연타로 승리 패널 건너뜀, 반칙 칸 연타로 하트 여러 개) + 깨진 저장 회색 화면 + Mark 붓 고양이 삭제·끌어 지우기 수정 → 빌드 11 |
 | 10-02 | "아 테스트앱에서 받아서 열엇어" | TestFlight 빌드 10 설치 확인. 느낌 피드백 대기 |
@@ -47,8 +54,12 @@ ASC 앱 `Kitty Queens: Cat Sudoku`(id 6818637278), AdMob 실제 ID 3개 반영. 
 - **새 앱 iOS 출시 순서 (이 세션에서 실제로 된 순서, 총 1시간 안쪽)**: ① `iOS 번들 ID 등록 · 앱 레코드 확인` Actions 로 번들 등록
   → ② 사용자가 ASC 웹에서 신규 앱(이름·언어·번들·SKU·Full Access) → ③ 같은 Actions 재실행으로 "앱 레코드: 있음" 확인
   → ④ `Release iOS` (앱 선택) — 서명~업로드 6분 → ⑤ 사용자: TestFlight 내부 그룹 + Invite Testers → 메일 "View in TestFlight" 의 Redeem 코드.
+- **'막혔다' 같은 판정 메시지는 *어디가* 그런지 짚어라**: "No spot left" 만 띄웠더니 다른 줄의 빈칸을 보고 "자리 남아 있는데?" — 판정은 맞았는데 틀린 말로 읽혔다. 줄/열/색 이름 + 판 위 테두리.
 - **보상형 광고는 '영상 없음'을 막힘으로 만들지 마라**: 새 AdMob 앱은 스토어 출시·링크 전까지 광고 재고가 거의 없다(TestFlight 에서 "No video" 연속).
   영상이 안 오면 보상을 그냥 주고(중간에 닫은 경우만 안 줌), 막다른 상태(더 놓을 칸 없음)는 화면에 이유를 띄운다.
+- **앱 내 구입(IAP)은 API 로 만들 수 있다**: `.github/scripts/asc_iap.py` + Actions `iOS 앱 내 구입 상품 만들기` (상품·현지화·가격 USD·판매국·심사 스크린샷).
+  사람이 꼭 해야 하는 건 ASC → 비즈니스 → **유료 앱 계약(은행·세금)** 뿐. 첫 IAP 는 앱 새 버전과 함께 심사. 앱에는 Restore purchase 버튼 필수.
+  Flutter 는 `in_app_purchase` — 테스트·웹은 FakePurchases 로 바꿔 끼워 결제/취소/복원 흐름을 로봇이 누른다.
 - **AdMob 안내할 때**: 사용자가 광고 단위 *이름*(rewarded_continue)을 *형식* 목록에서 찾았다 — "형식은 Rewarded 카드(4번째, Rewarded interstitial 아님), 이름은 직접 입력"이라고 분리해서 말할 것.
   완료 화면 캡처를 받으면 ID 를 읽어 바로 코드에 넣는다(사용자: "너가 이거보고 기억하면되지않냐"). 새 광고 단위는 첫 광고까지 최대 1시간.
 - **Flutter 웹 미리보기 = 폰으로 바로 해 보는 링크.** `flutter create . --platforms web` → `flutter build web --release --base-href /test-mvp/<폴더>/`

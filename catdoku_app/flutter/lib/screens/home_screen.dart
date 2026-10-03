@@ -8,6 +8,7 @@ import '../core/store.dart';
 import '../core/theme.dart';
 import 'game_screen.dart';
 import 'how_to.dart';
+import 'levels_screen.dart';
 import 'widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -138,14 +139,40 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   _card(
                     key: const Key('level-card'),
                     emoji: '🏆',
-                    title: 'Level $lv',
-                    sub:
-                        '${Puzzle.sizeForLevel(lv)}×${Puzzle.sizeForLevel(lv)} · '
-                        '${s.levelsSolved} solved',
-                    button: lv == 1 ? 'Start' : 'Continue',
-                    onTap: () => _open(GameScreen.level(lv)),
+                    icon: Icons.emoji_events_rounded,
+                    title: s.allLevelsDone ? 'All levels done!' : 'Level $lv',
+                    sub: s.allLevelsDone
+                        ? '${AppStore.totalLevels} of ${AppStore.totalLevels} solved 🎉'
+                        : '${Puzzle.sizeForLevel(lv)}×${Puzzle.sizeForLevel(lv)} · '
+                              '${s.levelsSolved} of ${AppStore.totalLevels} solved',
+                    button: s.allLevelsDone
+                        ? 'See all levels'
+                        : !s.isOpen(lv)
+                        ? 'Unlock Level $lv'
+                        : lv == 1
+                        ? 'Start'
+                        : 'Continue',
+                    onTap: () => _open(
+                      !s.allLevelsDone && s.isOpen(lv)
+                          ? GameScreen.level(lv)
+                          : const LevelsScreen(),
+                    ),
                   ),
-                  const SizedBox(height: 22),
+                  Center(
+                    child: TextButton(
+                      key: const Key('all-levels'),
+                      onPressed: () => _open(const LevelsScreen()),
+                      child: const Text(
+                        '▦ All levels',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w700,
+                          color: C.sub,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   const RuleChips(big: true),
                   const SizedBox(height: 14),
                   Center(
@@ -153,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       key: const Key('howto'),
                       onPressed: () => showHowTo(context),
                       child: const Text(
-                        '❓ How to play',
+                        '? How to play',
                         style: TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w700,
@@ -175,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ],
               ),
             ),
-            Ads.i.banner(),
+            const BannerSlot(),
             SizedBox(height: MediaQuery.of(context).padding.bottom),
           ],
         ),
@@ -186,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _card({
     required Key key,
     required String emoji,
+    IconData? icon,
     required String title,
     required String sub,
     required String button,
@@ -207,7 +235,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             children: [
               Row(
                 children: [
-                  Text(emoji, style: const TextStyle(fontSize: 30)),
+                  icon != null
+                      ? Icon(icon, size: 34, color: const Color(0xFFE6A817))
+                      : Text(emoji, style: const TextStyle(fontSize: 30)),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(

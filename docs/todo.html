@@ -47,7 +47,8 @@ const apps=[
  {id:'mortgage',name:'Glance: Mortgage Calculator',bundle:'com.soulfulfill.mortgage',sku:'mortgage',admob:'Glance Mortgage'},
  {id:'decibel',name:'Glance dB: Decibel Meter',bundle:'com.soulfulfill.decibel',sku:'decibel',admob:'Glance dB'},
  {id:'speedometer',name:'Glance Speed: GPS Speedometer',bundle:'com.soulfulfill.speedometer',sku:'speedometer',admob:'Glance Speed'},
- {id:'tides',name:'Glance Tides: Tide Chart',bundle:'com.soulfulfill.tides',sku:'tides',admob:'Glance Tides',note:'번들 등록이 끝나야 목록에 떠요 — 물때 세션이 "번들 등록 완료" 하면 그때.'}
+ {id:'tides',name:'Glance Tides: Tide Chart',bundle:'com.soulfulfill.tides',sku:'tides',admob:'Glance Tides',note:'번들 등록이 끝나야 목록에 떠요 — 물때 세션이 "번들 등록 완료" 하면 그때.'},
+ {id:'fuellog',name:'Glance MPG: Gas Mileage Log',bundle:'com.soulfulfill.fuellog',sku:'fuellog',admob:'Glance MPG'}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 function row(k,v){return `<div class="row"><span class="k">${k}</span><span class="v">${v}</span><button data-copy="${v}">복사</button></div>`}

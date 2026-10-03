@@ -4,9 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'store.dart';
+
 /// 보상형 광고를 보여 주는 자리. 자리마다 AdMob 광고 단위를 따로 둬서
 /// 어느 쪽이 수익을 내는지 AdMob 보고서에서 나눠 볼 수 있게 한다.
-enum RewardPlacement { hint, continueGame }
+enum RewardPlacement { hint, continueGame, unlockPack }
 
 enum RewardResult {
   /// 끝까지 봐서 보상을 받았다.
@@ -33,7 +35,8 @@ class AdIds {
       _ios
           ? 'ca-app-pub-4724352880074547/7250576612'
           : 'ca-app-pub-3940256099942544/5224354917',
-    RewardPlacement.continueGame =>
+    // 묶음 열기는 따로 단위를 만들기 전까지 이어하기 단위를 같이 쓴다.
+    RewardPlacement.continueGame || RewardPlacement.unlockPack =>
       _ios
           ? 'ca-app-pub-4724352880074547/7933102895'
           : 'ca-app-pub-3940256099942544/5224354917',
@@ -182,6 +185,18 @@ FakeAds webPreviewAds(String? mode) => switch (mode) {
   'early' => FakeAds(result: RewardResult.closedEarly),
   _ => FakeAds(),
 };
+
+/// 배너 자리 — 결제(배너 제거)하면 사라진다.
+class BannerSlot extends StatelessWidget {
+  const BannerSlot({super.key});
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: AppStore.i,
+    builder: (context, _) =>
+        AppStore.i.premium ? const SizedBox.shrink() : Ads.i.banner(),
+  );
+}
 
 /// 화면 맨 아래 320×50 배너. 광고가 안 와도 자리를 비워 둬 화면이 출렁이지 않는다.
 class _AdBanner extends StatefulWidget {

@@ -8,6 +8,8 @@ import '../core/store.dart';
 import '../core/theme.dart';
 import '../game/game.dart';
 import 'board.dart';
+import 'levels_screen.dart';
+import 'unlock.dart';
 import 'widgets.dart';
 
 class GameScreen extends StatefulWidget {
@@ -150,6 +152,10 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     // 버튼을 두 번 누르면 두 번 불린다 — 승리/패배 상태일 때만, 한 번만.
     if (next && game.status != GameStatus.won) return;
     if (!next && game.status != GameStatus.lost) return;
+    if (next &&
+        (_nextLevel > AppStore.totalLevels || !AppStore.i.isOpen(_nextLevel))) {
+      return;
+    }
     _saveCarry();
     final k = _boardKey;
     if (k != null && !next) AppStore.i.clearBoard(k);
@@ -158,7 +164,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     game.removeListener(_onGame);
     game.dispose();
     // 다음 단계는 저장된 진행에서 가져온다 (level++ 를 두 번 하면 한 단계를 건너뛰었다)
-    if (next) level = AppStore.i.level > level ? AppStore.i.level : level + 1;
+    if (next) level = _nextLevel;
     _recorded = false;
     _wonTime = null;
     _showWin = false;
@@ -331,7 +337,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                     const SizedBox(height: 12),
                     _palette(),
                     const SizedBox(height: 8),
-                    Ads.i.banner(),
+                    const BannerSlot(),
                     SizedBox(height: MediaQuery.of(context).padding.bottom),
                   ],
                 ),
@@ -346,6 +352,9 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       ),
     );
   }
+
+  /// 이 판 다음에 할 단계 — 다시 하기였으면 아직 안 깬 첫 단계로.
+  int get _nextLevel => AppStore.i.level > level ? AppStore.i.level : level + 1;
 
   bool get _overlayUp =>
       _waitingVideo ||
@@ -389,13 +398,20 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             ),
           );
         }
-        if (game.stuck) {
-          return const FittedBox(
+        final stuckAt = game.stuckLine;
+        if (stuckAt != null) {
+          final where = switch (stuckAt.kind) {
+            StuckKind.row => 'Row ${stuckAt.index + 1}',
+            StuckKind.column => 'Column ${stuckAt.index + 1}',
+            StuckKind.color =>
+              'The ${C.regionNames[stuckAt.index % C.regionNames.length]} color',
+          };
+          return FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              '🤔 No spot left — move a cat or try 💡 Hint',
-              key: Key('stuck'),
-              style: TextStyle(
+              '🤔 No spot left in ${where.toLowerCase()} — try moving a cat',
+              key: const Key('stuck'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
                 color: C.sub,
@@ -578,7 +594,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
           label: 'Play Levels',
           onTap: () => Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (_) => GameScreen.level(AppStore.i.level),
+              builder: (_) =>
+                  AppStore.i.isOpen(AppStore.i.level) &&
+                      !AppStore.i.allLevelsDone
+                  ? GameScreen.level(AppStore.i.level)
+                  : const LevelsScreen(),
             ),
           ),
         ),
@@ -592,13 +612,45 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         ),
       );
       kids.add(const SizedBox(height: 18));
-      kids.add(
-        BigButton(
-          key: const Key('next'),
-          label: 'Next Level',
-          onTap: () => _restart(next: true),
-        ),
-      );
+      final next = _nextLevel;
+      if (next > AppStore.totalLevels) {
+        kids.add(
+          const Text(
+            '🏆 You finished all 500 levels!',
+            key: Key('all-done'),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w900,
+              color: C.ink,
+            ),
+          ),
+        );
+      } else if (!AppStore.i.isOpen(next)) {
+        // 다음 단계가 잠긴 묶음이면 그 자리에서 연다
+        final (a, b) = AppStore.packOf(next);
+        kids.add(
+          Text(
+            '🔒 Levels $a–$b are locked',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: C.ink,
+            ),
+          ),
+        );
+        kids.add(const SizedBox(height: 10));
+        kids.add(UnlockChoices(onUnlocked: () => _restart(next: true)));
+      } else {
+        kids.add(
+          BigButton(
+            key: const Key('next'),
+            label: 'Next Level',
+            onTap: () => _restart(next: true),
+          ),
+        );
+      }
     }
     kids.add(const SizedBox(height: 10));
     kids.add(

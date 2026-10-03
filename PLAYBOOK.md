@@ -59,6 +59,26 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 대출 | 로컬 Flutter 3.47.6 으로 `flutter create` → `sdk: ^3.13.5` 가 박혀 Actions(Flutter 3.47.2, Dart 3.13.2)의 `Release iOS` 가 `pub get` 에서 실패 | 새 앱은 `pubspec.yaml` 의 `sdk:` 를 CI 버전(`^3.13.2`)에 맞춘다. 로컬도 workflow 의 `flutter-version` 과 같은 버전을 깔면 더 안전 |
+| 2026-10-03 | 연비 | 주유를 저장해도 기록 탭 숫자가 그대로 — 위에서 `ListenableBuilder` 로 감쌌지만 `const HomeShell()`·`const _Summary()` 는 **같은 const 위젯이라 다시 안 그려짐** | 저장소를 읽는 화면은 **각자 구독**(`build` 를 `ListenableBuilder` 로)하거나 바뀌는 데이터를 인자로 넘긴다. 로봇이 "저장 → 화면 숫자" 를 검사해서 잡았다 |
+| 2026-10-03 | 연비 | 거리 알림의 예상 날짜가 이미 지난 날(기록이 뜸할 때) → `notifyAt` 이 과거라 **알림이 예약조차 안 됨**. 테스트는 통과, **스크린샷의 "about Sep 29"(오늘 Oct 2)** 로 발견 | 예상일은 오늘보다 앞이면 오늘로, 알림은 다음 날 아침. 로봇에 "알림 켠 정비는 전부 미래 시각에 예약됐나" 검사. 고치기 전 실패 확인 |
+| 2026-10-03 | 연비 | `Semantics(button: true, excludeSemantics: true)` 로 감싼 버튼이 VoiceOver 에선 **누르기 동작이 없음**(앱 바 제목에 합쳐짐). 웹 점검 `getByRole('button')` 이 못 찾아서 발견 | `Semantics` 에 `onTap`(+앱 바 안이면 `container: true`). 로봇 `expectButtonsTappable`: 버튼인데 tap 액션 없는 노드 = 실패 (`fuellog_app/flutter/test/robot_test.dart`) |
+| 2026-10-03 | 연비 | 앱 바 제목·탭 글자가 스크린샷에서 검은 네모 → 잘림 검사 오탐. `appBarTheme.titleTextStyle: TextStyle(...)` 처럼 **빈 TextStyle 은 테마 글꼴을 안 이어받는다** | `base.textTheme.titleMedium!.copyWith(...)` 로 만든다 (기기에선 시스템 글꼴로 보여 눈치 못 챔) |
+| 2026-10-03 | 연비 | 큰 글씨(135%)에서 단가 칸 숫자가 1.5px 모자라 잘림 | 입력 칸 폭을 `MediaQuery.textScalerOf` 에 비례(화면 62% 까지). 3칸 요약은 `FittedBox(scaleDown)` |
+| 2026-10-03 | 연비 | `pkill -f "flutter test"`·`pkill -f flutter_tester` 가 **그 글자가 든 내 bash 명령까지 죽여** 뒤 명령이 안 돎 | 멈춘 테스트는 `pkill -9 -x flutter_tester` (프로세스 이름 정확히) |
+| 2026-10-03 | 연비 | 다른 앱 CSV 가져오기 형식을 알 길이 없음(사이트 막힘) | 오픈소스 가져오기 도구 코드(Hammond·LubeLogger)에서 Fuelly 열 이름을 읽었다 → 머리글 별칭으로 맞추고 엔진 테스트에 그 형식 그대로 고정 (`fuellog_app/flutter/lib/core/csv.dart`) |
+| 2026-10-03 | 캣도쿠(Kitty Queens) | TestFlight 에서 "No video available" 연속 — 새 AdMob 앱은 스토어 출시·링크 전 광고 재고가 거의 없고, 그 사이 틀린 고양이로 막다른 판에 갇힘 | 보상형 광고가 **안 오면 보상을 그냥 준다**(중간 닫기만 안 줌). 막다른 상태는 화면에 이유 표시. 출시 뒤 AdMob 에 스토어 링크 연결 |
+| 2026-10-03 | 캣도쿠 | 점검 팀 426회 누름에서 가장 많이 나온 버그 = **연타**: 다음 레벨 연타로 레벨 건너뛰기·저장 중단, 새 판에 엉뚱한 고양이, 반칙 칸 연타로 하트 3개, 마지막 칸 연타로 승리 패널 버튼이 눌림, 힌트 연타로 창 즉시 닫힘 | 결과 패널은 0.9~1.1초 뒤에, 새 판·반칙·창 닫힘 뒤 0.45~0.7초 입력 잠금(**Timer 로** — DateTime.now 는 위젯 테스트 가짜 시계에서 안 풀림), "다음 단계"는 저장값에서 계산, 확인 창 `barrierDismissible:false`. 로봇에 연타 테스트 |
+| 2026-10-03 | 캣도쿠 | 뒤로 갔다 오면 홈 카드 숫자가 옛 값 — `await Navigator.push` 뒤 setState 는 다음 화면 dispose 저장보다 먼저 돈다(`pushReplacement` 도 같음) | 홈은 저장소(ChangeNotifier)를 구독해 다시 그린다. 자정 넘김은 앱 복귀 + 주기 확인 |
+| 2026-10-03 | 캣도쿠 | Flutter 웹(ensureSemantics)에서 반투명 패널 뒤 버튼이 눌림 | 패널이 뜨면 뒤 화면을 `AbsorbPointer` + `ExcludeSemantics` |
+| 2026-10-02 | 캣도쿠 | 웹판 탭 순환(✕→🐱→해제)은 ✕ 를 지우려다 하트를 잃음(재현) | 팔레트(🐱/✕) + ✕ 끌어 칠하기·끌어 지우기. ✕ 붓은 고양이를 지우지 않는다 |
+| 2026-10-02 | 캣도쿠 | 유일해 퍼즐을 다시 뽑기로 찾으면 8×8 부터 수천 번 | "다른 해의 칸을 이웃 구역으로 넘기기" 보정 → 9×9 ≤60ms. 난수는 xorshift32(곱셈 없음)라 Dart VM·웹이 같은 판 |
+| 2026-10-02 | 캣도쿠 | 폰으로 바로 해 보고 싶다는 요청 | Flutter 웹 빌드를 `docs/<앱>/` 로(`canvaskit/` 빼면 40→3.6MB), 광고는 kIsWeb 이면 가짜. 샌드박스 점검은 `catdoku_app/qa/flutter-web-harness.js` |
+| 2026-10-02 | 캣도쿠 | 웹게임 이름 "Catdoku" 가 스토어에 동명 앱 여럿 | 이름은 먼저 스토어 검색. 번들 ID 등록은 API(`iOS 번들 ID 등록` Actions), 앱 레코드는 사람이 ASC 웹에서 |
+| 2026-10-03 | 솔루나 | 다른 날을 누르면(위쪽 "지금" 카드가 빠짐) 목록을 맨 위로 보냈는데 230px 에서 멈춤 — `animateTo`/`jumpTo`/다음 프레임 모두 실패 | 내용이 바뀌는 목록은 `KeyedSubtree(key: 날짜·장소)` 로 새로 만들고 `ScrollController(keepScrollOffset: false)`. 로봇에서 "누른 뒤 제목이 화면 안" 을 검사 |
+| 2026-10-03 | 솔루나 | `timezone` 패키지 `latest_all.dart` 가 웹 스크립트를 1.8MB 키움 | `.tzf` 를 자산으로 넣고 `tz.initializeDatabase(bytes)` |
+| 2026-10-03 | 솔루나 | 다른 앱에서 복사한 코드에 "station" 문구가 남음 — 테스트 통과, 웹 스크린샷에서만 보임 | 복사해 온 파일은 문구를 grep, 로봇에 "옛 앱 단어 없음" 검사 |
+| 2026-10-03 | 솔루나 | AppBar 제목 자리 InkWell 이 웹/VoiceOver 에서 버튼이 아니라 제목으로만 읽힘 | `Semantics(container: true, button: true, label: …)` 로 감싸고 로봇에서 `find.bySemanticsLabel` 로 확인 |
 | 2026-10-03 | 경로 퍼즐 | 웹 실제 터치 점검에서 "드래그가 전혀 안 먹음" — 원인은 앱이 아니라 점검 스크립트가 부모 `flt-semantics`(화면 전체 상자)를 판으로 잡아 엉뚱한 곳을 끈 것 | 접근성 트리에서 요소를 찾을 땐 글자가 맞는 것 중 **가장 작은 상자**. 실패하면 스크린샷과 좌표부터 확인하고 앱을 고친다 |
 | 2026-10-03 | 경로 퍼즐 | 유일해 풀이기를 빠르게 하려고 가지치기를 넣을수록 해를 빠뜨려 "해가 하나"라고 잘못 믿을 위험 | 무식한 풀이(가지치기 없음)와 해 개수를 맞춰 보는 테스트를 같이 둔다 (`kittypath_app/flutter/test/puzzle_test.dart`) |
 | 2026-10-03 | 경로 퍼즐 | 날짜 시드 생성기가 VM 에선 빠른데 크롬(JS) 테스트에선 50~100배 느림 | `flutter test --platform chrome` 로 웹 속도·같은 판(지문)을 따로 잰다. 풀이기를 증분 계산으로 바꿔 8×8 105→16ms |

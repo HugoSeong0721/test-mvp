@@ -2,20 +2,28 @@
 마지막 갱신: 2026-10-03 06:20 (KST)
 
 ## 지금 상태 (3줄 이내)
-Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 세금·보험·HOA·PMI, 추가 상환 시뮬, 상환표(연/월), 차트. 테스트 20개 통과(엔진 10 + 로봇 10).
-웹 미리보기 https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html — 광고는 배너만(Google 테스트 ID).
-이름 확정·번들 `com.soulfulfill.mortgage` Apple 등록 완료(Actions 로그 "새로 등록함"). ASC 앱 레코드·AdMob(사용자) 대기 → TestFlight.
+빌드 22(종류 전환 스크롤 버그 수정판) 업로드 + `App Store 등록 정보 채우기` 성공: 부제·설명·키워드·스크린샷 5장·빌드 22·심사 메모 입력됨 (버전 1.0 PREPARE_FOR_SUBMISSION).
+남은 것은 사용자 클릭: 저작권·카테고리·App Privacy·연령 등급·가격/판매국(EU 제외)·심사 연락처 → 심사 제출.
+웹 미리보기 https://soulfulfillable.github.io/test-mvp/mortgage-app/index.html
 
 ## 다음 할 일 / 사용자에게 받을 것
 - ✅ [사용자] 이름 A `Glance: Mortgage Calculator`, 번들 `com.soulfulfill.mortgage` → ✅ [세션] 번들 Apple 등록.
-- [사용자] App Store Connect → 앱 → ＋ 신규 앱: iOS / `Glance: Mortgage Calculator` / English (U.S.) / `com.soulfulfill.mortgage` / SKU `mortgage` / Full Access.
-- [사용자] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Glance Mortgage) → 광고 단위 1개: 형식 **Banner**, 이름 `banner`. 완료 화면 캡처 주면 ID 반영.
+- ✅ [사용자] ASC 앱 레코드 → ✅ [세션] `Release iOS` 빌드 18 업로드 (첫 시도는 Dart SDK 제약 때문에 pub get 실패 → 수정).
+- [사용자] TestFlight → 내부 테스팅 그룹에 빌드 18 추가·초대 → 폰 TestFlight 앱에서 설치 → '느낌' 피드백.
+- ✅ [사용자] AdMob 앱(Glance Mortgage, `~9582805496`)·배너 `…/4605810985` → ✅ [세션] 코드 반영.
 - [사용자] 웹 미리보기 써 보고 '느낌' 한마디.
 - [세션] ASC 레코드 생기면 → `Release iOS`(app=mortgage) → TestFlight → 스크린샷 1290×2796 → `App Store 등록 정보 채우기`(`mortgage_app/store/ios-metadata.json` 준비됨).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | "엑스트라 페이에서 기간 넣으면 너무 복잡해지려나. 언제부터 언제까지 얼마더 … 비판적으로. 경쟁사 참고해서" → "저거는 넣지말자 세분화하는거" + 시작 달·한 번 크게 갚기·격주 납부 선택 | 구간 여러 개는 안 넣음(폰 입력·결과 흐림·경쟁 앱 근거). 1.1 에 3가지 추가 |
+| 10-03 | "근데 state, county 별로 텍스가 다르잖아 그거도 선택할수 잇게 해야하지 않겠나?" → 주 50+DC (추천) / 1.0 먼저 제출, 주 선택은 1.1 (추천) | 1.1 작업 시작: 공식 통계로 주별 재산세율·판매세율 표, 주 고르면 자동 입력(직접 수정 가능). 카운티는 보류 |
+| 10-03 | "괜찮은거같은데 … 쓰는사람은뭐 괜찮지않을까" → "응 아직괜찮아 앱으로낼수잇니" | 출시 진행. 스토어 스크린샷 5장(1290×2796, 로봇이 찍은 화면 + 제목) 만들다 **버그 발견·수정**: 아래로 내린 뒤 대출 종류를 바꾸면 맨 위로 안 가고 380px 아래에서 멈춤(같은 키 카드를 옛 위치째 재사용) → 종류마다 새 목록, 로봇 테스트 추가(고치기 전 실패 확인). 새 빌드 업로드 → 등록 정보 API 입력 |
+| 10-03 | TestFlight 빌드 18 실기기 스크린샷(다크) + "저기 맨밑에 광고배너자리가 잇는건가" | 맞음 — 배너 자리(높이 60 + 홈 막대 여백)를 미리 비워 둠(광고가 늦게 와도 화면이 안 출렁이게). 새 광고 단위·스토어 미출시라 아직 광고 없음. **자기 광고 누르지 말 것**(AdMob 정책) 안내. 실기기에서 앱 실행·입력·다크 모드 정상 확인됨 |
+| 10-03 | "했어" (ASC 앱 레코드 생성) | `Release iOS`(mortgage) 실행 → 1차 pub get 실패(sdk ^3.13.5) → ^3.13.2 로 고쳐 빌드 18 업로드 성공 |
+| 10-03 | 광고 단위 완료 화면 캡처 + "앱 이름 고치기 했어" | iOS 앱 ID `ca-app-pub-4724352880074547~9582805496`(Info.plist), 배너 `…/4605810985`(ads.dart) 반영. 안드로이드는 테스트 ID 유지. AdMob 앱 이름 Glance Mortgage 로 수정됨 |
+| 10-03 | AdMob 화면 캡처 2장 + "머지 완료 했더니 이화면나왓는데 맞는건가" | 앱이 이름 `banner` 로 만들어짐(광고 단위 이름을 앱 이름 칸에 넣음) → App settings 에서 이름 고치게 안내. 광고 형식 화면은 맞음 → **Banner** 카드 Select, 이름 `banner`. "Requires review" 는 스토어 연결 전 정상 |
 | 10-03 | 이름 A/B → "Glance: Mortgage Calculator (추천)", 번들 → "등록 (추천)" | 앱 안 이름·개인정보처리방침·웹 제목·스토어 문구 반영, `ios-metadata.json` 작성, Actions 로 번들 등록 완료 |
 | 10-03 | "대출·주택담보대출 계산기 앱 개발 시작해줘. plans/mortgage-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/mortgage.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 기획서 순서대로 ①조사 ②테스트 로봇 ③개발 ④광고(배너) ⑤워크플로까지. 이 파일을 단계마다 갱신 |
 
@@ -27,6 +35,7 @@ Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 
 - **잘린 글자·칸을 로봇이 자동으로 잡게** (`mortgage_app/flutter/test/robot_test.dart` 의 `expectNoTruncatedText`·`expectNoClippedFields`):
   화면의 모든 `RenderParagraph.didExceedMaxLines`(… 로 잘림) + 모든 `RenderEditable` 의 `getMaxIntrinsicWidth` > 칸 폭(입력 숫자 잘림)을 검사.
   "18.75 %" 가 "18.7" 로, 비싼 집에서 "Principal & intere…" 로 잘리던 걸 잡았고, 고치기 전 코드에서 실패하는 것도 확인. **큰 값($2.5M)·3개 기기로 돌릴 것** — 작은 값·한 기기에선 안 보였다.
+- **ListView 자식을 조건부로 바꿀 때 같은 Key 를 가진 카드가 남아 있으면** 옛 위치째 재사용돼 `jumpTo(0)` 이 중간(380px)에서 멈춘다 → 바뀌는 목록 자체에 `ValueKey(모드)`.
 - **VoiceOver 칸 중복**: `Semantics(textField: true)` 로 `TextField` 를 감싸면 입력 칸이 두 개로 읽힌다 → `MergeSemantics` + 앞뒤 글자 `ExcludeSemantics`.
   로봇: `find.semantics.byPredicate((n) => n.flagsCollection.isTextField)` 개수 == `EditableText` 개수.
 - **숫자 키패드엔 완료 키가 없다** → 키보드 위 Done 막대(이전/다음 칸 포함). `FocusScope.nextFocus()` 는 다음 마이크로태스크에 반영돼서

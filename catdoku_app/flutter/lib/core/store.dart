@@ -22,9 +22,49 @@ class AppStore extends ChangeNotifier {
   }
 
   // ── 단계 모드 ──
-  /// 지금 풀 차례인 단계 (1부터).
+  // 1~30단계 무료 → 이후 20단계 묶음마다 영상 1개로 열거나, $1.99 한 번으로 전부 + 배너 제거.
+  // (사용자 결정 2026-10-03: "영상 or $1.99")
+  static const totalLevels = 500;
+  static const freeLevels = 30;
+  static const packSize = 20;
+
+  /// 지금 풀 차례인 단계 (1부터). 500단계를 다 깨면 501.
   int get level => _p.getInt('level') ?? 1;
-  int get levelsSolved => level - 1;
+  int get levelsSolved => (level - 1).clamp(0, totalLevels);
+  bool get allLevelsDone => level > totalLevels;
+
+  /// 결제(전부 열기 + 배너 제거) 했나.
+  bool get premium => _p.getBool('premium') ?? false;
+  Future<void> setPremium(bool v) async {
+    if (premium == v) return;
+    await _p.setBool('premium', v);
+    notifyListeners();
+  }
+
+  /// 몇 단계까지 열려 있나.
+  int get unlockedThrough => premium
+      ? totalLevels
+      : (_p.getInt('unlockedThrough') ?? freeLevels).clamp(
+          freeLevels,
+          totalLevels,
+        );
+  bool isOpen(int lv) => lv <= unlockedThrough;
+
+  /// 다음 묶음(20단계)을 연다 — 영상 1개 보상.
+  Future<void> unlockNextPack() async {
+    final next = (unlockedThrough + packSize).clamp(freeLevels, totalLevels);
+    await _p.setInt('unlockedThrough', next);
+    notifyListeners();
+  }
+
+  /// lv 가 들어 있는 묶음의 [첫 단계, 끝 단계].
+  static (int, int) packOf(int lv) {
+    if (lv <= freeLevels) return (1, freeLevels);
+    final k = (lv - freeLevels - 1) ~/ packSize;
+    final a = freeLevels + k * packSize + 1;
+    return (a, (a + packSize - 1).clamp(a, totalLevels));
+  }
+
   Future<void> completeLevel(int lv) async {
     await _p.remove(levelBoardKey(lv));
     if (lv >= level) {
