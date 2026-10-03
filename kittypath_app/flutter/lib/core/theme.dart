@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// 앱 이름 — 스토어 이름이 정해지면 여기 한 곳만 바꾼다.
-const kAppName = 'Path Puzzle';
+const kAppName = 'Kitty Path';
 
 /// 연보라 종이 바탕 + 진남색 글씨. 줄은 청록 → 남보라로 번진다.
 class C {

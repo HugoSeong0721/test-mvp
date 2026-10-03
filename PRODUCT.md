@@ -48,7 +48,7 @@
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | ASC 앱 레코드·AdMob(사용자) → Release iOS → TestFlight |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 Flutter 1차 완성·테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). 번들 `com.soulfulfill.decibel` Apple 등록 완료 | ASC 앱 레코드·AdMob 배너(사용자) → `Release iOS`(decibel) → TestFlight(보정값 실기기 확인) |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
-| **한붓 경로 퍼즐** (`path_puzzle_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
+| **한붓 경로 퍼즐** (`kittypath_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
 | **낚시·사냥 시간** (`plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | **연비·정비 기록** (`plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 개발 세션 시작 대기 | 이름·번들 ID → 개발 → TestFlight |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |

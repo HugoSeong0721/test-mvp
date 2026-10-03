@@ -2,7 +2,7 @@
 마지막 갱신: 2026-10-03 (KST)
 
 ## 지금 상태 (3줄 이내)
-Flutter 1차 완성(`path_puzzle_app/flutter/`): 오늘의 퍼즐(6×6, 기기 날짜 시드, 연속 기록) + 무한 단계(5×5→8×8), 손가락 드래그로 줄 긋기·되돌리기, 보상형 힌트(정답 길을 다음 숫자까지 그어 줌).
+Flutter 1차 완성(`kittypath_app/flutter/`): 오늘의 퍼즐(6×6, 기기 날짜 시드, 연속 기록) + 무한 단계(5×5→8×8), 손가락 드래그로 줄 긋기·되돌리기, 보상형 힌트(정답 길을 다음 숫자까지 그어 줌).
 테스트 36개 통과(엔진 8 + 규칙 12 + 로봇 16) + 웹 실제 터치 점검 24/24. 웹 미리보기 https://soulfulfillable.github.io/test-mvp/path-puzzle-app/index.html (광고는 가짜, AdMob 은 Google 테스트 ID).
 앱 이름·번들 ID 사용자 확인 대기 (임시 이름 "Path Puzzle").
 
@@ -23,7 +23,7 @@ Flutter 1차 완성(`path_puzzle_app/flutter/`): 오늘의 퍼즐(6×6, 기기 �
 
 ## 다른 세션에 알리는 노하우 (다른 앱에서도 써먹을 것)
 - **웹 미리보기도 "진짜 터치"로 점검하자**: Playwright `page.touchscreen` 은 탭만 된다 → CDP `Input.dispatchTouchEvent`(touchStart/Move/End)로 끌기를 보낸다.
-  `path_puzzle_app/qa/web-touch-check.js` (캣도쿠 하네스 위에 얹음). 판 위 세로 끌기가 페이지를 스크롤하지 않는지도 같이 본다.
+  `kittypath_app/qa/web-touch-check.js` (캣도쿠 하네스 위에 얹음). 판 위 세로 끌기가 페이지를 스크롤하지 않는지도 같이 본다.
 - **Flutter 웹 접근성 트리에서 판 찾기**: 부모 `flt-semantics` 의 textContent 에도 자식 글자가 들어 있다 → 글자가 맞는 것 중 **가장 작은 상자**를 골라야 한다
   (처음엔 화면 전체 상자를 잡아 터치가 엉뚱한 칸에 떨어졌다 — 앱 버그처럼 보였음). 카드·버튼 글자는 `aria-label` 쪽에 있다.
 - **웹 점검용 상태 엿보기**: 조건부 import(`if (dart.library.js_interop)`)로 웹에서만 `window.__pathPuzzle` 에 판 상태 JSON 을 남김 (`lib/core/qa_hook*.dart`). 아이폰 앱엔 안 들어감.

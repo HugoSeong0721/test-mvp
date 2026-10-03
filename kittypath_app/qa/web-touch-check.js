@@ -3,7 +3,7 @@
 //
 // 실행 (리포 루트에서):
 //   mkdir -p /tmp/pp-serve && ln -sfn "$PWD/docs" /tmp/pp-serve/test-mvp && (cd /tmp/pp-serve && python3 -m http.server 8765 &)
-//   NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node path_puzzle_app/qa/web-touch-check.js [출력 폴더]
+//   NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node kittypath_app/qa/web-touch-check.js [출력 폴더]
 // 앱이 kIsWeb 에서 window.__pathPuzzle 에 판 상태(정답 줄 포함)를 남긴다 (lib/core/qa_hook_web.dart).
 const path = require('path');
 const fs = require('fs');
