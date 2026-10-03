@@ -139,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   _card(
                     key: const Key('level-card'),
                     emoji: '🏆',
+                    icon: Icons.emoji_events_rounded,
                     title: s.allLevelsDone ? 'All levels done!' : 'Level $lv',
                     sub: s.allLevelsDone
                         ? '${AppStore.totalLevels} of ${AppStore.totalLevels} solved 🎉'
@@ -162,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       key: const Key('all-levels'),
                       onPressed: () => _open(const LevelsScreen()),
                       child: const Text(
-                        '📋 All levels',
+                        '▦ All levels',
                         style: TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w700,
@@ -179,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       key: const Key('howto'),
                       onPressed: () => showHowTo(context),
                       child: const Text(
-                        '❓ How to play',
+                        '? How to play',
                         style: TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w700,
@@ -212,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _card({
     required Key key,
     required String emoji,
+    IconData? icon,
     required String title,
     required String sub,
     required String button,
@@ -233,7 +235,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             children: [
               Row(
                 children: [
-                  Text(emoji, style: const TextStyle(fontSize: 30)),
+                  icon != null
+                      ? Icon(icon, size: 34, color: const Color(0xFFE6A817))
+                      : Text(emoji, style: const TextStyle(fontSize: 30)),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(

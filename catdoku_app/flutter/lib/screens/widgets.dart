@@ -100,9 +100,19 @@ class Hearts extends StatelessWidget {
   const Hearts(this.n, {super.key, this.max = 3});
   final int n, max;
   @override
-  Widget build(BuildContext context) => Text(
-    [for (var i = 0; i < max; i++) i < n ? '❤️' : '🤍'].join(),
-    semanticsLabel: '$n hearts',
-    style: const TextStyle(fontSize: 20, letterSpacing: 1),
+  // 이모지 하트는 웹(스토어 스크린샷)에서 검게 나와 아이콘으로 그린다
+  Widget build(BuildContext context) => Semantics(
+    label: '$n hearts',
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < max; i++)
+          Icon(
+            i < n ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            size: 26,
+            color: i < n ? const Color(0xFFE5383B) : C.muted,
+          ),
+      ],
+    ),
   );
 }
