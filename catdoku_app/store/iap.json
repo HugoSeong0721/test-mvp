@@ -1,0 +1,14 @@
+{
+  "bundleId": "com.soulfulfill.catdoku",
+  "productId": "com.soulfulfill.catdoku.unlockall",
+  "referenceName": "Unlock All Levels",
+  "type": "NON_CONSUMABLE",
+  "priceUSD": "1.99",
+  "reviewNote": "Levels 1-30 are free. After that, each pack of 20 levels unlocks by watching one rewarded video, or this one-time purchase unlocks all 500 levels and removes banner ads. Find it on Home > All levels (the box above the first locked pack), or after clearing Level 30. 'Restore purchase' is at the bottom of the Levels screen.",
+  "locales": {
+    "en-US": {
+      "name": "Unlock All Levels",
+      "description": "All 500 levels and no banner ads."
+    }
+  }
+}

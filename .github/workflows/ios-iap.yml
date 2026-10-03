@@ -1,0 +1,42 @@
+name: iOS 앱 내 구입 상품 만들기
+
+# <앱>_app/store/iap.json 대로 App Store Connect 에 앱 내 구입 상품을 만든다 (있으면 빠진 것만 채움).
+# 가격·표시 이름·설명·판매 국가·심사용 스크린샷(<앱>_app/store/iap-review.png)까지.
+# 사람이 할 것: App Store Connect → 비즈니스 → 유료 앱 계약(은행·세금) — 없으면 팔 수 없다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "앱 폴더 이름 (예: catdoku)"
+        required: true
+        default: catdoku
+
+permissions:
+  contents: read
+
+jobs:
+  iap:
+    runs-on: ubuntu-latest
+    env:
+      KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      APP: ${{ inputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write API key
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s\n' "$KEY_P8" > "$RUNNER_TEMP/keys/AuthKey.p8"
+          echo "KEY_PATH=$RUNNER_TEMP/keys/AuthKey.p8" >> "$GITHUB_ENV"
+
+      - name: Create / fill in-app purchase
+        run: |
+          python3 -m pip install -q pyjwt cryptography
+          python3 .github/scripts/asc_iap.py "${APP}_app/store/iap.json" "${APP}_app/store/iap-review.png" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"

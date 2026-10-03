@@ -5,7 +5,8 @@
 //   const { browser, page, errs } = await require('./flutter-web-harness.js').open({
 //     url: 'http://localhost:8765/test-mvp/catdoku-app/index.html',   // python3 -m http.server 로 docs 를 띄운 주소
 //     canvaskit: '<앱>/flutter/build/web/canvaskit',                    // flutter build web 결과의 canvaskit 폴더
-//     viewport: { width: 390, height: 844 },
+//     viewport: { width: 390, height: 844 }, scale: 3,              // scale: 스크린샷 배율 (기본 2)
+//     init: () => { localStorage['flutter.level'] = '31' },        // 선택: 상태 미리 깔기
 //   })
 //   await page.getByRole('button', { name: /Play/ }).click()   // 앱이 kIsWeb 에서 ensureSemantics() 를 켜 둬야 한다
 const { chromium } = require('/opt/node-tools/node_modules/playwright');
@@ -14,7 +15,7 @@ const fs = require('fs'), path = require('path');
 exports.open = async (opts = {}) => {
   const CK = path.resolve(opts.canvaskit || 'build/web/canvaskit');
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
-  const ctx = await b.newContext({ viewport: opts.viewport || { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+  const ctx = await b.newContext({ viewport: opts.viewport || { width: 390, height: 844 }, deviceScaleFactor: opts.scale || 2, hasTouch: true, isMobile: true });
   const p = await ctx.newPage();
   await p.route(/^https:\/\//, async route => {
     const url = route.request().url();
@@ -34,6 +35,7 @@ exports.open = async (opts = {}) => {
   const errs = [];
   p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+  if (opts.init) await p.addInitScript(opts.init);   // 예: localStorage 에 진행 상태 미리 깔기
   await p.goto(opts.url);
   await p.getByRole('button').first().waitFor({ timeout: 30000 });
   await p.waitForTimeout(1200);

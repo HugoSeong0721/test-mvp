@@ -2,6 +2,7 @@
 // 막힌 길(버튼이 안 먹음)·뒤로가기 불가·깨진 레이아웃(overflow 는 Flutter 가 예외로 던져 테스트 실패)을 잡는다.
 // 실행: flutter test test/robot_test.dart  → 누른 버튼 목록이 로그로 찍힌다.
 import 'package:catdoku/core/ads.dart';
+import 'package:catdoku/core/purchases.dart';
 import 'package:catdoku/core/puzzle.dart';
 import 'package:catdoku/core/store.dart';
 import 'package:catdoku/game/game.dart';
@@ -26,12 +27,14 @@ Future<void> boot(
   double ratio = 3,
   Map<String, Object> prefs = const {},
   FakeAds? ads,
+  FakePurchases? purchases,
 }) async {
   t.view.physicalSize = size * ratio;
   t.view.devicePixelRatio = ratio;
   addTearDown(t.view.reset);
   SharedPreferences.setMockInitialValues(prefs);
   Ads.i = ads ?? FakeAds();
+  Purchases.i = purchases ?? FakePurchases();
   await AppStore.i.load();
   AppStore.i.clock = () => DateTime(2026, 10, 2, 9);
   await t.pumpWidget(const CatdokuApp());
@@ -658,6 +661,134 @@ void main() {
     await finish(t);
   });
 
+  testWidgets(
+    'levels screen: shows solved/left, replays an old level, locked tiles explain',
+    (t) async {
+      await boot(t, prefs: {'seenHowTo': true, 'level': 13});
+      expect(find.textContaining('12 of 500 solved'), findsOneWidget);
+      await press(t, find.byKey(const Key('all-levels')), 'Home: All levels');
+      expect(find.text('Levels'), findsOneWidget);
+      expect(find.byKey(const Key('levels-count')), findsOneWidget);
+      expect(find.text('12 / 500 solved'), findsOneWidget);
+      expect(find.text('Levels 1–30'), findsOneWidget);
+      expect(find.text('🔒 Levels 31–50'), findsOneWidget);
+      // 깬 단계 다시 하기 — 진행은 바뀌지 않는다
+      await t.ensureVisible(find.byKey(const Key('level-5')));
+      await press(
+        t,
+        find.byKey(const Key('level-5')),
+        'Levels: tile 5 (replay)',
+      );
+      expect(find.text('Level 5'), findsOneWidget);
+      await solveRest(t);
+      expect(find.text('🎉 Level 5 cleared!'), findsOneWidget);
+      expect(AppStore.i.level, 13, reason: 'replay keeps progress');
+      // 다시 하기 뒤 Next Level 은 아직 안 깬 첫 단계로
+      await press(t, find.byKey(const Key('next')), 'Won: Next Level');
+      expect(find.text('Level 13'), findsOneWidget);
+      await press(t, find.byKey(const Key('back')), 'Game: Back');
+      // 아직 못 가는 단계·잠긴 단계를 누르면 이유를 알려 준다
+      await t.ensureVisible(find.byKey(const Key('level-20')));
+      await press(
+        t,
+        find.byKey(const Key('level-20')),
+        'Levels: tile 20 (not yet)',
+      );
+      expect(find.textContaining('Solve Level 13 first'), findsOneWidget);
+      await t.pump(const Duration(seconds: 5));
+      await t.ensureVisible(find.byKey(const Key('level-40')));
+      await press(
+        t,
+        find.byKey(const Key('level-40')),
+        'Levels: tile 40 (locked)',
+      );
+      expect(find.textContaining('Unlock this pack first'), findsOneWidget);
+      await t.pump(const Duration(seconds: 5));
+      await t.ensureVisible(find.byKey(const Key('levels-back')));
+      await press(t, find.byKey(const Key('levels-back')), 'Levels: Back');
+      expect(find.text('Today’s Puzzle'), findsOneWidget);
+      await finish(t);
+    },
+  );
+
+  testWidgets(
+    'level 30 cleared → next pack locked → watch a video → 20 levels open',
+    (t) async {
+      final ads = FakeAds();
+      await boot(t, prefs: {'seenHowTo': true, 'level': 30}, ads: ads);
+      await press(t, find.text('Continue'), 'Home: Level Continue');
+      await solveRest(t);
+      expect(find.text('🔒 Levels 31–50 are locked'), findsOneWidget);
+      expect(find.byKey(const Key('next')), findsNothing);
+      await press(
+        t,
+        find.byKey(const Key('unlock-video')),
+        'Won: Watch a video +20 levels',
+      );
+      expect(ads.shown.last, RewardPlacement.unlockPack);
+      expect(AppStore.i.unlockedThrough, 50);
+      expect(find.text('Level 31'), findsOneWidget, reason: 'goes straight on');
+      await press(t, find.byKey(const Key('back')), 'Game: Back');
+      expect(find.text('Level 31'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
+      await finish(t);
+    },
+  );
+
+  testWidgets(
+    r'unlock all for $1.99: everything opens and the banner goes away',
+    (t) async {
+      final buy = FakePurchases();
+      await boot(t, prefs: {'seenHowTo': true, 'level': 31}, purchases: buy);
+      expect(find.text('Unlock Level 31'), findsOneWidget);
+      await press(t, find.text('Unlock Level 31'), 'Home: Unlock Level 31');
+      expect(find.byKey(const Key('unlock-box')), findsOneWidget);
+      await press(
+        t,
+        find.byKey(const Key('unlock-buy')),
+        r'Levels: Unlock all $1.99',
+      );
+      expect(buy.buys, 1);
+      expect(AppStore.i.premium, isTrue);
+      expect(AppStore.i.unlockedThrough, 500);
+      expect(find.byKey(const Key('unlock-box')), findsNothing);
+      expect(find.byKey(const Key('restore')), findsNothing);
+      await press(t, find.byKey(const Key('levels-back')), 'Levels: Back');
+      expect(find.text('Continue'), findsOneWidget);
+      // 배너 자리가 사라진다 (FakeAds 배너 = 높이 60 SizedBox)
+      expect(find.byType(BannerSlot), findsOneWidget);
+      expect(t.getSize(find.byType(BannerSlot)).height, 0);
+      await finish(t);
+    },
+  );
+
+  testWidgets(
+    'cancelled purchase changes nothing; Restore finds an old purchase',
+    (t) async {
+      final buy = FakePurchases(result: BuyResult.cancelled);
+      await boot(t, prefs: {'seenHowTo': true, 'level': 31}, purchases: buy);
+      await press(t, find.byKey(const Key('all-levels')), 'Home: All levels');
+      await t.ensureVisible(find.byKey(const Key('unlock-buy')));
+      await press(
+        t,
+        find.byKey(const Key('unlock-buy')),
+        r'Levels: Unlock all (cancel)',
+      );
+      expect(AppStore.i.premium, isFalse);
+      expect(AppStore.i.unlockedThrough, 30);
+      buy.restoreFinds = true;
+      await t.ensureVisible(find.byKey(const Key('restore')));
+      await press(
+        t,
+        find.byKey(const Key('restore')),
+        'Levels: Restore purchase',
+      );
+      expect(AppStore.i.premium, isTrue);
+      expect(find.textContaining('Purchase restored'), findsOneWidget);
+      await finish(t);
+    },
+  );
+
   testWidgets('daily clock carries over after losing', (t) async {
     await boot(t, prefs: {'seenHowTo': true, 'dailyCarry_20261002': 75});
     expect(find.textContaining('1:15 so far'), findsOneWidget);
@@ -672,7 +803,12 @@ void main() {
       t,
     ) async {
       final (size, ratio) = e.value;
-      await boot(t, size: size, ratio: ratio, prefs: {'level': 60});
+      await boot(
+        t,
+        size: size,
+        ratio: ratio,
+        prefs: {'level': 60, 'premium': true},
+      );
       expect(find.text('How to play'), findsOneWidget);
       await press(t, find.byKey(const Key('howto-ok')), 'How-to: Got it');
       await press(t, find.text('Continue'), 'Home: Level Continue');

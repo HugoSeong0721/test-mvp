@@ -8,6 +8,7 @@ import '../core/store.dart';
 import '../core/theme.dart';
 import 'game_screen.dart';
 import 'how_to.dart';
+import 'levels_screen.dart';
 import 'widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -138,14 +139,39 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   _card(
                     key: const Key('level-card'),
                     emoji: '🏆',
-                    title: 'Level $lv',
-                    sub:
-                        '${Puzzle.sizeForLevel(lv)}×${Puzzle.sizeForLevel(lv)} · '
-                        '${s.levelsSolved} solved',
-                    button: lv == 1 ? 'Start' : 'Continue',
-                    onTap: () => _open(GameScreen.level(lv)),
+                    title: s.allLevelsDone ? 'All levels done!' : 'Level $lv',
+                    sub: s.allLevelsDone
+                        ? '${AppStore.totalLevels} of ${AppStore.totalLevels} solved 🎉'
+                        : '${Puzzle.sizeForLevel(lv)}×${Puzzle.sizeForLevel(lv)} · '
+                              '${s.levelsSolved} of ${AppStore.totalLevels} solved',
+                    button: s.allLevelsDone
+                        ? 'See all levels'
+                        : !s.isOpen(lv)
+                        ? 'Unlock Level $lv'
+                        : lv == 1
+                        ? 'Start'
+                        : 'Continue',
+                    onTap: () => _open(
+                      !s.allLevelsDone && s.isOpen(lv)
+                          ? GameScreen.level(lv)
+                          : const LevelsScreen(),
+                    ),
                   ),
-                  const SizedBox(height: 22),
+                  Center(
+                    child: TextButton(
+                      key: const Key('all-levels'),
+                      onPressed: () => _open(const LevelsScreen()),
+                      child: const Text(
+                        '📋 All levels',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w700,
+                          color: C.sub,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   const RuleChips(big: true),
                   const SizedBox(height: 14),
                   Center(
@@ -175,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ],
               ),
             ),
-            Ads.i.banner(),
+            const BannerSlot(),
             SizedBox(height: MediaQuery.of(context).padding.bottom),
           ],
         ),

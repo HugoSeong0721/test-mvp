@@ -30,12 +30,19 @@ class BigButton extends StatelessWidget {
         child: SizedBox(
           height: height,
           child: Center(
-            child: Text(
-              icon == null ? label : '$icon  $label',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: textColor,
+            // 좁은 화면에서 긴 문구가 넘치지 않게 줄여서라도 한 줄로
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  icon == null ? label : '$icon  $label',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: textColor,
+                  ),
+                ),
               ),
             ),
           ),
