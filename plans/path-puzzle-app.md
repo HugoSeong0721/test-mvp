@@ -26,6 +26,14 @@
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
 
+### 2026-10-03 개발 세션 1 (이어서) — 이름·번들·스토어 준비
+- 사용자 결정: 이름 **Kitty Path: Number Puzzle** (부제 Daily One Line Logic Game), 번들 `com.soulfulfill.kittypath` 즉시 등록 → Actions 로 Apple 등록 완료.
+- 폴더 `path_puzzle_app` → `kittypath_app` (워크플로 규칙 `<이름>_app` + `com.soulfulfill.<이름>`), `Release iOS`·`App Store 등록 정보 채우기` 선택지에 `kittypath`.
+- 아이콘 `assets/icon/icon.svg` → 1024 PNG(Playwright) → flutter_launcher_icons(iOS·안드로이드·웹). 게임 속 줄 끝을 같은 모양의 고양이(Canvas 그림)로, 고양이가 숫자 위에 있으면 숫자를 모서리 배지로.
+- 첫 화면 안내 "👆 Drag the kitty from 1 to 2". 개인정보 `docs/kittypath-privacy.html`, 스토어 `kittypath_app/store/ios-metadata.json`·`ios-listing.md`(키워드에 zip·flow·numbrix·hidato 없음).
+- 할 일 페이지 `docs/todo.html` 에 ASC 신규 앱·AdMob(배너+보상형) 항목.
+- 남은 것: ASC 앱 레코드(사용자) → Release iOS(kittypath) → TestFlight → 스크린샷 → AdMob(제출 직전) → 심사.
+
 ### 2026-10-03 개발 세션 1
 - ①조사(하위 작업자): 원조 게임은 6×6 기본·숫자 8~14개(평균 10)·**1에서 시작해 가장 큰 숫자에서 끝**·어려운 판엔 벽. 따라 만든 앱들 평가 수백 개 이하 —
   불만은 "힌트가 숫자만 강조하고 길은 안 보여 줌", "되돌리기 없음", "판 지우기에 코인", "2판마다 20초 광고", "115단계쯤 결제 유도". Flow Free(40.5만)도 광고·힌트 제한 불만.

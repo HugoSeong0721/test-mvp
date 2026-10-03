@@ -48,7 +48,8 @@ const apps=[
  {id:'decibel',name:'Glance dB: Decibel Meter',bundle:'com.soulfulfill.decibel',sku:'decibel',admob:'Glance dB'},
  {id:'speedometer',name:'Glance Speed: GPS Speedometer',bundle:'com.soulfulfill.speedometer',sku:'speedometer',admob:'Glance Speed'},
  {id:'tides',name:'Glance Tides: Tide Chart',bundle:'com.soulfulfill.tides',sku:'tides',admob:'Glance Tides',note:'번들 등록이 끝나야 목록에 떠요 — 물때 세션이 "번들 등록 완료" 하면 그때.'},
- {id:'fuellog',name:'Glance MPG: Gas Mileage Log',bundle:'com.soulfulfill.fuellog',sku:'fuellog',admob:'Glance MPG'}
+ {id:'fuellog',name:'Glance MPG: Gas Mileage Log',bundle:'com.soulfulfill.fuellog',sku:'fuellog',admob:'Glance MPG'},
+ {id:'kittypath',name:'Kitty Path: Number Puzzle',bundle:'com.soulfulfill.kittypath',sku:'kittypath',admob:'Kitty Path',units:[['Banner','banner'],['Rewarded','rewarded_hint']]}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 function row(k,v){return `<div class="row"><span class="k">${k}</span><span class="v">${v}</span><button data-copy="${v}">복사</button></div>`}
@@ -56,7 +57,7 @@ function card(a,kind){
   const key='todo-'+kind+'-'+a.id, done=store.get(key)==='1';
   const body=kind==='asc'
     ? row('이름',a.name)+row('번들 ID',a.bundle)+row('SKU',a.sku)
-    : row('앱 이름',a.admob)+row('광고 단위','banner');
+    : row('앱 이름',a.admob)+(a.units||[['Banner','banner']]).map(([f,u])=>row(`광고 단위 · 형식 ${f}`,u)).join('');
   return `<div class="card"><h3>${a.name}</h3>${body}${a.note&&kind==='asc'?`<p class="note">${a.note}</p>`:''}
   <label class="chk"><input type="checkbox" data-key="${key}" ${done?'checked':''}> 했어요</label></div>`;
 }

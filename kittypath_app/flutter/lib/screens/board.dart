@@ -300,7 +300,6 @@ class BoardPainter extends CustomPainter {
         cs * (0.30 + 0.05 * pulse),
         Paint()..color = hc.withValues(alpha: 0.28),
       );
-      canvas.drawCircle(h, w * 0.62, Paint()..color = hc);
     }
     // 숫자
     for (var cell = 0; cell < total; cell++) {
@@ -345,6 +344,38 @@ class BoardPainter extends CustomPainter {
       )..layout();
       tp.paint(canvas, c - Offset(tp.width / 2, tp.height / 2));
     }
+    // 줄 끝의 고양이 — 손가락으로 끌고 다니는 "펜". 다 풀면 마지막 숫자 위에서 폴짝 뛴다.
+    if (path.isNotEmpty) {
+      final bounce = won ? -math.sin(win * math.pi * 3).abs() * cs * 0.12 : 0.0;
+      final head = path.last;
+      drawKitty(canvas, center(head) + Offset(0, bounce), cs * 0.36);
+      // 고양이가 숫자 칸 위에 있으면 그 숫자를 칸 모서리에 작게 남긴다 (시작할 때 1 이 가려지지 않게)
+      final num = numberAt[head];
+      if (num > 0) {
+        final b = center(head) + Offset(-cs * 0.32, -cs * 0.32);
+        final idx = path.length - 1;
+        canvas.drawCircle(b, cs * 0.17, Paint()..color = Colors.white);
+        canvas.drawCircle(
+          b,
+          cs * 0.145,
+          Paint()..color = C.pathAt(idx / denom),
+        );
+        final tp = TextPainter(
+          text: TextSpan(
+            text: '$num',
+            style: TextStyle(
+              fontFamily: fontFamily,
+              fontSize: cs * (num >= 10 ? 0.15 : 0.18),
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              height: 1,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        tp.paint(canvas, b - Offset(tp.width / 2, tp.height / 2));
+      }
+    }
     // 막힌 칸 — 빨간 고리
     final b = badCell;
     if (b != null && bad > 0) {
@@ -361,4 +392,75 @@ class BoardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BoardPainter old) => true;
+}
+
+/// 고양이 얼굴 (앱 아이콘과 같은 모양, assets/icon/icon.svg). [r] 은 얼굴 가로 반지름.
+/// 이모지 대신 직접 그려 아이폰·웹·테스트 화면이 똑같이 보인다.
+void drawKitty(Canvas canvas, Offset c, double r) {
+  final s = r / 92;
+  Offset p(double x, double y) => c + Offset(x * s, y * s);
+  Path tri(List<double> v) => Path()
+    ..moveTo(p(v[0], v[1]).dx, p(v[0], v[1]).dy)
+    ..lineTo(p(v[2], v[3]).dx, p(v[2], v[3]).dy)
+    ..lineTo(p(v[4], v[5]).dx, p(v[4], v[5]).dy)
+    ..close();
+  final gold = Paint()..color = C.gold;
+  final pink = Paint()..color = const Color(0xFFFF9DB5);
+  final ink = Paint()..color = C.ink;
+  // 그림자 — 줄 색 위에서도 얼굴 윤곽이 보이게
+  canvas.drawOval(
+    Rect.fromCenter(center: p(0, 6), width: 196 * s, height: 180 * s),
+    Paint()..color = const Color(0x33000000),
+  );
+  canvas.drawPath(tri([-78, -18, -70, -118, -18, -72]), gold);
+  canvas.drawPath(tri([78, -18, 70, -118, 18, -72]), gold);
+  canvas.drawPath(tri([-64, -38, -60, -92, -32, -66]), pink);
+  canvas.drawPath(tri([64, -38, 60, -92, 32, -66]), pink);
+  canvas.drawOval(
+    Rect.fromCenter(center: c, width: 184 * s, height: 168 * s),
+    gold,
+  );
+  canvas.drawOval(
+    Rect.fromCenter(center: p(-32, -8), width: 22 * s, height: 34 * s),
+    ink,
+  );
+  canvas.drawOval(
+    Rect.fromCenter(center: p(32, -8), width: 22 * s, height: 34 * s),
+    ink,
+  );
+  canvas.drawPath(
+    tri([-12, 18, 12, 18, 0, 31]),
+    Paint()..color = const Color(0xFFE86A8A),
+  );
+  final stroke = Paint()
+    ..color = C.ink
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = math.max(1, 6 * s)
+    ..strokeCap = StrokeCap.round;
+  canvas.drawPath(
+    Path()
+      ..moveTo(p(0, 31).dx, p(0, 31).dy)
+      ..quadraticBezierTo(
+        p(-10, 44).dx,
+        p(-10, 44).dy,
+        p(-22, 40).dx,
+        p(-22, 40).dy,
+      )
+      ..moveTo(p(0, 31).dx, p(0, 31).dy)
+      ..quadraticBezierTo(
+        p(10, 44).dx,
+        p(10, 44).dy,
+        p(22, 40).dx,
+        p(22, 40).dy,
+      ),
+    stroke,
+  );
+  for (final w in [
+    [-48.0, 22.0, -104.0, 12.0],
+    [-48.0, 32.0, -102.0, 40.0],
+    [48.0, 22.0, 104.0, 12.0],
+    [48.0, 32.0, 102.0, 40.0],
+  ]) {
+    canvas.drawLine(p(w[0], w[1]), p(w[2], w[3]), stroke);
+  }
 }

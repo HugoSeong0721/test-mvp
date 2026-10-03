@@ -401,6 +401,9 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         } else if (game.puzzle.numberAt[game.head] == p.lastNumber) {
           // 마지막 숫자에 닿았는데 빈칸이 남았다 — 무엇을 해야 하는지 계속 보여 준다
           text = '⚠️ ${game.left} empty — slide back and fill them';
+        } else if (game.path.length == 1) {
+          // 처음 — 무엇을 하면 되는지 한 줄로
+          text = '👆 Drag the kitty from 1 to ${game.nextNumber}';
         } else {
           text = 'Next: ${game.nextNumber}  ·  ${game.left} squares left';
         }

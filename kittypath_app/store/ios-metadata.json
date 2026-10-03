@@ -1,0 +1,14 @@
+{
+  "_comment": "App Store Connect 에 API 로 넣는 값 (.github/scripts/asc_metadata.py). 초안·이름 조사는 ios-listing.md. 스크린샷은 TestFlight 뒤에 screenshots/ 에 1290x2796 으로 넣는다.",
+  "bundleId": "com.soulfulfill.kittypath",
+  "locale": "en-US",
+  "subtitle": "Daily One Line Logic Game",
+  "privacyPolicyUrl": "https://soulfulfillable.github.io/test-mvp/kittypath-privacy.html",
+  "promotionalText": "Drag the kitty through every square, passing 1 → 2 → 3 in order. A new puzzle every day, endless levels, unlimited undo.",
+  "description": "Draw one line. Fill every square. Follow the numbers.\n\nKitty Path is a calm logic puzzle with just two rules:\n• Your line must pass through every square exactly once\n• It must pass the numbers in order: 1 → 2 → 3 …\n\nDrag the kitty from 1 and finish on the biggest number. Every puzzle has exactly one solution.\n\n■ A NEW PUZZLE EVERY DAY\nToday's Puzzle is the same for everyone. Solve it daily to keep your streak going.\n\n■ ENDLESS LEVELS\nStart with quick 5×5 boards and work up to 8×8. Levels never run out, and they are all free.\n\n■ NO MISTAKES, NO STRESS\nSlide back over your line to erase it. Undo and Clear are always free and unlimited — no coins, no timers you can fail.\n\n■ HINTS THAT ACTUALLY HELP\nStuck? Watch a short video and the app draws the real way to the next number, fixing any wrong turns.\n\n■ PLAY ANYWHERE\nWorks offline — perfect for the bus, the subway or a coffee break. No account, no sign-in.",
+  "keywords": "connect,dots,brain,teaser,puzzles,cat,stroke,draw,grid,fill,maze,trail,mind,relax,games",
+  "supportUrl": "https://github.com/soulfulfillable/test-mvp/issues",
+  "reviewNotes": "One-line number puzzle game. No account or login.\n\nHow to play: drag from the square marked 1 (the kitty) to draw a line through every square exactly once, passing the numbers in order and ending on the biggest number. Slide back over the line to erase; Undo / Clear buttons at the bottom.\n\nModes: Today's Puzzle (one new 6x6 board per day, same for everyone) and Levels (endless, 5x5 to 8x8), all free.\n\nAds: Google AdMob banner + optional rewarded video for a hint (draws the way to the next number). If no video is available, the hint is granted anyway. The app does not request tracking permission.\n\nNo backend server; puzzles are generated on the device. English only.",
+  "screenshots": [],
+  "screenshotDisplayType": "APP_IPHONE_67"
+}

@@ -238,7 +238,7 @@ void main() {
       final g = gameOf(t);
       expect(g.n, PathPuzzle.dailySize);
       expect(g.path, [g.puzzle.clues.first]);
-      expect(find.textContaining('Next: 2'), findsOneWidget);
+      expect(find.textContaining('Drag the kitty from 1 to 2'), findsOneWidget);
       await shot(t, '03-daily-start');
 
       // 정답대로 6칸

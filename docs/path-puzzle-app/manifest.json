@@ -1,9 +1,9 @@
 {
-    "name": "Path Puzzle",
-    "short_name": "Path Puzzle",
+    "name": "Kitty Path",
+    "short_name": "Kitty Path",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#F2F0F9",
+    "background_color": "#251E4A",
     "theme_color": "#251E4A",
     "description": "Draw one line through every square, numbers in order.",
     "orientation": "portrait-primary",
