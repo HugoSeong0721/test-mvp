@@ -43,7 +43,7 @@
 |---|---|---|
 | **Glance FX: Currency Converter** (`currency_app/`) | 2026-10-02 v1.0(빌드 8) 심사 제출. v1.1 후보 = 빌드 9(TestFlight): 줄 꾹 눌러 끌기로 순서 변경, 긴 이름 줄 넘침 수정. 스크린샷 v2(금·BTC 첫 장) 준비됨 | 승인 대기 → AdMob 스토어 링크·결제 정보 → v1.1 제출(빌드 9 + 스크린샷 v2, `App Store 등록 정보 채우기`) → 리뷰·수익 확인 |
 | **Cozy Coloring 정식판** (원형 `docs/coloring-book.html`) | **보류** (2026-10-02). 기획서 OK, 선화 수집·변환기·테스트 로봇까지 만듦 | 재개 시 `plans/coloring-app.md` 의 첫 메시지로 새 세션 |
-| **Glance Tides: Tide Chart** (물때, `tides_app/`, `plans/tides-app.md`, `board/tides.md`) | 2026-10-03 Flutter 1차 완성·테스트 31개·웹 미리보기 `docs/tides-app/`. 번들 `com.soulfulfill.tides` | 보상형 30일 표 → ASC 앱 레코드·AdMob(사용자) → TestFlight |
+| **Glance Tides: Tide Chart** (물때, `tides_app/`, `plans/tides-app.md`, `board/tides.md`) | 2026-10-03 Flutter 1차 완성·테스트 31개·웹 미리보기 `docs/tides-app/`. 번들 `com.soulfulfill.tides` | TestFlight 빌드 21 업로드(10-03) → 사용자 느낌 → 스크린샷 → 심사 |
 | **Glance Speed: GPS Speedometer** (GPS 속도계, `speedometer_app/`, `plans/speedometer-app.md`, `board/speedometer.md`) | 2026-10-03 Flutter 1차 완성·테스트 37개·웹 미리보기 `docs/speedometer-app/`(폰 GPS 로 진짜 속도). 번들 `com.soulfulfill.speedometer` | 번들 등록 → ASC 앱 레코드·AdMob(사용자) → TestFlight |
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | 빌드 18 TestFlight 업로드 완료 → 사용자 설치·느낌 → 스크린샷·등록 정보 → 심사 |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 TestFlight 빌드 19 업로드. 테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). AdMob 배너 실제 ID | 사용자 TestFlight 느낌 → 보정값(+94) 실기기 확인 → 스크린샷·등록 정보 → 심사 |
