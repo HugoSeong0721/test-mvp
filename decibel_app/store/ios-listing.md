@@ -104,8 +104,24 @@ Phone microphones are not certified sound level meters. Readings are estimates f
 ## 홍보 문구 (170)
 Free decibel meter with no subscription. See how loud it is, what it sounds like, and save a noise report for your neighbor or landlord.
 
-## 심사 메모 (App Review Notes)
-The app uses the microphone only to compute sound level (dB) on-device in real time; no audio is recorded, stored or transmitted. Measuring stops when the app leaves the foreground (no background audio mode). Ads are AdMob banners only. No login required.
+## 심사 메모 (App Review Notes) — 첫 제출용
+환율 앱이 첫 제출에서 "새 계정 정보 요청(2.1)"으로 반려됐다 → **처음부터 같은 6항목을 Notes 에 넣고, 실기기 화면 녹화(앱 실행부터)를 첨부**한다.
+
+```
+Glance dB is a sound level meter (decibel meter). No account, login, user-generated content, or in-app purchases.
+
+1. Screen recording: attached, captured on a physical iPhone from launch (welcome screen → microphone permission → measuring → report → history → settings).
+
+2. Purpose: helps people check how loud it is (noisy neighbors, restaurants, baby white-noise machines, concerts) and save a simple noise report with date, time, average and max levels to share with a landlord or neighbor. Every feature is free.
+
+3. How to use (no credentials needed): tap Continue, allow the microphone, and the live level appears. Pause/Resume/Reset control the measurement. Tap "Report" to see and share the report image (iOS share sheet). Tap the level chip for everyday comparisons. History lists past measurements. Settings: calibration offset, dBA/dBC/dBZ weighting, keep screen on.
+
+4. Microphone: used only while the app is in the foreground to compute sound level on-device in real time (AVAudioSession measurement mode). Audio is never recorded, stored, or transmitted. No background audio mode. Only the numbers (per-second levels) are saved locally.
+
+5. External services: Google AdMob banner ads only. No analytics, no backend server, no AI services. Measuring works offline.
+
+6. Accuracy / regulated use: the app states in the app and description that phone microphones are not certified sound level meters and readings are estimates; it makes no legal or medical claims. Hearing-safety tips cite the CDC/NIOSH 85 dBA guideline as general information.
+```
 
 ## 스크린샷 (6.7형 1290×2796) — 계획
 1. 측정 화면, 큰 숫자 + "Like a vacuum cleaner" (가장 매력적인 순간) — 문구 "How loud is it? Know instantly."
