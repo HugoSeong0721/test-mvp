@@ -46,4 +46,5 @@
 - Actions: `Release iOS`·`App Store 등록 정보 채우기` 선택지에 mortgage 추가, 번들 ID 를 `com.soulfulfill.<앱>` 규칙으로 일반화.
 - 개인정보처리방침 `docs/mortgage-privacy.html`.
 - 이름 **Glance: Mortgage Calculator** · 번들 `com.soulfulfill.mortgage` (사용자 확인, Apple 등록 완료). `mortgage_app/store/ios-metadata.json` 작성.
-- 남은 것: ASC 앱 레코드·AdMob 앱(사용자) → 실제 광고 ID → Release iOS → TestFlight → 스크린샷·등록 정보.
+- ASC 앱 레코드(사용자), AdMob iOS 앱 `~9582805496`·배너 `/4605810985` 반영, `Release iOS` 빌드 18 업로드 성공.
+- 남은 것: TestFlight 설치·느낌 피드백 → 스크린샷 1290×2796 → `App Store 등록 정보 채우기` → 심사.
