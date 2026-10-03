@@ -28,6 +28,11 @@
 
 ## 진행 기록 (개발 세션이 추가, 최신이 위)
 
+### 2026-10-03 개발 세션 1 (계속)
+- 사용자가 ASC 앱 레코드·AdMob(iOS 앱 + 배너 단위) 생성 → 실제 ID 반영(안드로이드는 테스트 ID).
+- VoiceOver 에서 Start/Pause/Reset/Report·비유 칩이 안 눌리던 것 수정(연비 세션 교훈). 로봇에 접근성 tap 검사 추가 — 고치기 전 실패 확인.
+- `Release iOS`(decibel) 첫 업로드 실행.
+
 ### 2026-10-03 개발 세션 1 (05~07시 KST)
 - **이름 `Glance dB: Decibel Meter`·번들 `com.soulfulfill.decibel` 확정(사용자 "추천대로") → Actions 로 Apple 번들 ID 등록 완료.**
   `Release iOS`·`App Store 등록 정보 채우기` 선택지에 decibel 추가.
