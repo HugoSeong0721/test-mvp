@@ -398,16 +398,23 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             ),
           );
         }
-        if (game.stuck) {
-          return const FittedBox(
+        final stuckAt = game.stuckLine;
+        if (stuckAt != null) {
+          final where = switch (stuckAt.kind) {
+            StuckKind.row => 'Row ${stuckAt.index + 1}',
+            StuckKind.column => 'Column ${stuckAt.index + 1}',
+            StuckKind.color =>
+              'The ${C.regionNames[stuckAt.index % C.regionNames.length]} color',
+          };
+          return FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              '🤔 No spot left — move a cat or try 💡 Hint',
-              key: Key('stuck'),
-              style: TextStyle(
+              '🤔 $where has no spot left — move a cat',
+              key: const Key('stuck'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: C.sub,
+                color: C.red,
               ),
             ),
           );

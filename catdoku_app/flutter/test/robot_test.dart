@@ -789,6 +789,26 @@ void main() {
     },
   );
 
+  testWidgets('TestFlight 캡처 재현: Level 11 막다른 판은 "Row 5" 를 짚는다', (t) async {
+    await boot(t, prefs: {'seenHowTo': true, 'level': 11});
+    // 캡처와 같은 판인지: 첫 줄 = 파랑 1칸 + 청록 6칸
+    final p = Puzzle.level(11);
+    expect(p.n, 7);
+    expect(p.region[0].sublist(1).toSet().length, 1);
+    expect(p.region[0][0] != p.region[0][1], isTrue);
+    await press(t, find.text('Continue'), 'Home: Level Continue');
+    final g = gameOf(t);
+    for (final (r, c) in [(2, 2), (3, 4), (5, 6)]) {
+      await tapCell(t, r, c);
+    }
+    expect(g.cats, 3, reason: 'the three cats from the screenshot are legal');
+    expect(g.stuckLine?.kind, StuckKind.row);
+    expect(g.stuckLine?.index, 4);
+    await t.pump(const Duration(seconds: 3));
+    expect(find.text('🤔 Row 5 has no spot left — move a cat'), findsOneWidget);
+    await finish(t);
+  });
+
   testWidgets('daily clock carries over after losing', (t) async {
     await boot(t, prefs: {'seenHowTo': true, 'dailyCarry_20261002': 75});
     expect(find.textContaining('1:15 so far'), findsOneWidget);

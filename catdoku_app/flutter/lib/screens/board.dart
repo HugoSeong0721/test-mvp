@@ -294,6 +294,40 @@ class _BoardPainter extends CustomPainter {
         }
       }
     }
+    // 막다른 줄·색: 빨갛게 칠하고 바깥 테두리를 그어 "여기가 막혔다"를 보여 준다
+    final st = g.stuckLine;
+    if (st != null) {
+      final set = st.cells.toSet();
+      final tint = Paint()..color = const Color(0x33E02020);
+      final edge = Paint()
+        ..color = const Color(0xFFD1342A)
+        ..strokeWidth = 4
+        ..strokeCap = StrokeCap.round;
+      for (final (r, c) in st.cells) {
+        canvas.drawRect(Rect.fromLTWH(c * cs, r * cs, cs, cs), tint);
+        final x = c * cs, y = r * cs;
+        if (!set.contains((r - 1, c))) {
+          canvas.drawLine(Offset(x, y + 2), Offset(x + cs, y + 2), edge);
+        }
+        if (!set.contains((r + 1, c))) {
+          canvas.drawLine(
+            Offset(x, y + cs - 2),
+            Offset(x + cs, y + cs - 2),
+            edge,
+          );
+        }
+        if (!set.contains((r, c - 1))) {
+          canvas.drawLine(Offset(x + 2, y), Offset(x + 2, y + cs), edge);
+        }
+        if (!set.contains((r, c + 1))) {
+          canvas.drawLine(
+            Offset(x + cs - 2, y),
+            Offset(x + cs - 2, y + cs),
+            edge,
+          );
+        }
+      }
+    }
     // 힌트·새 고양이 자리 반짝임
     final gc = glowCell;
     if (gc != null && glow < 1) {

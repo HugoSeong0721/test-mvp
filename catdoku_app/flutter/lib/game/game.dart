@@ -15,6 +15,17 @@ enum DragMode { none, mark, erase }
 
 enum GameMode { daily, level }
 
+enum StuckKind { row, column, color }
+
+class StuckLine {
+  StuckLine(this.kind, this.index, this.cells);
+  final StuckKind kind;
+
+  /// 행·열 번호(0부터) 또는 색 구역 번호.
+  final int index;
+  final List<(int, int)> cells;
+}
+
 /// 규칙 위반 한 건 — 화면에 빨갛게 번쩍이고 이유를 띄운다.
 class Violation {
   Violation(this.r, this.c, this.reason, this.culprits);
@@ -75,33 +86,43 @@ class Game extends ChangeNotifier {
 
   /// 막다른 길: 고양이가 아직 없는 행·열·구역 가운데, 놓을 수 있는 칸이 하나도 안 남은 곳이 있다.
   /// = 이미 놓은 고양이 중 하나가 틀린 자리. (TestFlight 에서 사용자가 이 상태로 갇혔다)
-  bool get stuck {
-    if (status != GameStatus.playing || cats >= n) return false;
+  bool get stuck => stuckLine != null;
+
+  /// 막힌 곳 하나 — 화면이 "Row 5 has no spot left" 처럼 짚고, 판에 테두리를 그린다.
+  /// (빈칸이 다른 줄에 남아 있으면 "자리 있는데?" 로 읽혀서, 어디가 막혔는지 보여 줘야 했다)
+  StuckLine? get stuckLine {
+    if (status != GameStatus.playing || cats >= n) return null;
     bool open(int r, int c) =>
         cells[r][c] != Mark.cat && conflictsWith(r, c).isEmpty;
     for (var i = 0; i < n; i++) {
-      if (!rowDone(i) &&
-          ![for (var c = 0; c < n; c++) open(i, c)].contains(true)) {
-        return true;
-      }
-      if (!colDone(i) &&
-          ![for (var r = 0; r < n; r++) open(r, i)].contains(true)) {
-        return true;
-      }
-      if (!regionDone(i)) {
-        var any = false;
-        for (var r = 0; r < n && !any; r++) {
-          for (var c = 0; c < n; c++) {
-            if (puzzle.region[r][c] == i && open(r, c)) {
-              any = true;
-              break;
-            }
-          }
+      if (!rowDone(i)) {
+        final line = [for (var c = 0; c < n; c++) (i, c)];
+        if (!line.any((p) => open(p.$1, p.$2))) {
+          return StuckLine(StuckKind.row, i, line);
         }
-        if (!any) return true;
       }
     }
-    return false;
+    for (var i = 0; i < n; i++) {
+      if (!colDone(i)) {
+        final line = [for (var r = 0; r < n; r++) (r, i)];
+        if (!line.any((p) => open(p.$1, p.$2))) {
+          return StuckLine(StuckKind.column, i, line);
+        }
+      }
+    }
+    for (var g = 0; g < n; g++) {
+      if (!regionDone(g)) {
+        final area = [
+          for (var r = 0; r < n; r++)
+            for (var c = 0; c < n; c++)
+              if (puzzle.region[r][c] == g) (r, c),
+        ];
+        if (!area.any((p) => open(p.$1, p.$2))) {
+          return StuckLine(StuckKind.color, g, area);
+        }
+      }
+    }
+    return null;
   }
 
   /// 화면 가장자리 표시용 — 그 행/열/구역에 고양이가 있나.
