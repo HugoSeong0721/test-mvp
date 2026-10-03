@@ -85,9 +85,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       value: kind,
                       onChanged: (k) {
                         unfocus();
-                        setState(() => kind = k);
+                        setState(() {
+                          kind = k;
+                          collapsed = false;
+                        });
                         store.setKind(k);
-                        if (_scroll.hasClients) _scroll.jumpTo(0);
+                        // 새 목록이 그려진 뒤 맨 위로 (먼저 올리면 바뀐 목록 길이에 밀려 중간에 멈춘다)
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scroll.hasClients) _scroll.jumpTo(0);
+                        });
                       },
                     ),
                   ),
@@ -116,20 +122,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: unfocus,
-                child: ListView(
+                child: KeyedSubtree(
                   key: const Key('form'),
-                  controller: _scroll,
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                  children: [
-                    _loanCard(tk),
-                    if (s.hasFees) _feesCard(tk, res),
-                    if (valid) _breakdownCard(tk, res, effect),
-                    if (valid) _extraCard(tk, res, effect),
-                    if (valid) _scheduleButton(tk, res, effect),
-                    _footer(tk),
-                  ],
+                  // 종류마다 새 목록 — 같은 키 카드(내역·추가 상환)를 옛 위치째 재사용하면
+                  // 맨 위로 올려도 스크롤이 중간에 멈춘다 (로봇이 380px 에서 멈추는 걸 잡음)
+                  child: ListView(
+                    key: ValueKey(kind),
+                    controller: _scroll,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                    children: [
+                      _loanCard(tk),
+                      if (s.hasFees) _feesCard(tk, res),
+                      if (valid) _breakdownCard(tk, res, effect),
+                      if (valid) _extraCard(tk, res, effect),
+                      if (valid) _scheduleButton(tk, res, effect),
+                      _footer(tk),
+                    ],
+                  ),
                 ),
               ),
             ),

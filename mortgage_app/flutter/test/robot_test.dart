@@ -66,6 +66,7 @@ Future<void> boot(
   Map<String, Object> prefs = const {},
   Brightness brightness = Brightness.light,
   bool resetPrefs = true,
+  Ads? ads,
 }) async {
   await t.runAsync(loadFonts);
   final (size, ratio, bottom) = devices[device]!;
@@ -77,7 +78,7 @@ Future<void> boot(
   addTearDown(t.view.reset);
   addTearDown(t.platformDispatcher.clearPlatformBrightnessTestValue);
   if (resetPrefs) SharedPreferences.setMockInitialValues(prefs);
-  Ads.i = FakeAds();
+  Ads.i = ads ?? FakeAds();
   await AppStore.i.load();
   AppStore.i.clock = () => DateTime(2026, 10, 2, 9);
   await t.pumpWidget(const MortgageApp());

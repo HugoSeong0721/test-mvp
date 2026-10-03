@@ -17,6 +17,7 @@ Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | "괜찮은거같은데 … 쓰는사람은뭐 괜찮지않을까" → "응 아직괜찮아 앱으로낼수잇니" | 출시 진행. 스토어 스크린샷 5장(1290×2796, 로봇이 찍은 화면 + 제목) 만들다 **버그 발견·수정**: 아래로 내린 뒤 대출 종류를 바꾸면 맨 위로 안 가고 380px 아래에서 멈춤(같은 키 카드를 옛 위치째 재사용) → 종류마다 새 목록, 로봇 테스트 추가(고치기 전 실패 확인). 새 빌드 업로드 → 등록 정보 API 입력 |
 | 10-03 | TestFlight 빌드 18 실기기 스크린샷(다크) + "저기 맨밑에 광고배너자리가 잇는건가" | 맞음 — 배너 자리(높이 60 + 홈 막대 여백)를 미리 비워 둠(광고가 늦게 와도 화면이 안 출렁이게). 새 광고 단위·스토어 미출시라 아직 광고 없음. **자기 광고 누르지 말 것**(AdMob 정책) 안내. 실기기에서 앱 실행·입력·다크 모드 정상 확인됨 |
 | 10-03 | "했어" (ASC 앱 레코드 생성) | `Release iOS`(mortgage) 실행 → 1차 pub get 실패(sdk ^3.13.5) → ^3.13.2 로 고쳐 빌드 18 업로드 성공 |
 | 10-03 | 광고 단위 완료 화면 캡처 + "앱 이름 고치기 했어" | iOS 앱 ID `ca-app-pub-4724352880074547~9582805496`(Info.plist), 배너 `…/4605810985`(ads.dart) 반영. 안드로이드는 테스트 ID 유지. AdMob 앱 이름 Glance Mortgage 로 수정됨 |
@@ -32,6 +33,7 @@ Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 
 - **잘린 글자·칸을 로봇이 자동으로 잡게** (`mortgage_app/flutter/test/robot_test.dart` 의 `expectNoTruncatedText`·`expectNoClippedFields`):
   화면의 모든 `RenderParagraph.didExceedMaxLines`(… 로 잘림) + 모든 `RenderEditable` 의 `getMaxIntrinsicWidth` > 칸 폭(입력 숫자 잘림)을 검사.
   "18.75 %" 가 "18.7" 로, 비싼 집에서 "Principal & intere…" 로 잘리던 걸 잡았고, 고치기 전 코드에서 실패하는 것도 확인. **큰 값($2.5M)·3개 기기로 돌릴 것** — 작은 값·한 기기에선 안 보였다.
+- **ListView 자식을 조건부로 바꿀 때 같은 Key 를 가진 카드가 남아 있으면** 옛 위치째 재사용돼 `jumpTo(0)` 이 중간(380px)에서 멈춘다 → 바뀌는 목록 자체에 `ValueKey(모드)`.
 - **VoiceOver 칸 중복**: `Semantics(textField: true)` 로 `TextField` 를 감싸면 입력 칸이 두 개로 읽힌다 → `MergeSemantics` + 앞뒤 글자 `ExcludeSemantics`.
   로봇: `find.semantics.byPredicate((n) => n.flagsCollection.isTextField)` 개수 == `EditableText` 개수.
 - **숫자 키패드엔 완료 키가 없다** → 키보드 위 Done 막대(이전/다음 칸 포함). `FocusScope.nextFocus()` 는 다음 마이크로태스크에 반영돼서
