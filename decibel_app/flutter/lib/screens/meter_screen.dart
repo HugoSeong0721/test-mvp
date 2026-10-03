@@ -201,6 +201,13 @@ class _MeterScreenState extends State<MeterScreen> with WidgetsBindingObserver {
     ),
   );
 
+  void _openGuide() => _open(
+    GuideScreen(
+      current: ctl.hasData ? ctl.engine!.current : null,
+      unit: (ctl.engine?.weighting ?? AppStore.i.weighting).unit,
+    ),
+  );
+
   Widget _likeChip(double? cur) {
     final band = cur == null ? null : bandOf(cur);
     final text = switch (ctl.state) {
@@ -212,16 +219,12 @@ class _MeterScreenState extends State<MeterScreen> with WidgetsBindingObserver {
     return Semantics(
       button: true,
       label: 'Sound level guide. $text',
+      onTap: _openGuide,
       excludeSemantics: true,
       child: InkWell(
         key: const Key('guide'),
         borderRadius: BorderRadius.circular(22),
-        onTap: () => _open(
-          GuideScreen(
-            current: cur,
-            unit: (ctl.engine?.weighting ?? AppStore.i.weighting).unit,
-          ),
-        ),
+        onTap: _openGuide,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(

@@ -453,6 +453,8 @@ class RoundButton extends StatelessWidget {
       button: true,
       enabled: enabled,
       label: label,
+      // excludeSemantics 로 아래 GestureDetector 의 동작까지 지워지므로 VoiceOver 용 tap 을 여기 단다
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,
