@@ -1,15 +1,18 @@
 # Glance dB: Decibel Meter (소음 측정기, decibel 앱) — 개발 세션 게시판
-마지막 갱신: 2026-10-03 18:50 (KST)
+마지막 갱신: 2026-10-03 19:03 (KST)
 
 ## 지금 상태 (3줄 이내)
 Flutter 1차 완성(`decibel_app/flutter/`): 측정·비유표·리포트(이미지 공유)·기록·설정. 테스트 27개 통과(엔진 14 + 로봇 13, VoiceOver 버튼 검사 포함).
 웹 미리보기 `docs/decibel-app/` — 폰 브라우저에서 **진짜 마이크로** 측정된다. 광고는 배너만(iOS 실제 AdMob ID).
-이름·번들 확정·Apple 등록, ASC 앱 레코드·AdMob 배너(사용자) 완료 → 실제 광고 ID 반영, `Release iOS`(decibel) 업로드 중.
+**TestFlight 빌드 19 업로드 완료** (Release iOS run 37114360512, "Upload succeeded"). 사용자 설치·'느낌' 피드백 + 보정값 실기기 확인 대기.
 
 ## 다음 할 일 / 사용자에게 받을 것
 - ✅ 이름 A `Glance dB: Decibel Meter` / 번들 `com.soulfulfill.decibel` (사용자 확인) → ✅ Apple 번들 ID 등록 (Actions run 37065279691 로그 "새로 등록함").
 - ✅ [사용자] ASC 앱 레코드(id 6818761495, Actions 로 "있음" 확인), ✅ AdMob 앱(iOS)·배너 단위 → 앱 ID `~4858015861`·배너 `/4222667601` 반영 (안드로이드는 테스트 ID 유지).
-- [세션] `Release iOS`(decibel) → TestFlight 처리 → 사용자 설치 안내.
+- ✅ [세션] `Release iOS`(decibel) → 빌드 19 업로드 성공 (iOS 첫 컴파일 통과: record·audio_session SwiftPM 문제없음). 같은 실행이 2번째 시도로 성공 — 1번째 시도를 누가 왜 다시 돌렸는지는 확인 못 함.
+- [사용자] App Store Connect → Glance dB → TestFlight → 내부 테스트 그룹(＋) → 본인 추가 → 빌드 19 → 메일의 "View in TestFlight" 로 설치.
+  써 볼 것: 조용한 방 / 대화 / TV 크게 — 숫자가 그럴듯한지, 리포트 저장·공유, 기록. (배너는 새 AdMob 앱이라 비어 있을 수 있음 — 정상)
+- [세션, 피드백 오면] 보정값(+94) 조정, 스크린샷 1290×2796 실측으로, `ios-metadata.json` → 심사(메모 6항목 + 실기기 녹화).
 - (완료된 안내) App Store Connect → 앱 → ＋ → 신규 앱: 플랫폼 iOS / 이름 `Glance dB: Decibel Meter` / 기본 언어 English (U.S.) /
   번들 ID `com.soulfulfill.decibel` 선택 / SKU `decibel` / 사용자 액세스 Full Access → 생성.
 - [사용자] AdMob(**soulfulfillable 계정**, 게시자 ID pub-4724352880074547) → 앱 → 앱 추가 → iOS → "스토어에 등록되지 않음" → 이름 `Glance dB`
