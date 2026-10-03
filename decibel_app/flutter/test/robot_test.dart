@@ -10,6 +10,10 @@ import 'package:decibel/core/share.dart';
 import 'package:decibel/core/store.dart';
 import 'package:decibel/main.dart';
 import 'package:flutter/material.dart';
+
+import 'dart:ui' show Tristate;
+
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -87,6 +91,30 @@ void noKorean(WidgetTester t, String screen) {
     final s = (e.widget as RichText).text.toPlainText();
     expect(ko.hasMatch(s), isFalse, reason: 'Korean text on $screen: $s');
   }
+}
+
+/// VoiceOver 로도 누를 수 있나: 버튼인데 tap 동작이 없는 접근성 노드가 있으면 실패.
+/// (연비 앱 세션이 찾은 문제 — Semantics(excludeSemantics) 로 감싸면 누르기 동작이 사라진다)
+void expectButtonsTappable(WidgetTester t, String where) {
+  final sem = t.ensureSemantics();
+  final bad = <String>[];
+  void visit(SemanticsNode n) {
+    final d = n.getSemanticsData();
+    final f = d.flagsCollection;
+    final disabled = f.isEnabled == Tristate.isFalse;
+    if (f.isButton && !d.hasAction(SemanticsAction.tap) && !disabled) {
+      bad.add(d.label);
+    }
+    n.visitChildren((c) {
+      visit(c);
+      return true;
+    });
+  }
+
+  visit(t.binding.renderViews.first.owner!.semanticsOwner!.rootSemanticsNode!);
+  sem.dispose();
+  expect(bad, isEmpty, reason: '$where: buttons without a tap action: $bad');
+  pressed.add('VoiceOver tappable: $where');
 }
 
 Future<void> finish(WidgetTester t) async {
@@ -515,6 +543,7 @@ void main() {
       final (size, ratio) = d.value;
       await boot(t, size: size, ratio: ratio, prefs: const {});
       noKorean(t, 'Intro @${d.key}');
+      expectButtonsTappable(t, 'Intro');
       await press(
         t,
         find.byKey(const Key('intro-continue')),
@@ -530,16 +559,22 @@ void main() {
         lessThanOrEqualTo(banner.top),
         reason: 'controls overlap the ad',
       );
+      expectButtonsTappable(t, 'Meter (running)');
       await press(t, find.byKey(const Key('report')), 'Meter: Report');
+      expectButtonsTappable(t, 'Report');
       await back(t, 'Report');
       await press(t, find.byKey(const Key('guide')), 'Meter: Level guide chip');
+      expectButtonsTappable(t, 'Guide');
       await back(t, 'Guide');
       await press(t, find.byKey(const Key('settings')), 'Meter: Settings');
+      expectButtonsTappable(t, 'Settings');
       await back(t, 'Settings');
       await press(t, find.byKey(const Key('history')), 'Meter: History');
+      expectButtonsTappable(t, 'History');
       await back(t, 'History');
       await press(t, find.byKey(const Key('main')), 'Meter: Pause');
       expect(find.byKey(const Key('notice')), findsOneWidget);
+      expectButtonsTappable(t, 'Meter (paused)');
       await finish(t);
     });
   }
