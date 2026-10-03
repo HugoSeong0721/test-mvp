@@ -17,6 +17,7 @@
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | "근데 state 에서도 county 마다 텍스가 다른데 그건 왜 없어 넣는게" | 처음엔 데이터 양·검증 때문에 보류했으나 공식 출처(인구조사국 ACS 표 단위 요약 파일, 키 불필요)를 Actions 로 받아 3,135곳 반영. 주 고른 뒤 County 검색 선택, 재산세 \$10,000+ 상한에 걸린 17곳은 '더 높을 수 있음' 표시 |
 | 10-03 | "엑스트라 페이에서 기간 넣으면 너무 복잡해지려나. 언제부터 언제까지 얼마더 … 비판적으로. 경쟁사 참고해서" → "저거는 넣지말자 세분화하는거" + 시작 달·한 번 크게 갚기·격주 납부 선택 | 구간 여러 개는 안 넣음(폰 입력·결과 흐림·경쟁 앱 근거). 1.1 에 3가지 추가 |
 | 10-03 | "근데 state, county 별로 텍스가 다르잖아 그거도 선택할수 잇게 해야하지 않겠나?" → 주 50+DC (추천) / 1.0 먼저 제출, 주 선택은 1.1 (추천) | 1.1 작업 시작: 공식 통계로 주별 재산세율·판매세율 표, 주 고르면 자동 입력(직접 수정 가능). 카운티는 보류 |
 | 10-03 | "괜찮은거같은데 … 쓰는사람은뭐 괜찮지않을까" → "응 아직괜찮아 앱으로낼수잇니" | 출시 진행. 스토어 스크린샷 5장(1290×2796, 로봇이 찍은 화면 + 제목) 만들다 **버그 발견·수정**: 아래로 내린 뒤 대출 종류를 바꾸면 맨 위로 안 가고 380px 아래에서 멈춤(같은 키 카드를 옛 위치째 재사용) → 종류마다 새 목록, 로봇 테스트 추가(고치기 전 실패 확인). 새 빌드 업로드 → 등록 정보 API 입력 |
@@ -36,6 +37,8 @@
   화면의 모든 `RenderParagraph.didExceedMaxLines`(… 로 잘림) + 모든 `RenderEditable` 의 `getMaxIntrinsicWidth` > 칸 폭(입력 숫자 잘림)을 검사.
   "18.75 %" 가 "18.7" 로, 비싼 집에서 "Principal & intere…" 로 잘리던 걸 잡았고, 고치기 전 코드에서 실패하는 것도 확인. **큰 값($2.5M)·3개 기기로 돌릴 것** — 작은 값·한 기기에선 안 보였다.
 - **ListView 자식을 조건부로 바꿀 때 같은 Key 를 가진 카드가 남아 있으면** 옛 위치째 재사용돼 `jumpTo(0)` 이 중간(380px)에서 멈춘다 → 바뀌는 목록 자체에 `ValueKey(모드)`.
+- **미국 인구조사국 API 는 이제 키가 필요**(키 없이 부르면 HTML 'Missing Key'). 키 없이: `www2.census.gov/programs-surveys/acs/summary_file/<연도>/table-based-SF/data/5YRData/acsdt5y<연도>-<표>.dat` (| 구분, GEO_ID `0500000US…` = 카운티) + `documentation/Geos<연도>5YR.txt`(이름). 이 환경에선 census 가 막혀 Actions(`fetch-census.yml`)로 받아 데이터 브랜치에.
+- **테스트에서 `WidgetController.hitTestWarningShouldBeFatal = true`** — 화면 밖 칸을 '눌렀다'고 통과하던 걸 잡는다(시트 맨 아래 줄).
 - **주별 세율 같은 공공 데이터**: 이 환경은 taxfoundation.org·census.gov 직접 열기가 막혀 있다. 조사 에이전트가 사이트 한정 검색 요약 + 같은 표를 재배포한 npm 패키지(`us-property-tax-data`)로 교차 확인했다. 원본 표는 `mortgage_app/store/state_rates.json` 에 출처와 같이 둔다.
 - **VoiceOver 칸 중복**: `Semantics(textField: true)` 로 `TextField` 를 감싸면 입력 칸이 두 개로 읽힌다 → `MergeSemantics` + 앞뒤 글자 `ExcludeSemantics`.
   로봇: `find.semantics.byPredicate((n) => n.flagsCollection.isTextField)` 개수 == `EditableText` 개수.

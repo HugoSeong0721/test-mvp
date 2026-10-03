@@ -113,9 +113,9 @@ The app does not offer loans, collect financial information or show live interes
 ## Version 1.1 — What's New (1.0 승인 뒤 새 버전 만들 때 붙여넣기)
 
 ```
-• Choose your state to fill in its average property tax rate (or sales tax for car loans). You can still edit the rate for your county.
+• Choose your state and county to fill in the local property tax rate (or your state's sales tax for car loans). You can still edit the rate.
 • Start extra payments in a later month.
 • Add a one-time payment, like a bonus or tax refund.
 • Bi-weekly option: pay half every 2 weeks and see how much sooner you're debt-free.
 ```
-- 주별 세율 출처: Tax Foundation 2026 (`mortgage_app/store/state_rates.json`). 설명(Description) ■ PAY OFF 절에 위 3가지를 한 줄씩 추가할 것.
+- 주별 세율 출처: Tax Foundation 2026 (`mortgage_app/store/state_rates.json`). 카운티 재산세: 인구조사국 ACS 2024 5년 (`county_rates.json`, 3,135곳). 설명(Description) ■ PAY OFF 절에 위 3가지를 한 줄씩 추가할 것.

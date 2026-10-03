@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'robot_test.dart' as r;
 
 void main() {
+  setUpAll(() => WidgetController.hitTestWarningShouldBeFatal = true);
   testWidgets('switching loan type after scrolling lands at the top', (
     t,
   ) async {

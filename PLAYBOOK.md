@@ -59,6 +59,8 @@
 
 | 날짜 | 앱 | 무슨 일이 있었나 | 다음엔 이렇게 |
 |---|---|---|---|
+| 2026-10-03 | 대출 | 인구조사국 API 가 키 없이 'Missing Key' HTML 을 돌려줌 + 이 환경에서 census 차단 | 키 없는 ACS 표 단위 요약 파일(.dat)을 Actions 로 받아 데이터 브랜치에 (`tools/mortgage/fetch_census_counties.py`) |
+| 2026-10-03 | 대출 | 테스트가 화면 밖(시트 맨 아래) 항목을 탭하고도 경고만 내고 진행 | `WidgetController.hitTestWarningShouldBeFatal = true` 로 실패시키기 |
 | 2026-10-03 | 대출 | 로컬 Flutter 3.47.6 으로 `flutter create` → `sdk: ^3.13.5` 가 박혀 Actions(Flutter 3.47.2, Dart 3.13.2)의 `Release iOS` 가 `pub get` 에서 실패 | 새 앱은 `pubspec.yaml` 의 `sdk:` 를 CI 버전(`^3.13.2`)에 맞춘다. 로컬도 workflow 의 `flutter-version` 과 같은 버전을 깔면 더 안전 |
 | 2026-10-03 | 연비 | 주유를 저장해도 기록 탭 숫자가 그대로 — 위에서 `ListenableBuilder` 로 감쌌지만 `const HomeShell()`·`const _Summary()` 는 **같은 const 위젯이라 다시 안 그려짐** | 저장소를 읽는 화면은 **각자 구독**(`build` 를 `ListenableBuilder` 로)하거나 바뀌는 데이터를 인자로 넘긴다. 로봇이 "저장 → 화면 숫자" 를 검사해서 잡았다 |
 | 2026-10-03 | 연비 | 거리 알림의 예상 날짜가 이미 지난 날(기록이 뜸할 때) → `notifyAt` 이 과거라 **알림이 예약조차 안 됨**. 테스트는 통과, **스크린샷의 "about Sep 29"(오늘 Oct 2)** 로 발견 | 예상일은 오늘보다 앞이면 오늘로, 알림은 다음 날 아침. 로봇에 "알림 켠 정비는 전부 미래 시각에 예약됐나" 검사. 고치기 전 실패 확인 |

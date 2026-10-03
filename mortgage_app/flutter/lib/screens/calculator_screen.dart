@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../core/ads.dart';
+import '../core/counties.dart';
 import '../core/format.dart';
 import '../core/loan.dart';
 import '../core/states.dart';
@@ -413,6 +414,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     child: Column(
                       children: [
                         _stateRow(tk, forSales: false),
+                        if (countiesOf(s.stateCode).length > 1) _countyRow(tk),
                         FieldRow(
                           label: 'Property tax',
                           hint: _taxHint(),
@@ -932,6 +934,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   );
 
   String _taxHint() {
+    final co = countyOf(s.stateCode, s.countyName);
+    if (co != null && s.taxIsPercent && s.tax == co.rate) {
+      return co.capped
+          ? '${co.name} · may be higher'
+          : '${co.name} average · per year';
+    }
     final st = stateByCode(s.stateCode);
     if (st != null && s.taxIsPercent && s.tax == st.propertyTax) {
       return '${st.name} average · per year';
@@ -961,6 +969,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           final picked = await pickState(context, s.stateCode);
           if (picked == null) return;
           update((s) {
+            if (s.stateCode != picked.code) s.countyName = null;
             s.stateCode = picked.code;
             if (forSales) {
               s.salesTax = picked.combinedSalesTax;
@@ -973,6 +982,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       ),
     );
   }
+
+  Widget _countyRow(Tk tk) => FieldRow(
+    label: 'County',
+    hint: 'Fills in property tax',
+    child: _PickerButton(
+      key: const Key('f-county'),
+      text: s.countyName ?? 'Choose',
+      onTap: () async {
+        unfocus();
+        final picked = await pickCounty(context, s.stateCode!, s.countyName);
+        if (picked == null) return;
+        update((s) {
+          s.countyName = picked.name;
+          s.tax = picked.rate;
+          s.taxIsPercent = true;
+        });
+      },
+    ),
+  );
 
   Future<void> _pickLoanMonth(
     String title,
@@ -1417,5 +1445,139 @@ Future<UsState?> pickState(BuildContext context, String? current) {
         ),
       );
     },
+  );
+}
+
+/// 카운티 고르기 — 위에 검색 칸 (텍사스는 254곳).
+Future<County?> pickCounty(
+  BuildContext context,
+  String state,
+  String? current,
+) {
+  final all = countiesOf(state);
+  var query = '';
+  return showModalBottomSheet<County>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Tk.of(context).surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (c) => StatefulBuilder(
+      builder: (c, setSheet) {
+        final tk = Tk.of(c);
+        final q = query.trim().toLowerCase();
+        final list = q.isEmpty
+            ? all
+            : all.where((x) => x.name.toLowerCase().contains(q)).toList();
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(c).bottom),
+          child: SafeArea(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(c).height * 0.8,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Choose your county',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: tk.text,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          key: const Key('county-close'),
+                          onPressed: () => Navigator.pop(c),
+                          child: const Text('Cancel'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                    child: TextField(
+                      key: const Key('county-search'),
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        hintText: 'Search counties',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        isDense: true,
+                        filled: true,
+                        fillColor: tk.surface2,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onChanged: (v) => setSheet(() => query = v),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 6),
+                    child: Text(
+                      'Median property tax ÷ median home value ($countySource). Your home may differ — you can edit the rate.',
+                      style: TextStyle(fontSize: 12, color: tk.muted),
+                    ),
+                  ),
+                  Expanded(
+                    child: list.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No county found',
+                              style: TextStyle(color: tk.muted),
+                            ),
+                          )
+                        : ListView.builder(
+                            key: const Key('county-list'),
+                            itemCount: list.length,
+                            itemExtent: 56,
+                            itemBuilder: (c, k) {
+                              final co = list[k];
+                              final sel = co.name == current;
+                              return ListTile(
+                                key: Key('county-${co.name}'),
+                                selected: sel,
+                                selectedColor: tk.accent,
+                                title: Text(
+                                  co.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: sel
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Property tax ${trimNum(co.rate, 2)}%${co.capped ? ' or more' : ''}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: tk.muted,
+                                  ),
+                                ),
+                                trailing: sel
+                                    ? Icon(
+                                        Icons.check_rounded,
+                                        color: tk.accent,
+                                      )
+                                    : null,
+                                onTap: () => Navigator.pop(c, co),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ),
   );
 }

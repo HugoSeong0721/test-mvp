@@ -25,6 +25,7 @@ class Scenario {
     this.tradeIn = 0,
     this.salesTax = 0,
     this.stateCode,
+    this.countyName,
     this.extraFromYear = 0,
     this.extraFromMonth = 0,
     this.lump = 0,
@@ -63,6 +64,9 @@ class Scenario {
 
   /// 고른 주 (없으면 null). 고르면 재산세율·판매세율이 채워지고, 그 뒤 직접 고칠 수 있다.
   String? stateCode;
+
+  /// 고른 카운티 (집 대출만). 고르면 그 카운티 재산세율이 채워진다.
+  String? countyName;
 
   /// 매달 추가 상환 시작 달 (0 = 첫 납입부터).
   int extraFromYear, extraFromMonth;
@@ -153,6 +157,7 @@ class Scenario {
     'tradeIn': tradeIn,
     'salesTax': salesTax,
     'stateCode': ?stateCode,
+    'countyName': ?countyName,
     'extraFromYear': extraFromYear,
     'extraFromMonth': extraFromMonth,
     'lump': lump,
@@ -196,6 +201,7 @@ class Scenario {
       tradeIn: n('tradeIn', d.tradeIn),
       salesTax: n('salesTax', d.salesTax),
       stateCode: j['stateCode'] is String ? j['stateCode'] as String : null,
+      countyName: j['countyName'] is String ? j['countyName'] as String : null,
       extraFromYear: j['extraFromYear'] is int ? j['extraFromYear'] as int : 0,
       extraFromMonth:
           (j['extraFromMonth'] is int ? j['extraFromMonth'] as int : 0).clamp(

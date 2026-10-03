@@ -211,6 +211,7 @@ Future<void> finish(WidgetTester t) async {
 }
 
 void main() {
+  setUpAll(() => WidgetController.hitTestWarningShouldBeFatal = true);
   tearDownAll(() {
     // ignore: avoid_print
     print(

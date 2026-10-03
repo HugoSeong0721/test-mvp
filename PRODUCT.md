@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | Glance Mortgage 1.1 에 **카운티(3,135곳)도 넣음** — 인구조사국 ACS 2024 (재산세 중앙값 ÷ 집값 중앙값), 주 고른 뒤 검색해서 선택 | 사용자 "county 마다 텍스가 다른데 그건 왜 없어 넣는게". 공식 데이터를 Actions 로 받을 수 있어 정확도 문제 해결 |
 | 2026-10-03 | 경로 퍼즐 이름 **Kitty Path: Number Puzzle** (부제 Daily One Line Logic Game), 번들 `com.soulfulfill.kittypath` Apple 등록 완료 | 사용자: 둘 다 추천안. Kitty Queens 와 고양이 시리즈, 검색어 number puzzle·daily·one line·logic. "Zip" 은 LinkedIn 상표 출원이라 제외 |
 | 2026-10-03 | 솔루나 앱 이름 **Glance Solunar: Fishing Times** (부제 Hunting Times & Moon Phases), 번들 ID `com.soulfulfill.solunar` 등록 실행 | 사용자: 둘 다 추천안. 1·2위 검색어 solunar + fishing times 를 이름에, hunting times 는 부제에. Glance 시리즈 통일 |
 | 2026-10-03 | Glance Mortgage 추가 상환: **구간 여러 개(언제~언제 얼마) 안 넣음**. 1.1 에 시작 달·한 번 크게 갚기·격주 납부 3가지만 | 폰 입력 부담·핵심 한 줄이 흐려짐·기능 많은 경쟁 앱(Karl's 평가 124개)이 평가를 못 받음. 사용자 "세분화하는거 넣지말자" + 3가지 선택 |

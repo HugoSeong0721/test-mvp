@@ -2,6 +2,7 @@
 // 모든 기기에서 새 칸이 잘리지 않는지도 본다.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mortgage/core/counties.dart';
 import 'package:mortgage/core/format.dart';
 import 'package:mortgage/core/loan.dart';
 import 'package:mortgage/core/states.dart';
@@ -23,12 +24,16 @@ Future<void> pickState(WidgetTester t, String code) async {
     300,
     scrollable: list.first,
   );
+  await t.ensureVisible(find.byKey(Key('state-$code')));
+  await t.pumpAndSettle();
   await t.tap(find.byKey(Key('state-$code')));
   r.pressed.add('State $code');
   await t.pumpAndSettle();
 }
 
 void main() {
+  // 화면 밖·가려진 곳을 눌러 놓고 '통과'하는 일이 없게
+  setUpAll(() => WidgetController.hitTestWarningShouldBeFatal = true);
   test('state table: 51 entries, sane ranges, no-sales-tax states', () {
     expect(usStates.length, 51);
     expect(usStates.map((s) => s.code).toSet().length, 51);
@@ -188,6 +193,72 @@ void main() {
       await r.pressKey(t, 'kind-LoanKind.auto', 'Auto');
       await pickState(t, 'NY');
       r.expectNoTruncatedText(t, 'auto state $device');
+      await r.finish(t);
+    }
+  });
+
+  test('county table: every state has counties, sane rates', () {
+    var total = 0;
+    for (final st in usStates) {
+      final cs = countiesOf(st.code);
+      expect(cs, isNotEmpty, reason: st.code);
+      total += cs.length;
+      for (final c in cs) {
+        expect(
+          c.rate,
+          inInclusiveRange(0.05, 4),
+          reason: '${st.code} ${c.name}',
+        );
+      }
+    }
+    expect(total, greaterThan(3000));
+    expect(countyOf('TX', 'Harris County')!.rate, 1.62);
+    expect(countiesOf('XX'), isEmpty);
+  });
+
+  testWidgets('mortgage: state then county fills county property tax', (
+    t,
+  ) async {
+    for (final device in r.devices.keys) {
+      await r.boot(t, device: device);
+      final s = r.sc(LoanKind.mortgage);
+      await r.pressKey(t, 'fees-toggle', 'fees open');
+      expect(
+        find.byKey(const Key('f-county')),
+        findsNothing,
+        reason: 'county after state',
+      );
+      await pickState(t, 'TX');
+      await r.pressKey(t, 'f-county', 'County picker');
+      expect(find.text('Choose your county'), findsOneWidget);
+      await t.enterText(find.byKey(const Key('county-search')), 'harr');
+      await t.pumpAndSettle();
+      r.pressed.add('County search');
+      expect(find.byKey(const Key('county-Harris County')), findsOneWidget);
+      expect(find.byKey(const Key('county-Travis County')), findsNothing);
+      if (device.startsWith('iPhone 13')) await r.shot(t, '32_county_search');
+      await t.tap(find.byKey(const Key('county-Harris County')));
+      await t.pumpAndSettle();
+      r.pressed.add('County Harris');
+      expect(s.countyName, 'Harris County');
+      expect(s.tax, 1.62);
+      expect(find.text('Harris County average · per year'), findsOneWidget);
+      expect(r.monthlyText(t), r.expectedMonthly(LoanKind.mortgage));
+      r.expectNoTruncatedText(t, 'county row $device');
+      // 검색 결과 없음 + 취소
+      await r.pressKey(t, 'f-county', 'County picker');
+      await t.enterText(find.byKey(const Key('county-search')), 'zzzz');
+      await t.pumpAndSettle();
+      expect(find.text('No county found'), findsOneWidget);
+      await r.press(t, find.byKey(const Key('county-close')), 'County: Cancel');
+      expect(s.countyName, 'Harris County');
+      // 주를 바꾸면 카운티는 지워진다
+      await pickState(t, 'NJ');
+      expect(s.countyName, isNull);
+      expect(s.tax, 1.88);
+      // DC 는 카운티가 하나라 행이 안 보인다
+      await pickState(t, 'DC');
+      expect(find.byKey(const Key('f-county')), findsNothing);
       await r.finish(t);
     }
   });
