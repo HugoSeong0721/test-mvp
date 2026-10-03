@@ -15,6 +15,10 @@
 
 ## 이미 만들어진 공용 도구 (다시 만들지 말 것)
 
+- ⚠️ **`Release iOS` 는 대기 줄이 1칸뿐이다** (concurrency group `release-ios`). 다른 앱이 돌고 있을 때 새로 누르면 **이미 대기 중이던 다른 앱 실행이 취소된다.**
+  누르기 전에 Actions 목록에서 `pending`/`queued` 인 Release iOS 가 있는지 보고, 있으면 그게 시작(in_progress)될 때까지 기다린다.
+  (물때 세션이 10-03 에 소음 측정기 대기분을 이렇게 취소시켰다 → 바로 내 것 취소 + 그 실행 re-run 으로 되돌림.)
+
 - `Release iOS` · `App Store 등록 정보 채우기` 워크플로: **앱 선택형으로 일반화됨** (Catdoku 세션, 2026-10-02).
   새 앱은 선택지(`options:`)에 자기 앱 이름만 추가한다 — 번들 ID 는 `com.soulfulfill.<이름>` 규칙으로 자동 (mortgage 세션, 10-03).
   번들 ID 가 이 규칙과 다르게 등록된 앱이 생기면 그때 매핑을 다시 넣는다.
