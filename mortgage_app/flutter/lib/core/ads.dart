@@ -4,14 +4,13 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'theme.dart';
 
-/// AdMob 광고 단위 ID.
-/// 아직 AdMob 에 이 앱을 만들지 않아 Google 공식 **테스트 ID** 를 쓴다.
-/// 콘솔에서 앱·광고 단위를 만들면 여기와 ios/Runner/Info.plist 의 GADApplicationIdentifier,
-/// android/app/src/main/AndroidManifest.xml 의 APPLICATION_ID 를 함께 바꾼다.
+/// AdMob 광고 단위 ID (soulfulfillable 계정, 앱 Glance Mortgage ~9582805496, 2026-10-03).
+/// iOS 는 실제 ID, 안드로이드는 아직 AdMob 앱이 없어 Google 공식 테스트 ID.
+/// 앱 ID 는 ios/Runner/Info.plist 의 GADApplicationIdentifier 와 짝.
 class AdIds {
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
   static String get banner => _ios
-      ? 'ca-app-pub-3940256099942544/2934735716'
+      ? 'ca-app-pub-4724352880074547/4605810985'
       : 'ca-app-pub-3940256099942544/6300978111';
 }
 

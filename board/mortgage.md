@@ -9,13 +9,14 @@ Flutter 1차 완성(`mortgage_app/flutter/`): 주택·자동차·개인 대출, 
 ## 다음 할 일 / 사용자에게 받을 것
 - ✅ [사용자] 이름 A `Glance: Mortgage Calculator`, 번들 `com.soulfulfill.mortgage` → ✅ [세션] 번들 Apple 등록.
 - [사용자] App Store Connect → 앱 → ＋ 신규 앱: iOS / `Glance: Mortgage Calculator` / English (U.S.) / `com.soulfulfill.mortgage` / SKU `mortgage` / Full Access.
-- [사용자] AdMob(**`soulfulfillable` 계정**) → 앱 추가(iOS, 스토어 미등록, 이름 Glance Mortgage) → 광고 단위 1개: 형식 **Banner**, 이름 `banner`. 완료 화면 캡처 주면 ID 반영.
+- ✅ [사용자] AdMob 앱(Glance Mortgage, `~9582805496`)·배너 `…/4605810985` → ✅ [세션] 코드 반영.
 - [사용자] 웹 미리보기 써 보고 '느낌' 한마디.
 - [세션] ASC 레코드 생기면 → `Release iOS`(app=mortgage) → TestFlight → 스크린샷 1290×2796 → `App Store 등록 정보 채우기`(`mortgage_app/store/ios-metadata.json` 준비됨).
 
 ## 사용자 피드백 기록 (최신이 위, 원문 인용 + 어떻게 반영했나)
 | 날짜 | 원문 | 반영 |
 |---|---|---|
+| 10-03 | 광고 단위 완료 화면 캡처 + "앱 이름 고치기 했어" | iOS 앱 ID `ca-app-pub-4724352880074547~9582805496`(Info.plist), 배너 `…/4605810985`(ads.dart) 반영. 안드로이드는 테스트 ID 유지. AdMob 앱 이름 Glance Mortgage 로 수정됨 |
 | 10-03 | AdMob 화면 캡처 2장 + "머지 완료 했더니 이화면나왓는데 맞는건가" | 앱이 이름 `banner` 로 만들어짐(광고 단위 이름을 앱 이름 칸에 넣음) → App settings 에서 이름 고치게 안내. 광고 형식 화면은 맞음 → **Banner** 카드 Select, 이름 `banner`. "Requires review" 는 스토어 연결 전 정상 |
 | 10-03 | 이름 A/B → "Glance: Mortgage Calculator (추천)", 번들 → "등록 (추천)" | 앱 안 이름·개인정보처리방침·웹 제목·스토어 문구 반영, `ios-metadata.json` 작성, Actions 로 번들 등록 완료 |
 | 10-03 | "대출·주택담보대출 계산기 앱 개발 시작해줘. plans/mortgage-app.md 기획서대로 하고, 시작 전에 PLAYBOOK.md 와 board/ 전체를 읽어. 네 게시판은 board/mortgage.md 야 — 내 피드백 받을 때마다, 단계 끝날 때마다 갱신해서 다른 세션들과 공유해줘." | 읽고 시작. 기획서 순서대로 ①조사 ②테스트 로봇 ③개발 ④광고(배너) ⑤워크플로까지. 이 파일을 단계마다 갱신 |
