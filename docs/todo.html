@@ -49,7 +49,8 @@ const apps=[
  {id:'speedometer',name:'Glance Speed: GPS Speedometer',bundle:'com.soulfulfill.speedometer',sku:'speedometer',admob:'Glance Speed'},
  {id:'tides',name:'Glance Tides: Tide Chart',bundle:'com.soulfulfill.tides',sku:'tides',admob:'Glance Tides',note:'번들 등록이 끝나야 목록에 떠요 — 물때 세션이 "번들 등록 완료" 하면 그때.'},
  {id:'fuellog',name:'Glance MPG: Gas Mileage Log',bundle:'com.soulfulfill.fuellog',sku:'fuellog',admob:'Glance MPG'},
- {id:'solunar',name:'Glance Solunar: Fishing Times',bundle:'com.soulfulfill.solunar',sku:'solunar',admob:'Glance Solunar',units:[['광고 단위 1 · Banner 카드','banner'],['광고 단위 2 · Rewarded 카드','rewarded_calendar']],note:'번들 등록 Actions 가 끝나야 목록에 떠요.'}
+ {id:'solunar',name:'Glance Solunar: Fishing Times',bundle:'com.soulfulfill.solunar',sku:'solunar',admob:'Glance Solunar',units:[['광고 단위 1 · Banner 카드','banner'],['광고 단위 2 · Rewarded 카드','rewarded_calendar']],note:'번들 등록 Actions 가 끝나야 목록에 떠요.'},
+ {id:'kittypath',name:'Kitty Path: Number Puzzle',bundle:'com.soulfulfill.kittypath',sku:'kittypath',admob:'Kitty Path',units:[['광고 단위 1 · Banner 카드','banner'],['광고 단위 2 · Rewarded 카드','rewarded_hint']]}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 function row(k,v){return `<div class="row"><span class="k">${k}</span><span class="v">${v}</span><button data-copy="${v}">복사</button></div>`}

@@ -48,7 +48,7 @@
 | **Glance: Mortgage Calculator** (대출 계산기, `mortgage_app/`, `plans/mortgage-app.md`, `board/mortgage.md`) | 2026-10-03 Flutter 1차 완성·테스트 20개 통과·웹 미리보기 `docs/mortgage-app/`. 번들 `com.soulfulfill.mortgage` 등록 | 빌드 22·등록 정보·스크린샷 입력 완료 (사용자 "괜찮은 것 같다, 앱으로 내자") | 사용자: App Privacy·연령·가격 → 심사 제출 → 승인 후 AdMob 스토어 연결 |
 | **Glance dB: Decibel Meter** (소음 측정기, `decibel_app/`, `plans/decibel-app.md`, `board/decibel.md`) | 2026-10-03 TestFlight 빌드 19 업로드. 테스트 27개 통과·웹 미리보기 `docs/decibel-app/`(진짜 마이크 측정). AdMob 배너 실제 ID | 사용자 TestFlight 느낌 → 보정값(+94) 실기기 확인 → 스크린샷·등록 정보 → 심사 |
 | **Kitty Queens: Cat Sudoku** (Catdoku 앱, `catdoku_app/`, `plans/catdoku-app.md`) | 2026-10-02 Flutter 1차 완성·테스트 로봇 17개 통과·웹 미리보기 `docs/catdoku-app/` | 번들 ID 등록 → ASC 앱 레코드·AdMob 앱(사용자) → TestFlight |
-| **한붓 경로 퍼즐** (`path_puzzle_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 35개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 이름 후보 A Kitty Path: Number Puzzle / B Number Trail: Logic Puzzle | 이름·번들 ID(사용자) → 번들 등록 → 아이콘·스토어 문구 → ASC 앱 레코드·AdMob → TestFlight |
+| **Kitty Path: Number Puzzle** (한붓 경로 퍼즐, `kittypath_app/`, `plans/path-puzzle-app.md`, `board/path-puzzle.md`) | 2026-10-03 Flutter 1차 완성·테스트 36개·웹 실제 터치 점검 24/24·웹 미리보기 `docs/path-puzzle-app/`. 번들 `com.soulfulfill.kittypath` Apple 등록 완료 | 아이콘·스토어 문구 → ASC 앱 레코드(사용자) → Release iOS → TestFlight → AdMob(제출 전) |
 | **Glance Solunar: Fishing Times** (낚시·사냥 시간, `solunar_app/`, `plans/solunar-app.md`, `board/solunar.md`) | 2026-10-03 Flutter 1차 완성·테스트 34개(PyEphem 대조 1,800건+)·웹 미리보기 `docs/solunar-app/`(오프라인 계산, 마을 2만 곳). 번들 `com.soulfulfill.solunar` | ASC 앱 레코드·AdMob 배너+보상형(사용자) → `Release iOS`(solunar) → TestFlight |
 | **Glance MPG: Gas Mileage Log** (연비·정비 기록, `fuellog_app/`, `plans/fuel-log-app.md`, `board/fuel-log.md`) | 2026-10-03 Flutter 1차 완성·테스트 47개 통과·웹 미리보기 `docs/fuel-log-app/`(`?demo=1` 예시). 번들 `com.soulfulfill.fuellog` | ASC 앱 레코드(사용자) → Release iOS → TestFlight → AdMob(제출 전) |
 | 웹 미니게임 9종 (`docs/*.html`) | 웹으로 공개 중 | 앱화 후보 고르기 (아래 백로그) |
@@ -81,6 +81,7 @@
 
 | 날짜 | 결정 | 이유 |
 |---|---|---|
+| 2026-10-03 | 경로 퍼즐 이름 **Kitty Path: Number Puzzle** (부제 Daily One Line Logic Game), 번들 `com.soulfulfill.kittypath` Apple 등록 완료 | 사용자: 둘 다 추천안. Kitty Queens 와 고양이 시리즈, 검색어 number puzzle·daily·one line·logic. "Zip" 은 LinkedIn 상표 출원이라 제외 |
 | 2026-10-03 | 솔루나 앱 이름 **Glance Solunar: Fishing Times** (부제 Hunting Times & Moon Phases), 번들 ID `com.soulfulfill.solunar` 등록 실행 | 사용자: 둘 다 추천안. 1·2위 검색어 solunar + fishing times 를 이름에, hunting times 는 부제에. Glance 시리즈 통일 |
 | 2026-10-03 | Glance Mortgage 추가 상환: **구간 여러 개(언제~언제 얼마) 안 넣음**. 1.1 에 시작 달·한 번 크게 갚기·격주 납부 3가지만 | 폰 입력 부담·핵심 한 줄이 흐려짐·기능 많은 경쟁 앱(Karl's 평가 124개)이 평가를 못 받음. 사용자 "세분화하는거 넣지말자" + 3가지 선택 |
 | 2026-10-03 | Glance Mortgage: 1.0 은 지금대로 심사 제출, **1.1 에 주(50+DC) 선택** → 재산세율(집)·판매세율(자동차) 자동 입력. 카운티는 데이터가 방대해 보류(% 직접 입력 유지) | 사용자 "state, county 별로 텍스가 다르잖아" → A/B 둘 다 추천안 |
