@@ -29,7 +29,9 @@ jobs:
           fi
 
       - name: Fetch ACS county data
-        run: python3 -u tools/mortgage/fetch_census_counties.py | tee -a "$GITHUB_STEP_SUMMARY"
+        run: |
+          set -o pipefail
+          python3 -u tools/mortgage/fetch_census_counties.py | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Commit
         run: |

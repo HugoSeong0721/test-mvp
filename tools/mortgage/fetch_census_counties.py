@@ -39,11 +39,14 @@ def main():
         url = (f'https://api.census.gov/data/{y}/acs/acs5'
                '?get=NAME,B25103_001E,B25077_001E&for=county:*&in=state:*')
         try:
-            with urllib.request.urlopen(url, timeout=60) as r:
-                data, year = json.load(r), y
-                break
+            req = urllib.request.Request(url, headers={'User-Agent': 'soulfulfill-mortgage-data/1.0'})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                raw = r.read().decode('utf-8', 'replace')
+            data, year = json.loads(raw), y
+            break
         except Exception as e:  # noqa: BLE001
             print('year', y, 'not available:', e)
+            print('  response head:', (locals().get('raw') or '')[:400].replace('\n', ' '))
     if data is None:
         raise SystemExit('no ACS year available')
     head, rows = data[0], data[1:]
